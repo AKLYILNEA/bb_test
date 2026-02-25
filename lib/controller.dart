@@ -871,7 +871,6 @@ class AppController {
       // Recovery steps
       await globalState.handleStop();
       await Future.delayed(const Duration(milliseconds: 750));
-      await applyProfile();
 
       if (autoRun) {
         commonPrint.log('Waiting for system stabilization...');
@@ -880,7 +879,11 @@ class AppController {
 
         commonPrint.log('Executing delayed AutoRun...');
         await updateStatus(true);
+        // Apply profile AFTER VPN
+        await applyProfile();
       } else {
+        // core in stopped state
+        await applyProfile();
         commonPrint.log('Waiting for user action...');
       }
 
