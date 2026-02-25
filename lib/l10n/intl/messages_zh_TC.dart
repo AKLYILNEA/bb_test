@@ -186,6 +186,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "defaultText": MessageLookupByLibrary.simpleMessage("預設"),
     "delay": MessageLookupByLibrary.simpleMessage("延遲"),
     "delayAnimation": MessageLookupByLibrary.simpleMessage("延遲動畫"),
+    "delayAnimationDesc": MessageLookupByLibrary.simpleMessage("自訂測試過程中的動畫顯示"),
     "delaySort": MessageLookupByLibrary.simpleMessage("按延遲排序"),
     "delete": MessageLookupByLibrary.simpleMessage("刪除"),
     "deleteMultipTip": m0,

@@ -89,6 +89,7 @@ class _DelayAnimationItem extends ConsumerWidget {
     return ListItem<DelayAnimationType>.options(
       leading: const Icon(Icons.animation),
       title: Text(appLocalizations.delayAnimation),
+      subtitle: Text(appLocalizations.delayAnimationDesc),
       delegate: OptionsDelegate(
         title: appLocalizations.delayAnimation,
         options: DelayAnimationType.values,

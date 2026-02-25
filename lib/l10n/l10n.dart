@@ -2044,6 +2044,16 @@ class AppLocalizations {
     );
   }
 
+  /// `Customize animation during delay testing`
+  String get delayAnimationDesc {
+    return Intl.message(
+      'Customize animation during delay testing',
+      name: 'delayAnimationDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Default`
   String get noAnimation {
     return Intl.message('Default', name: 'noAnimation', desc: '', args: []);

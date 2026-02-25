@@ -256,6 +256,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "defaultText": MessageLookupByLibrary.simpleMessage("Default"),
     "delay": MessageLookupByLibrary.simpleMessage("Delay"),
     "delayAnimation": MessageLookupByLibrary.simpleMessage("Delay Animation"),
+    "delayAnimationDesc": MessageLookupByLibrary.simpleMessage(
+      "Customize animation during delay testing",
+    ),
     "delaySort": MessageLookupByLibrary.simpleMessage("Sort by Delay"),
     "delete": MessageLookupByLibrary.simpleMessage("Delete"),
     "deleteMultipTip": m0,

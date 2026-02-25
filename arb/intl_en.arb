@@ -258,6 +258,7 @@
   "style": "Style",
   "size": "Size",
   "delayAnimation": "Delay Animation",
+  "delayAnimationDesc": "Customize animation during delay testing",
   "noAnimation": "Default",
   "rotatingCircle": "Rotating Circle",
   "pulse": "Pulse",

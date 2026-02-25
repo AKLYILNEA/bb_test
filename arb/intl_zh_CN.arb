@@ -258,6 +258,7 @@
   "style": "风格",
   "size": "尺寸",
   "delayAnimation": "延迟动画",
+  "delayAnimationDesc": "自定义测试过程中的动画显示",
   "noAnimation": "默认",
   "rotatingCircle": "单圆自转",
   "pulse": "脉冲律动",
