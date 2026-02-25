@@ -14,8 +14,10 @@ class MainActivity : FlutterActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        CoroutineScope(Dispatchers.Main).launch {
-            GlobalState.destroyServiceEngine()
+        if (GlobalState.currentRunState == RunState.STOP) {
+            CoroutineScope(Dispatchers.Main).launch {
+                GlobalState.destroyServiceEngine()
+            }
         }
     }
     
