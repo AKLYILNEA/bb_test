@@ -192,27 +192,63 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
   }
 }
 
-class HomeBackScope extends StatelessWidget {
+class HomeBackScope extends ConsumerStatefulWidget {
   final Widget child;
 
   const HomeBackScope({super.key, required this.child});
 
   @override
+  ConsumerState<HomeBackScope> createState() => _HomeBackScopeState();
+}
+
+class _HomeBackScopeState extends ConsumerState<HomeBackScope> {
+  int? sdkInt;
+
+  @override
+  void initState() {
+    super.initState();
+    if (system.isAndroid) {
+      system.version.then((value) {
+        if (mounted) {
+          setState(() {
+            sdkInt = value;
+          });
+        }
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (system.isAndroid) {
-      return CommonPopScope(
-        onPop: () async {
-          final canPop = Navigator.canPop(context);
-          if (canPop) {
-            Navigator.pop(context);
-          } else {
-            await globalState.appController.handleBackOrExit();
-          }
-          return false;
+      if (sdkInt == null) {
+        return widget.child;
+      }
+
+      if (sdkInt! < 31) {
+        return CommonPopScope(
+          onPop: () async {
+            final canPop = Navigator.canPop(context);
+            if (canPop) {
+              Navigator.pop(context);
+            } else {
+              await globalState.appController.handleBackOrExit();
+            }
+            return false;
+          },
+          child: widget.child,
+        );
+      }
+
+      final backBlock = ref.watch(backBlockProvider);
+      return PopScope(
+        canPop: !backBlock,
+        onPopInvokedWithResult: (didPop, _) async {
+          if (didPop) return;
         },
-        child: child,
+        child: widget.child,
       );
     }
-    return child;
+    return widget.child;
   }
 }
