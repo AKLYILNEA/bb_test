@@ -90,12 +90,11 @@ class AppController {
 
   Future<void> updateStatus(bool isStart) async {
     if (isStart) {
-      // Fast start path: immediately start core
+      // Quick start
       await _fastStart();
 
-      // Background async load other data
-      // Note: for desktop TUN mode, _fastStart internally delays _backgroundLoad
-      // to avoid race conditions with TUN config updates
+      // Lazy load
+      // Note: desktop TUN mode needs delay to avoid races
     } else {
       await globalState.handleStop();
       clashCore.resetTraffic();
@@ -111,27 +110,25 @@ class AppController {
     final patchConfig = _ref.read(patchClashConfigProvider);
     final isDesktop = system.isDesktop;
 
-    // Desktop optimization: if TUN enabled, start core with TUN disabled first, then enable
-    // Avoids TUN init blocking causing slow button response
+    // Desktop TUN optimization
     if (isDesktop && patchConfig.tun.enable) {
-      // 1. Force apply config (disable TUN)
+      // Disable TUN
       await _quickSetupConfig(enableTun: false);
 
-      // 2. Start service (update UI state)
+      // Update UI
       await globalState.handleStart([updateRunTime, updateTraffic]);
 
-      // 3. Delay enabling TUN, load background data after TUN enabled
-      // Avoid race conditions with config updates causing proxy page flicker
+      // Delay TUN enabling
       Future.microtask(() async {
         final res = await _requestAdmin(true);
         if (!res.isError) {
           await _updateClashConfig();
         }
-        // Load background data after TUN config complete
+        // Lazy load
         _backgroundLoad();
       });
 
-      // Delay IP detection, ensure proxy ready (after 2s)
+      // Delayed IP check
       Future.delayed(const Duration(seconds: 2), () {
         addCheckIpNumDebounce();
       });
@@ -140,14 +137,14 @@ class AppController {
 
     await globalState.handleStart([updateRunTime, updateTraffic]);
 
-    // Check if need to reapply config
+    // Check config status
     final needReapply = await _checkIfNeedReapply();
     if (needReapply) {
-      // Only set config, don't update groups and providers (done in background)
+      // Quick apply
       await _quickSetupConfig();
     }
 
-    // Delay IP detection, ensure proxy ready (after 2s)
+    // Delayed IP check
     Future.delayed(const Duration(seconds: 2), () {
       addCheckIpNumDebounce();
     });
@@ -156,18 +153,17 @@ class AppController {
     _backgroundLoad();
   }
 
-  /// Background load: async execute non-critical operations
+  /// Async data load
   void _backgroundLoad() {
     Future.microtask(() async {
       try {
-        // Parallel network requests
+        // Fetch data
         await Future.wait([updateGroups(), updateProviders()]);
 
-        // Delay GC to avoid startup impact
+        // Delayed GC
         await Future.delayed(const Duration(seconds: 2));
         await clashCore.requestGc();
       } catch (e) {
-        // Silent error handling
         commonPrint.log('Background load error: $e');
       }
     });
@@ -178,7 +174,7 @@ class AppController {
         .read(currentProfileProvider)
         ?.profileLastModified;
 
-    // Skip reapply if config unchanged
+    // Skip if unchanged
     if (currentLastModified != null &&
         lastProfileModified != null &&
         currentLastModified <= lastProfileModified!) {
@@ -188,7 +184,7 @@ class AppController {
     return true;
   }
 
-  /// Quick config setup: only set config, no heavy operations
+  /// Simple setup
   Future<void> _quickSetupConfig({bool? enableTun}) async {
     await safeRun(
       () async {
@@ -208,17 +204,17 @@ class AppController {
         );
         final message = await clashCore.setupConfig(params);
         if (message.isNotEmpty) {
-          // Config failed, rollback to last successful config
+          // Rollback
           await _rollbackConfig();
           throw message;
         }
-        // Config success, backup for future rollback
+        // Backup
         globalState.backupSuccessfulConfig(params);
         lastProfileModified = await _ref.read(
           currentProfileProvider.select((state) => state?.profileLastModified),
         );
       },
-      needLoading: false, // No loading UI, keep fast startup
+      needLoading: false, // Fast startup
     );
   }
 
@@ -428,7 +424,7 @@ class AppController {
         case AuthorizeCode.none:
           break;
         case AuthorizeCode.error:
-          // Windows: prompt user to run with admin privileges
+          // Admin hint
           if (system.isWindows) {
             globalState.showNotifier(appLocalizations.tunEnableRequireAdmin);
           }
@@ -460,11 +456,11 @@ class AppController {
     );
     final message = await clashCore.setupConfig(params);
     if (message.isNotEmpty) {
-      // Config failed, rollback to last successful config
+      // Rollback
       await _rollbackConfig();
       throw message;
     }
-    // Config success, backup for future rollback
+    // Backup
     globalState.backupSuccessfulConfig(params);
     lastProfileModified = await _ref.read(
       currentProfileProvider.select((state) => state?.profileLastModified),
@@ -528,14 +524,14 @@ class AppController {
           return await clashCore.getProxiesGroups();
         },
         retryIf: (res) => res.isEmpty,
-        maxAttempts: 5, // Increase retries, give core more init time
+        maxAttempts: 5, // Wait for core
       );
-      // Update when data received
+      // Refresh data
       _ref.read(groupsProvider.notifier).value = newGroups;
     } catch (e) {
       final currentGroups = _ref.read(groupsProvider);
       if (currentGroups.isEmpty) {
-        // First install: retry after delay if initial load fails
+        // Retry initial load
         commonPrint.log(
           'updateGroups initial load failed, scheduling retry: $e',
         );
@@ -543,7 +539,7 @@ class AppController {
           updateGroupsDebounce();
         });
       } else {
-        // Has data: keep existing, avoid sidebar flicker
+        // Keep cache
         commonPrint.log('updateGroups error, keeping existing groups: $e');
       }
     }
@@ -830,12 +826,15 @@ class AppController {
         await prefs?.setString('last_run_version', currentVersion);
       }
 
-      needRecovery = isReinstall || isAbnormalExit;
+      needRecovery = (!globalState.isStart && isReinstall) || isAbnormalExit;
     }
 
     if (system.isDesktop) {
-      // Version detection: if previously run and version changed (upgrade/downgrade)
-      if (lastRunVersion != null && lastRunVersion != currentVersion) {
+      // Version check
+      // Skip recovery if core is already running
+      if (!globalState.isStart &&
+          lastRunVersion != null &&
+          lastRunVersion != currentVersion) {
         commonPrint.log(
           'Desktop version change detected: $lastRunVersion -> $currentVersion',
         );
@@ -843,8 +842,7 @@ class AppController {
         recoveryReason = 'Version update';
       }
 
-      // 2. Detect TUN resource conflict: if TUN was running but Core died
-      // TUN device resources may not be properly released
+      // TUN resource check
       final wasTunRunning = prefs?.getBool('is_tun_running') ?? false;
       final isTunConflict = !globalState.isStart && wasTunRunning;
       if (isTunConflict) {
@@ -861,28 +859,20 @@ class AppController {
       }
     }
 
-    // Unified recovery logic (applies to Android and Desktop)
+    // Unified recovery logic
     if (needRecovery) {
       final settingsAutoRun = _ref.read(appSettingProvider).autoRun;
       final autoRun = settingsAutoRun;
 
       commonPrint.log('Handling Recovery ($recoveryReason)...');
 
-      // Key logic:
-      // 1. Even if autoRun is true, don't start immediately.
-      // 2. Use await to ensure UI stays locked until recovery completes (initProvider won't become true), prevent accidental touches.
-      // 3. Sequential: cleanup -> wait -> restart core -> reload config -> (optional) auto-start
+      // Strategy: Stop -> Wait -> Apply -> AutoStart
 
-      // Step 1: Clean up possible residual state
+      // Recovery steps
       await globalState.handleStop();
-
-      // Step 2: Wait a bit for system to clean resources
       await Future.delayed(const Duration(milliseconds: 750));
-
-      // Step 3: Reload config
       await applyProfile();
 
-      // Step 4: If auto-run enabled, delay startup
       if (autoRun) {
         commonPrint.log('Waiting for system stabilization...');
         // Delay to simulate user "manual startup" timing
@@ -907,8 +897,7 @@ class AppController {
 
     await updateStatus(status);
 
-    // Force config sync: fix Android abnormal exit (swiped app) restart connection issue
-    // Core may start but config could be missing, need manual resend
+    // Fix Android abnormal exit connection issue
     if (system.isAndroid && status) {
       commonPrint.log('Force applying profile...');
       await applyProfile(silence: true);
@@ -1408,16 +1397,15 @@ class AppController {
     );
 
     if (hasBettboxMarker) {
-      // Bettbox backup: full recovery based on user choice
+      // Bettbox backup
       await _recoveryBettboxBackup(archive, recoveryOption, homeDirPath);
     } else {
-      // Non-Bettbox backup (e.g., FlClash): restore subscriptions only
+      // Legacy backup
       await _recoveryLegacyBackup(archive, recoveryOption, homeDirPath);
     }
   }
 
-  /// Restore Bettbox backup (full recovery)
-  /// Decide recovery scope based on RecoveryOption
+  /// Restore Bettbox
   Future<void> _recoveryBettboxBackup(
     Archive archive,
     RecoveryOption recoveryOption,
@@ -1458,8 +1446,7 @@ class AppController {
     _recovery(tempConfig, recoveryOption);
   }
 
-  /// Restore non-Bettbox backup (subscriptions and app list only)
-  /// Restore subscriptions regardless of recovery mode
+  /// Restore legacy
   Future<void> _recoveryLegacyBackup(
     Archive archive,
     RecoveryOption recoveryOption,
@@ -1604,7 +1591,7 @@ class AppController {
     _showRecoveryResultMessage(profiles, extractedFromDatabase);
   }
 
-  /// Extract friendly label from YAML file
+  /// Extract label
   Future<String?> _extractLabelFromYaml(ArchiveFile profileFile) async {
     try {
       final yamlContent = utf8.decode(profileFile.content);
@@ -1640,7 +1627,7 @@ class AppController {
     return null;
   }
 
-  /// Show recovery result message
+  /// Show results
   void _showRecoveryResultMessage(
     List<Profile> profiles,
     bool extractedFromDatabase,
@@ -1669,8 +1656,7 @@ class AppController {
     );
   }
 
-  /// Limited recovery (subscriptions and app list only)
-  /// Used for non-Bettbox backup recovery
+  /// Partial restore
   void _recoveryLimited(Config config, RecoveryOption recoveryOption) {
     final recoveryStrategy = _ref.read(
       appSettingProvider.select((state) => state.recoveryStrategy),
@@ -1705,8 +1691,7 @@ class AppController {
     }
   }
 
-  /// Full recovery (Bettbox backup)
-  /// Decide recovery scope based on RecoveryOption
+  /// Full restore
   void _recovery(Config config, RecoveryOption recoveryOption) {
     final recoveryStrategy = _ref.read(
       appSettingProvider.select((state) => state.recoveryStrategy),
@@ -1724,12 +1709,11 @@ class AppController {
       }
     }
 
-    // Decide recovery scope based on option
     final onlyProfiles = recoveryOption == RecoveryOption.onlyProfiles;
     if (!onlyProfiles) {
-      // Restore all settings with smart platform-specific merging
+      // Restore settings
 
-      // 1. Smart Clash config recovery
+      // 1. Clash config
       if (system.isDesktop) {
         // Desktop: preserve current TUN state, avoid mobile backup override
         final currentTunEnable = _ref.read(patchClashConfigProvider).tun.enable;
@@ -1743,7 +1727,7 @@ class AppController {
             config.patchClashConfig;
       }
 
-      // 2. Smart app settings recovery
+      // 2. App settings
       final currentAppSetting = _ref.read(appSettingProvider);
       final backupAppSetting = config.appSetting;
 
@@ -1774,7 +1758,7 @@ class AppController {
         _ref.read(windowSettingProvider.notifier).value = config.windowProps;
       }
 
-      // 7. Smart VPN/network settings recovery
+      // 7. VPN settings
       if (system.isAndroid) {
         // Android: restore VPN settings
         _ref.read(vpnSettingProvider.notifier).value = config.vpnProps;
@@ -1812,13 +1796,12 @@ class AppController {
     }
   }
 
-  /// Merge dashboard widgets list
-  /// Preserve platform-specific widgets at original positions
+  /// Merge widgets
   List<DashboardWidget> _mergeDashboardWidgets(
     List<DashboardWidget> currentWidgets,
     List<DashboardWidget> backupWidgets,
   ) {
-    // Define platform-specific widgets
+    // Platform widgets
     final Set<DashboardWidget> androidOnlyWidgets = {
       // Android-specific widgets (if any)
     };
@@ -1868,14 +1851,14 @@ class AppController {
     return mergedWidgets.isNotEmpty ? mergedWidgets : defaultDashboardWidgets;
   }
 
-  /// Rollback to last successful config when setup fails
+  /// Rollback
   Future<void> _rollbackConfig() async {
     final lastConfig = globalState.getLastSuccessfulConfig();
     if (lastConfig == null) {
       commonPrint.log('No backup config available for rollback');
       return;
     }
-    
+
     try {
       commonPrint.log('Rolling back to last successful config');
       await clashCore.setupConfig(lastConfig);
