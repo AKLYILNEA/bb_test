@@ -30,6 +30,7 @@
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="Bettbox"
+        android:banner="@drawable/tv_banner"
         android:enableOnBackInvokedCallback="true">
         <activity
             android:name="com.appshub.bettbox.MainActivity"
