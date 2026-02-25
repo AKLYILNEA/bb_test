@@ -322,7 +322,7 @@ class GlobalState {
   /// Backup successful config for rollback
   void backupSuccessfulConfig(SetupParams params) {
     _lastSuccessfulSetupParams = params;
-    commonPrint.log('Config backup created');
+    commonPrint.log('Current config protected');
   }
 
   /// Get last successful config for rollback

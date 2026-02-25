@@ -256,11 +256,6 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }
     
     private fun handleNetworkChange() {
-        if (!quickResponseEnabled) return
-        
-        // Check runState to bypass quick response if not running
-        if (GlobalState.currentRunState != RunState.START) return
-        
         val currentNetworkType = getCurrentNetworkType()
         if (lastNetworkType == null) {
             lastNetworkType = currentNetworkType
@@ -271,6 +266,11 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         if (currentNetworkType != lastNetworkType) {
             lastNetworkType = currentNetworkType
             
+            ServicePlugin.notifyNetworkChanged()
+            
+            if (!quickResponseEnabled) return
+            if (GlobalState.currentRunState != RunState.START) return
+
             val now = System.currentTimeMillis()
             
             // Reset window if expired

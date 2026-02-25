@@ -1,5 +1,7 @@
 package com.appshub.bettbox.plugins
 
+import android.os.Handler
+import android.os.Looper
 import com.appshub.bettbox.GlobalState
 import com.appshub.bettbox.models.VpnOptions
 import com.google.gson.Gson
@@ -12,13 +14,32 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
     private lateinit var flutterMethodChannel: MethodChannel
 
+    companion object {
+        private var activeChannel: MethodChannel? = null
+        private val mainHandler = Handler(Looper.getMainLooper())
+
+        fun notifyNetworkChanged() {
+            mainHandler.post {
+                try {
+                    activeChannel?.invokeMethod("networkChanged", null)
+                } catch (e: Exception) {
+                    android.util.Log.e("ServicePlugin", "networkChanged notify error: ${e.message}")
+                }
+            }
+        }
+    }
+
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         flutterMethodChannel = MethodChannel(flutterPluginBinding.binaryMessenger, "service")
         flutterMethodChannel.setMethodCallHandler(this)
+        activeChannel = flutterMethodChannel
     }
 
     override fun onDetachedFromEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         flutterMethodChannel.setMethodCallHandler(null)
+        if (activeChannel == flutterMethodChannel) {
+            activeChannel = null
+        }
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) = when (call.method) {

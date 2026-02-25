@@ -136,6 +136,7 @@ class AppController {
     }
 
     await globalState.handleStart([updateRunTime, updateTraffic]);
+    await Future.delayed(const Duration(milliseconds: 500));
 
     // Check config status
     final needReapply = await _checkIfNeedReapply();
@@ -149,7 +150,6 @@ class AppController {
       addCheckIpNumDebounce();
     });
 
-    // Non-TUN mode or mobile, load background data immediately
     _backgroundLoad();
   }
 
@@ -693,7 +693,6 @@ class AppController {
       await clashCore.init();
       await clashCore.setState(globalState.getCoreState());
     }
-    await applyProfile();
   }
 
   void startWakelockAutoRecovery() {
@@ -859,54 +858,34 @@ class AppController {
       }
     }
 
-    // Unified recovery logic
+    // Recovery
     if (needRecovery) {
-      final settingsAutoRun = _ref.read(appSettingProvider).autoRun;
-      final autoRun = settingsAutoRun;
+      final autoRun = _ref.read(appSettingProvider).autoRun;
+      commonPrint.log('Recovery ($recoveryReason)...');
 
-      commonPrint.log('Handling Recovery ($recoveryReason)...');
-
-      // Strategy: Stop -> Wait -> Apply -> AutoStart
-
-      // Recovery steps
-      await globalState.handleStop();
-      await Future.delayed(const Duration(milliseconds: 750));
+      if (globalState.isStart) {
+        await globalState.handleStop();
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
 
       if (autoRun) {
-        commonPrint.log('Waiting for system stabilization...');
-        // Delay to simulate user "manual startup" timing
-        await Future.delayed(const Duration(milliseconds: 750));
-
-        commonPrint.log('Executing delayed AutoRun...');
         await updateStatus(true);
-        // Apply profile AFTER VPN
-        await applyProfile();
       } else {
-        // core in stopped state
         await applyProfile();
-        commonPrint.log('Waiting for user action...');
       }
 
       addCheckIpNumDebounce();
-      commonPrint.log('Recovery sequence completed');
-
-      // Return directly, skip default startup logic below
+      commonPrint.log('Recovery completed');
       return;
     }
 
-    final status = globalState.isStart == true
-        ? true
-        : _ref.read(appSettingProvider).autoRun;
+    final shouldStart =
+        globalState.isStart || _ref.read(appSettingProvider).autoRun;
 
-    await updateStatus(status);
-
-    // Fix Android abnormal exit connection issue
-    if (system.isAndroid && status) {
-      commonPrint.log('Force applying profile...');
-      await applyProfile(silence: true);
-    }
-
-    if (!status) {
+    if (shouldStart) {
+      await updateStatus(true);
+    } else {
+      await applyProfile();
       addCheckIpNumDebounce();
     }
   }

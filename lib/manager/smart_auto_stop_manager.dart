@@ -9,17 +9,10 @@ import 'package:bett_box/plugins/service.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Smart Auto Stop Manager
-///
-/// Monitors network changes and automatically stops/starts VPN based on
-/// configured intranet IP/CIDR matching rules.
-///
-/// Logic:
-/// - Android VPN running: Use native VPN code for network detection (more stable)
-/// - Android VPN stopped: Use connectivity_plus (service closes with VPN)
-/// - Other platforms: Always use connectivity_plus
 class SmartAutoStopManager extends ConsumerStatefulWidget {
   final Widget child;
 
@@ -34,10 +27,29 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
   String? _lastCheckedIp;
 
+  static const _serviceChannel = MethodChannel('service');
+
   @override
   void initState() {
     super.initState();
     _initConnectivityListener();
+    _initNativeNetworkListener();
+  }
+
+  void _initNativeNetworkListener() {
+    _serviceChannel.setMethodCallHandler((call) async {
+      if (call.method == 'networkChanged') {
+        _onNativeNetworkChanged();
+      }
+    });
+  }
+
+  void _onNativeNetworkChanged() {
+    final vpnProps = ref.read(vpnSettingProvider);
+    if (!vpnProps.smartAutoStop) return;
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      _checkCurrentNetwork();
+    });
   }
 
   @override
@@ -50,9 +62,6 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
         _onSettingsChanged();
       }
     });
-
-    // We don't rely solely on runTimeProvider listener for Android status
-    // because it might be out of sync. We rely more on network changes and polling.
   }
 
   void _initConnectivityListener() {
@@ -198,8 +207,8 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
       await service?.setSmartStopped(false);
       await service?.smartResume();
 
-      // Update Dart state to look "running"
       globalState.startTime = DateTime.now();
+      ref.read(runTimeProvider.notifier).value = 0;
       globalState.appController.addCheckIpNumDebounce();
     } else {
       // Desktop: Full start
