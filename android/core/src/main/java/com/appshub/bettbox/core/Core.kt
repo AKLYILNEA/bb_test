@@ -26,7 +26,11 @@ data object Core {
     ) {
         startTun(fd, object : TunInterface {
             override fun protect(fd: Int) {
-                protect(fd)
+                try {
+                    protect(fd)
+                } catch (e: Exception) {
+                    Log.e("Core", "protect JNI callback error: ${e.message}")
+                }
             }
 
             override fun resolverProcess(
@@ -35,12 +39,17 @@ data object Core {
                 target: String,
                 uid: Int
             ): String {
-                return resolverProcess(
-                    protocol,
-                    parseInetSocketAddress(source),
-                    parseInetSocketAddress(target),
-                    uid,
-                )
+                return try {
+                    resolverProcess(
+                        protocol,
+                        parseInetSocketAddress(source),
+                        parseInetSocketAddress(target),
+                        uid,
+                    )
+                } catch (e: Exception) {
+                    Log.e("Core", "resolverProcess JNI callback error: ${e.message}")
+                    ""
+                }
             }
         });
     }

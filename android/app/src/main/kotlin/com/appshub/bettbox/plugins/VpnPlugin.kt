@@ -45,7 +45,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     private var isBind: Boolean = false
     private lateinit var scope: CoroutineScope
     private var lastStartForegroundParams: StartForegroundParams? = null
-    private val uidPageNameMap = mutableMapOf<Int, String>()
+    private val uidPageNameMap = java.util.concurrent.ConcurrentHashMap<Int, String>()
     private var suspendModule: SuspendModule? = null
     
     // Quick Response: Network change debounce
@@ -408,7 +408,12 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }
 
     private fun protect(fd: Int): Boolean {
-        return (bettBoxService as? BettboxVpnService)?.protect(fd) == true
+        return try {
+            (bettBoxService as? BettboxVpnService)?.protect(fd) == true
+        } catch (e: Exception) {
+            android.util.Log.e("VpnPlugin", "protect error: ${e.message}")
+            false
+        }
     }
 
     private fun resolverProcess(
@@ -417,20 +422,25 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         target: InetSocketAddress,
         uid: Int,
     ): String {
-        val nextUid = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            connectivity?.getConnectionOwnerUid(protocol, source, target) ?: -1
-        } else {
-            uid
+        return try {
+            val nextUid = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                connectivity?.getConnectionOwnerUid(protocol, source, target) ?: -1
+            } else {
+                uid
+            }
+            if (nextUid == -1) {
+                return ""
+            }
+            if (!uidPageNameMap.containsKey(nextUid)) {
+                uidPageNameMap[nextUid] =
+                    BettboxApplication.getAppContext().packageManager?.getPackagesForUid(nextUid)
+                        ?.firstOrNull() ?: ""
+            }
+            uidPageNameMap[nextUid] ?: ""
+        } catch (e: Exception) {
+            android.util.Log.e("VpnPlugin", "resolverProcess error: ${e.message}")
+            ""
         }
-        if (nextUid == -1) {
-            return ""
-        }
-        if (!uidPageNameMap.containsKey(nextUid)) {
-            uidPageNameMap[nextUid] =
-                BettboxApplication.getAppContext().packageManager?.getPackagesForUid(nextUid)
-                    ?.first() ?: ""
-        }
-        return uidPageNameMap[nextUid] ?: ""
     }
 
     fun handleStop() {
