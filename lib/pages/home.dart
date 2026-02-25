@@ -242,9 +242,15 @@ class _HomeBackScopeState extends ConsumerState<HomeBackScope> {
 
       final backBlock = ref.watch(backBlockProvider);
       return PopScope(
-        canPop: !backBlock,
+        canPop: false,
         onPopInvokedWithResult: (didPop, _) async {
-          if (didPop) return;
+          if (didPop || backBlock) return;
+          final canPop = Navigator.canPop(context);
+          if (canPop) {
+            Navigator.pop(context);
+          } else {
+            await globalState.appController.handleBackOrExit();
+          }
         },
         child: widget.child,
       );

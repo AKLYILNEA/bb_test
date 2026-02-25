@@ -27,10 +27,6 @@ class MainActivity : FlutterActivity() {
         GlobalState.flutterEngine = flutterEngine
     }
 
-    override fun finish() {
-        moveTaskToBack(true)
-    }
-
     override fun onDestroy() {
         GlobalState.flutterEngine = null
         super.onDestroy()
