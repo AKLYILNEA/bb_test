@@ -38,24 +38,28 @@ Future<void> delayTest(List<Proxy> proxies, [String? testUrl]) async {
   final proxyNames = proxies.map((proxy) => proxy.name).toSet().toList();
   final concurrencyLimit = globalState.config.proxiesStyle.concurrencyLimit;
 
-  final delayProxies = proxyNames.map<Future>((proxyName) async {
-    final state = appController.getProxyCardState(proxyName);
-    final url = state.testUrl.getSafeValue(
-      appController.getRealTestUrl(testUrl),
-    );
-    final name = state.proxyName;
-    if (name.isEmpty) {
-      return;
-    }
-    // Set testing state
-    appController.setDelay(Delay(url: url, name: name, value: 0));
-    // Get and set delay
-    appController.setDelay(await clashCore.getDelay(url, name));
+  // Create lazy task
+  final delayTasks = proxyNames.map((proxyName) {
+    return () async {
+      final state = appController.getProxyCardState(proxyName);
+      final url = state.testUrl.getSafeValue(
+        appController.getRealTestUrl(testUrl),
+      );
+      final name = state.proxyName;
+      if (name.isEmpty) {
+        return;
+      }
+      // Set testing state
+      appController.setDelay(Delay(url: url, name: name, value: 0));
+      // Get and set delay
+      appController.setDelay(await clashCore.getDelay(url, name));
+    };
   }).toList();
 
-  final batchesDelayProxies = delayProxies.batch(concurrencyLimit);
-  for (final batchDelayProxies in batchesDelayProxies) {
-    await Future.wait(batchDelayProxies);
+  // Execute tasks in batches
+  final batchedTasks = delayTasks.batch(concurrencyLimit);
+  for (final batchTasks in batchedTasks) {
+    await Future.wait(batchTasks.map((task) => task()));
   }
   appController.addSortNum();
 }

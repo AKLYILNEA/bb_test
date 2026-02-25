@@ -23,66 +23,36 @@ class _ConcurrencyLimitItem extends ConsumerWidget {
 
   static const _options = [1, 4, 8, 16, 32, 64];
 
+  String _getDisplayText(int value, BuildContext context) {
+    if (value == 64) {
+      return '$value (${appLocalizations.notRecommended})';
+    }
+    return '$value';
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final concurrencyLimit = ref.watch(
       proxiesStyleSettingProvider.select((state) => state.concurrencyLimit),
     );
 
-    return ListItem(
+    return ListItem<int>.options(
+      leading: const Icon(Icons.speed),
       title: Text(appLocalizations.concurrencyLimit),
       subtitle: Text(appLocalizations.concurrencyLimitDesc),
-      trailing: Text('$concurrencyLimit'),
-      onTap: () async {
-        final selected = await showSheet<int>(
-          context: context,
-          builder: (_, type) {
-            return AdaptiveSheetScaffold(
-              type: type,
-              title: appLocalizations.concurrencyLimit,
-              body: ListView.builder(
-                itemCount: _options.length,
-                itemBuilder: (context, index) {
-                  final value = _options[index];
-                  final isNotRecommended = value == 64;
-
-                  return ListItem.radio(
-                    padding: const EdgeInsets.only(left: 12, right: 16),
-                    title: Row(
-                      children: [
-                        Text('$value'),
-                        if (isNotRecommended) ...[
-                          const SizedBox(width: 8),
-                          Text(
-                            '(${appLocalizations.notRecommended})',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.error,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    delegate: RadioDelegate(
-                      value: value,
-                      groupValue: concurrencyLimit,
-                      onChanged: (v) {
-                        Navigator.of(context, rootNavigator: true).pop(v);
-                      },
-                    ),
-                  );
-                },
-              ),
-            );
-          },
-        );
-
-        if (selected != null && selected != concurrencyLimit) {
-          ref.read(proxiesStyleSettingProvider.notifier).updateState(
-                (state) => state.copyWith(concurrencyLimit: selected),
-              );
-        }
-      },
+      delegate: OptionsDelegate(
+        title: appLocalizations.concurrencyLimit,
+        options: _options,
+        value: concurrencyLimit,
+        textBuilder: (value) => _getDisplayText(value, context),
+        onChanged: (value) {
+          if (value != null) {
+            ref.read(proxiesStyleSettingProvider.notifier).updateState(
+                  (state) => state.copyWith(concurrencyLimit: value),
+                );
+          }
+        },
+      ),
     );
   }
 }
