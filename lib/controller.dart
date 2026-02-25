@@ -207,12 +207,16 @@ class AppController {
           pathConfig: realPatchConfig,
         );
         final message = await clashCore.setupConfig(params);
+        if (message.isNotEmpty) {
+          // Config failed, rollback to last successful config
+          await _rollbackConfig();
+          throw message;
+        }
+        // Config success, backup for future rollback
+        globalState.backupSuccessfulConfig(params);
         lastProfileModified = await _ref.read(
           currentProfileProvider.select((state) => state?.profileLastModified),
         );
-        if (message.isNotEmpty) {
-          throw message;
-        }
       },
       needLoading: false, // No loading UI, keep fast startup
     );
@@ -455,12 +459,16 @@ class AppController {
       pathConfig: realPatchConfig,
     );
     final message = await clashCore.setupConfig(params);
+    if (message.isNotEmpty) {
+      // Config failed, rollback to last successful config
+      await _rollbackConfig();
+      throw message;
+    }
+    // Config success, backup for future rollback
+    globalState.backupSuccessfulConfig(params);
     lastProfileModified = await _ref.read(
       currentProfileProvider.select((state) => state?.profileLastModified),
     );
-    if (message.isNotEmpty) {
-      throw message;
-    }
   }
 
   Future _applyProfile() async {
@@ -1858,6 +1866,23 @@ class AppController {
 
     // Use default widgets if merged is empty
     return mergedWidgets.isNotEmpty ? mergedWidgets : defaultDashboardWidgets;
+  }
+
+  /// Rollback to last successful config when setup fails
+  Future<void> _rollbackConfig() async {
+    final lastConfig = globalState.getLastSuccessfulConfig();
+    if (lastConfig == null) {
+      commonPrint.log('No backup config available for rollback');
+      return;
+    }
+    
+    try {
+      commonPrint.log('Rolling back to last successful config');
+      await clashCore.setupConfig(lastConfig);
+      commonPrint.log('Config rollback successful');
+    } catch (e) {
+      commonPrint.log('Config rollback failed: $e');
+    }
   }
 
   Future<T?> safeRun<T>(

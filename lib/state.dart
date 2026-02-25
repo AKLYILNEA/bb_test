@@ -50,6 +50,9 @@ class GlobalState {
   final navigatorKey = GlobalKey<NavigatorState>();
   AppController? _appController;
 
+  // Config rollback: backup last successful config params
+  SetupParams? _lastSuccessfulSetupParams;
+
   // GlobalKey<CommonScaffoldState> homeScaffoldKey = GlobalKey();
   bool isInit = false;
 
@@ -314,6 +317,17 @@ class GlobalState {
       testUrl: config.appSetting.testUrl,
     );
     return params;
+  }
+
+  /// Backup successful config for rollback
+  void backupSuccessfulConfig(SetupParams params) {
+    _lastSuccessfulSetupParams = params;
+    commonPrint.log('Config backup created');
+  }
+
+  /// Get last successful config for rollback
+  SetupParams? getLastSuccessfulConfig() {
+    return _lastSuccessfulSetupParams;
   }
 
   Future<Map<String, dynamic>> patchRawConfig({
