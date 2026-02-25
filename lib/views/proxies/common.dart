@@ -36,6 +36,7 @@ Future<void> proxyDelayTest(Proxy proxy, [String? testUrl]) async {
 Future<void> delayTest(List<Proxy> proxies, [String? testUrl]) async {
   final appController = globalState.appController;
   final proxyNames = proxies.map((proxy) => proxy.name).toSet().toList();
+  final concurrencyLimit = globalState.config.proxiesStyle.concurrencyLimit;
 
   final delayProxies = proxyNames.map<Future>((proxyName) async {
     final state = appController.getProxyCardState(proxyName);
@@ -52,7 +53,7 @@ Future<void> delayTest(List<Proxy> proxies, [String? testUrl]) async {
     appController.setDelay(await clashCore.getDelay(url, name));
   }).toList();
 
-  final batchesDelayProxies = delayProxies.batch(100);
+  final batchesDelayProxies = delayProxies.batch(concurrencyLimit);
   for (final batchDelayProxies in batchesDelayProxies) {
     await Future.wait(batchDelayProxies);
   }

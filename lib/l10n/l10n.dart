@@ -2549,6 +2549,46 @@ class AppLocalizations {
     );
   }
 
+  /// `Advanced Settings`
+  String get advancedSettings {
+    return Intl.message(
+      'Advanced Settings',
+      name: 'advancedSettings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Concurrency Limit`
+  String get concurrencyLimit {
+    return Intl.message(
+      'Concurrency Limit',
+      name: 'concurrencyLimit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Maximum concurrent delay tests`
+  String get concurrencyLimitDesc {
+    return Intl.message(
+      'Maximum concurrent delay tests',
+      name: 'concurrencyLimitDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Not Recommended`
+  String get notRecommended {
+    return Intl.message(
+      'Not Recommended',
+      name: 'notRecommended',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Override DNS`
   String get overrideDns {
     return Intl.message(

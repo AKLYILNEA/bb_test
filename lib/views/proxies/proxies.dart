@@ -9,6 +9,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'advanced_settings.dart';
 import 'setting.dart';
 import 'tab.dart';
 
@@ -74,6 +75,22 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
                   );
                 },
               ),
+            PopupMenuItemData(
+              icon: Icons.settings_suggest,
+              label: appLocalizations.advancedSettings,
+              onPressed: () {
+                showExtend(
+                  context,
+                  builder: (_, type) {
+                    return AdaptiveSheetScaffold(
+                      type: type,
+                      body: const ProxiesAdvancedSettings(),
+                      title: appLocalizations.advancedSettings,
+                    );
+                  },
+                );
+              },
+            ),
             if (!_isTab)
               PopupMenuItemData(
                 icon: Icons.style_outlined,

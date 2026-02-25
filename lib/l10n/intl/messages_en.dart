@@ -80,6 +80,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "adminAutoLaunchDesc": MessageLookupByLibrary.simpleMessage(
       "Auto-start with admin privileges",
     ),
+    "advancedSettings": MessageLookupByLibrary.simpleMessage(
+      "Advanced Settings",
+    ),
     "ago": MessageLookupByLibrary.simpleMessage(" Ago"),
     "agree": MessageLookupByLibrary.simpleMessage("Agree"),
     "allApps": MessageLookupByLibrary.simpleMessage("All Apps"),
@@ -202,6 +205,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "compatible": MessageLookupByLibrary.simpleMessage("Compatible Mode"),
     "compatibleDesc": MessageLookupByLibrary.simpleMessage(
       "Reduces some features for full Clash compatibility",
+    ),
+    "concurrencyLimit": MessageLookupByLibrary.simpleMessage(
+      "Concurrency Limit",
+    ),
+    "concurrencyLimitDesc": MessageLookupByLibrary.simpleMessage(
+      "Maximum concurrent delay tests",
     ),
     "confirm": MessageLookupByLibrary.simpleMessage("Confirm"),
     "connection": MessageLookupByLibrary.simpleMessage("Active Connections"),
@@ -580,6 +589,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "noResolve": MessageLookupByLibrary.simpleMessage("No Resolve"),
     "noStatusAvailable": MessageLookupByLibrary.simpleMessage("No Status"),
     "none": MessageLookupByLibrary.simpleMessage("None"),
+    "notRecommended": MessageLookupByLibrary.simpleMessage("Not Recommended"),
     "notSelectedTip": MessageLookupByLibrary.simpleMessage(
       "Current proxy group cannot be selected.",
     ),
