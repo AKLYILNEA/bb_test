@@ -124,6 +124,7 @@ abstract class Log with _$Log {
 
   factory Log.app(String payload) {
     return Log(
+      logLevel: LogLevel.info,
       payload: payload,
       dateTime: _logDateTime(null),
       // id: _logId(null),
