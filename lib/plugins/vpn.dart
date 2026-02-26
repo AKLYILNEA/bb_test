@@ -22,6 +22,8 @@ class Vpn {
       switch (call.method) {
         case 'gc':
           clashCore.requestGc();
+        case 'closeConnections':
+          clashCore.closeConnections();
         case 'getStartForegroundParams':
           if (handleGetStartForegroundParams != null) {
             return await handleGetStartForegroundParams!();

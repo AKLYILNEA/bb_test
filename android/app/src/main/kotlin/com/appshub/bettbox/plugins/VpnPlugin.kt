@@ -282,8 +282,12 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             // Check if within limit
             if (disconnectCount < maxDisconnectsInWindow) {
                 disconnectCount++
-                android.util.Log.d("VpnPlugin", "Quick Response: Network changed, sending close connections ($disconnectCount/$maxDisconnectsInWindow)")
-                ServicePlugin.notifyQuickResponse()
+                android.util.Log.d("VpnPlugin", "Quick Response: Network changed, closing connections ($disconnectCount/$maxDisconnectsInWindow)")
+                scope.launch {
+                    withContext(Dispatchers.Main) {
+                        flutterMethodChannel.invokeMethod("closeConnections", null)
+                    }
+                }
             } else {
                 android.util.Log.d("VpnPlugin", "Quick Response: Disconnect limit reached, ignoring")
             }
@@ -443,9 +447,9 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         }
     }
 
-    fun handleStop() {
+    fun handleStop(force: Boolean = false) {
         GlobalState.runLock.withLock {
-            if (GlobalState.currentRunState == RunState.STOP) return
+            if (!force && GlobalState.currentRunState == RunState.STOP) return
             GlobalState.updateRunState(RunState.STOP)
             lastStartForegroundParams = null
             // Uninstall SuspendModule
@@ -455,6 +459,16 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             Core.stopTun()
             // Then stop service
             bettBoxService?.stop()
+
+            if (force) {
+                try {
+                    val appContext = BettboxApplication.getAppContext()
+                    appContext.stopService(android.content.Intent(appContext, BettboxVpnService::class.java))
+                } catch (e: Exception) {
+                    android.util.Log.e("VpnPlugin", "Force stop service failed: ${e.message}")
+                }
+            }
+
             GlobalState.handleTryDestroy()
         }
     }
