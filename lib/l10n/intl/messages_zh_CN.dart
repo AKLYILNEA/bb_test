@@ -729,6 +729,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "vpnTip": MessageLookupByLibrary.simpleMessage("重启VPN后改变生效"),
     "wakelock": MessageLookupByLibrary.simpleMessage("亮屏锁"),
+    "restart": MessageLookupByLibrary.simpleMessage("重启"),
     "wakelockDescription": MessageLookupByLibrary.simpleMessage(
       "本功能不需要任何特殊权限，因为它仅启用屏幕唤醒锁，而不是任何CPU唤醒锁，应用会在后台保持必要的活跃，且屏幕不会自动熄灭，这在一些场景下会很有用",
     ),

@@ -4788,6 +4788,16 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Restart`
+  String get restart {
+    return Intl.message(
+      'Restart',
+      name: 'restart',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

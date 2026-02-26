@@ -271,11 +271,13 @@ class GlobalState {
     );
   }
 
-  void showNotifier(String text) {
+  void showNotifier(String text,
+      {VoidCallback? onAction, String? actionLabel}) {
     if (text.isEmpty) {
       return;
     }
-    navigatorKey.currentContext?.showNotifier(text);
+    navigatorKey.currentContext
+        ?.showNotifier(text, onAction: onAction, actionLabel: actionLabel);
   }
 
   Future<void> openUrl(String url) async {

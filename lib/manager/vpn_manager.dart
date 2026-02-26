@@ -27,7 +27,15 @@ class _VpnContainerState extends ConsumerState<VpnManager> {
   void showTip() {
     debouncer.call(FunctionTag.vpnTip, () {
       if (ref.read(runTimeProvider.notifier).isStart) {
-        globalState.showNotifier(appLocalizations.vpnTip);
+        globalState.showNotifier(
+          appLocalizations.vpnTip,
+          onAction: () async {
+            await globalState.appController.updateStatus(false);
+            await Future.delayed(const Duration(milliseconds: 500));
+            await globalState.appController.updateStatus(true);
+          },
+          actionLabel: appLocalizations.restart,
+        );
       }
     });
   }

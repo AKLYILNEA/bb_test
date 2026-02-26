@@ -1040,6 +1040,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "vpnTip": MessageLookupByLibrary.simpleMessage(
       "Restart VPN to apply changes",
     ),
+    "restart": MessageLookupByLibrary.simpleMessage("Restart"),
     "wakelock": MessageLookupByLibrary.simpleMessage("Wakelock"),
     "wakelockDescription": MessageLookupByLibrary.simpleMessage(
       "Keeps the screen on and app active in the background without requiring special CPU wakelock permissions.",
