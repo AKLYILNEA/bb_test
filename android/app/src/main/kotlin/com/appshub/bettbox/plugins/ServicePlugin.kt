@@ -10,16 +10,31 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
 
-data object ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
-    private lateinit var flutterMethodChannel: MethodChannel
-    private val mainHandler = Handler(Looper.getMainLooper())
+class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
-    fun notifyNetworkChanged() {
-        mainHandler.post {
-            try {
-                flutterMethodChannel.invokeMethod("networkChanged", null)
-            } catch (e: Exception) {
-                android.util.Log.e("ServicePlugin", "networkChanged notify error: ${e.message}")
+    private lateinit var flutterMethodChannel: MethodChannel
+
+    companion object {
+        private var activeChannel: MethodChannel? = null
+        private val mainHandler = Handler(Looper.getMainLooper())
+
+        fun notifyNetworkChanged() {
+            mainHandler.post {
+                try {
+                    activeChannel?.invokeMethod("networkChanged", null)
+                } catch (e: Exception) {
+                    android.util.Log.e("ServicePlugin", "networkChanged notify error: ${e.message}")
+                }
+            }
+        }
+
+        fun notifyQuickResponse() {
+            mainHandler.post {
+                try {
+                    activeChannel?.invokeMethod("quickResponse", null)
+                } catch (e: Exception) {
+                    android.util.Log.e("ServicePlugin", "quickResponse notify error: ${e.message}")
+                }
             }
         }
     }
@@ -27,30 +42,36 @@ data object ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         flutterMethodChannel = MethodChannel(flutterPluginBinding.binaryMessenger, "service")
         flutterMethodChannel.setMethodCallHandler(this)
+        activeChannel = flutterMethodChannel
     }
 
     override fun onDetachedFromEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         flutterMethodChannel.setMethodCallHandler(null)
+        if (activeChannel == flutterMethodChannel) {
+            activeChannel = null
+        }
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) = when (call.method) {
         "startVpn" -> {
             val data = call.argument<String>("data")
-            val options = Gson().fromJson(data, VpnOptions::class.java)
-            // Ensure serviceEngine is initialized before calling VpnPlugin
-            GlobalState.initServiceEngine()
-            GlobalState.getCurrentVPNPlugin()?.handleStart(options)
-            result.success(true)
+            if (data == "null" || data == null) {
+                result.error("INVALID_ARGUMENT", "options data is null", null)
+            } else {
+                val options = Gson().fromJson(data, VpnOptions::class.java)
+                if (options != null) {
+                    GlobalState.getCurrentVPNPlugin()?.handleStart(options)
+                }
+                result.success(true)
+            }
         }
 
         "stopVpn" -> {
-            GlobalState.initServiceEngine()
             GlobalState.getCurrentVPNPlugin()?.handleStop()
             result.success(true)
         }
 
         "smartStop" -> {
-            GlobalState.initServiceEngine()
             GlobalState.getCurrentVPNPlugin()?.handleSmartStop()
             result.success(true)
         }
@@ -58,7 +79,6 @@ data object ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         "smartResume" -> {
             val data = call.argument<String>("data")
             val options = Gson().fromJson(data, VpnOptions::class.java)
-            GlobalState.initServiceEngine()
             GlobalState.getCurrentVPNPlugin()?.handleSmartResume(options)
             result.success(true)
         }

@@ -282,8 +282,8 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             // Check if within limit
             if (disconnectCount < maxDisconnectsInWindow) {
                 disconnectCount++
-                android.util.Log.d("VpnPlugin", "Quick Response: Network changed, disconnecting ($disconnectCount/$maxDisconnectsInWindow)")
-                handleStop()
+                android.util.Log.d("VpnPlugin", "Quick Response: Network changed, sending close connections ($disconnectCount/$maxDisconnectsInWindow)")
+                ServicePlugin.notifyQuickResponse()
             } else {
                 android.util.Log.d("VpnPlugin", "Quick Response: Disconnect limit reached, ignoring")
             }

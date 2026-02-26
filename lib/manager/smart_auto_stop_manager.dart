@@ -40,6 +40,14 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
     _serviceChannel.setMethodCallHandler((call) async {
       if (call.method == 'networkChanged') {
         _onNativeNetworkChanged();
+      } else if (call.method == 'quickResponse') {
+        final vpnProps = ref.read(vpnSettingProvider);
+        if (vpnProps.quickResponse) {
+          commonPrint.log(
+            'Quick Response triggered on network change: closing connections.',
+          );
+          clashCore.closeConnections();
+        }
       }
     });
   }

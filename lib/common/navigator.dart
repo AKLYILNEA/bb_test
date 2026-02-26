@@ -1,3 +1,4 @@
+import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/state.dart';
@@ -70,10 +71,10 @@ class CommonRoute<T> extends MaterialPageRoute<T> {
   CommonRoute({required super.builder});
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: 300);
+  Duration get transitionDuration => const Duration(milliseconds: 500);
 
   @override
-  Duration get reverseTransitionDuration => const Duration(milliseconds: 300);
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 500);
 }
 
 final Animatable<Offset> _kRightMiddleTween = Tween<Offset>(
@@ -133,15 +134,11 @@ class CommonPageTransition extends StatefulWidget {
     bool allowSnapshotting,
     Widget? child,
   ) {
-    final CurvedAnimation curvedAnimation = CurvedAnimation(
+    final Animation<Offset> delegatedPositionAnimation = CurvedAnimation(
       parent: secondaryAnimation,
       curve: Curves.linearToEaseOut,
       reverseCurve: Curves.easeInToLinear,
-    );
-    final Animation<Offset> delegatedPositionAnimation = curvedAnimation.drive(
-      _kMiddleLeftTween,
-    );
-    curvedAnimation.dispose();
+    ).drive(_kMiddleLeftTween);
 
     assert(debugCheckHasDirectionality(context));
     final TextDirection textDirection = Directionality.of(context);
@@ -227,7 +224,7 @@ class _CommonPageTransitionState extends State<CommonPageTransition> {
           DecorationTween(
             begin: const _CommonEdgeShadowDecoration(),
             end: _CommonEdgeShadowDecoration(<Color>[
-              Color(0x04000000),
+              widget.context.colorScheme.inverseSurface.withValues(alpha: 0.02),
               Colors.transparent,
             ]),
           ),
@@ -278,7 +275,7 @@ class _CommonEdgeShadowPainter extends BoxPainter {
       return;
     }
 
-    final double shadowWidth = 0.05 * configuration.size!.width;
+    final double shadowWidth = 1 * configuration.size!.width;
     final double shadowHeight = configuration.size!.height;
     final double bandWidth = shadowWidth / (colors.length - 1);
 

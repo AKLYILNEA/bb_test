@@ -3,6 +3,7 @@ package com.appshub.bettbox
 import android.os.SystemClock
 import androidx.lifecycle.MutableLiveData
 import com.appshub.bettbox.plugins.AppPlugin
+import com.appshub.bettbox.plugins.ServicePlugin
 import com.appshub.bettbox.plugins.TilePlugin
 import com.appshub.bettbox.plugins.VpnPlugin
 import io.flutter.FlutterInjector
@@ -162,8 +163,8 @@ object GlobalState {
             serviceEngine = FlutterEngine(BettboxApplication.getAppContext())
             serviceEngine?.plugins?.add(VpnPlugin)
             serviceEngine?.plugins?.add(AppPlugin())
-            serviceEngine?.plugins?.add(ServicePlugin)
             serviceEngine?.plugins?.add(TilePlugin())
+            serviceEngine?.plugins?.add(ServicePlugin())
             val vpnService = DartExecutor.DartEntrypoint(
                 FlutterInjector.instance().flutterLoader().findAppBundlePath(),
                 "_service"
