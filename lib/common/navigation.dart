@@ -62,6 +62,14 @@ class Navigation {
         modes: [NavigationItemMode.more],
       ),
       NavigationItem(
+        icon: Icon(Icons.functions),
+        label: PageLabel.script,
+        description: 'scriptDesc',
+        builder: (_) =>
+            const ScriptsView(key: GlobalObjectKey(PageLabel.script)),
+        modes: [NavigationItemMode.more],
+      ),
+      NavigationItem(
         icon: const Icon(Icons.adb),
         label: PageLabel.logs,
         builder: (_) => const LogsView(key: GlobalObjectKey(PageLabel.logs)),

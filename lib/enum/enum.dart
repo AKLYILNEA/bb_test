@@ -351,6 +351,7 @@ enum PageLabel {
   logs,
   requests,
   resources,
+  script,
   connections,
 }
 

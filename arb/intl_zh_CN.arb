@@ -13,6 +13,7 @@
   "syncAll": "全部同步",
   "syncFailed": "同步失败",
   "resourcesDesc": "外部资源相关信息",
+  "scriptDesc": "配置全局覆写脚本",
   "trafficUsage": "流量统计",
   "coreInfo": "内核信息",
   "networkSpeed": "网络速度",
