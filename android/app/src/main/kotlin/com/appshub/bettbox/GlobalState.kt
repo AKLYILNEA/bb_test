@@ -162,6 +162,7 @@ object GlobalState {
             serviceEngine = FlutterEngine(BettboxApplication.getAppContext())
             serviceEngine?.plugins?.add(VpnPlugin)
             serviceEngine?.plugins?.add(AppPlugin())
+            serviceEngine?.plugins?.add(ServicePlugin)
             serviceEngine?.plugins?.add(TilePlugin())
             val vpnService = DartExecutor.DartEntrypoint(
                 FlutterInjector.instance().flutterLoader().findAppBundlePath(),
