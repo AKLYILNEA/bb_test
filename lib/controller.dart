@@ -129,14 +129,11 @@ class AppController {
       });
 
       // Delayed IP check
-      Future.delayed(const Duration(seconds: 2), () {
+      Future.delayed(const Duration(seconds: 1), () {
         addCheckIpNumDebounce();
       });
       return;
     }
-
-    await globalState.handleStart([updateRunTime, updateTraffic]);
-    await Future.delayed(const Duration(milliseconds: 500));
 
     // Check config status
     final needReapply = await _checkIfNeedReapply();
@@ -145,8 +142,10 @@ class AppController {
       await _quickSetupConfig();
     }
 
+    await globalState.handleStart([updateRunTime, updateTraffic]);
+
     // Delayed IP check
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 1), () {
       addCheckIpNumDebounce();
     });
 
@@ -813,9 +812,7 @@ class AppController {
       final isVpnRunningFlag = prefs?.getBool('is_vpn_running') ?? false;
       final isAbnormalExit = !globalState.isStart && isVpnRunningFlag;
       if (isAbnormalExit) {
-        commonPrint.log(
-          'Abnormal exit detected (was running but core is dead)',
-        );
+        commonPrint.log('Abnormal exit detected');
         recoveryReason = 'Abnormal exit';
       }
       if (savedApkUpdateTime != apkLastUpdateTime) {
@@ -845,9 +842,7 @@ class AppController {
       final wasTunRunning = prefs?.getBool('is_tun_running') ?? false;
       final isTunConflict = !globalState.isStart && wasTunRunning;
       if (isTunConflict) {
-        commonPrint.log(
-          'Desktop TUN resource conflict detected (was running but core is dead)',
-        );
+        commonPrint.log('Desktop TUN resource conflict detected');
         needRecovery = true;
         recoveryReason = 'TUN resource conflict';
       }
@@ -892,7 +887,6 @@ class AppController {
         await updateStatus(true);
       } catch (e) {
         commonPrint.log('Auto start failed: $e');
-        // 启动失败时降级为只加载配置
         await applyProfile();
         addCheckIpNumDebounce();
       }
@@ -1014,7 +1008,7 @@ class AppController {
 
     final profile = await safeRun(
       () async {
-        await Future.delayed(const Duration(milliseconds: 300));
+        await Future.delayed(const Duration(milliseconds: 500));
         return await Profile.normal(label: platformFile?.name).saveFile(bytes);
       },
       needLoading: true,

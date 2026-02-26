@@ -118,9 +118,7 @@ class System {
 
   Future<void> back() async {
     if (system.isAndroid) {
-      try {
-        await app.moveTaskToBack();
-      } catch (_) {}
+      await app.moveTaskToBack();
     }
     await window?.hide();
   }
