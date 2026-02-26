@@ -71,10 +71,10 @@ class CommonRoute<T> extends MaterialPageRoute<T> {
   CommonRoute({required super.builder});
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: 500);
+  Duration get transitionDuration => const Duration(milliseconds: 300);
 
   @override
-  Duration get reverseTransitionDuration => const Duration(milliseconds: 500);
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 300);
 }
 
 final Animatable<Offset> _kRightMiddleTween = Tween<Offset>(
@@ -134,11 +134,15 @@ class CommonPageTransition extends StatefulWidget {
     bool allowSnapshotting,
     Widget? child,
   ) {
-    final Animation<Offset> delegatedPositionAnimation = CurvedAnimation(
+    final CurvedAnimation curvedAnimation = CurvedAnimation(
       parent: secondaryAnimation,
       curve: Curves.linearToEaseOut,
       reverseCurve: Curves.easeInToLinear,
-    ).drive(_kMiddleLeftTween);
+    );
+    final Animation<Offset> delegatedPositionAnimation = curvedAnimation.drive(
+      _kMiddleLeftTween,
+    );
+    curvedAnimation.dispose();
 
     assert(debugCheckHasDirectionality(context));
     final TextDirection textDirection = Directionality.of(context);
@@ -224,7 +228,7 @@ class _CommonPageTransitionState extends State<CommonPageTransition> {
           DecorationTween(
             begin: const _CommonEdgeShadowDecoration(),
             end: _CommonEdgeShadowDecoration(<Color>[
-              widget.context.colorScheme.inverseSurface.withValues(alpha: 0.02),
+              Color(0x04000000),
               Colors.transparent,
             ]),
           ),
@@ -275,7 +279,7 @@ class _CommonEdgeShadowPainter extends BoxPainter {
       return;
     }
 
-    final double shadowWidth = 1 * configuration.size!.width;
+    final double shadowWidth = 0.05 * configuration.size!.width;
     final double shadowHeight = configuration.size!.height;
     final double bandWidth = shadowWidth / (colors.length - 1);
 
