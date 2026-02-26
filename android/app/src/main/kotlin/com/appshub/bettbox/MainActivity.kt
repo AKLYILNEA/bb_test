@@ -6,19 +6,13 @@ import com.appshub.bettbox.plugins.ServicePlugin
 import com.appshub.bettbox.plugins.TilePlugin
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class MainActivity : FlutterActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (GlobalState.currentRunState == RunState.STOP) {
-            CoroutineScope(Dispatchers.Main).launch {
-                GlobalState.destroyServiceEngine()
-            }
-        }
+
+
     }
     
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {

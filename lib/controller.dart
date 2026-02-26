@@ -869,7 +869,12 @@ class AppController {
       }
 
       if (autoRun) {
-        await updateStatus(true);
+        try {
+          await updateStatus(true);
+        } catch (e) {
+          commonPrint.log('Recovery autoRun start failed: $e');
+          await applyProfile();
+        }
       } else {
         await applyProfile();
       }
@@ -883,7 +888,14 @@ class AppController {
         globalState.isStart || _ref.read(appSettingProvider).autoRun;
 
     if (shouldStart) {
-      await updateStatus(true);
+      try {
+        await updateStatus(true);
+      } catch (e) {
+        commonPrint.log('Auto start failed: $e');
+        // 启动失败时降级为只加载配置
+        await applyProfile();
+        addCheckIpNumDebounce();
+      }
     } else {
       await applyProfile();
       addCheckIpNumDebounce();
