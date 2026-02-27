@@ -32,17 +32,9 @@ class _TrayContainerState extends ConsumerState<TrayManager> with TrayListener {
   }
 
   @override
-  void onTrayIconRightMouseDown() async {
-    // Bring window to front before showing menu (Windows requirement)
-    // This ensures menu dismisses when clicking outside
-    if (system.isWindows) {
-      try {
-        await window?.show();
-        await Future.delayed(const Duration(milliseconds: 50));
-        await window?.hide();
-      } catch (_) {}
-    }
-    trayManager.popUpContextMenu();
+  void onTrayIconRightMouseDown() {
+    // ignore: deprecated_member_use
+    trayManager.popUpContextMenu(bringAppToFront: true);
   }
 
   @override
