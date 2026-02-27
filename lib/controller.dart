@@ -94,7 +94,6 @@ class AppController {
       await _fastStart();
 
       // Lazy load
-      // Note: desktop TUN mode needs delay to avoid races
     } else {
       await globalState.handleStop();
       clashCore.resetTraffic();
@@ -696,7 +695,7 @@ class AppController {
 
   void startWakelockAutoRecovery() {
     _wakelockSyncTimer?.cancel();
-    _wakelockSyncTimer = Timer.periodic(const Duration(seconds: 180), (
+    _wakelockSyncTimer = Timer.periodic(const Duration(seconds: 240), (
       _,
     ) async {
       try {
@@ -776,107 +775,16 @@ class AppController {
   }
 
   Future<void> _initStatus() async {
-    if (system.isAndroid) {
+    if (globalState.isStart) {
       await globalState.updateStartTime();
     }
 
-    final prefs = await preferences.sharedPreferencesCompleter.future;
-    final packageInfo = await PackageInfo.fromPlatform();
-    final currentVersion = '${packageInfo.version}+${packageInfo.buildNumber}';
-    final lastRunVersion = prefs?.getString('last_run_version');
+    final (needRecovery, recoveryReason) = await _detectRecoveryReason();
 
-    bool needRecovery = false;
-    String recoveryReason = '';
-
-    if (system.isAndroid) {
-      final apkLastUpdateTime = await app.getSelfLastUpdateTime();
-      final savedApkUpdateTime = prefs?.getInt('apk_last_update_time') ?? 0;
-
-      bool isReinstall = false;
-      if (savedApkUpdateTime != 0 && savedApkUpdateTime != apkLastUpdateTime) {
-        commonPrint.log(
-          'Reinstall detected by time: $savedApkUpdateTime -> $apkLastUpdateTime',
-        );
-        isReinstall = true;
-        recoveryReason = 'APK reinstall/upgrade';
-      }
-
-      if (lastRunVersion != null && lastRunVersion != currentVersion) {
-        commonPrint.log(
-          'Reinstall detected by version: $lastRunVersion -> $currentVersion',
-        );
-        isReinstall = true;
-        recoveryReason = 'Version change';
-      }
-
-      final isVpnRunningFlag = prefs?.getBool('is_vpn_running') ?? false;
-      final isAbnormalExit = !globalState.isStart && isVpnRunningFlag;
-      if (isAbnormalExit) {
-        commonPrint.log('Abnormal exit detected');
-        recoveryReason = 'Abnormal exit';
-      }
-      if (savedApkUpdateTime != apkLastUpdateTime) {
-        await prefs?.setInt('apk_last_update_time', apkLastUpdateTime);
-      }
-      if (lastRunVersion != currentVersion) {
-        await prefs?.setString('last_run_version', currentVersion);
-      }
-
-      needRecovery = (!globalState.isStart && isReinstall) || isAbnormalExit;
-    }
-
-    if (system.isDesktop) {
-      // Version check
-      // Skip recovery if core is already running
-      if (!globalState.isStart &&
-          lastRunVersion != null &&
-          lastRunVersion != currentVersion) {
-        commonPrint.log(
-          'Desktop version change detected: $lastRunVersion -> $currentVersion',
-        );
-        needRecovery = true;
-        recoveryReason = 'Version update';
-      }
-
-      // TUN resource check
-      final wasTunRunning = prefs?.getBool('is_tun_running') ?? false;
-      final isTunConflict = !globalState.isStart && wasTunRunning;
-      if (isTunConflict) {
-        commonPrint.log('Desktop TUN resource conflict detected');
-        needRecovery = true;
-        recoveryReason = 'TUN resource conflict';
-      }
-
-      // Update version record
-      if (lastRunVersion != currentVersion) {
-        await prefs?.setString('last_run_version', currentVersion);
-      }
-    }
-
-    // Recovery
     if (needRecovery) {
-      final autoRun = _ref.read(appSettingProvider).autoRun;
-      commonPrint.log('Recovery ($recoveryReason)...');
-
-      if (globalState.isStart) {
-        await globalState.handleStop();
-        await Future.delayed(const Duration(milliseconds: 500));
-      }
-
-      if (autoRun) {
-        try {
-          await updateStatus(true);
-        } catch (e) {
-          commonPrint.log('Recovery autoRun start failed: $e');
-          await applyProfile();
-        }
-      } else {
-        await applyProfile();
-      }
-
-      addCheckIpNumDebounce();
-      commonPrint.log('Recovery completed');
-      return;
+      commonPrint.log('Handling Recovery ($recoveryReason)...');
+      await _performDeepClean();
+      commonPrint.log('Cleaned residual states successfully.');
     }
 
     final shouldStart =
@@ -885,6 +793,10 @@ class AppController {
     if (shouldStart) {
       try {
         await updateStatus(true);
+        if (system.isAndroid && needRecovery) {
+          commonPrint.log('Force applying profile for Android');
+          await applyProfile(silence: true);
+        }
       } catch (e) {
         commonPrint.log('Auto start failed: $e');
         await applyProfile();
@@ -893,6 +805,101 @@ class AppController {
     } else {
       await applyProfile();
       addCheckIpNumDebounce();
+    }
+  }
+
+  Future<(bool, String)> _detectRecoveryReason() async {
+    final results = await Future.wait<dynamic>([
+      preferences.sharedPreferencesCompleter.future,
+      PackageInfo.fromPlatform(),
+      system.isAndroid ? app.getSelfLastUpdateTime() : Future.value(0),
+    ]);
+
+    final prefs = results[0];
+    final packageInfo = results[1] as PackageInfo;
+    final apkLastUpdateTime = results[2] as int;
+
+    final currentVersion = '${packageInfo.version}+${packageInfo.buildNumber}';
+    final lastRunVersion = prefs?.getString('last_run_version');
+
+    if (system.isAndroid) {
+      final savedApkUpdateTime = prefs?.getInt('apk_last_update_time') ?? 0;
+      bool isReinstall = false;
+      String reason = '';
+
+      if (savedApkUpdateTime != 0 && savedApkUpdateTime != apkLastUpdateTime) {
+        commonPrint.log(
+          'Reinstall detected by time: $savedApkUpdateTime -> $apkLastUpdateTime',
+        );
+        isReinstall = true;
+        reason = 'APK reinstall/upgrade';
+      }
+
+      if (lastRunVersion != null && lastRunVersion != currentVersion) {
+        commonPrint.log(
+          'Reinstall detected by version: $lastRunVersion -> $currentVersion',
+        );
+        isReinstall = true;
+        reason = 'Version change';
+      }
+
+      final isVpnRunningFlag = prefs?.getBool('is_vpn_running') ?? false;
+      final isAbnormalExit = !globalState.isStart && isVpnRunningFlag;
+      if (isAbnormalExit && !isReinstall) {
+        commonPrint.log('Abnormal exit detected');
+        reason = 'Abnormal exit';
+      }
+
+      if (savedApkUpdateTime != apkLastUpdateTime) {
+        prefs?.setInt('apk_last_update_time', apkLastUpdateTime);
+      }
+      if (lastRunVersion != currentVersion) {
+        prefs?.setString('last_run_version', currentVersion);
+      }
+
+      final needRecovery =
+          (!globalState.isStart && isReinstall) || isAbnormalExit;
+      return (needRecovery, reason);
+    }
+
+    if (system.isDesktop) {
+      bool needRecovery = false;
+      String reason = '';
+
+      // Skip recovery if core is already running
+      if (!globalState.isStart &&
+          lastRunVersion != null &&
+          lastRunVersion != currentVersion) {
+        commonPrint.log(
+          'Desktop version change detected: $lastRunVersion -> $currentVersion',
+        );
+        needRecovery = true;
+        reason = 'Version update';
+      }
+
+      final wasTunRunning = prefs?.getBool('is_tun_running') ?? false;
+      final isTunConflict = !globalState.isStart && wasTunRunning;
+      if (isTunConflict) {
+        commonPrint.log('Desktop TUN resource conflict detected');
+        needRecovery = true;
+        reason = 'TUN resource conflict';
+      }
+
+      if (lastRunVersion != currentVersion) {
+        prefs?.setString('last_run_version', currentVersion);
+      }
+
+      return (needRecovery, reason);
+    }
+
+    return (false, '');
+  }
+
+  Future<void> _performDeepClean() async {
+    await globalState.handleStop();
+
+    for (int i = 0; i < 10; i++) {
+      await Future.delayed(const Duration(milliseconds: 100));
     }
   }
 
