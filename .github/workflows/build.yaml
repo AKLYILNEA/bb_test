@@ -7,7 +7,7 @@ on:
 
 env:
   IS_STABLE: ${{ !contains(github.ref, '-') }}
-  # GOEXPERIMENT: nogreenteagc
+  GOEXPERIMENT: nogreenteagc
   
 jobs:
   build:
@@ -29,10 +29,10 @@ jobs:
             os: ubuntu-24.04
             arch: universal
           - platform: windows
-            os: windows-2025
+            os: windows-2022
             arch: amd64
           - platform: windows
-            os: windows-2025
+            os: windows-2022
             arch: arm64
           - platform: macos
             os: macos-15
@@ -93,7 +93,7 @@ jobs:
       - name: Setup Golang
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ matrix.compatible == true && '1.22.x' || '1.25.x' }}
+          go-version: ${{ matrix.compatible == true && '1.22.x' || '1.26.x' }}
           cache-dependency-path: core/go.sum
 
       - name: Setup Flutter
