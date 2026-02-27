@@ -16,18 +16,29 @@ class UiManager {
   }
 
   /// 初始化 UI 文件
-  /// 从 assets/data/zash.zip 解压到 UI 目录
   Future<void> initializeUI() async {
     try {
       final uiPath = await appPath.uiPath;
       final uiDir = Directory(uiPath);
 
-      // 检查 UI 目录是否已存在且有文件
+      // Check version file
+      final versionFile = File(join(uiPath, '.ui_version'));
+      const currentVersion = '2.6.1'; // Update version
+
       if (await uiDir.exists()) {
         final files = await uiDir.list().toList();
         if (files.isNotEmpty) {
-          commonPrint.log('UI already exists, skip extraction');
-          return;
+          // Check version
+          if (await versionFile.exists()) {
+            final existingVersion = await versionFile.readAsString();
+            if (existingVersion.trim() == currentVersion) {
+              commonPrint.log('UI already up to date (v$currentVersion)');
+              return;
+            }
+            commonPrint.log('UI version mismatch: $existingVersion -> $currentVersion');
+          }
+          // Clear old UI for update
+          await clearUI();
         }
       }
 
@@ -67,21 +78,20 @@ class UiManager {
         }
 
         // 移动文件到目标目录
-        // 检查是否有单一根目录
         final extractedFiles = await tempExtractDir.list().toList();
         String sourceDir = tempExtractPath;
 
         if (extractedFiles.length == 1 && extractedFiles.first is Directory) {
-          // 如果只有一个目录，使用该目录作为源
           sourceDir = extractedFiles.first.path;
         }
 
-        // 复制文件到目标目录
         await _copyDirectory(Directory(sourceDir), uiDir);
 
-        commonPrint.log('UI extracted successfully to: $uiPath');
+        final versionFile = File(join(uiPath, '.ui_version'));
+        await versionFile.writeAsString(currentVersion);
+
+        commonPrint.log('UI extracted successfully to: $uiPath (v$currentVersion)');
       } finally {
-        // 清理临时目录
         if (await tempExtractDir.exists()) {
           await tempExtractDir.delete(recursive: true);
         }

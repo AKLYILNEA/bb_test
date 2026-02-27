@@ -7,7 +7,7 @@ on:
 
 env:
   IS_STABLE: ${{ !contains(github.ref, '-') }}
-  GOEXPERIMENT: nogreenteagc
+  # GOEXPERIMENT: nogreenteagc
   
 jobs:
   build:
