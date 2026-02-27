@@ -861,6 +861,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Are you sure you want to save?",
     ),
     "script": MessageLookupByLibrary.simpleMessage("Script"),
+    "scriptDesc": MessageLookupByLibrary.simpleMessage(
+      "Global override script config",
+    ),
     "search": MessageLookupByLibrary.simpleMessage("Search"),
     "seconds": MessageLookupByLibrary.simpleMessage("Seconds"),
     "secretCopied": MessageLookupByLibrary.simpleMessage(

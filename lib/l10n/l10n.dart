@@ -134,6 +134,16 @@ class AppLocalizations {
     );
   }
 
+  /// `Global override script config`
+  String get scriptDesc {
+    return Intl.message(
+      'Global override script config',
+      name: 'scriptDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Traffic Usage`
   String get trafficUsage {
     return Intl.message(

@@ -37,33 +37,24 @@ class SuspendModule(private val context: Context) {
         val screenOn = isScreenOn()
         val deviceIdle = isDeviceIdleMode
         
-        // 只在 Device Idle 时挂起
+        Log.d(TAG, "updateSuspendState - screenOn: $screenOn, deviceIdle: $deviceIdle, isSuspended: $isSuspended")
+        
         if (!screenOn && deviceIdle) {
             if (!isSuspended) {
-                Log.i(TAG, "Device Idle Mode - Suspend enabled")
+                Log.i(TAG, "Entering Doze - Suspending core")
                 Core.suspended(true)
                 isSuspended = true
             }
             return
         }
         
-        // 只在屏幕亮起且退出 Device Idle 时恢复
-        if (screenOn && !deviceIdle) {
+        if (screenOn || !deviceIdle) {
             if (isSuspended) {
-                Log.i(TAG, "Screen ON and Device Idle OFF - Resume from suspend")
+                Log.i(TAG, "Exiting Doze (screenOn: $screenOn, deviceIdle: $deviceIdle) - Resuming core")
                 Core.suspended(false)
                 isSuspended = false
-            } else {
-                Log.d(TAG, "Screen ON and Device Idle OFF - Already running")
             }
             return
-        }
-        
-        // 其他情况：屏幕关闭但未进入 Device Idle，或者屏幕亮起但仍在 Device Idle
-        if (!screenOn && !deviceIdle) {
-            Log.d(TAG, "Screen OFF but not in Device Idle - Keep running")
-        } else if (screenOn && deviceIdle) {
-            Log.d(TAG, "Screen ON but still in Device Idle - Keep suspended")
         }
     }
 
