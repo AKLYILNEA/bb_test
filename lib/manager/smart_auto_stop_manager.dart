@@ -125,34 +125,42 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
 
     final isSmartStopped = ref.read(isSmartStoppedProvider);
 
-    // 2. Get current IP
-    String? currentIp;
+    // 2. Get current IPs (may be multiple if on both mobile and WiFi)
+    List<String> currentIps;
     if (system.isAndroid && isRunning) {
       // Android VPN running: use native detection
-      currentIp = await _getNativeLocalIpAddress();
+      currentIps = await _getNativeLocalIpAddresses();
     } else {
       // Android VPN stopped or other platforms
-      currentIp = await _getLocalIpAddress();
+      final ip = await _getLocalIpAddress();
+      currentIps = ip != null ? [ip] : [];
     }
 
-    if (currentIp == null || currentIp.isEmpty) {
+    if (currentIps.isEmpty) {
       commonPrint.log('Smart Auto Stop: No legitimate IP found. Skipping.');
       return;
     }
 
     // Dedup check to avoid repeated actions on same IP
-    if (currentIp == _lastCheckedIp &&
+    final ipsKey = currentIps.join(',');
+    if (ipsKey == _lastCheckedIp &&
         ((isRunning && !isSmartStopped) || (!isRunning && isSmartStopped))) {
       // State is stable matching current IP, skip
       return;
     }
-    _lastCheckedIp = currentIp;
+    _lastCheckedIp = ipsKey;
 
-    // 3. Match Logic
-    final shouldStop = NetworkMatcher.matchAny(currentIp, networks);
+    // 3. Match Logic - check ALL IPs against rules
+    bool shouldStop = false;
+    for (final ip in currentIps) {
+      if (NetworkMatcher.matchAny(ip, networks)) {
+        shouldStop = true;
+        break;
+      }
+    }
 
     commonPrint.log(
-      'SmartAutoStop: IP=$currentIp, RuleMatch=$shouldStop, Running=$isRunning, SmartStopped=$isSmartStopped',
+      'SmartAutoStop: IPs=$currentIps, RuleMatch=$shouldStop, Running=$isRunning, SmartStopped=$isSmartStopped',
     );
 
     if (shouldStop) {
@@ -173,17 +181,18 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
     }
   }
 
-  Future<String?> _getNativeLocalIpAddress() async {
+  Future<List<String>> _getNativeLocalIpAddresses() async {
     try {
       final serviceInstance = service;
       if (serviceInstance != null) {
         final ips = await serviceInstance.getLocalIpAddresses();
-        if (ips.isNotEmpty) return ips.first;
+        return ips;
       }
     } catch (e) {
       commonPrint.log('Smart Auto Stop: Native IP error: $e');
     }
-    return await _getLocalIpAddress();
+    final ip = await _getLocalIpAddress();
+    return ip != null ? [ip] : [];
   }
 
   Future<String?> _getLocalIpAddress() async {
