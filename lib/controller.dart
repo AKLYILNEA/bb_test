@@ -782,7 +782,7 @@ class AppController {
     final (needRecovery, recoveryReason) = await _detectRecoveryReason();
 
     if (needRecovery) {
-      commonPrint.log('Handling Recovery ($recoveryReason)...');
+      commonPrint.log('Handling Recovery: $recoveryReason');
       await _performDeepClean();
       commonPrint.log('Cleaned residual states successfully.');
     }
@@ -829,7 +829,7 @@ class AppController {
 
       if (savedApkUpdateTime != 0 && savedApkUpdateTime != apkLastUpdateTime) {
         commonPrint.log(
-          'Reinstall detected by time: $savedApkUpdateTime -> $apkLastUpdateTime',
+          'Detected by time: $savedApkUpdateTime -> $apkLastUpdateTime',
         );
         isReinstall = true;
         reason = 'APK reinstall/upgrade';
@@ -837,7 +837,7 @@ class AppController {
 
       if (lastRunVersion != null && lastRunVersion != currentVersion) {
         commonPrint.log(
-          'Reinstall detected by version: $lastRunVersion -> $currentVersion',
+          'Detected by version: $lastRunVersion -> $currentVersion',
         );
         isReinstall = true;
         reason = 'Version change';

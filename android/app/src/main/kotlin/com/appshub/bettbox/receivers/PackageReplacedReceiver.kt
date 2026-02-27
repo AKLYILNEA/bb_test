@@ -15,10 +15,7 @@ class PackageReplacedReceiver : BroadcastReceiver() {
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action != Intent.ACTION_PACKAGE_REPLACED) return
-
-        val dataString = intent.dataString ?: return
-        if (!dataString.contains(context.packageName)) return
+        if (intent.action != Intent.ACTION_MY_PACKAGE_REPLACED) return
 
         Log.i(TAG, "Self package replaced, clearing VPN running state flags")
 
