@@ -125,42 +125,34 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
 
     final isSmartStopped = ref.read(isSmartStoppedProvider);
 
-    // 2. Get current IPs (may be multiple if on both mobile and WiFi)
-    List<String> currentIps;
+    // 2. Get current IP
+    String? currentIp;
     if (system.isAndroid && isRunning) {
       // Android VPN running: use native detection
-      currentIps = await _getNativeLocalIpAddresses();
+      currentIp = await _getNativeLocalIpAddress();
     } else {
       // Android VPN stopped or other platforms
-      final ip = await _getLocalIpAddress();
-      currentIps = ip != null ? [ip] : [];
+      currentIp = await _getLocalIpAddress();
     }
 
-    if (currentIps.isEmpty) {
+    if (currentIp == null || currentIp.isEmpty) {
       commonPrint.log('Smart Auto Stop: No legitimate IP found. Skipping.');
       return;
     }
 
     // Dedup check to avoid repeated actions on same IP
-    final ipsKey = currentIps.join(',');
-    if (ipsKey == _lastCheckedIp &&
+    if (currentIp == _lastCheckedIp &&
         ((isRunning && !isSmartStopped) || (!isRunning && isSmartStopped))) {
       // State is stable matching current IP, skip
       return;
     }
-    _lastCheckedIp = ipsKey;
+    _lastCheckedIp = currentIp;
 
-    // 3. Match Logic - check ALL IPs against rules
-    bool shouldStop = false;
-    for (final ip in currentIps) {
-      if (NetworkMatcher.matchAny(ip, networks)) {
-        shouldStop = true;
-        break;
-      }
-    }
+    // 3. Match Logic
+    final shouldStop = NetworkMatcher.matchAny(currentIp, networks);
 
     commonPrint.log(
-      'SmartAutoStop: IPs=$currentIps, RuleMatch=$shouldStop, Running=$isRunning, SmartStopped=$isSmartStopped',
+      'SmartAutoStop: IP=$currentIp, RuleMatch=$shouldStop, Running=$isRunning, SmartStopped=$isSmartStopped',
     );
 
     if (shouldStop) {
@@ -168,31 +160,30 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
       if (isRunning && !isSmartStopped) {
         // Only mark as smart-stopped if we are currently running normally
         ref.read(isSmartStoppedProvider.notifier).set(true);
-        commonPrint.log('Smart Auto Stop: Stopping VPN...');
+        commonPrint.log('Smart Auto Stop: Stopping ...');
         await _stopVpn();
       }
     } else {
       // Rule NOT matched: VPN should be RUNNING (if it was smart-stopped)
       if (!isRunning && isSmartStopped) {
         ref.read(isSmartStoppedProvider.notifier).set(false);
-        commonPrint.log('Smart Auto Stop: Restarting VPN...');
+        commonPrint.log('Smart Auto Stop: Restarting ...');
         await _restartVpn();
       }
     }
   }
 
-  Future<List<String>> _getNativeLocalIpAddresses() async {
+  Future<String?> _getNativeLocalIpAddress() async {
     try {
       final serviceInstance = service;
       if (serviceInstance != null) {
         final ips = await serviceInstance.getLocalIpAddresses();
-        return ips;
+        if (ips.isNotEmpty) return ips.first;
       }
     } catch (e) {
       commonPrint.log('Smart Auto Stop: Native IP error: $e');
     }
-    final ip = await _getLocalIpAddress();
-    return ip != null ? [ip] : [];
+    return await _getLocalIpAddress();
   }
 
   Future<String?> _getLocalIpAddress() async {
