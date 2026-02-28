@@ -136,7 +136,11 @@ fn start(start_params: StartParams) -> String {
         return msg;
     }
     
-    // Start process while holding lock
+
+    let _ = file.unlock();
+    drop(file);
+    
+    // Start process after lock is released
     stop();
     let mut process = PROCESS.lock().unwrap();
     
@@ -150,10 +154,8 @@ fn start(start_params: StartParams) -> String {
     let result = match command.spawn() {
         Ok(child) => {
             *process = Some(child);
-            // 进程已启动，可以释放锁
-            let _ = file.unlock();
             
-            // 启动日志收集线程
+            // Start log collection thread
             if let Some(ref mut child) = *process {
                 if let Some(stderr) = child.stderr.take() {
                     let reader = io::BufReader::new(stderr);
@@ -174,7 +176,6 @@ fn start(start_params: StartParams) -> String {
             "".to_string()
         }
         Err(e) => {
-            let _ = file.unlock();
             log_message(e.to_string());
             e.to_string()
         }
