@@ -60,6 +60,11 @@ class Service {
     await methodChannel.invokeMethod<bool>('setSmartStopped', {'value': value});
   }
 
+  /// Check if VPN was stopped by smart auto stop feature.
+  Future<bool> isSmartStopped() async {
+    return await methodChannel.invokeMethod<bool>('isSmartStopped') ?? false;
+  }
+
   /// Get local IP addresses from native Android code.
   /// More reliable than connectivity_plus when VPN is running.
   Future<List<String>> getLocalIpAddresses() async {

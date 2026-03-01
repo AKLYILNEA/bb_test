@@ -7,6 +7,7 @@ import 'package:archive/archive_io.dart';
 import 'package:bett_box/clash/clash.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/plugins/app.dart';
+import 'package:bett_box/plugins/vpn.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/dialog.dart';
@@ -777,6 +778,20 @@ class AppController {
   Future<void> _initStatus() async {
     if (globalState.isStart) {
       await globalState.updateStartTime();
+    }
+
+    if (system.isAndroid) {
+      try {
+        final hasResidual = await vpn?.checkAndCleanResidualVpn() ?? false;
+        if (hasResidual) {
+          commonPrint.log('Detected and cleaned residual VPN state');
+          // Reset VPN running flag since we cleaned up the residual state
+          final prefs = await preferences.sharedPreferencesCompleter.future;
+          await prefs?.setBool('is_vpn_running', false);
+        }
+      } catch (e) {
+        commonPrint.log('Failed to check/clean residual VPN: $e');
+      }
     }
 
     final (needRecovery, recoveryReason) = await _detectRecoveryReason();

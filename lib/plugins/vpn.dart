@@ -93,6 +93,14 @@ class Vpn {
     });
   }
 
+  /// Check if there is a residual zombie TUN interface.
+  Future<bool> isZombieTunAlive() async {
+    return await methodChannel.invokeMethod<bool>('isZombieTunAlive') ?? false;
+  }
+  Future<bool> checkAndCleanResidualVpn() async {
+    return await methodChannel.invokeMethod<bool>('checkAndCleanResidualVpn') ?? false;
+  }
+
   void addListener(VpnListener listener) {
     _listeners.add(listener);
   }

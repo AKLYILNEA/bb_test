@@ -11,6 +11,7 @@ import 'package:bett_box/state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:synchronized/synchronized.dart';
 
 /// Smart Auto Stop Manager
 class SmartAutoStopManager extends ConsumerStatefulWidget {
@@ -28,6 +29,10 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
   String? _lastCheckedIp;
 
   static const _serviceChannel = MethodChannel('service');
+
+  final _checkLock = Lock();
+
+  int _checkSequence = 0;
 
   @override
   void initState() {
@@ -55,9 +60,7 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
   void _onNativeNetworkChanged() {
     final vpnProps = ref.read(vpnSettingProvider);
     if (!vpnProps.smartAutoStop) return;
-    Future.delayed(const Duration(milliseconds: 1000), () {
-      _checkCurrentNetwork();
-    });
+    _debouncedCheckCurrentNetwork();
   }
 
   @override
@@ -99,76 +102,108 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
     final vpnProps = ref.read(vpnSettingProvider);
     if (!vpnProps.smartAutoStop) return;
 
-    // Delay a bit to let network stabilize
-    await Future.delayed(const Duration(milliseconds: 1000));
-    await _checkCurrentNetwork();
+    _debouncedCheckCurrentNetwork();
+  }
+
+  void _debouncedCheckCurrentNetwork() {
+    final currentSequence = ++_checkSequence;
+
+    Future.delayed(const Duration(milliseconds: 1000), () async {
+      if (currentSequence != _checkSequence) {
+        commonPrint.log('Smart Auto Stop: Skipping outdated network check');
+        return;
+      }
+      await _checkCurrentNetwork();
+    });
   }
 
   Future<void> _checkCurrentNetwork() async {
-    final vpnProps = ref.read(vpnSettingProvider);
-    if (!vpnProps.smartAutoStop) return;
+    await _checkLock.synchronized(() async {
+      final vpnProps = ref.read(vpnSettingProvider);
+      if (!vpnProps.smartAutoStop) return;
 
-    final networks = vpnProps.smartAutoStopNetworks;
-    // Empty networks rule = disable feature effectively
-    if (networks.isEmpty) return;
+      final networks = vpnProps.smartAutoStopNetworks;
+      // Empty networks rule = disable feature effectively
+      if (networks.isEmpty) return;
 
-    // 1. Determine reliable Running state
-    bool isRunning;
-    if (system.isAndroid) {
-      // On Android, always sync with native side
-      await globalState.updateStartTime();
-      // Also check runTimeProvider as a fallback/confirmation
-      isRunning = globalState.isStart;
-    } else {
-      isRunning = ref.read(runTimeProvider) != null;
-    }
+      // 0. Sync smart stopped state with native side first
+      await _syncSmartStoppedState();
 
-    final isSmartStopped = ref.read(isSmartStoppedProvider);
-
-    // 2. Get current IP
-    String? currentIp;
-    if (system.isAndroid && isRunning) {
-      // Android VPN running: use native detection
-      currentIp = await _getNativeLocalIpAddress();
-    } else {
-      // Android VPN stopped or other platforms
-      currentIp = await _getLocalIpAddress();
-    }
-
-    if (currentIp == null || currentIp.isEmpty) {
-      commonPrint.log('Smart Auto Stop: No legitimate IP found. Skipping.');
-      return;
-    }
-
-    // Dedup check to avoid repeated actions on same IP
-    if (currentIp == _lastCheckedIp &&
-        ((isRunning && !isSmartStopped) || (!isRunning && isSmartStopped))) {
-      // State is stable matching current IP, skip
-      return;
-    }
-    _lastCheckedIp = currentIp;
-
-    // 3. Match Logic
-    final shouldStop = NetworkMatcher.matchAny(currentIp, networks);
-
-    commonPrint.log(
-      'SmartAutoStop: IP=$currentIp, RuleMatch=$shouldStop, Running=$isRunning, SmartStopped=$isSmartStopped',
-    );
-
-    if (shouldStop) {
-      // Rule matched: VPN should be STOPPED
-      if (isRunning && !isSmartStopped) {
-        // Only mark as smart-stopped if we are currently running normally
-        ref.read(isSmartStoppedProvider.notifier).set(true);
-        commonPrint.log('Smart Auto Stop: Stopping ...');
-        await _stopVpn();
+      // 1. Determine reliable Running state
+      bool isRunning;
+      if (system.isAndroid) {
+        // On Android, always sync with native side
+        await globalState.updateStartTime();
+        // Also check runTimeProvider as a fallback/confirmation
+        isRunning = globalState.isStart;
+      } else {
+        isRunning = ref.read(runTimeProvider) != null;
       }
-    } else {
-      // Rule NOT matched: VPN should be RUNNING (if it was smart-stopped)
-      if (!isRunning && isSmartStopped) {
-        ref.read(isSmartStoppedProvider.notifier).set(false);
-        commonPrint.log('Smart Auto Stop: Restarting ...');
-        await _restartVpn();
+
+      final isSmartStopped = ref.read(isSmartStoppedProvider);
+
+      // 2. Get current IP
+      String? currentIp;
+      if (system.isAndroid && isRunning) {
+        // Android VPN running: use native detection
+        currentIp = await _getNativeLocalIpAddress();
+      } else {
+        // Android VPN stopped or other platforms
+        currentIp = await _getLocalIpAddress();
+      }
+
+      if (currentIp == null || currentIp.isEmpty) {
+        commonPrint.log('Smart Auto Stop: No legitimate IP found. Skipping.');
+        return;
+      }
+
+      // Dedup check to avoid repeated actions on same IP
+      if (currentIp == _lastCheckedIp &&
+          ((isRunning && !isSmartStopped) || (!isRunning && isSmartStopped))) {
+        // State is stable matching current IP, skip
+        return;
+      }
+      _lastCheckedIp = currentIp;
+
+      // 3. Match Logic
+      final shouldStop = NetworkMatcher.matchAny(currentIp, networks);
+
+      commonPrint.log(
+        'SmartAutoStop: IP=$currentIp, RuleMatch=$shouldStop, Running=$isRunning, SmartStopped=$isSmartStopped',
+      );
+
+      if (shouldStop) {
+        // Rule matched: VPN should be STOPPED
+        if (isRunning && !isSmartStopped) {
+          // Only mark as smart-stopped if we are currently running normally
+          ref.read(isSmartStoppedProvider.notifier).set(true);
+          commonPrint.log('Smart Auto Stop: Stopping ...');
+          await _stopVpn();
+        }
+      } else {
+        // Rule NOT matched: VPN should be RUNNING (if it was smart-stopped)
+        if (!isRunning && isSmartStopped) {
+          ref.read(isSmartStoppedProvider.notifier).set(false);
+          commonPrint.log('Smart Auto Stop: Restarting ...');
+          await _restartVpn();
+        }
+      }
+    });
+  }
+
+  Future<void> _syncSmartStoppedState() async {
+    if (system.isAndroid) {
+      try {
+        final nativeState = await service?.isSmartStopped() ?? false;
+        final dartState = ref.read(isSmartStoppedProvider);
+        if (nativeState != dartState) {
+          commonPrint.log(
+            'Smart Auto Stop: Syncing state - Native=$nativeState, Dart=$dartState',
+          );
+          ref.read(isSmartStoppedProvider.notifier).set(nativeState);
+        }
+      } catch (e) {
+        commonPrint.log('Smart Auto Stop: Failed to sync state: $e');
       }
     }
   }

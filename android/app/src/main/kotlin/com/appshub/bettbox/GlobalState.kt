@@ -11,6 +11,8 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.dart.DartExecutor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.locks.ReentrantLock
@@ -31,6 +33,8 @@ object GlobalState {
     const val NOTIFICATION_ID = 1
 
     private const val TOGGLE_DEBOUNCE_MS = 1000L
+    private const val PENDING_TIMEOUT_MS = 5000L // 5秒 PENDING
+
     @Volatile
     private var lastToggleAt = 0L
 
@@ -40,7 +44,15 @@ object GlobalState {
 
     val runState: MutableLiveData<RunState> = MutableLiveData<RunState>(RunState.STOP)
 
+    // PENDING 
+    private var pendingTimeoutJob: Job? = null
+
     fun updateRunState(newState: RunState) {
+        if (newState != RunState.PENDING) {
+            pendingTimeoutJob?.cancel()
+            pendingTimeoutJob = null
+        }
+
         currentRunState = newState
         try {
             if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
@@ -52,6 +64,19 @@ object GlobalState {
             runState.postValue(newState)
         }
     }
+
+
+    private fun startPendingTimeout() {
+        pendingTimeoutJob?.cancel()
+        pendingTimeoutJob = CoroutineScope(Dispatchers.Main).launch {
+            delay(PENDING_TIMEOUT_MS)
+            if (currentRunState == RunState.PENDING) {
+                android.util.Log.w("GlobalState", "PENDING state timeout, resetting to STOP")
+                updateRunState(RunState.STOP)
+            }
+        }
+    }
+
     var flutterEngine: FlutterEngine? = null
     private var serviceEngine: FlutterEngine? = null
     
@@ -103,6 +128,7 @@ object GlobalState {
         if (!skipDebounce && !acquireToggleSlot()) return false
         if (currentRunState == RunState.STOP) {
             updateRunState(RunState.PENDING)
+            startPendingTimeout() 
             runLock.lock()
             try {
                 val tilePlugin = getCurrentTilePlugin()
@@ -123,6 +149,7 @@ object GlobalState {
         if (!skipDebounce && !acquireToggleSlot()) return
         if (currentRunState == RunState.START) {
             updateRunState(RunState.PENDING)
+            startPendingTimeout() 
             runLock.lock()
             try {
                 getCurrentTilePlugin()?.handleStop()
@@ -176,5 +203,3 @@ object GlobalState {
         }
     }
 }
-
-

@@ -20,6 +20,7 @@ import com.appshub.bettbox.extensions.resolveDns
 import com.appshub.bettbox.models.StartForegroundParams
 import com.appshub.bettbox.models.VpnOptions
 import com.appshub.bettbox.modules.SuspendModule
+import com.appshub.bettbox.modules.VpnResidualCleaner
 import com.appshub.bettbox.services.BaseServiceInterface
 import com.appshub.bettbox.services.BettboxService
 import com.appshub.bettbox.services.BettboxVpnService
@@ -149,6 +150,26 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             "setQuickResponse" -> {
                 quickResponseEnabled = call.argument<Boolean>("enabled") ?: false
                 result.success(true)
+            }
+
+            "checkAndCleanResidualVpn" -> {
+                scope.launch {
+                    try {
+                        val hasResidual = VpnResidualCleaner.isZombieTunAlive()
+                        if (hasResidual) {
+                            android.util.Log.i("VpnPlugin", "Detected residual VPN, cleaning...")
+                            VpnResidualCleaner.cleanResidualVpnStateSync()
+                        }
+                        result.success(hasResidual)
+                    } catch (e: Exception) {
+                        android.util.Log.e("VpnPlugin", "Failed to check/clean residual VPN: ${e.message}")
+                        result.error("CLEANUP_ERROR", e.message, null)
+                    }
+                }
+            }
+
+            "isZombieTunAlive" -> {
+                result.success(VpnResidualCleaner.isZombieTunAlive())
             }
 
             else -> {
