@@ -89,6 +89,10 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             result.success(true)
         }
 
+        "isSmartStopped" -> {
+            result.success(GlobalState.isSmartStopped)
+        }
+
         "getLocalIpAddresses" -> {
             result.success(GlobalState.getCurrentVPNPlugin()?.getLocalIpAddresses() ?: emptyList<String>())
         }
