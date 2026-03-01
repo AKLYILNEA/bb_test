@@ -1,7 +1,9 @@
 package com.appshub.bettbox.modules
 
+import android.content.Context
 import android.net.VpnService
 import android.util.Log
+import com.appshub.bettbox.BettboxApplication
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -17,8 +19,8 @@ object VpnResidualCleaner {
     private const val ZOMBIE_IP = "198.51.100.1"
     
     private const val CLEANUP_TIMEOUT_MS = 2000L
-    private const val POLL_INTERVAL_MS = 200L
-    private const val MAX_POLL_RETRIES = 10
+    private const val POLL_INTERVAL_MS = 100L
+    private const val MAX_POLL_RETRIES = 20
 
     fun isZombieTunAlive(): Boolean {
         return try {
@@ -60,16 +62,21 @@ object VpnResidualCleaner {
     }
 
     private suspend fun performCleanup() {
+        val context = BettboxApplication.getAppContext()
+        
+        Log.d(TAG, "Starting cleanup process...")
+        
         try {
-            val builder = VpnService.Builder()
-                .setSession("bettbox_cleanup")
-                .addAddress("10.255.255.254", 30)
+            val intent = android.content.Intent(context, CleanupVpnService::class.java)
+            context.startService(intent)
             
-            val conn = builder.establish()
-            conn?.close()
-            Log.d(TAG, "Sent dummy VPN signal to OS.")
+            delay(500)
+            
+            context.stopService(intent)
+            
+            Log.d(TAG, "Triggered VPN cleanup via CleanupVpnService")
         } catch (e: Exception) {
-            Log.w(TAG, "Failed to establish dummy VPN: ${e.message}")
+            Log.w(TAG, "Failed to start CleanupVpnService: ${e.message}")
         }
 
         var retryCount = 0

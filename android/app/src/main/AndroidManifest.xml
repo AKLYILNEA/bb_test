@@ -172,6 +172,15 @@
                 android:value="Maintains critical data synchronization services" />
         </service>
 
+        <service
+            android:name=".services.CleanupVpnService"
+            android:exported="false"
+            android:permission="android.permission.BIND_VPN_SERVICE">
+            <intent-filter>
+                <action android:name="android.net.VpnService" />
+            </intent-filter>
+        </service>
+
         <receiver
             android:name=".receivers.BootReceiver"
             android:enabled="true"

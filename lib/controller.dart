@@ -798,8 +798,6 @@ class AppController {
 
     if (needRecovery) {
       commonPrint.log('Handling Recovery: $recoveryReason');
-      await _performDeepClean();
-      commonPrint.log('Cleaned residual states successfully.');
     }
 
     final shouldStart =
@@ -908,14 +906,6 @@ class AppController {
     }
 
     return (false, '');
-  }
-
-  Future<void> _performDeepClean() async {
-    await globalState.handleStop();
-
-    for (int i = 0; i < 10; i++) {
-      await Future.delayed(const Duration(milliseconds: 100));
-    }
   }
 
   void setDelay(Delay delay) {
