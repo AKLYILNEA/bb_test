@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.VpnService
 import android.util.Log
 import com.appshub.bettbox.BettboxApplication
+import com.appshub.bettbox.services.CleanupVpnService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
