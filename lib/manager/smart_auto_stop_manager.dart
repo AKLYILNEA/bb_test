@@ -9,7 +9,6 @@ import 'package:bett_box/plugins/service.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:synchronized/synchronized.dart';
 
@@ -28,11 +27,11 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
   String? _lastCheckedIp;
 
-  static const _serviceChannel = MethodChannel('service');
-
   final _checkLock = Lock();
 
   int _checkSequence = 0;
+
+  late final NativeEventCallback _nativeEventCallback;
 
   @override
   void initState() {
@@ -42,10 +41,10 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
   }
 
   void _initNativeNetworkListener() {
-    _serviceChannel.setMethodCallHandler((call) async {
-      if (call.method == 'networkChanged') {
+    _nativeEventCallback = (String method, dynamic arguments) async {
+      if (method == 'networkChanged') {
         _onNativeNetworkChanged();
-      } else if (call.method == 'quickResponse') {
+      } else if (method == 'quickResponse') {
         final vpnProps = ref.read(vpnSettingProvider);
         if (vpnProps.quickResponse) {
           commonPrint.log(
@@ -54,7 +53,8 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
           clashCore.closeConnections();
         }
       }
-    });
+    };
+    service?.addNativeEventCallback(_nativeEventCallback);
   }
 
   void _onNativeNetworkChanged() {
@@ -262,6 +262,7 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
   @override
   void dispose() {
     _connectivitySubscription?.cancel();
+    service?.removeNativeEventCallback(_nativeEventCallback);
     super.dispose();
   }
 

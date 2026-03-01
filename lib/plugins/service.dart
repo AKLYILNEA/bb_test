@@ -8,18 +8,40 @@ import 'package:flutter/services.dart';
 
 import '../clash/lib.dart';
 
+typedef NativeEventCallback = Future<void> Function(String method, dynamic arguments);
+
 class Service {
   static Service? _instance;
   late MethodChannel methodChannel;
   ReceivePort? receiver;
 
+  final List<NativeEventCallback> _nativeEventCallbacks = [];
+
   Service._internal() {
     methodChannel = const MethodChannel('service');
+    methodChannel.setMethodCallHandler(_handleMethodCall);
   }
 
   factory Service() {
     _instance ??= Service._internal();
     return _instance!;
+  }
+
+  Future<dynamic> _handleMethodCall(MethodCall call) async {
+    // Forward to registered callbacks
+    for (final callback in _nativeEventCallbacks) {
+      await callback(call.method, call.arguments);
+    }
+  }
+
+  /// Register a callback for native events (networkChanged, quickResponse, etc.)
+  void addNativeEventCallback(NativeEventCallback callback) {
+    _nativeEventCallbacks.add(callback);
+  }
+
+  /// Remove a native event callback
+  void removeNativeEventCallback(NativeEventCallback callback) {
+    _nativeEventCallbacks.remove(callback);
   }
 
   Future<bool?> init() async {
@@ -80,7 +102,18 @@ class Service {
       'enabled': enabled,
     });
   }
+
+  /// Check if Service Engine is already running (e.g. from tile quick start).
+  Future<bool> isServiceEngineRunning() async {
+    return await methodChannel.invokeMethod<bool>('isServiceEngineRunning') ?? false;
+  }
+
+  /// Request Service Engine to re-establish IPC with UI Engine.
+  Future<bool?> reconnectIpc() async {
+    return await methodChannel.invokeMethod<bool>('reconnectIpc');
+  }
 }
 
 Service? get service =>
     system.isAndroid && !globalState.isService ? Service() : null;
+

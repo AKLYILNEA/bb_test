@@ -1,6 +1,5 @@
 package com.appshub.bettbox
 
-import android.content.Context
 import android.os.SystemClock
 import androidx.lifecycle.MutableLiveData
 import com.appshub.bettbox.plugins.AppPlugin
@@ -63,27 +62,6 @@ object GlobalState {
             }
         } catch (e: Exception) {
             runState.postValue(newState)
-        }
-
-        // Sync VPN running state to SharedPreferences for Flutter layer detection
-        // This ensures the state is persisted even if the app is killed
-        if (newState == RunState.START || newState == RunState.STOP) {
-            syncVpnStateToPreferences(newState == RunState.START)
-        }
-    }
-
-    /**
-     * Sync VPN running state to SharedPreferences
-     * This allows Flutter layer to detect VPN state on app startup
-     */
-    private fun syncVpnStateToPreferences(isRunning: Boolean) {
-        try {
-            val prefs = BettboxApplication.getAppContext()
-                .getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
-            prefs.edit().putBoolean("flutter.is_vpn_running", isRunning).apply()
-            android.util.Log.d("GlobalState", "Synced VPN state to preferences: isRunning=$isRunning")
-        } catch (e: Exception) {
-            android.util.Log.e("GlobalState", "Failed to sync VPN state: ${e.message}")
         }
     }
 
@@ -223,5 +201,14 @@ object GlobalState {
                 if (flutterEngine == null) listOf("quick") else null
             )
         }
+    }
+
+    fun isServiceEngineRunning(): Boolean {
+        return serviceEngine != null
+    }
+
+    fun reconnectIpc() {
+        val tilePlugin = serviceEngine?.plugins?.get(TilePlugin::class.java) as TilePlugin?
+        tilePlugin?.handleReconnectIpc()
     }
 }

@@ -776,7 +776,9 @@ class AppController {
   }
 
   Future<void> _initStatus() async {
-    if (globalState.isStart) {
+    if (system.isAndroid) {
+      await globalState.updateStartTime();
+    } else if (globalState.isStart) {
       await globalState.updateStartTime();
     }
 
@@ -791,36 +793,6 @@ class AppController {
         }
       } catch (e) {
         commonPrint.log('Failed to check/clean residual VPN: $e');
-      }
-
-      try {
-        final isVpnRunningNative = await vpn?.getStatus() ?? false;
-        final prefs = await preferences.sharedPreferencesCompleter.future;
-        final isVpnRunningFlag = prefs?.getBool('is_vpn_running') ?? false;
-
-        commonPrint.log(
-            'VPN State Sync: native=$isVpnRunningNative, flag=$isVpnRunningFlag, dart=${globalState.isStart}');
-
-        if (isVpnRunningNative && !globalState.isStart) {
-          commonPrint.log('Syncing VPN state: Native reports running but Dart is not started');
-          
-          globalState.startTime = DateTime.now();
-          
-          if (!isVpnRunningFlag) {
-            await prefs?.setBool('is_vpn_running', true);
-          }
-          
-          globalState.startUpdateTasks([
-            updateRunTime,
-            updateTraffic,
-          ]);
-        } else if (!isVpnRunningNative && globalState.isStart) {
-          commonPrint.log('Syncing VPN state: Native reports stopped but Dart thinks running');
-          globalState.startTime = null;
-          await prefs?.setBool('is_vpn_running', false);
-        }
-      } catch (e) {
-        commonPrint.log('Failed to sync VPN state: $e');
       }
     }
 
@@ -846,6 +818,11 @@ class AppController {
         addCheckIpNumDebounce();
       }
     } else {
+      // Clear stale flag to prevent repeated "abnormal exit" detection on next launch
+      if (needRecovery) {
+        final prefs = await preferences.sharedPreferencesCompleter.future;
+        await prefs?.setBool('is_vpn_running', false);
+      }
       await applyProfile();
       addCheckIpNumDebounce();
     }

@@ -26,6 +26,10 @@ class TilePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         channel.invokeMethod("stop", null)
     }
 
+    fun handleReconnectIpc() {
+        channel.invokeMethod("reconnectIpc", null)
+    }
+
     private fun handleDetached() {
         channel.invokeMethod("detached", null)
     }

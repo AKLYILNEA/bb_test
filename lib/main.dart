@@ -96,6 +96,10 @@ Future<void> _service(List<String> flags) async {
         await vpn?.stop();
         exit(0);
       },
+      onReconnectIpc: () {
+        commonPrint.log('Service: reconnectIpc requested, re-establishing IPC');
+        _handleMainIpc(clashLibHandler);
+      },
     ),
   );
 
@@ -178,12 +182,15 @@ void _handleMainIpc(ClashLibHandler clashLibHandler) {
 class _TileListenerWithService with TileListener {
   final Function() _onStart;
   final Function() _onStop;
+  final Function() _onReconnectIpc;
 
   const _TileListenerWithService({
     required Function() onStart,
     required Function() onStop,
+    required Function() onReconnectIpc,
   }) : _onStart = onStart,
-       _onStop = onStop;
+       _onStop = onStop,
+       _onReconnectIpc = onReconnectIpc;
 
   @override
   void onStart() {
@@ -193,6 +200,11 @@ class _TileListenerWithService with TileListener {
   @override
   void onStop() {
     _onStop();
+  }
+
+  @override
+  void onReconnectIpc() {
+    _onReconnectIpc();
   }
 }
 

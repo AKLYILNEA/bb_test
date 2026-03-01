@@ -45,6 +45,13 @@ class ClashLib extends ClashHandlerInterface with AndroidClashInterface {
       }
     });
     await service?.init();
+    final connected = await _canSendCompleter.future
+        .timeout(const Duration(seconds: 2), onTimeout: () => false);
+    if (!connected) {
+      commonPrint.log('ClashLib: IPC not established');
+      _canSendCompleter = Completer();
+      await service?.reconnectIpc();
+    }
   }
 
   void _registerMainPort(SendPort sendPort) {

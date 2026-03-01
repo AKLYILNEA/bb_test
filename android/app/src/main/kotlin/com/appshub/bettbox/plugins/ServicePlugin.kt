@@ -89,10 +89,6 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             result.success(true)
         }
 
-        "isSmartStopped" -> {
-            result.success(GlobalState.isSmartStopped)
-        }
-
         "getLocalIpAddresses" -> {
             result.success(GlobalState.getCurrentVPNPlugin()?.getLocalIpAddresses() ?: emptyList<String>())
         }
@@ -107,6 +103,15 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             GlobalState.getCurrentAppPlugin()
                 ?.requestNotificationsPermission()
             GlobalState.initServiceEngine()
+            result.success(true)
+        }
+
+        "isServiceEngineRunning" -> {
+            result.success(GlobalState.isServiceEngineRunning())
+        }
+
+        "reconnectIpc" -> {
+            GlobalState.reconnectIpc()
             result.success(true)
         }
 

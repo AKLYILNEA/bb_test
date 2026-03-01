@@ -10,6 +10,8 @@ abstract mixin class TileListener {
   void onStop() {}
 
   void onDetached() {}
+
+  void onReconnectIpc() {}
 }
 
 class Tile {
@@ -34,6 +36,9 @@ class Tile {
           break;
         case 'detached':
           listener.onDetached();
+          break;
+        case 'reconnectIpc':
+          listener.onReconnectIpc();
           break;
       }
     }
