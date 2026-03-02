@@ -796,14 +796,20 @@ class AppController {
       }
     }
 
-    final (needRecovery, recoveryReason) = await _detectRecoveryReason();
+    final (needRecovery, recoveryReason, isUpgrade) = await _detectRecoveryReason();
 
     if (needRecovery) {
       commonPrint.log('Handling Recovery: $recoveryReason');
+      if (isUpgrade) {
+        commonPrint.log('Restarting core after upgrade...');
+        await clashService?.reStart();
+        await _initCore();
+      }
     }
 
+    // After APK upgrade, skip autoRun to let TUN cleanup finish first
     final shouldStart =
-        globalState.isStart || _ref.read(appSettingProvider).autoRun;
+        globalState.isStart || (!isUpgrade && _ref.read(appSettingProvider).autoRun);
 
     if (shouldStart) {
       try {
@@ -828,7 +834,7 @@ class AppController {
     }
   }
 
-  Future<(bool, String)> _detectRecoveryReason() async {
+  Future<(bool, String, bool)> _detectRecoveryReason() async {
     final results = await Future.wait<dynamic>([
       preferences.sharedPreferencesCompleter.future,
       PackageInfo.fromPlatform(),
@@ -852,7 +858,7 @@ class AppController {
           'Detected by time: $savedApkUpdateTime -> $apkLastUpdateTime',
         );
         isReinstall = true;
-        reason = 'APK reinstall/upgrade';
+        reason = 'APK Upgrade';
       }
 
       if (lastRunVersion != null && lastRunVersion != currentVersion) {
@@ -860,7 +866,7 @@ class AppController {
           'Detected by version: $lastRunVersion -> $currentVersion',
         );
         isReinstall = true;
-        reason = 'Version change';
+        reason = 'APK Upgrade';
       }
 
       final isVpnRunningFlag = prefs?.getBool('is_vpn_running') ?? false;
@@ -879,7 +885,7 @@ class AppController {
 
       final needRecovery =
           (!globalState.isStart && isReinstall) || isAbnormalExit;
-      return (needRecovery, reason);
+      return (needRecovery, reason, isReinstall);
     }
 
     if (system.isDesktop) {
@@ -909,10 +915,10 @@ class AppController {
         prefs?.setString('last_run_version', currentVersion);
       }
 
-      return (needRecovery, reason);
+      return (needRecovery, reason, false);
     }
 
-    return (false, '');
+    return (false, '', false);
   }
 
   void setDelay(Delay delay) {

@@ -23,7 +23,7 @@ class UiManager {
 
       // Check version file
       final versionFile = File(join(uiPath, '.ui_version'));
-      const currentVersion = '2.6.1'; // Update version
+      const currentVersion = '2.7.0'; // Update version
 
       if (await uiDir.exists()) {
         final files = await uiDir.list().toList();
