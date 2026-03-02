@@ -800,11 +800,9 @@ class AppController {
 
     if (needRecovery) {
       commonPrint.log('Handling Recovery: $recoveryReason');
-      if (isUpgrade) {
-        commonPrint.log('Restarting core after upgrade...');
-        await clashService?.reStart();
-        await _initCore();
-      }
+      commonPrint.log('Restarting core for clean state...');
+      await clashService?.reStart();
+      await _initCore();
     }
 
     // After APK upgrade, skip autoRun to let TUN cleanup finish first
