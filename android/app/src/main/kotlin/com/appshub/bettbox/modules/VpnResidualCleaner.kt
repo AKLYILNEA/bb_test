@@ -67,30 +67,30 @@ object VpnResidualCleaner {
         
         Log.d(TAG, "Starting cleanup process...")
         
+        val intent = android.content.Intent(context, CleanupVpnService::class.java)
         try {
-            val intent = android.content.Intent(context, CleanupVpnService::class.java)
             context.startService(intent)
-            
-            delay(500)
-            
-            context.stopService(intent)
-            
-            Log.d(TAG, "Triggered VPN cleanup via CleanupVpnService")
         } catch (e: Exception) {
             Log.w(TAG, "Failed to start CleanupVpnService: ${e.message}")
+            return
         }
 
-        var retryCount = 0
-        while (retryCount < MAX_POLL_RETRIES) {
-            if (!isZombieTunAlive()) {
-                Log.d(TAG, "Success: Zombie TUN ($ZOMBIE_IP) destroyed in ${retryCount * POLL_INTERVAL_MS}ms.")
-                return
+        try {
+            var retryCount = 0
+            while (retryCount < MAX_POLL_RETRIES) {
+                delay(POLL_INTERVAL_MS)
+                retryCount++
+                if (!isZombieTunAlive()) {
+                    Log.d(TAG, "Success: Zombie TUN destroyed in ${retryCount * POLL_INTERVAL_MS}ms")
+                    return
+                }
             }
-            delay(POLL_INTERVAL_MS)
-            retryCount++
+            Log.w(TAG, "Warning: Timeout waiting for zombie TUN to disappear after ${MAX_POLL_RETRIES * POLL_INTERVAL_MS}ms")
+        } finally {
+            try {
+                context.stopService(intent)
+            } catch (_: Exception) {}
         }
-        
-        Log.w(TAG, "Warning: Timeout waiting for zombie TUN to disappear after ${CLEANUP_TIMEOUT_MS}ms.")
     }
 
     suspend fun cleanResidualVpnStateSync(): Boolean = withContext(Dispatchers.IO) {

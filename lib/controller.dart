@@ -784,12 +784,23 @@ class AppController {
 
     if (system.isAndroid) {
       try {
-        final hasResidual = await vpn?.checkAndCleanResidualVpn() ?? false;
+        final prefs = await preferences.sharedPreferencesCompleter.future;
+        final needsTunCleanup = prefs?.getBool('needs_tun_cleanup') ?? false;
+
+        // Check: Receiver flagged cleanup needed, or real-time detection
+        final hasResidual = needsTunCleanup ||
+            (await vpn?.checkAndCleanResidualVpn() ?? false);
+
         if (hasResidual) {
+          if (needsTunCleanup) {
+            // Receiver detected zombie TUN but couldn't clean (background restriction)
+            // Do cleanup now in foreground context
+            commonPrint.log('Receiver flagged TUN cleanup, executing...');
+            await vpn?.checkAndCleanResidualVpn();
+          }
           commonPrint.log('Detected and cleaned residual VPN state');
-          // Reset VPN running flag since we cleaned up the residual state
-          final prefs = await preferences.sharedPreferencesCompleter.future;
           await prefs?.setBool('is_vpn_running', false);
+          await prefs?.setBool('needs_tun_cleanup', false);
         }
       } catch (e) {
         commonPrint.log('Failed to check/clean residual VPN: $e');
