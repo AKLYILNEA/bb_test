@@ -37,7 +37,7 @@ class DnsOverride extends StatelessWidget {
     if (result == true) {
       await clashCore.flushFakeIP();
       await clashCore.flushDnsCache();
-      globalState.showNotifier(appLocalizations.clearCacheTitle);
+      globalState.showNotifier(appLocalizations.success);
     }
   }
 

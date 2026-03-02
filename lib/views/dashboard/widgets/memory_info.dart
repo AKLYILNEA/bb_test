@@ -103,7 +103,7 @@ class _MemoryInfoState extends State<MemoryInfo> {
           // Execute force GC after user confirms
           if (result == true) {
             await clashCore.requestGc();
-            globalState.showNotifier(appLocalizations.forceGCTitle);
+            globalState.showNotifier(appLocalizations.success);
           }
         },
         child: Container(

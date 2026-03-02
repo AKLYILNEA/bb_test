@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.appshub.bettbox.GlobalState
 import com.appshub.bettbox.modules.VpnResidualCleaner
 
 class PackageReplacedReceiver : BroadcastReceiver() {
@@ -13,7 +14,6 @@ class PackageReplacedReceiver : BroadcastReceiver() {
 
         private const val KEY_VPN_RUNNING = "flutter.is_vpn_running"
         private const val KEY_TUN_RUNNING = "flutter.is_tun_running"
-        private const val KEY_NEEDS_TUN_CLEANUP = "flutter.needs_tun_cleanup"
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -22,22 +22,26 @@ class PackageReplacedReceiver : BroadcastReceiver() {
         val pendingResult = goAsync()
 
         try {
-            Log.i(TAG, "Self package replaced, checking for residual VPN state")
+            Log.i(TAG, "Self package replaced, cleaning up stale state")
 
-            val hasZombieTun = VpnResidualCleaner.isZombieTunAlive()
+            // Destroy Service Engine so the new APP launch recreates it cleanly.
+            // This ensures Go Core listener uses the new .so, not the stale one.
+            GlobalState.destroyServiceEngine()
+
+            // Reset VPN state flags
             val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-
             prefs.edit()
                 .putBoolean(KEY_VPN_RUNNING, false)
                 .putBoolean(KEY_TUN_RUNNING, false)
-                .putBoolean(KEY_NEEDS_TUN_CLEANUP, hasZombieTun)
                 .apply()
 
-            if (hasZombieTun) {
+            // Flag zombie TUN for cleanup on next APP launch (foreground context)
+            if (VpnResidualCleaner.isZombieTunAlive()) {
                 Log.i(TAG, "Zombie TUN detected, flagged for cleanup on next APP launch")
-            } else {
-                Log.i(TAG, "No zombie TUN detected")
+                prefs.edit().putBoolean("needs_tun_cleanup", true).apply()
             }
+
+            Log.i(TAG, "Package replaced cleanup done")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to handle package replace", e)
         } finally {

@@ -155,7 +155,12 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             "checkAndCleanResidualVpn" -> {
                 scope.launch {
                     try {
-                        val hasResidual = VpnResidualCleaner.isZombieTunAlive()
+                        // Check real-time TUN state OR flag set by PackageReplacedReceiver
+                        val prefs = context.getSharedPreferences(
+                            "FlutterSharedPreferences", android.content.Context.MODE_PRIVATE
+                        )
+                        val flaggedForCleanup = prefs.getBoolean("flutter.needs_tun_cleanup", false)
+                        val hasResidual = flaggedForCleanup || VpnResidualCleaner.isZombieTunAlive()
                         if (hasResidual) {
                             android.util.Log.i("VpnPlugin", "Detected residual VPN, cleaning...")
                             VpnResidualCleaner.cleanResidualVpnStateSync()

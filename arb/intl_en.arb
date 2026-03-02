@@ -481,6 +481,7 @@
   "profileHasUpdate": "Profile modified. Disable auto-update?",
   "hasCacheChange": "Cache modifications?",
   "copySuccess": "Copy Successful",
+  "success": "Success",
   "copyLink": "Copy Link",
   "exportFile": "Export File",
   "cacheCorrupt": "Cache corrupted. Clear it?",

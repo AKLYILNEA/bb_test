@@ -667,6 +667,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "style": MessageLookupByLibrary.simpleMessage("風格"),
     "subRule": MessageLookupByLibrary.simpleMessage("子規則"),
     "submit": MessageLookupByLibrary.simpleMessage("提交"),
+    "success": MessageLookupByLibrary.simpleMessage("Success"),
     "switchLabel": MessageLookupByLibrary.simpleMessage("開關"),
     "switchToDomesticIp": MessageLookupByLibrary.simpleMessage("切換國內 IP"),
     "sync": MessageLookupByLibrary.simpleMessage("同步"),

@@ -3889,6 +3889,11 @@ class AppLocalizations {
     );
   }
 
+  /// `Success`
+  String get success {
+    return Intl.message('Success', name: 'success', desc: '', args: []);
+  }
+
   /// `Copy Link`
   String get copyLink {
     return Intl.message('Copy Link', name: 'copyLink', desc: '', args: []);

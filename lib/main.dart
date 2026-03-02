@@ -176,6 +176,11 @@ void _handleMainIpc(ClashLibHandler clashLibHandler) {
   messageReceiverPort.listen((message) {
     sendPort.send(message);
   });
+  // Restart the listener goroutine now that the message port is bound.
+  // In quick start, startListener() was called before attachMessagePort,
+  // so the goroutine had no port and exited. Re-calling it here ensures
+  // log/traffic messages actually flow to the UI Engine.
+  clashLibHandler.startListener();
 }
 
 @immutable

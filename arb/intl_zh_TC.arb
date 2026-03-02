@@ -481,6 +481,7 @@
   "profileHasUpdate": "設定檔已經修改，是否關閉自動更新 ",
   "hasCacheChange": "是否快取修改",
   "copySuccess": "複製成功",
+  "success": "Success",
   "copyLink": "複製連結",
   "exportFile": "匯出檔案",
   "cacheCorrupt": "快取已損壞，是否清空？",
