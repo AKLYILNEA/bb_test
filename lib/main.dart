@@ -147,7 +147,6 @@ Future<void> _service(List<String> flags) async {
       if (system.isAndroid) {
         await vpn?.checkAndCleanResidualVpn();
       }
-      await clashLibHandler.reStart();
 
       final params = await globalState.getSetupParams(pathConfig: clashConfig);
       final res = await clashLibHandler.quickStart(
@@ -161,6 +160,13 @@ Future<void> _service(List<String> flags) async {
         exit(0);
       }
       await vpn?.start(clashLibHandler.getAndroidVpnOptions());
+      
+      if (globalState.config.appSetting.openLogs) {
+        await clashLibHandler.invokeAction('{"id": "quickStartLog", "method": "startLog"}');
+      } else {
+        await clashLibHandler.invokeAction('{"id": "quickStopLog", "method": "stopLog"}');
+      }
+      
       clashLibHandler.startListener();
     });
   }
