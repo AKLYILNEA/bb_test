@@ -630,25 +630,6 @@ class AppController {
     await prefs?.setInt('last_check_update_time', now);
   }
 
-  Future<void> autoCheckUpdate() async {
-    final prefs = await preferences.sharedPreferencesCompleter.future;
-    final lastCheckTime = prefs?.getInt('last_check_update_time') ?? 0;
-    final now = DateTime.now().millisecondsSinceEpoch;
-    final isAutoCheck = _ref.read(appSettingProvider).autoCheckUpdate;
-
-    final forceCheck =
-        (now - lastCheckTime) > const Duration(days: 28).inMilliseconds;
-
-    if (!isAutoCheck && !forceCheck) return;
-
-    final res = await request.checkForUpdate();
-    if (res != null) {
-      checkUpdateResultHandle(data: res);
-    }
-
-    await prefs?.setInt('last_check_update_time', now);
-  }
-
   Future<void> checkUpdateResultHandle({
     Map<String, dynamic>? data,
     bool handleError = false,
