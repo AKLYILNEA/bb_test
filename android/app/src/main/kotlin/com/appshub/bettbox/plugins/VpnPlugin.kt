@@ -156,7 +156,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 scope.launch {
                     try {
                         // Check real-time TUN state OR flag set by PackageReplacedReceiver
-                        val prefs = context.getSharedPreferences(
+                        val prefs = BettboxApplication.getAppContext().getSharedPreferences(
                             "FlutterSharedPreferences", android.content.Context.MODE_PRIVATE
                         )
                         val flaggedForCleanup = prefs.getBoolean("flutter.needs_tun_cleanup", false)
