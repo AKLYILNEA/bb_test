@@ -786,7 +786,7 @@ class AppController {
 
     final (needRecovery, recoveryReason, isUpgrade) = await _detectRecoveryReason();
 
-    if (system.isAndroid) {
+    if (system.isAndroid && needRecovery) {
       try {
         final hasResidual = await vpn?.checkAndCleanResidualVpn() ?? false;
         if (hasResidual) {
@@ -794,24 +794,21 @@ class AppController {
           final prefs = await preferences.sharedPreferencesCompleter.future;
           await prefs?.setBool('is_vpn_running', false);
           await prefs?.setBool('needs_tun_cleanup', false);
-          
-          if (isUpgrade) {
-            await Future.delayed(const Duration(milliseconds: 450));
-          }
         }
       } catch (e) {
         commonPrint.log('Failed to check/clean residual VPN: $e');
       }
-    }
 
-    if (needRecovery) {
       commonPrint.log('Handling Recovery: $recoveryReason');
-      if (isUpgrade) {
-        await clashService?.reStart();
-        await _initCore();
+      await Future.delayed(const Duration(milliseconds: 1000));
 
-        await Future.delayed(const Duration(milliseconds: 450));
-      }
+      await clashService?.reStart();
+      await _initCore();
+
+      await Future.delayed(const Duration(milliseconds: 1000));
+
+      commonPrint.log('Force applying profile for Android');
+      await applyProfile(silence: true);
     }
 
     final shouldStart =
@@ -819,14 +816,6 @@ class AppController {
 
     if (shouldStart) {
       try {
-        if (system.isAndroid && needRecovery) {
-          if (!isUpgrade) {
-            await globalState.handleStop();
-            await Future.delayed(const Duration(milliseconds: 450));
-          }
-          commonPrint.log('Force applying profile for Android');
-          await applyProfile();
-        }
         await updateStatus(true);
       } catch (e) {
         commonPrint.log('Auto start failed: $e');
