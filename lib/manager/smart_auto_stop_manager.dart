@@ -47,7 +47,7 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
         final vpnProps = ref.read(vpnSettingProvider);
         if (vpnProps.quickResponse) {
           commonPrint.log(
-            'Quick Response triggered on network change: closing connections.',
+            'Network change: Closing connections.',
           );
           clashCore.closeConnections();
         }
@@ -65,7 +65,6 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Listen to VPN settings changes to trigger check immediately if enabled
     ref.listenManual(vpnSettingProvider, (prev, next) {
       if (prev?.smartAutoStop != next.smartAutoStop ||
           prev?.smartAutoStopNetworks != next.smartAutoStopNetworks) {

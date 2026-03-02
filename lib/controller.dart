@@ -593,7 +593,6 @@ class AppController {
       system.exit();
     });
     try {
-      // Clean up WakeLock timer
       stopWakelockAutoRecovery();
 
       await savePreferences();
@@ -656,10 +655,12 @@ class AppController {
         ),
         confirmText: appLocalizations.goDownload,
       );
-      if (res != true) {
-        return;
+      if (res == true) {
+        launchUrl(
+          Uri.parse('https://github.com/$repository/releases/latest'),
+          mode: LaunchMode.externalApplication,
+        );
       }
-      launchUrl(Uri.parse('https://github.com/$repository/releases/latest'));
     } else if (handleError) {
       globalState.showMessage(
         title: appLocalizations.checkUpdate,
@@ -696,7 +697,7 @@ class AppController {
 
   void startWakelockAutoRecovery() {
     _wakelockSyncTimer?.cancel();
-    _wakelockSyncTimer = Timer.periodic(const Duration(seconds: 240), (
+    _wakelockSyncTimer = Timer.periodic(const Duration(seconds: 168), (
       _,
     ) async {
       try {
@@ -710,7 +711,7 @@ class AppController {
 
         if (!actualState) {
           commonPrint.log(
-            'WakeLock was released by system, attempting auto-recovery',
+            'WakeLock attempting auto-recovery',
           );
 
           await WakelockPlus.enable();
@@ -782,6 +783,8 @@ class AppController {
       await globalState.updateStartTime();
     }
 
+    final (needRecovery, recoveryReason, isUpgrade) = await _detectRecoveryReason();
+
     if (system.isAndroid) {
       try {
         final hasResidual = await vpn?.checkAndCleanResidualVpn() ?? false;
@@ -791,22 +794,25 @@ class AppController {
           await prefs?.setBool('is_vpn_running', false);
           await prefs?.setBool('needs_tun_cleanup', false);
           
-          await Future.delayed(const Duration(milliseconds: 450));
+          if (isUpgrade) {
+            await Future.delayed(const Duration(milliseconds: 450));
+          }
         }
       } catch (e) {
         commonPrint.log('Failed to check/clean residual VPN: $e');
       }
     }
 
-    final (needRecovery, recoveryReason, isUpgrade) = await _detectRecoveryReason();
-
     if (needRecovery) {
       commonPrint.log('Handling Recovery: $recoveryReason');
-      commonPrint.log('Restarting core for clean state...');
-      await clashService?.reStart();
-      await _initCore();
+      if (isUpgrade) {
+        await clashService?.reStart();
+        await _initCore();
 
-      await Future.delayed(const Duration(milliseconds: 450));
+        await Future.delayed(const Duration(milliseconds: 450));
+      } else {
+        commonPrint.log('Force applying profile for Android');
+      }
     }
 
     final shouldStart =
@@ -825,7 +831,6 @@ class AppController {
         addCheckIpNumDebounce();
       }
     } else {
-      // Clear stale flag to prevent repeated "abnormal exit" detection on next launch
       if (needRecovery) {
         final prefs = await preferences.sharedPreferencesCompleter.future;
         await prefs?.setBool('is_vpn_running', false);
@@ -855,17 +860,11 @@ class AppController {
       String reason = '';
 
       if (savedApkUpdateTime != 0 && savedApkUpdateTime != apkLastUpdateTime) {
-        commonPrint.log(
-          'Detected by time: $savedApkUpdateTime -> $apkLastUpdateTime',
-        );
         isReinstall = true;
         reason = 'APK Upgrade';
       }
 
       if (lastRunVersion != null && lastRunVersion != currentVersion) {
-        commonPrint.log(
-          'Detected by version: $lastRunVersion -> $currentVersion',
-        );
         isReinstall = true;
         reason = 'APK Upgrade';
       }

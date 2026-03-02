@@ -278,16 +278,18 @@ class GlobalState {
     navigatorKey.currentContext?.showNotifier(text);
   }
 
-  Future<void> openUrl(String url) async {
-    final res = await showMessage(
-      message: TextSpan(text: url),
-      title: appLocalizations.externalLink,
-      confirmText: appLocalizations.go,
-    );
-    if (res != true) {
-      return;
+  Future<void> openUrl(String url, {bool needConfirm = false}) async {
+    if (needConfirm) {
+      final res = await showMessage(
+        message: TextSpan(text: url),
+        title: appLocalizations.externalLink,
+        confirmText: appLocalizations.go,
+      );
+      if (res != true) {
+        return;
+      }
     }
-    launchUrl(Uri.parse(url));
+    launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
   }
 
   Future<void> migrateOldData(Config config) async {
