@@ -819,15 +819,15 @@ class AppController {
 
     if (shouldStart) {
       try {
-        await updateStatus(true);
         if (system.isAndroid && needRecovery) {
           if (!isUpgrade) {
-            await clashService?.reStart();
-            await _initCore();
+            await globalState.handleStop();
+            await Future.delayed(const Duration(milliseconds: 450));
           }
           commonPrint.log('Force applying profile for Android');
-          await applyProfile(silence: true);
+          await applyProfile();
         }
+        await updateStatus(true);
       } catch (e) {
         commonPrint.log('Auto start failed: $e');
         await applyProfile();
