@@ -805,9 +805,8 @@ class AppController {
       await _initCore();
     }
 
-    // After APK upgrade, skip autoRun to let TUN cleanup finish first
     final shouldStart =
-        globalState.isStart || (!isUpgrade && _ref.read(appSettingProvider).autoRun);
+        globalState.isStart || _ref.read(appSettingProvider).autoRun;
 
     if (shouldStart) {
       try {
