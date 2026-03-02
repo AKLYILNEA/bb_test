@@ -143,6 +143,12 @@ Future<void> _service(List<String> flags) async {
       if (profileId == null) {
         return;
       }
+
+      if (system.isAndroid) {
+        await vpn?.checkAndCleanResidualVpn();
+      }
+      await clashLibHandler.reStart();
+
       final params = await globalState.getSetupParams(pathConfig: clashConfig);
       final res = await clashLibHandler.quickStart(
         InitParams(homeDir: homeDirPath, version: version),

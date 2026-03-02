@@ -790,6 +790,8 @@ class AppController {
           final prefs = await preferences.sharedPreferencesCompleter.future;
           await prefs?.setBool('is_vpn_running', false);
           await prefs?.setBool('needs_tun_cleanup', false);
+          
+          await Future.delayed(const Duration(milliseconds: 450));
         }
       } catch (e) {
         commonPrint.log('Failed to check/clean residual VPN: $e');
@@ -803,6 +805,8 @@ class AppController {
       commonPrint.log('Restarting core for clean state...');
       await clashService?.reStart();
       await _initCore();
+
+      await Future.delayed(const Duration(milliseconds: 450));
     }
 
     final shouldStart =
