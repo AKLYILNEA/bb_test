@@ -4804,6 +4804,11 @@ class AppLocalizations {
     );
   }
 
+  /// `Restart`
+  String get restart {
+    return Intl.message('Restart', name: 'restart', desc: '', args: []);
+  }
+
   /// `Restart Core`
   String get restartCoreTitle {
     return Intl.message(
