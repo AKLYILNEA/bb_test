@@ -29,12 +29,15 @@ class ApplicationState extends ConsumerState<Application> {
 
   final _pageTransitionsTheme = const PageTransitionsTheme(
     builders: <TargetPlatform, PageTransitionsBuilder>{
-      TargetPlatform.android: CommonPageTransitionsBuilder(),
+      // Android 13+（API 33+）：PredictiveBackPageTransitionsBuilder 支持预测性返回手势动画
+      // 低版本 Android 会自动降级为传统过渡动画，无需额外适配
+      TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
       TargetPlatform.windows: CommonPageTransitionsBuilder(),
       TargetPlatform.linux: CommonPageTransitionsBuilder(),
       TargetPlatform.macOS: CommonPageTransitionsBuilder(),
     },
   );
+
 
   ColorScheme _getAppColorScheme({
     required Brightness brightness,

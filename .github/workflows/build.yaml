@@ -80,7 +80,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '17'
           cache: 'gradle'
 
       - name: Install Dependencies
@@ -92,7 +92,7 @@ jobs:
       - name: Setup Golang
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ matrix.compatible == true && '1.22.x' || '1.25.x' }}
+          go-version: ${{ matrix.compatible == true && '1.22.x' || '1.26.x' }}
           cache-dependency-path: core/go.sum
 
       - name: Setup Flutter

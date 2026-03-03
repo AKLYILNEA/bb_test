@@ -664,7 +664,6 @@ class DetectionState {
   bool _isIpMasked = false; // IP privacy protection state
   IpInfo? _originalIpInfo; // Save original IP info
   bool _isFirstLaunch = true; // First launch flag
-  bool _forceNextCheck = false;
 
   final state = ValueNotifier<NetworkDetectionState>(
     const NetworkDetectionState(
@@ -706,7 +705,6 @@ class DetectionState {
   void manualRefresh() {
     _isIpMasked = false;
     _originalIpInfo = null;
-    _forceNextCheck = true;
     startCheck();
   }
 
@@ -811,22 +809,13 @@ class DetectionState {
     // Remove lifecycle and window visibility checks for stability
 
     final isStart = appState.runTime != null;
-    final stateChanged = _preIsStart != isStart;
 
     // Optimization: if VPN off and cached data exists, return
-    // But ONLY if the state hasn't changed (meaning it didn't just turn off) and we aren't forcing a refresh.
-    if (!isStart && !stateChanged && !_forceNextCheck && state.value.ipInfo != null && !state.value.isLoading) {
-      return;
-    }
-
-    // Double-refresh prevention:
-    // If we're already loading AND the state hasn't changed AND we're not forcing, skip.
-    if (state.value.isLoading && !stateChanged && !_forceNextCheck) {
+    if (!isStart && state.value.ipInfo != null && !state.value.isLoading) {
       return;
     }
 
     _preIsStart = isStart;
-    _forceNextCheck = false;
     _cancelPreviousRequest();
     _cancelToken = CancelToken();
     final requestId = ++_requestId;

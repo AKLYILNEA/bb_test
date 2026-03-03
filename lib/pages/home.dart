@@ -225,6 +225,7 @@ class _HomeBackScopeState extends ConsumerState<HomeBackScope> {
         return widget.child;
       }
 
+      // Android < 31（Android 11 及以下）：使用 CommonPopScope 拦截
       if (sdkInt! < 31) {
         return CommonPopScope(
           onPop: () async {
@@ -240,9 +241,18 @@ class _HomeBackScopeState extends ConsumerState<HomeBackScope> {
         );
       }
 
+      // Android 13+（API 33+）：Native 层已通过 OnBackInvokedCallback 接管侧滑返回
+      // 侧滑返回由 MainActivity.onBackInvokedCallback 处理（moveTaskToBack），
+      // 系统可正常播放「返回主屏」的预测性动画。
+      // Flutter 层不设置 canPop: false，避免干扰系统动画。
+      if (sdkInt! >= 33) {
+        return widget.child;
+      }
+
+      // Android 31-32（Android 12）：仍使用 PopScope 拦截（无预测性返回动画）
       final backBlock = ref.watch(backBlockProvider);
       return PopScope(
-        canPop: !backBlock,
+        canPop: false,
         onPopInvokedWithResult: (didPop, _) async {
           if (didPop || backBlock) return;
           final canPop = Navigator.canPop(context);
