@@ -173,6 +173,11 @@ class AppController {
         .read(currentProfileProvider)
         ?.profileLastModified;
 
+    if (lastProfileModified == null) {
+      final prefs = await preferences.sharedPreferencesCompleter.future;
+      lastProfileModified = prefs?.getInt('last_profile_modified');
+    }
+
     // Skip if unchanged
     if (currentLastModified != null &&
         lastProfileModified != null &&
@@ -212,6 +217,10 @@ class AppController {
         lastProfileModified = await _ref.read(
           currentProfileProvider.select((state) => state?.profileLastModified),
         );
+        if (lastProfileModified != null) {
+          final prefs = await preferences.sharedPreferencesCompleter.future;
+          await prefs?.setInt('last_profile_modified', lastProfileModified!);
+        }
       },
       needLoading: false, // Fast startup
     );
@@ -464,6 +473,10 @@ class AppController {
     lastProfileModified = await _ref.read(
       currentProfileProvider.select((state) => state?.profileLastModified),
     );
+    if (lastProfileModified != null) {
+      final prefs = await preferences.sharedPreferencesCompleter.future;
+      await prefs?.setInt('last_profile_modified', lastProfileModified!);
+    }
   }
 
   Future _applyProfile() async {
@@ -860,7 +873,6 @@ class AppController {
         isReinstall = true;
         reason = 'APK Upgrade';
       }
-
       final isVpnRunningFlag = prefs?.getBool('is_vpn_running') ?? false;
       final isAbnormalExit = !globalState.isStart && isVpnRunningFlag;
       if (isAbnormalExit && !isReinstall) {
