@@ -14,6 +14,8 @@ abstract class CommonMessage with _$CommonMessage {
     required String id,
     required String text,
     @Default(Duration(seconds: 3)) Duration duration,
+    VoidCallback? onAction,
+    String? actionLabel,
   }) = _CommonMessage;
 }
 
@@ -30,7 +32,7 @@ abstract class AppBarState with _$AppBarState {
 abstract class AppBarSearchState with _$AppBarSearchState {
   const factory AppBarSearchState({
     required Function(String) onSearch,
-    @Default(null) String? query,
+    String? query,
   }) = _AppBarSearchState;
 }
 

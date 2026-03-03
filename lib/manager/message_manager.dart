@@ -31,8 +31,22 @@ class MessageManagerState extends State<MessageManager> {
     super.dispose();
   }
 
-  Future<void> message(String text) async {
-    final commonMessage = CommonMessage(id: utils.uuidV4, text: text);
+  Future<void> message(
+    String text, {
+    VoidCallback? onAction,
+    String? actionLabel,
+  }) async {
+    if (_messagesNotifier.value.any((m) => m.text == text) ||
+        _bufferMessages.any((m) => m.text == text)) {
+      return;
+    }
+
+    final commonMessage = CommonMessage(
+      id: utils.uuidV4,
+      text: text,
+      onAction: onAction,
+      actionLabel: actionLabel,
+    );
     _bufferMessages.add(commonMessage);
     await _showMessage();
   }
@@ -56,7 +70,7 @@ class MessageManagerState extends State<MessageManager> {
     }
   }
 
-  Future<void> _handleRemove(CommonMessage commonMessage) async {
+  void _handleRemove(CommonMessage commonMessage) {
     _messagesNotifier.value = List<CommonMessage>.from(_messagesNotifier.value)
       ..remove(commonMessage);
   }
@@ -93,9 +107,38 @@ class MessageManagerState extends State<MessageManager> {
                             width: min(constraints.maxWidth, 500),
                             padding: EdgeInsets.symmetric(
                               horizontal: 12,
-                              vertical: 16,
+                              vertical: 12,
                             ),
-                            child: Text(messages.last.text),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Expanded(child: Text(messages.last.text)),
+                                if (messages.last.actionLabel != null &&
+                                    messages.last.onAction != null) ...[
+                                  const SizedBox(width: 8),
+                                  TextButton(
+                                    onPressed: () {
+                                      final message = messages.last;
+                                      _handleRemove(message);
+                                      message.onAction?.call();
+                                    },
+                                    style: TextButton.styleFrom(
+                                      minimumSize: Size.zero,
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      visualDensity: VisualDensity.compact,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
+                                      foregroundColor:
+                                          context.colorScheme.primary,
+                                    ),
+                                    child: Text(messages.last.actionLabel!),
+                                  ),
+                                ],
+                              ],
+                            ),
                           ),
                         );
                       },
