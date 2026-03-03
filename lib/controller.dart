@@ -800,12 +800,13 @@ class AppController {
       }
 
       commonPrint.log('Handling Recovery: $recoveryReason');
-      await Future.delayed(const Duration(milliseconds: 666));
+      await Future.delayed(const Duration(milliseconds: 888));
       await applyProfile(silence: true);
       await clashService?.reStart();
       await _initCore();
-      await Future.delayed(const Duration(milliseconds: 666));
+      await Future.delayed(const Duration(milliseconds: 888));
       commonPrint.log('Force applying profile for Android');
+      await applyProfile(silence: true);
     }
 
     final shouldStart =
