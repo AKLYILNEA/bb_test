@@ -4803,6 +4803,26 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Restart Core`
+  String get restartCoreTitle {
+    return Intl.message(
+      'Restart Core',
+      name: 'restartCoreTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Manually restart the core?`
+  String get restartCoreDesc {
+    return Intl.message(
+      'Manually restart the core?',
+      name: 'restartCoreDesc',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

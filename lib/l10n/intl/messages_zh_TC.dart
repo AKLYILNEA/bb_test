@@ -590,6 +590,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "resourcesDesc": MessageLookupByLibrary.simpleMessage("外部資源相關資訊"),
     "respectRules": MessageLookupByLibrary.simpleMessage("遵守規則"),
     "respectRulesDesc": MessageLookupByLibrary.simpleMessage("DNS 連線跟隨 Rules"),
+    "restartCoreDesc": MessageLookupByLibrary.simpleMessage("是否手動重啟內核？"),
+    "restartCoreTitle": MessageLookupByLibrary.simpleMessage("重啟內核"),
     "restartTip": MessageLookupByLibrary.simpleMessage("重啟 APP 後改變生效"),
     "retry": MessageLookupByLibrary.simpleMessage("重試"),
     "rotatingCircle": MessageLookupByLibrary.simpleMessage("單圓自轉"),

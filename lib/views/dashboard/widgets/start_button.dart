@@ -40,6 +40,36 @@ class _StartButtonState extends ConsumerState<StartButton> {
     }, duration: commonDuration);
   }
 
+  Future<void> _handleLongPress() async {
+    final isStart = ref.read(runTimeProvider) != null;
+    if (!isStart) return;
+
+    final result = await globalState.showCommonDialog<bool>(
+      child: CommonDialog(
+        title: appLocalizations.restartCoreTitle,
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context, rootNavigator: true).pop(false);
+            },
+            child: Text(appLocalizations.cancel),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context, rootNavigator: true).pop(true);
+            },
+            child: Text(appLocalizations.confirm),
+          ),
+        ],
+        child: Text(appLocalizations.restartCoreDesc),
+      ),
+    );
+
+    if (result == true) {
+      await globalState.appController.restartCore();
+    }
+  }
+
   @override
   void dispose() {
     _disableTimer?.cancel();
@@ -63,6 +93,7 @@ class _StartButtonState extends ConsumerState<StartButton> {
           iconData: Icons.power_settings_new,
         ),
         onPressed: canPress ? _handleStart : null,
+        onLongPress: canPress ? _handleLongPress : null,
         child: Container(
           padding: baseInfoEdgeInsets.copyWith(top: 0),
           child: Column(

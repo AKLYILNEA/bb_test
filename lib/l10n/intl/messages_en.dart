@@ -834,6 +834,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "respectRulesDesc": MessageLookupByLibrary.simpleMessage(
       "DNS connections follow Rules",
     ),
+    "restartCoreDesc": MessageLookupByLibrary.simpleMessage(
+      "Manually restart the core?",
+    ),
+    "restartCoreTitle": MessageLookupByLibrary.simpleMessage("Restart Core"),
     "restartTip": MessageLookupByLibrary.simpleMessage(
       "Restart the app for changes to take effect",
     ),
