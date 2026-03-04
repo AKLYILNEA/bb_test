@@ -45,6 +45,11 @@ func Start(fd int, device string, stack constant.TUNStack, disableIcmpForwarding
 	var dnsHijack []string
 	dnsHijack = append(dnsHijack, net.JoinHostPort(state.GetDnsServerAddress(), "53"))
 
+	validMtu := mtu
+	if validMtu < 1280 || validMtu > 65535 {
+		validMtu = 1480
+	}
+
 	options := LC.Tun{
 		Enable:                true,
 		Device:                device,
@@ -54,7 +59,7 @@ func Start(fd int, device string, stack constant.TUNStack, disableIcmpForwarding
 		AutoDetectInterface:   false,
 		Inet4Address:          prefix4,
 		Inet6Address:          prefix6,
-		MTU:                   mtu,
+		MTU:                   validMtu,
 		FileDescriptor:        fd,
 		DisableICMPForwarding: disableIcmpForwarding,
 	}
