@@ -634,7 +634,7 @@ class AppController {
     Map<String, dynamic>? data,
     bool handleError = false,
   }) async {
-    if (globalState.isPre) {
+    if (globalState.isPre && !handleError) {
       return;
     }
     if (data != null) {
