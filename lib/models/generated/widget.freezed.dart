@@ -467,14 +467,14 @@ return $default(_that.id,_that.text,_that.duration,_that.onAction,_that.actionLa
 
 
 class _CommonMessage implements CommonMessage {
-  const _CommonMessage({required this.id, required this.text, this.duration = const Duration(seconds: 3), this.onAction = null, this.actionLabel = null});
+  const _CommonMessage({required this.id, required this.text, this.duration = const Duration(seconds: 3), this.onAction, this.actionLabel});
   
 
 @override final  String id;
 @override final  String text;
 @override@JsonKey() final  Duration duration;
-@override@JsonKey() final  VoidCallback? onAction;
-@override@JsonKey() final  String? actionLabel;
+@override final  VoidCallback? onAction;
+@override final  String? actionLabel;
 
 /// Create a copy of CommonMessage
 /// with the given fields replaced by the non-null parameter values.
@@ -1050,11 +1050,11 @@ return $default(_that.onSearch,_that.query);case _:
 
 
 class _AppBarSearchState implements AppBarSearchState {
-  const _AppBarSearchState({required this.onSearch, this.query = null});
+  const _AppBarSearchState({required this.onSearch, this.query});
   
 
 @override final   Function(String) onSearch;
-@override@JsonKey() final  String? query;
+@override final  String? query;
 
 /// Create a copy of AppBarSearchState
 /// with the given fields replaced by the non-null parameter values.

@@ -411,6 +411,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "noProxyDesc": MessageLookupByLibrary.simpleMessage("请创建配置或者添加有效配置文件"),
     "noResolve": MessageLookupByLibrary.simpleMessage("不解析IP"),
     "noStatusAvailable": MessageLookupByLibrary.simpleMessage("未获取到状态"),
+    "nodeExclusion": MessageLookupByLibrary.simpleMessage("节点排除"),
+    "nodeExclusionDesc": MessageLookupByLibrary.simpleMessage("排除所有匹配到的节点"),
+    "nodeExclusionPlaceholder": MessageLookupByLibrary.simpleMessage(
+      "HK|香港|🇭🇰",
+    ),
     "none": MessageLookupByLibrary.simpleMessage("无"),
     "notRecommended": MessageLookupByLibrary.simpleMessage("不推荐"),
     "notSelectedTip": MessageLookupByLibrary.simpleMessage("当前代理组无法选中"),
@@ -572,6 +577,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "resourcesDesc": MessageLookupByLibrary.simpleMessage("外部资源相关信息"),
     "respectRules": MessageLookupByLibrary.simpleMessage("遵守规则"),
     "respectRulesDesc": MessageLookupByLibrary.simpleMessage("DNS连接跟随Rules"),
+    "restart": MessageLookupByLibrary.simpleMessage("重启"),
     "restartCoreDesc": MessageLookupByLibrary.simpleMessage("是否手动重启内核？"),
     "restartCoreTitle": MessageLookupByLibrary.simpleMessage("重启内核"),
     "restartTip": MessageLookupByLibrary.simpleMessage("重启APP后改变生效"),
@@ -733,7 +739,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "vpnTip": MessageLookupByLibrary.simpleMessage("重启VPN后改变生效"),
     "wakelock": MessageLookupByLibrary.simpleMessage("亮屏锁"),
-    "restart": MessageLookupByLibrary.simpleMessage("重启"),
     "wakelockDescription": MessageLookupByLibrary.simpleMessage(
       "本功能不需要任何特殊权限，因为它仅启用屏幕唤醒锁，而不是任何CPU唤醒锁，应用会在后台保持必要的活跃，且屏幕不会自动熄灭，这在一些场景下会很有用",
     ),

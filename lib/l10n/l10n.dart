@@ -2579,6 +2579,36 @@ class AppLocalizations {
     );
   }
 
+  /// `Node Exclusion`
+  String get nodeExclusion {
+    return Intl.message(
+      'Node Exclusion',
+      name: 'nodeExclusion',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Exclude all matched nodes`
+  String get nodeExclusionDesc {
+    return Intl.message(
+      'Exclude all matched nodes',
+      name: 'nodeExclusionDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `HK|Hong Kong|🇭🇰`
+  String get nodeExclusionPlaceholder {
+    return Intl.message(
+      'HK|Hong Kong|🇭🇰',
+      name: 'nodeExclusionPlaceholder',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Concurrency Limit`
   String get concurrencyLimit {
     return Intl.message(

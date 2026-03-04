@@ -7,6 +7,7 @@ import 'package:archive/archive_io.dart';
 import 'package:bett_box/clash/clash.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/plugins/app.dart';
+import 'package:bett_box/plugins/service.dart';
 import 'package:bett_box/plugins/vpn.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
@@ -788,7 +789,10 @@ class AppController {
 
     if (system.isAndroid && needRecovery) {
       try {
-        final hasResidual = await vpn?.checkAndCleanResidualVpn() ?? false;
+        final hasResidual =
+            await (service?.checkAndCleanResidualVpn() ??
+                vpn?.checkAndCleanResidualVpn()) ??
+            false;
         if (hasResidual) {
           commonPrint.log('Cleaned residual VPN state');
           final prefs = await preferences.sharedPreferencesCompleter.future;
@@ -800,7 +804,7 @@ class AppController {
       }
 
       commonPrint.log('Handling Recovery: $recoveryReason');
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 1000));
       commonPrint.log('Force applying profile for Android');
       await applyProfile(silence: true);
       await clashService?.reStart();

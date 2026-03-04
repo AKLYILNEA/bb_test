@@ -160,14 +160,24 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                         )
                         val flaggedForCleanup = prefs.getBoolean("flutter.needs_tun_cleanup", false)
                         val cleanupStartTime = prefs.getLong("flutter.cleanup_start_time", 0)
-                        if (flaggedForCleanup && System.currentTimeMillis() - cleanupStartTime < 2000) {
-                            android.util.Log.i("VpnPlugin", "Cleanup started by Receiver, waiting...")
+                        val timeSinceCleanup = System.currentTimeMillis() - cleanupStartTime
+                        
+                        if (flaggedForCleanup && timeSinceCleanup < 3000) {
+                            android.util.Log.i("VpnPlugin", "Cleanup recently started, waiting...")
                             delay(500)
                         }
-                        val hasResidual = VpnResidualCleaner.isZombieTunAlive()
+                        
+                        var hasResidual = VpnResidualCleaner.isZombieTunAlive()
                         if (hasResidual) {
-                            android.util.Log.i("VpnPlugin", "Zombie TUN still alive, cleaning...")
+                            android.util.Log.i("VpnPlugin", "Zombie TUN detected, cleaning...")
                             VpnResidualCleaner.cleanResidualVpnStateSync()
+                            hasResidual = VpnResidualCleaner.isZombieTunAlive()
+                            if (hasResidual) {
+                                android.util.Log.w("VpnPlugin", "Cleanup retry after delay...")
+                                delay(300)
+                                VpnResidualCleaner.cleanResidualVpnStateSync()
+                                hasResidual = VpnResidualCleaner.isZombieTunAlive()
+                            }
                         }
                         prefs.edit().putBoolean("flutter.needs_tun_cleanup", false).apply()
                         result.success(hasResidual)

@@ -1,6 +1,7 @@
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/providers/providers.dart';
+import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,9 +15,41 @@ class ProxiesAdvancedSettings extends ConsumerWidget {
       padding: const EdgeInsets.only(bottom: 20),
       children: generateSection(
         items: [
+          const _NodeExclusionItem(),
           const _ConcurrencyLimitItem(),
           const _DelayAnimationItem(),
         ],
+      ),
+    );
+  }
+}
+
+class _NodeExclusionItem extends ConsumerWidget {
+  const _NodeExclusionItem();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final nodeExcludeFilter = globalState.config.nodeExcludeFilter;
+
+    return ListItem.input(
+      leading: const Icon(Icons.filter_alt_outlined),
+      title: Text(appLocalizations.nodeExclusion),
+      subtitle: Text(
+        nodeExcludeFilter.isEmpty
+            ? appLocalizations.nodeExclusionPlaceholder
+            : nodeExcludeFilter,
+      ),
+      delegate: InputDelegate(
+        title: appLocalizations.nodeExclusion,
+        value: nodeExcludeFilter,
+        onChanged: (String? value) {
+          if (value == null) return;
+          final filter = value.trim();
+          globalState.config = globalState.config.copyWith(
+            nodeExcludeFilter: filter,
+          );
+          globalState.appController.applyProfileDebounce();
+        },
       ),
     );
   }

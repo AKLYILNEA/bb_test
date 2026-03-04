@@ -138,17 +138,17 @@ Future<void> _service(List<String> flags) async {
     final clashConfig = globalState.config.patchClashConfig.copyWith.tun(
       enable: false,
     );
+    
+    if (system.isAndroid) {
+      await vpn?.checkAndCleanResidualVpn();
+    }
+    
+    final params = await globalState.getSetupParams(pathConfig: clashConfig);
     Future(() async {
       final profileId = globalState.config.currentProfileId;
       if (profileId == null) {
         return;
       }
-
-      if (system.isAndroid) {
-        await vpn?.checkAndCleanResidualVpn();
-      }
-
-      final params = await globalState.getSetupParams(pathConfig: clashConfig);
       final res = await clashLibHandler.quickStart(
         InitParams(homeDir: homeDirPath, version: version),
         params,

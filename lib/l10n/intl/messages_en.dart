@@ -591,6 +591,13 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "noResolve": MessageLookupByLibrary.simpleMessage("No Resolve"),
     "noStatusAvailable": MessageLookupByLibrary.simpleMessage("No Status"),
+    "nodeExclusion": MessageLookupByLibrary.simpleMessage("Node Exclusion"),
+    "nodeExclusionDesc": MessageLookupByLibrary.simpleMessage(
+      "Exclude all matched nodes",
+    ),
+    "nodeExclusionPlaceholder": MessageLookupByLibrary.simpleMessage(
+      "HK|Hong Kong|🇭🇰",
+    ),
     "none": MessageLookupByLibrary.simpleMessage("None"),
     "notRecommended": MessageLookupByLibrary.simpleMessage("Not Recommended"),
     "notSelectedTip": MessageLookupByLibrary.simpleMessage(
@@ -834,6 +841,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "respectRulesDesc": MessageLookupByLibrary.simpleMessage(
       "DNS connections follow Rules",
     ),
+    "restart": MessageLookupByLibrary.simpleMessage("Restart"),
     "restartCoreDesc": MessageLookupByLibrary.simpleMessage(
       "Manually restart the core?",
     ),
@@ -1048,7 +1056,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "vpnTip": MessageLookupByLibrary.simpleMessage(
       "Restart VPN to apply changes",
     ),
-    "restart": MessageLookupByLibrary.simpleMessage("Restart"),
     "wakelock": MessageLookupByLibrary.simpleMessage("Wakelock"),
     "wakelockDescription": MessageLookupByLibrary.simpleMessage(
       "Keeps the screen on and app active in the background without requiring special CPU wakelock permissions.",

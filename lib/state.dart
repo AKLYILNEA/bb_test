@@ -510,6 +510,18 @@ class GlobalState {
       final experimental = realPatchConfig.experimental;
       rawConfig['experimental'] = experimental.toJson();
     }
+
+    // Apply node exclude filter to all proxy groups
+    final nodeExcludeFilter = globalState.config.nodeExcludeFilter;
+    if (nodeExcludeFilter.isNotEmpty && rawConfig['proxy-groups'] != null) {
+      final proxyGroups = rawConfig['proxy-groups'] as List;
+      for (final group in proxyGroups) {
+        if (group is Map) {
+          group['exclude-filter'] = nodeExcludeFilter;
+        }
+      }
+    }
+
     var rules = [];
     // Support both field names: rules (plural) and rule (singular)
     if (rawConfig['rules'] != null) {
