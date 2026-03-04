@@ -16,12 +16,10 @@ import java.net.NetworkInterface
 
 object VpnResidualCleaner {
     private const val TAG = "VpnResidualCleaner"
-    
     private const val ZOMBIE_IP = "198.51.100.1"
-    
     private const val CLEANUP_TIMEOUT_MS = 2000L
-    private const val POLL_INTERVAL_MS = 100L
-    private const val MAX_POLL_RETRIES = 20
+    private const val POLL_INTERVAL_MS = 200L
+    private const val MAX_POLL_RETRIES = 10
 
     fun isZombieTunAlive(): Boolean {
         return try {

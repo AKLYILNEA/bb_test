@@ -155,16 +155,21 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             "checkAndCleanResidualVpn" -> {
                 scope.launch {
                     try {
-                        // Check real-time TUN state OR flag set by PackageReplacedReceiver
                         val prefs = BettboxApplication.getAppContext().getSharedPreferences(
                             "FlutterSharedPreferences", android.content.Context.MODE_PRIVATE
                         )
                         val flaggedForCleanup = prefs.getBoolean("flutter.needs_tun_cleanup", false)
-                        val hasResidual = flaggedForCleanup || VpnResidualCleaner.isZombieTunAlive()
+                        val cleanupStartTime = prefs.getLong("flutter.cleanup_start_time", 0)
+                        if (flaggedForCleanup && System.currentTimeMillis() - cleanupStartTime < 2000) {
+                            android.util.Log.i("VpnPlugin", "Cleanup started by Receiver, waiting...")
+                            delay(500)
+                        }
+                        val hasResidual = VpnResidualCleaner.isZombieTunAlive()
                         if (hasResidual) {
-                            android.util.Log.i("VpnPlugin", "Detected residual VPN, cleaning...")
+                            android.util.Log.i("VpnPlugin", "Zombie TUN still alive, cleaning...")
                             VpnResidualCleaner.cleanResidualVpnStateSync()
                         }
+                        prefs.edit().putBoolean("flutter.needs_tun_cleanup", false).apply()
                         result.success(hasResidual)
                     } catch (e: Exception) {
                         android.util.Log.e("VpnPlugin", "Failed to check/clean residual VPN: ${e.message}")
@@ -403,11 +408,8 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         }
         GlobalState.runLock.withLock {
             if (GlobalState.currentRunState == RunState.START) {
-                // Service running, update notice
                 android.util.Log.d("VpnPlugin", "Service reconnected, updating notification")
-                scope.launch {
-                    startForeground()
-                }
+                scope.launch { startForeground() }
                 return
             }
             val currentOptions = options
@@ -416,19 +418,35 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 GlobalState.updateRunState(RunState.STOP)
                 return
             }
+            if (VpnResidualCleaner.isZombieTunAlive()) {
+                android.util.Log.w("VpnPlugin", "Zombie TUN before start, cleaning...")
+                kotlinx.coroutines.runBlocking {
+                    VpnResidualCleaner.cleanResidualVpnStateSync()
+                }
+                Thread.sleep(200)
+            }
             GlobalState.updateRunState(RunState.START)
             lastStartForegroundParams = null
-            val fd = bettBoxService?.start(currentOptions)
+            var fd = bettBoxService?.start(currentOptions)
+            if (fd == null || fd == 0) {
+                android.util.Log.w("VpnPlugin", "VPN establish failed, retrying...")
+                kotlinx.coroutines.runBlocking {
+                    VpnResidualCleaner.cleanResidualVpnStateSync()
+                }
+                Thread.sleep(300)
+                fd = bettBoxService?.start(currentOptions)
+                if (fd == null || fd == 0) {
+                    android.util.Log.e("VpnPlugin", "VPN start failed after retry")
+                    GlobalState.updateRunState(RunState.STOP)
+                    return
+                }
+            }
             Core.startTun(
                 fd = fd ?: 0,
                 protect = this::protect,
                 resolverProcess = this::resolverProcess,
             )
-            // Update notice on start
-            scope.launch {
-                startForeground()
-            }
-            // Install SuspendModule if dozeSuspend is enabled
+            scope.launch { startForeground() }
             if (options?.dozeSuspend == true) {
                 suspendModule?.uninstall()
                 suspendModule = SuspendModule(BettboxApplication.getAppContext())

@@ -140,6 +140,11 @@ jobs:
         run: |
           echo "- Fixes and improvements" > release.md
 
+      - name: Patch release.md
+        run: |
+          version=$(echo "${{ github.ref_name }}" | sed 's/^v//')
+          sed "s|VERSION|$version|g" ./.github/release_template.md >> release.md
+
       - name: Generate sha256
         if: env.IS_STABLE == 'true'
         run: |

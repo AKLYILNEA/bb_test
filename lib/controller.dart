@@ -790,7 +790,7 @@ class AppController {
       try {
         final hasResidual = await vpn?.checkAndCleanResidualVpn() ?? false;
         if (hasResidual) {
-          commonPrint.log('Detected and cleaned residual VPN state');
+          commonPrint.log('Cleaned residual VPN state');
           final prefs = await preferences.sharedPreferencesCompleter.future;
           await prefs?.setBool('is_vpn_running', false);
           await prefs?.setBool('needs_tun_cleanup', false);
@@ -800,13 +800,11 @@ class AppController {
       }
 
       commonPrint.log('Handling Recovery: $recoveryReason');
-      await Future.delayed(const Duration(milliseconds: 888));
+      await Future.delayed(const Duration(milliseconds: 500));
+      commonPrint.log('Force applying profile for Android');
       await applyProfile(silence: true);
       await clashService?.reStart();
       await _initCore();
-      await Future.delayed(const Duration(milliseconds: 888));
-      commonPrint.log('Force applying profile for Android');
-      await applyProfile(silence: true);
     }
 
     final shouldStart =
