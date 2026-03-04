@@ -51,7 +51,7 @@ Bettbox 的诞生依赖以下根基项目：
 * [FlClash](https://github.com/chen0820/FlClash) - 来自陈师傅的优秀项目。
 * [Mihomo](https://github.com/MetaCubeX/mihomo) - 强大且灵活的代理内核。
 
-开发构建过程中还额外从以下开源项目获取过灵感：
+开发构建过程中还额外从以下开源项目获取过灵感(以参考顺序排名)：
 
 [CMFA](https://github.com/MetaCubeX/ClashMetaForAndroid), [Sparkle](https://github.com/xishang0128/sparkle), [SFA](https://github.com/SagerNet/sing-box-for-android), [HUSI](https://github.com/xchacha20-poly1305/husi), [V2rayN](https://github.com/2dust/v2rayN)
 
