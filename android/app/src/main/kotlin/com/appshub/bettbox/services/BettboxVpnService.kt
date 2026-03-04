@@ -88,7 +88,7 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
                 )
             }
             addDnsServer(options.dnsServerAddress)
-            setMtu(1480)
+            setMtu(options.mtu)
             options.accessControl.let { accessControl ->
                 if (accessControl.enable) {
                     when (accessControl.mode) {

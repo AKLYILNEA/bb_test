@@ -49,7 +49,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "accessControlDesc": MessageLookupByLibrary.simpleMessage("設定應用存取代理"),
     "accessControlNotAllowDesc": MessageLookupByLibrary.simpleMessage(
-      "選取的應用程式將被排除在 VPN 之外",
+      "選取的應用程式將被排除在VPN之外",
     ),
     "account": MessageLookupByLibrary.simpleMessage("帳號"),
     "action": MessageLookupByLibrary.simpleMessage("操作"),
@@ -592,7 +592,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "respectRulesDesc": MessageLookupByLibrary.simpleMessage("DNS 連線跟隨 Rules"),
     "restartCoreDesc": MessageLookupByLibrary.simpleMessage("是否手動重啟內核？"),
     "restartCoreTitle": MessageLookupByLibrary.simpleMessage("重啟內核"),
-    "restartTip": MessageLookupByLibrary.simpleMessage("重啟 APP 後改變生效"),
+    "restartTip": MessageLookupByLibrary.simpleMessage("重啟APP後改變生效"),
     "retry": MessageLookupByLibrary.simpleMessage("重試"),
     "rotatingCircle": MessageLookupByLibrary.simpleMessage("單圓自轉"),
     "routeAddress": MessageLookupByLibrary.simpleMessage("路由地址"),
@@ -744,14 +744,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "value": MessageLookupByLibrary.simpleMessage("值"),
     "vibrantScheme": MessageLookupByLibrary.simpleMessage("活力"),
     "view": MessageLookupByLibrary.simpleMessage("查看"),
-    "vpnDesc": MessageLookupByLibrary.simpleMessage("修改 VPN 相關設定"),
+    "vpnDesc": MessageLookupByLibrary.simpleMessage("修改VPN相關設定"),
     "vpnEnableDesc": MessageLookupByLibrary.simpleMessage(
       "透過 VpnService 自動路由系統所有流量",
     ),
     "vpnSystemProxyDesc": MessageLookupByLibrary.simpleMessage(
       "為 VpnService 附加 HTTP 代理",
     ),
-    "vpnTip": MessageLookupByLibrary.simpleMessage("重啟 VPN 後改變生效"),
+    "vpnTip": MessageLookupByLibrary.simpleMessage("重啟VPN後改變生效"),
     "wakelock": MessageLookupByLibrary.simpleMessage("亮螢幕鎖"),
     "restart": MessageLookupByLibrary.simpleMessage("重啟"),
     "wakelockDescription": MessageLookupByLibrary.simpleMessage(

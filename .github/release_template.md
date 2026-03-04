@@ -1,19 +1,19 @@
 <div align="left">
 
-# Bettbox - Another Better Mihomo Client
+# ⚡ Bettbox Release
 
 [![Latest Release](https://img.shields.io/github/v/release/appshubcc/Bettbox?style=for-the-badge&logo=github&color=238636&label=Release)](https://github.com/appshubcc/Bettbox/releases/latest) 
+[![Core](https://img.shields.io/badge/Core-V1.19.20-8A2BE2?style=for-the-badge&logo=go&logoColor=white)](https://github.com/MetaCubeX/mihomo) 
 [![Downloads](https://img.shields.io/github/downloads/appshubcc/Bettbox/total?style=for-the-badge&logo=github&color=007ec6)](https://github.com/appshubcc/Bettbox/releases) 
-[![Core](https://img.shields.io/badge/Version-VMIHOMO_VERSION-8A2BE2?style=for-the-badge&logo=go&logoColor=white)](https://github.com/MetaCubeX/mihomo) 
 
 ---
 </div>
 
-### ⬇️ Download
+### ⬇️ Download Links
 
 <div align="left">
 
-| <kbd> OS </kbd> | <kbd>System Requirements</kbd> | <kbd>Direct Links</kbd> |
+| <kbd> OS </kbd> | <kbd> System Requirements</kbd> | <kbd>Direct Links</kbd> |
 |:---|:---|:---|
 | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/android/android-original.svg" alt="Android" width="28"/> | Android 8.0+ | <a href="https://github.com/appshubcc/Bettbox/releases/download/vVERSION/Bettbox-VERSION-android-arm64-v8a.apk"><img src="https://img.shields.io/badge/APK-ARMv8-3DDC84?logo=android&logoColor=white&style=flat-square&labelColor=222222"></a> <a href="https://github.com/appshubcc/Bettbox/releases/download/vVERSION/Bettbox-VERSION-android-x86_64.apk"><img src="https://img.shields.io/badge/APK-x64-3DDC84?logo=android&logoColor=white&style=flat-square&labelColor=222222"></a><br><a href="https://github.com/appshubcc/Bettbox/releases/download/vVERSION/Bettbox-VERSION-android-arm-v7a.apk"><img src="https://img.shields.io/badge/APK-ARMv7-3DDC84?logo=android&logoColor=white&style=flat-square&labelColor=222222"></a> <a href="https://github.com/appshubcc/Bettbox/releases/download/vVERSION/Bettbox-VERSION-android-universal.apk"><img src="https://img.shields.io/badge/APK-Universal-3DDC84?logo=android&logoColor=white&style=flat-square&labelColor=222222"></a> |
 | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/windows11/windows11-original.svg" alt="Windows" width="28"/> | Windows 10+<br>*(Compatible for Older CPU)* | <a href="https://github.com/appshubcc/Bettbox/releases/download/vVERSION/Bettbox-VERSION-windows-amd64-setup.exe"><img src="https://img.shields.io/badge/Setup-x64-0078D7?logo=windows&logoColor=white&style=flat-square&labelColor=222222"></a> <a href="https://github.com/appshubcc/Bettbox/releases/download/vVERSION/Bettbox-VERSION-windows-arm64-setup.exe"><img src="https://img.shields.io/badge/Setup-ARM64-0078D7?logo=windows&logoColor=white&style=flat-square&labelColor=222222"></a><br><a href="https://github.com/appshubcc/Bettbox/releases/download/vVERSION/Bettbox-VERSION-windows-amd64-compatible-setup.exe"><img src="https://img.shields.io/badge/Setup-Compatible%20x64-555555?logo=windows&logoColor=white&style=flat-square&labelColor=222222"></a> |

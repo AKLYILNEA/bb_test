@@ -20,6 +20,7 @@ type AndroidVpnOptions struct {
 	DnsServerAddress      string         `json:"dnsServerAddress"`
 	DozeSuspend           bool           `json:"dozeSuspend"`
 	DisableIcmpForwarding bool           `json:"disableIcmpForwarding"`
+	Mtu                   uint32         `json:"mtu"`
 }
 
 type AccessControl struct {

@@ -92,7 +92,7 @@ jobs:
       - name: Setup Golang
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ matrix.compatible == true && '1.22.x' || '1.26.x' }}
+          go-version: ${{ matrix.compatible == true && '1.22.x' || '1.25.x' }}
           cache-dependency-path: core/go.sum
 
       - name: Setup Flutter
@@ -139,12 +139,6 @@ jobs:
       - name: Generate release.md
         run: |
           echo "- Fixes and improvements" > release.md
-
-      - name: Patch release.md
-        run: |
-          version=$(echo "${{ github.ref_name }}" | sed 's/^v//')
-          mihomo_version=$(grep -oP 'Version\s*=\s*"\K[^"]+' core/Clash.Meta/constant/version.go)
-          sed "s|VERSION|$version|g; s|MIHOMO_VERSION|$mihomo_version|g" ./.github/release_template.md >> release.md
 
       - name: Generate sha256
         if: env.IS_STABLE == 'true'

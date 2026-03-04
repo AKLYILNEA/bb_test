@@ -67,6 +67,7 @@ class _StartButtonState extends ConsumerState<StartButton> {
 
     if (result == true) {
       await globalState.appController.restartCore();
+      globalState.showNotifier(appLocalizations.success);
     }
   }
 

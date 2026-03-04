@@ -110,7 +110,7 @@ func handleStartTun(fd int, callback unsafe.Pointer) {
 			limit:    semaphore.NewWeighted(4),
 		}
 		initTunHook()
-		tunListener, _ := t.Start(fd, currentConfig.General.Tun.Device, currentConfig.General.Tun.Stack, currentConfig.General.Tun.DisableICMPForwarding)
+		tunListener, _ := t.Start(fd, currentConfig.General.Tun.Device, currentConfig.General.Tun.Stack, currentConfig.General.Tun.DisableICMPForwarding, uint32(currentConfig.General.Tun.MTU))
 		if tunListener != nil {
 			log.Infoln("TUN address: %v", tunListener.Address())
 			tunHandler.listener = tunListener
@@ -167,6 +167,7 @@ func handleGetAndroidVpnOptions() string {
 		DnsServerAddress:      state.GetDnsServerAddress(),
 		DozeSuspend:           state.CurrentState.VpnProps.DozeSuspend,
 		DisableIcmpForwarding: currentConfig.General.Tun.DisableICMPForwarding,
+		Mtu:                   uint32(currentConfig.General.Tun.MTU),
 	}
 	data, err := json.Marshal(options)
 	if err != nil {

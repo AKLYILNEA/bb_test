@@ -28,6 +28,7 @@ data class VpnOptions(
     val ipv6Address: String,
     val dnsServerAddress: String,
     val dozeSuspend: Boolean = false,
+    val mtu: Int = 4064,
 )
 
 data class StartForegroundParams(

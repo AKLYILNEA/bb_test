@@ -8,6 +8,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+Future<void> _handleNetworkConfigChange(WidgetRef ref) async {
+  // Check if VPN/TUN is running
+  final isRunning = ref.read(runTimeProvider) != null;
+
+  if (isRunning) {
+    final tipMessage = system.isAndroid 
+        ? appLocalizations.vpnTip 
+        : appLocalizations.restartTip;
+    globalState.showNotifier(
+      tipMessage,
+      actionLabel: appLocalizations.restart,
+      onAction: () async {
+        await globalState.appController.restartCore();
+        globalState.showNotifier(appLocalizations.success);
+      },
+    );
+  } else {
+    // VPN/TUN not running, just update config (takes effect on next start)
+    await globalState.appController.updateClashConfig();
+  }
+}
+
 class VPNItem extends ConsumerWidget {
   const VPNItem({super.key});
 
@@ -212,38 +234,13 @@ class IcmpForwardingItem extends ConsumerWidget {
                 (state) => state.copyWith.tun(disableIcmpForwarding: !value),
               );
 
-          // Check if VPN/TUN is running
-          final isRunning = ref.read(runTimeProvider) != null;
-
-          if (isRunning) {
-            if (system.isAndroid) {
-              // Android: gentle recovery to avoid core restart
-              // Step 1: clear residual state
-              await globalState.handleStop();
-
-              // Step 2: wait for VPN resource cleanup
-              await Future.delayed(const Duration(milliseconds: 500));
-
-              // Step 3: reload config
-              await globalState.appController.applyProfile();
-
-              // Step 4: start directly
-              await globalState.appController.updateStatus(true);
-            } else {
-              // Desktop: simple stop-start flow
-              await globalState.appController.updateStatus(false);
-              await Future.delayed(const Duration(milliseconds: 500));
-              await globalState.appController.updateStatus(true);
-            }
-          } else {
-            // VPN/TUN not running, just update config (takes effect on next start)
-            await globalState.appController.updateClashConfig();
-          }
+          await _handleNetworkConfigChange(ref);
         },
       ),
     );
   }
 }
+
 
 class DnsHijackItem extends ConsumerWidget {
   const DnsHijackItem({super.key});
@@ -269,6 +266,7 @@ class DnsHijackItem extends ConsumerWidget {
                   dnsHijack: value ? ['any:53', 'tcp://any:53'] : [],
                 ),
               );
+          await _handleNetworkConfigChange(ref);
         },
       ),
     );
@@ -291,13 +289,14 @@ class TunStackItem extends ConsumerWidget {
         value: stack,
         options: TunStack.values,
         textBuilder: (value) => value.name,
-        onChanged: (value) {
+        onChanged: (value) async {
           if (value == null) {
             return;
           }
           ref
               .read(patchClashConfigProvider.notifier)
               .updateState((state) => state.copyWith.tun(stack: value));
+          await _handleNetworkConfigChange(ref);
         },
         title: appLocalizations.stackMode,
       ),
@@ -391,6 +390,7 @@ class MtuItem extends ConsumerWidget {
         ref
             .read(patchClashConfigProvider.notifier)
             .updateState((state) => state.copyWith.tun(mtu: intValue));
+        await _handleNetworkConfigChange(ref);
       }
     }
   }
@@ -429,6 +429,7 @@ class MtuItem extends ConsumerWidget {
             ref
                 .read(patchClashConfigProvider.notifier)
                 .updateState((state) => state.copyWith.tun(mtu: intValue));
+            await _handleNetworkConfigChange(ref);
           }
         },
         title: 'MTU',
