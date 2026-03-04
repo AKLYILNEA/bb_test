@@ -435,6 +435,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "hasCacheChange": MessageLookupByLibrary.simpleMessage(
       "Cache modifications?",
     ),
+    "healthCheckTimeout": MessageLookupByLibrary.simpleMessage("Timeout"),
+    "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(
+      "Node health check timeout",
+    ),
     "host": MessageLookupByLibrary.simpleMessage("Host"),
     "hostsDesc": MessageLookupByLibrary.simpleMessage(
       "Append hosts to current config",

@@ -59,8 +59,9 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         }
     }
 
-    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) = when (call.method) {
-        "startVpn" -> {
+    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        when (call.method) {
+            "startVpn" -> {
             val data = call.argument<String>("data")
             if (data == "null" || data == null) {
                 result.error("INVALID_ARGUMENT", "options data is null", null)
@@ -73,44 +74,44 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             }
         }
 
-        "stopVpn" -> {
+            "stopVpn" -> {
             VpnPlugin.handleStop(force = true)
             result.success(true)
         }
 
-        "smartStop" -> {
+            "smartStop" -> {
             GlobalState.getCurrentVPNPlugin()?.handleSmartStop()
             result.success(true)
         }
 
-        "smartResume" -> {
+            "smartResume" -> {
             val data = call.argument<String>("data")
             val options = Gson().fromJson(data, VpnOptions::class.java)
             GlobalState.getCurrentVPNPlugin()?.handleSmartResume(options)
             result.success(true)
         }
 
-        "setSmartStopped" -> {
+            "setSmartStopped" -> {
             val value = call.argument<Boolean>("value") ?: false
             GlobalState.isSmartStopped = value
             result.success(true)
         }
 
-        "isSmartStopped" -> {
+            "isSmartStopped" -> {
             result.success(GlobalState.isSmartStopped)
         }
 
-        "getLocalIpAddresses" -> {
+            "getLocalIpAddresses" -> {
             result.success(GlobalState.getCurrentVPNPlugin()?.getLocalIpAddresses() ?: emptyList<String>())
         }
 
-        "setQuickResponse" -> {
+            "setQuickResponse" -> {
             val enabled = call.argument<Boolean>("enabled") ?: false
             VpnPlugin.setQuickResponse(enabled)
             result.success(true)
         }
 
-        "checkAndCleanResidualVpn" -> {
+            "checkAndCleanResidualVpn" -> {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val context = BettboxApplication.getAppContext()
@@ -141,29 +142,30 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             }
         }
 
-        "init" -> {
+            "init" -> {
             GlobalState.getCurrentAppPlugin()
                 ?.requestNotificationsPermission()
             GlobalState.initServiceEngine()
             result.success(true)
         }
 
-        "isServiceEngineRunning" -> {
+            "isServiceEngineRunning" -> {
             result.success(GlobalState.isServiceEngineRunning())
         }
 
-        "reconnectIpc" -> {
+            "reconnectIpc" -> {
             GlobalState.reconnectIpc()
             result.success(true)
         }
 
-        "destroy" -> {
+            "destroy" -> {
             handleDestroy()
             result.success(true)
         }
 
-        else -> {
+            else -> {
             result.notImplemented()
+        }
         }
     }
 

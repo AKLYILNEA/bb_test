@@ -2609,6 +2609,26 @@ class AppLocalizations {
     );
   }
 
+  /// `Timeout`
+  String get healthCheckTimeout {
+    return Intl.message(
+      'Timeout',
+      name: 'healthCheckTimeout',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Node health check timeout`
+  String get healthCheckTimeoutDesc {
+    return Intl.message(
+      'Node health check timeout',
+      name: 'healthCheckTimeoutDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Concurrency Limit`
   String get concurrencyLimit {
     return Intl.message(

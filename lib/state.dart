@@ -513,11 +513,18 @@ class GlobalState {
 
     // Apply node exclude filter to all proxy groups
     final nodeExcludeFilter = globalState.config.nodeExcludeFilter;
-    if (nodeExcludeFilter.isNotEmpty && rawConfig['proxy-groups'] != null) {
+    final healthCheckTimeout = globalState.config.healthCheckTimeout;
+    if ((nodeExcludeFilter.isNotEmpty || healthCheckTimeout != 5000) &&
+        rawConfig['proxy-groups'] != null) {
       final proxyGroups = rawConfig['proxy-groups'] as List;
       for (final group in proxyGroups) {
         if (group is Map) {
-          group['exclude-filter'] = nodeExcludeFilter;
+          if (nodeExcludeFilter.isNotEmpty) {
+            group['exclude-filter'] = nodeExcludeFilter;
+          }
+          if (healthCheckTimeout != 5000) {
+            group['timeout'] = healthCheckTimeout;
+          }
         }
       }
     }

@@ -2640,7 +2640,7 @@ as List<Script>,
 /// @nodoc
 mixin _$Config {
 
-@JsonKey(fromJson: AppSettingProps.safeFromJson) AppSettingProps get appSetting; List<Profile> get profiles; List<HotKeyAction> get hotKeyActions; String? get currentProfileId; bool get overrideDns; bool get overrideNtp; bool get overrideSniffer; bool get overrideTunnel; bool get overrideExperimental; DAV? get dav; NetworkProps get networkProps;@JsonKey(fromJson: VpnProps.safeFromJson) VpnProps get vpnProps;@JsonKey(fromJson: ThemeProps.safeFromJson) ThemeProps get themeProps; ProxiesStyle get proxiesStyle; WindowProps get windowProps; ClashConfig get patchClashConfig; ScriptProps get scriptProps; String get nodeExcludeFilter;
+@JsonKey(fromJson: AppSettingProps.safeFromJson) AppSettingProps get appSetting; List<Profile> get profiles; List<HotKeyAction> get hotKeyActions; String? get currentProfileId; bool get overrideDns; bool get overrideNtp; bool get overrideSniffer; bool get overrideTunnel; bool get overrideExperimental; DAV? get dav; NetworkProps get networkProps;@JsonKey(fromJson: VpnProps.safeFromJson) VpnProps get vpnProps;@JsonKey(fromJson: ThemeProps.safeFromJson) ThemeProps get themeProps; ProxiesStyle get proxiesStyle; WindowProps get windowProps; ClashConfig get patchClashConfig; ScriptProps get scriptProps; String get nodeExcludeFilter; int get healthCheckTimeout;
 /// Create a copy of Config
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2653,16 +2653,16 @@ $ConfigCopyWith<Config> get copyWith => _$ConfigCopyWithImpl<Config>(this as Con
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Config&&(identical(other.appSetting, appSetting) || other.appSetting == appSetting)&&const DeepCollectionEquality().equals(other.profiles, profiles)&&const DeepCollectionEquality().equals(other.hotKeyActions, hotKeyActions)&&(identical(other.currentProfileId, currentProfileId) || other.currentProfileId == currentProfileId)&&(identical(other.overrideDns, overrideDns) || other.overrideDns == overrideDns)&&(identical(other.overrideNtp, overrideNtp) || other.overrideNtp == overrideNtp)&&(identical(other.overrideSniffer, overrideSniffer) || other.overrideSniffer == overrideSniffer)&&(identical(other.overrideTunnel, overrideTunnel) || other.overrideTunnel == overrideTunnel)&&(identical(other.overrideExperimental, overrideExperimental) || other.overrideExperimental == overrideExperimental)&&(identical(other.dav, dav) || other.dav == dav)&&(identical(other.networkProps, networkProps) || other.networkProps == networkProps)&&(identical(other.vpnProps, vpnProps) || other.vpnProps == vpnProps)&&(identical(other.themeProps, themeProps) || other.themeProps == themeProps)&&(identical(other.proxiesStyle, proxiesStyle) || other.proxiesStyle == proxiesStyle)&&(identical(other.windowProps, windowProps) || other.windowProps == windowProps)&&(identical(other.patchClashConfig, patchClashConfig) || other.patchClashConfig == patchClashConfig)&&(identical(other.scriptProps, scriptProps) || other.scriptProps == scriptProps)&&(identical(other.nodeExcludeFilter, nodeExcludeFilter) || other.nodeExcludeFilter == nodeExcludeFilter));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Config&&(identical(other.appSetting, appSetting) || other.appSetting == appSetting)&&const DeepCollectionEquality().equals(other.profiles, profiles)&&const DeepCollectionEquality().equals(other.hotKeyActions, hotKeyActions)&&(identical(other.currentProfileId, currentProfileId) || other.currentProfileId == currentProfileId)&&(identical(other.overrideDns, overrideDns) || other.overrideDns == overrideDns)&&(identical(other.overrideNtp, overrideNtp) || other.overrideNtp == overrideNtp)&&(identical(other.overrideSniffer, overrideSniffer) || other.overrideSniffer == overrideSniffer)&&(identical(other.overrideTunnel, overrideTunnel) || other.overrideTunnel == overrideTunnel)&&(identical(other.overrideExperimental, overrideExperimental) || other.overrideExperimental == overrideExperimental)&&(identical(other.dav, dav) || other.dav == dav)&&(identical(other.networkProps, networkProps) || other.networkProps == networkProps)&&(identical(other.vpnProps, vpnProps) || other.vpnProps == vpnProps)&&(identical(other.themeProps, themeProps) || other.themeProps == themeProps)&&(identical(other.proxiesStyle, proxiesStyle) || other.proxiesStyle == proxiesStyle)&&(identical(other.windowProps, windowProps) || other.windowProps == windowProps)&&(identical(other.patchClashConfig, patchClashConfig) || other.patchClashConfig == patchClashConfig)&&(identical(other.scriptProps, scriptProps) || other.scriptProps == scriptProps)&&(identical(other.nodeExcludeFilter, nodeExcludeFilter) || other.nodeExcludeFilter == nodeExcludeFilter)&&(identical(other.healthCheckTimeout, healthCheckTimeout) || other.healthCheckTimeout == healthCheckTimeout));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,appSetting,const DeepCollectionEquality().hash(profiles),const DeepCollectionEquality().hash(hotKeyActions),currentProfileId,overrideDns,overrideNtp,overrideSniffer,overrideTunnel,overrideExperimental,dav,networkProps,vpnProps,themeProps,proxiesStyle,windowProps,patchClashConfig,scriptProps,nodeExcludeFilter);
+int get hashCode => Object.hashAll([runtimeType,appSetting,const DeepCollectionEquality().hash(profiles),const DeepCollectionEquality().hash(hotKeyActions),currentProfileId,overrideDns,overrideNtp,overrideSniffer,overrideTunnel,overrideExperimental,dav,networkProps,vpnProps,themeProps,proxiesStyle,windowProps,patchClashConfig,scriptProps,nodeExcludeFilter,healthCheckTimeout]);
 
 @override
 String toString() {
-  return 'Config(appSetting: $appSetting, profiles: $profiles, hotKeyActions: $hotKeyActions, currentProfileId: $currentProfileId, overrideDns: $overrideDns, overrideNtp: $overrideNtp, overrideSniffer: $overrideSniffer, overrideTunnel: $overrideTunnel, overrideExperimental: $overrideExperimental, dav: $dav, networkProps: $networkProps, vpnProps: $vpnProps, themeProps: $themeProps, proxiesStyle: $proxiesStyle, windowProps: $windowProps, patchClashConfig: $patchClashConfig, scriptProps: $scriptProps, nodeExcludeFilter: $nodeExcludeFilter)';
+  return 'Config(appSetting: $appSetting, profiles: $profiles, hotKeyActions: $hotKeyActions, currentProfileId: $currentProfileId, overrideDns: $overrideDns, overrideNtp: $overrideNtp, overrideSniffer: $overrideSniffer, overrideTunnel: $overrideTunnel, overrideExperimental: $overrideExperimental, dav: $dav, networkProps: $networkProps, vpnProps: $vpnProps, themeProps: $themeProps, proxiesStyle: $proxiesStyle, windowProps: $windowProps, patchClashConfig: $patchClashConfig, scriptProps: $scriptProps, nodeExcludeFilter: $nodeExcludeFilter, healthCheckTimeout: $healthCheckTimeout)';
 }
 
 
@@ -2673,7 +2673,7 @@ abstract mixin class $ConfigCopyWith<$Res>  {
   factory $ConfigCopyWith(Config value, $Res Function(Config) _then) = _$ConfigCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(fromJson: AppSettingProps.safeFromJson) AppSettingProps appSetting, List<Profile> profiles, List<HotKeyAction> hotKeyActions, String? currentProfileId, bool overrideDns, bool overrideNtp, bool overrideSniffer, bool overrideTunnel, bool overrideExperimental, DAV? dav, NetworkProps networkProps,@JsonKey(fromJson: VpnProps.safeFromJson) VpnProps vpnProps,@JsonKey(fromJson: ThemeProps.safeFromJson) ThemeProps themeProps, ProxiesStyle proxiesStyle, WindowProps windowProps, ClashConfig patchClashConfig, ScriptProps scriptProps, String nodeExcludeFilter
+@JsonKey(fromJson: AppSettingProps.safeFromJson) AppSettingProps appSetting, List<Profile> profiles, List<HotKeyAction> hotKeyActions, String? currentProfileId, bool overrideDns, bool overrideNtp, bool overrideSniffer, bool overrideTunnel, bool overrideExperimental, DAV? dav, NetworkProps networkProps,@JsonKey(fromJson: VpnProps.safeFromJson) VpnProps vpnProps,@JsonKey(fromJson: ThemeProps.safeFromJson) ThemeProps themeProps, ProxiesStyle proxiesStyle, WindowProps windowProps, ClashConfig patchClashConfig, ScriptProps scriptProps, String nodeExcludeFilter, int healthCheckTimeout
 });
 
 
@@ -2690,7 +2690,7 @@ class _$ConfigCopyWithImpl<$Res>
 
 /// Create a copy of Config
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? appSetting = null,Object? profiles = null,Object? hotKeyActions = null,Object? currentProfileId = freezed,Object? overrideDns = null,Object? overrideNtp = null,Object? overrideSniffer = null,Object? overrideTunnel = null,Object? overrideExperimental = null,Object? dav = freezed,Object? networkProps = null,Object? vpnProps = null,Object? themeProps = null,Object? proxiesStyle = null,Object? windowProps = null,Object? patchClashConfig = null,Object? scriptProps = null,Object? nodeExcludeFilter = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? appSetting = null,Object? profiles = null,Object? hotKeyActions = null,Object? currentProfileId = freezed,Object? overrideDns = null,Object? overrideNtp = null,Object? overrideSniffer = null,Object? overrideTunnel = null,Object? overrideExperimental = null,Object? dav = freezed,Object? networkProps = null,Object? vpnProps = null,Object? themeProps = null,Object? proxiesStyle = null,Object? windowProps = null,Object? patchClashConfig = null,Object? scriptProps = null,Object? nodeExcludeFilter = null,Object? healthCheckTimeout = null,}) {
   return _then(_self.copyWith(
 appSetting: null == appSetting ? _self.appSetting : appSetting // ignore: cast_nullable_to_non_nullable
 as AppSettingProps,profiles: null == profiles ? _self.profiles : profiles // ignore: cast_nullable_to_non_nullable
@@ -2710,7 +2710,8 @@ as ProxiesStyle,windowProps: null == windowProps ? _self.windowProps : windowPro
 as WindowProps,patchClashConfig: null == patchClashConfig ? _self.patchClashConfig : patchClashConfig // ignore: cast_nullable_to_non_nullable
 as ClashConfig,scriptProps: null == scriptProps ? _self.scriptProps : scriptProps // ignore: cast_nullable_to_non_nullable
 as ScriptProps,nodeExcludeFilter: null == nodeExcludeFilter ? _self.nodeExcludeFilter : nodeExcludeFilter // ignore: cast_nullable_to_non_nullable
-as String,
+as String,healthCheckTimeout: null == healthCheckTimeout ? _self.healthCheckTimeout : healthCheckTimeout // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 /// Create a copy of Config
@@ -2879,10 +2880,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(fromJson: AppSettingProps.safeFromJson)  AppSettingProps appSetting,  List<Profile> profiles,  List<HotKeyAction> hotKeyActions,  String? currentProfileId,  bool overrideDns,  bool overrideNtp,  bool overrideSniffer,  bool overrideTunnel,  bool overrideExperimental,  DAV? dav,  NetworkProps networkProps, @JsonKey(fromJson: VpnProps.safeFromJson)  VpnProps vpnProps, @JsonKey(fromJson: ThemeProps.safeFromJson)  ThemeProps themeProps,  ProxiesStyle proxiesStyle,  WindowProps windowProps,  ClashConfig patchClashConfig,  ScriptProps scriptProps,  String nodeExcludeFilter)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(fromJson: AppSettingProps.safeFromJson)  AppSettingProps appSetting,  List<Profile> profiles,  List<HotKeyAction> hotKeyActions,  String? currentProfileId,  bool overrideDns,  bool overrideNtp,  bool overrideSniffer,  bool overrideTunnel,  bool overrideExperimental,  DAV? dav,  NetworkProps networkProps, @JsonKey(fromJson: VpnProps.safeFromJson)  VpnProps vpnProps, @JsonKey(fromJson: ThemeProps.safeFromJson)  ThemeProps themeProps,  ProxiesStyle proxiesStyle,  WindowProps windowProps,  ClashConfig patchClashConfig,  ScriptProps scriptProps,  String nodeExcludeFilter,  int healthCheckTimeout)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Config() when $default != null:
-return $default(_that.appSetting,_that.profiles,_that.hotKeyActions,_that.currentProfileId,_that.overrideDns,_that.overrideNtp,_that.overrideSniffer,_that.overrideTunnel,_that.overrideExperimental,_that.dav,_that.networkProps,_that.vpnProps,_that.themeProps,_that.proxiesStyle,_that.windowProps,_that.patchClashConfig,_that.scriptProps,_that.nodeExcludeFilter);case _:
+return $default(_that.appSetting,_that.profiles,_that.hotKeyActions,_that.currentProfileId,_that.overrideDns,_that.overrideNtp,_that.overrideSniffer,_that.overrideTunnel,_that.overrideExperimental,_that.dav,_that.networkProps,_that.vpnProps,_that.themeProps,_that.proxiesStyle,_that.windowProps,_that.patchClashConfig,_that.scriptProps,_that.nodeExcludeFilter,_that.healthCheckTimeout);case _:
   return orElse();
 
 }
@@ -2900,10 +2901,10 @@ return $default(_that.appSetting,_that.profiles,_that.hotKeyActions,_that.curren
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(fromJson: AppSettingProps.safeFromJson)  AppSettingProps appSetting,  List<Profile> profiles,  List<HotKeyAction> hotKeyActions,  String? currentProfileId,  bool overrideDns,  bool overrideNtp,  bool overrideSniffer,  bool overrideTunnel,  bool overrideExperimental,  DAV? dav,  NetworkProps networkProps, @JsonKey(fromJson: VpnProps.safeFromJson)  VpnProps vpnProps, @JsonKey(fromJson: ThemeProps.safeFromJson)  ThemeProps themeProps,  ProxiesStyle proxiesStyle,  WindowProps windowProps,  ClashConfig patchClashConfig,  ScriptProps scriptProps,  String nodeExcludeFilter)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(fromJson: AppSettingProps.safeFromJson)  AppSettingProps appSetting,  List<Profile> profiles,  List<HotKeyAction> hotKeyActions,  String? currentProfileId,  bool overrideDns,  bool overrideNtp,  bool overrideSniffer,  bool overrideTunnel,  bool overrideExperimental,  DAV? dav,  NetworkProps networkProps, @JsonKey(fromJson: VpnProps.safeFromJson)  VpnProps vpnProps, @JsonKey(fromJson: ThemeProps.safeFromJson)  ThemeProps themeProps,  ProxiesStyle proxiesStyle,  WindowProps windowProps,  ClashConfig patchClashConfig,  ScriptProps scriptProps,  String nodeExcludeFilter,  int healthCheckTimeout)  $default,) {final _that = this;
 switch (_that) {
 case _Config():
-return $default(_that.appSetting,_that.profiles,_that.hotKeyActions,_that.currentProfileId,_that.overrideDns,_that.overrideNtp,_that.overrideSniffer,_that.overrideTunnel,_that.overrideExperimental,_that.dav,_that.networkProps,_that.vpnProps,_that.themeProps,_that.proxiesStyle,_that.windowProps,_that.patchClashConfig,_that.scriptProps,_that.nodeExcludeFilter);case _:
+return $default(_that.appSetting,_that.profiles,_that.hotKeyActions,_that.currentProfileId,_that.overrideDns,_that.overrideNtp,_that.overrideSniffer,_that.overrideTunnel,_that.overrideExperimental,_that.dav,_that.networkProps,_that.vpnProps,_that.themeProps,_that.proxiesStyle,_that.windowProps,_that.patchClashConfig,_that.scriptProps,_that.nodeExcludeFilter,_that.healthCheckTimeout);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -2920,10 +2921,10 @@ return $default(_that.appSetting,_that.profiles,_that.hotKeyActions,_that.curren
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(fromJson: AppSettingProps.safeFromJson)  AppSettingProps appSetting,  List<Profile> profiles,  List<HotKeyAction> hotKeyActions,  String? currentProfileId,  bool overrideDns,  bool overrideNtp,  bool overrideSniffer,  bool overrideTunnel,  bool overrideExperimental,  DAV? dav,  NetworkProps networkProps, @JsonKey(fromJson: VpnProps.safeFromJson)  VpnProps vpnProps, @JsonKey(fromJson: ThemeProps.safeFromJson)  ThemeProps themeProps,  ProxiesStyle proxiesStyle,  WindowProps windowProps,  ClashConfig patchClashConfig,  ScriptProps scriptProps,  String nodeExcludeFilter)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(fromJson: AppSettingProps.safeFromJson)  AppSettingProps appSetting,  List<Profile> profiles,  List<HotKeyAction> hotKeyActions,  String? currentProfileId,  bool overrideDns,  bool overrideNtp,  bool overrideSniffer,  bool overrideTunnel,  bool overrideExperimental,  DAV? dav,  NetworkProps networkProps, @JsonKey(fromJson: VpnProps.safeFromJson)  VpnProps vpnProps, @JsonKey(fromJson: ThemeProps.safeFromJson)  ThemeProps themeProps,  ProxiesStyle proxiesStyle,  WindowProps windowProps,  ClashConfig patchClashConfig,  ScriptProps scriptProps,  String nodeExcludeFilter,  int healthCheckTimeout)?  $default,) {final _that = this;
 switch (_that) {
 case _Config() when $default != null:
-return $default(_that.appSetting,_that.profiles,_that.hotKeyActions,_that.currentProfileId,_that.overrideDns,_that.overrideNtp,_that.overrideSniffer,_that.overrideTunnel,_that.overrideExperimental,_that.dav,_that.networkProps,_that.vpnProps,_that.themeProps,_that.proxiesStyle,_that.windowProps,_that.patchClashConfig,_that.scriptProps,_that.nodeExcludeFilter);case _:
+return $default(_that.appSetting,_that.profiles,_that.hotKeyActions,_that.currentProfileId,_that.overrideDns,_that.overrideNtp,_that.overrideSniffer,_that.overrideTunnel,_that.overrideExperimental,_that.dav,_that.networkProps,_that.vpnProps,_that.themeProps,_that.proxiesStyle,_that.windowProps,_that.patchClashConfig,_that.scriptProps,_that.nodeExcludeFilter,_that.healthCheckTimeout);case _:
   return null;
 
 }
@@ -2935,7 +2936,7 @@ return $default(_that.appSetting,_that.profiles,_that.hotKeyActions,_that.curren
 @JsonSerializable()
 
 class _Config implements Config {
-  const _Config({@JsonKey(fromJson: AppSettingProps.safeFromJson) this.appSetting = defaultAppSettingProps, final  List<Profile> profiles = const [], final  List<HotKeyAction> hotKeyActions = const [], this.currentProfileId, this.overrideDns = false, this.overrideNtp = false, this.overrideSniffer = false, this.overrideTunnel = false, this.overrideExperimental = false, this.dav, this.networkProps = defaultNetworkProps, @JsonKey(fromJson: VpnProps.safeFromJson) this.vpnProps = defaultVpnProps, @JsonKey(fromJson: ThemeProps.safeFromJson) required this.themeProps, this.proxiesStyle = defaultProxiesStyle, this.windowProps = defaultWindowProps, this.patchClashConfig = defaultClashConfig, this.scriptProps = const ScriptProps(), this.nodeExcludeFilter = ''}): _profiles = profiles,_hotKeyActions = hotKeyActions;
+  const _Config({@JsonKey(fromJson: AppSettingProps.safeFromJson) this.appSetting = defaultAppSettingProps, final  List<Profile> profiles = const [], final  List<HotKeyAction> hotKeyActions = const [], this.currentProfileId, this.overrideDns = false, this.overrideNtp = false, this.overrideSniffer = false, this.overrideTunnel = false, this.overrideExperimental = false, this.dav, this.networkProps = defaultNetworkProps, @JsonKey(fromJson: VpnProps.safeFromJson) this.vpnProps = defaultVpnProps, @JsonKey(fromJson: ThemeProps.safeFromJson) required this.themeProps, this.proxiesStyle = defaultProxiesStyle, this.windowProps = defaultWindowProps, this.patchClashConfig = defaultClashConfig, this.scriptProps = const ScriptProps(), this.nodeExcludeFilter = '', this.healthCheckTimeout = 5000}): _profiles = profiles,_hotKeyActions = hotKeyActions;
   factory _Config.fromJson(Map<String, dynamic> json) => _$ConfigFromJson(json);
 
 @override@JsonKey(fromJson: AppSettingProps.safeFromJson) final  AppSettingProps appSetting;
@@ -2968,6 +2969,7 @@ class _Config implements Config {
 @override@JsonKey() final  ClashConfig patchClashConfig;
 @override@JsonKey() final  ScriptProps scriptProps;
 @override@JsonKey() final  String nodeExcludeFilter;
+@override@JsonKey() final  int healthCheckTimeout;
 
 /// Create a copy of Config
 /// with the given fields replaced by the non-null parameter values.
@@ -2982,16 +2984,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Config&&(identical(other.appSetting, appSetting) || other.appSetting == appSetting)&&const DeepCollectionEquality().equals(other._profiles, _profiles)&&const DeepCollectionEquality().equals(other._hotKeyActions, _hotKeyActions)&&(identical(other.currentProfileId, currentProfileId) || other.currentProfileId == currentProfileId)&&(identical(other.overrideDns, overrideDns) || other.overrideDns == overrideDns)&&(identical(other.overrideNtp, overrideNtp) || other.overrideNtp == overrideNtp)&&(identical(other.overrideSniffer, overrideSniffer) || other.overrideSniffer == overrideSniffer)&&(identical(other.overrideTunnel, overrideTunnel) || other.overrideTunnel == overrideTunnel)&&(identical(other.overrideExperimental, overrideExperimental) || other.overrideExperimental == overrideExperimental)&&(identical(other.dav, dav) || other.dav == dav)&&(identical(other.networkProps, networkProps) || other.networkProps == networkProps)&&(identical(other.vpnProps, vpnProps) || other.vpnProps == vpnProps)&&(identical(other.themeProps, themeProps) || other.themeProps == themeProps)&&(identical(other.proxiesStyle, proxiesStyle) || other.proxiesStyle == proxiesStyle)&&(identical(other.windowProps, windowProps) || other.windowProps == windowProps)&&(identical(other.patchClashConfig, patchClashConfig) || other.patchClashConfig == patchClashConfig)&&(identical(other.scriptProps, scriptProps) || other.scriptProps == scriptProps)&&(identical(other.nodeExcludeFilter, nodeExcludeFilter) || other.nodeExcludeFilter == nodeExcludeFilter));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Config&&(identical(other.appSetting, appSetting) || other.appSetting == appSetting)&&const DeepCollectionEquality().equals(other._profiles, _profiles)&&const DeepCollectionEquality().equals(other._hotKeyActions, _hotKeyActions)&&(identical(other.currentProfileId, currentProfileId) || other.currentProfileId == currentProfileId)&&(identical(other.overrideDns, overrideDns) || other.overrideDns == overrideDns)&&(identical(other.overrideNtp, overrideNtp) || other.overrideNtp == overrideNtp)&&(identical(other.overrideSniffer, overrideSniffer) || other.overrideSniffer == overrideSniffer)&&(identical(other.overrideTunnel, overrideTunnel) || other.overrideTunnel == overrideTunnel)&&(identical(other.overrideExperimental, overrideExperimental) || other.overrideExperimental == overrideExperimental)&&(identical(other.dav, dav) || other.dav == dav)&&(identical(other.networkProps, networkProps) || other.networkProps == networkProps)&&(identical(other.vpnProps, vpnProps) || other.vpnProps == vpnProps)&&(identical(other.themeProps, themeProps) || other.themeProps == themeProps)&&(identical(other.proxiesStyle, proxiesStyle) || other.proxiesStyle == proxiesStyle)&&(identical(other.windowProps, windowProps) || other.windowProps == windowProps)&&(identical(other.patchClashConfig, patchClashConfig) || other.patchClashConfig == patchClashConfig)&&(identical(other.scriptProps, scriptProps) || other.scriptProps == scriptProps)&&(identical(other.nodeExcludeFilter, nodeExcludeFilter) || other.nodeExcludeFilter == nodeExcludeFilter)&&(identical(other.healthCheckTimeout, healthCheckTimeout) || other.healthCheckTimeout == healthCheckTimeout));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,appSetting,const DeepCollectionEquality().hash(_profiles),const DeepCollectionEquality().hash(_hotKeyActions),currentProfileId,overrideDns,overrideNtp,overrideSniffer,overrideTunnel,overrideExperimental,dav,networkProps,vpnProps,themeProps,proxiesStyle,windowProps,patchClashConfig,scriptProps,nodeExcludeFilter);
+int get hashCode => Object.hashAll([runtimeType,appSetting,const DeepCollectionEquality().hash(_profiles),const DeepCollectionEquality().hash(_hotKeyActions),currentProfileId,overrideDns,overrideNtp,overrideSniffer,overrideTunnel,overrideExperimental,dav,networkProps,vpnProps,themeProps,proxiesStyle,windowProps,patchClashConfig,scriptProps,nodeExcludeFilter,healthCheckTimeout]);
 
 @override
 String toString() {
-  return 'Config(appSetting: $appSetting, profiles: $profiles, hotKeyActions: $hotKeyActions, currentProfileId: $currentProfileId, overrideDns: $overrideDns, overrideNtp: $overrideNtp, overrideSniffer: $overrideSniffer, overrideTunnel: $overrideTunnel, overrideExperimental: $overrideExperimental, dav: $dav, networkProps: $networkProps, vpnProps: $vpnProps, themeProps: $themeProps, proxiesStyle: $proxiesStyle, windowProps: $windowProps, patchClashConfig: $patchClashConfig, scriptProps: $scriptProps, nodeExcludeFilter: $nodeExcludeFilter)';
+  return 'Config(appSetting: $appSetting, profiles: $profiles, hotKeyActions: $hotKeyActions, currentProfileId: $currentProfileId, overrideDns: $overrideDns, overrideNtp: $overrideNtp, overrideSniffer: $overrideSniffer, overrideTunnel: $overrideTunnel, overrideExperimental: $overrideExperimental, dav: $dav, networkProps: $networkProps, vpnProps: $vpnProps, themeProps: $themeProps, proxiesStyle: $proxiesStyle, windowProps: $windowProps, patchClashConfig: $patchClashConfig, scriptProps: $scriptProps, nodeExcludeFilter: $nodeExcludeFilter, healthCheckTimeout: $healthCheckTimeout)';
 }
 
 
@@ -3002,7 +3004,7 @@ abstract mixin class _$ConfigCopyWith<$Res> implements $ConfigCopyWith<$Res> {
   factory _$ConfigCopyWith(_Config value, $Res Function(_Config) _then) = __$ConfigCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(fromJson: AppSettingProps.safeFromJson) AppSettingProps appSetting, List<Profile> profiles, List<HotKeyAction> hotKeyActions, String? currentProfileId, bool overrideDns, bool overrideNtp, bool overrideSniffer, bool overrideTunnel, bool overrideExperimental, DAV? dav, NetworkProps networkProps,@JsonKey(fromJson: VpnProps.safeFromJson) VpnProps vpnProps,@JsonKey(fromJson: ThemeProps.safeFromJson) ThemeProps themeProps, ProxiesStyle proxiesStyle, WindowProps windowProps, ClashConfig patchClashConfig, ScriptProps scriptProps, String nodeExcludeFilter
+@JsonKey(fromJson: AppSettingProps.safeFromJson) AppSettingProps appSetting, List<Profile> profiles, List<HotKeyAction> hotKeyActions, String? currentProfileId, bool overrideDns, bool overrideNtp, bool overrideSniffer, bool overrideTunnel, bool overrideExperimental, DAV? dav, NetworkProps networkProps,@JsonKey(fromJson: VpnProps.safeFromJson) VpnProps vpnProps,@JsonKey(fromJson: ThemeProps.safeFromJson) ThemeProps themeProps, ProxiesStyle proxiesStyle, WindowProps windowProps, ClashConfig patchClashConfig, ScriptProps scriptProps, String nodeExcludeFilter, int healthCheckTimeout
 });
 
 
@@ -3019,7 +3021,7 @@ class __$ConfigCopyWithImpl<$Res>
 
 /// Create a copy of Config
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? appSetting = null,Object? profiles = null,Object? hotKeyActions = null,Object? currentProfileId = freezed,Object? overrideDns = null,Object? overrideNtp = null,Object? overrideSniffer = null,Object? overrideTunnel = null,Object? overrideExperimental = null,Object? dav = freezed,Object? networkProps = null,Object? vpnProps = null,Object? themeProps = null,Object? proxiesStyle = null,Object? windowProps = null,Object? patchClashConfig = null,Object? scriptProps = null,Object? nodeExcludeFilter = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? appSetting = null,Object? profiles = null,Object? hotKeyActions = null,Object? currentProfileId = freezed,Object? overrideDns = null,Object? overrideNtp = null,Object? overrideSniffer = null,Object? overrideTunnel = null,Object? overrideExperimental = null,Object? dav = freezed,Object? networkProps = null,Object? vpnProps = null,Object? themeProps = null,Object? proxiesStyle = null,Object? windowProps = null,Object? patchClashConfig = null,Object? scriptProps = null,Object? nodeExcludeFilter = null,Object? healthCheckTimeout = null,}) {
   return _then(_Config(
 appSetting: null == appSetting ? _self.appSetting : appSetting // ignore: cast_nullable_to_non_nullable
 as AppSettingProps,profiles: null == profiles ? _self._profiles : profiles // ignore: cast_nullable_to_non_nullable
@@ -3039,7 +3041,8 @@ as ProxiesStyle,windowProps: null == windowProps ? _self.windowProps : windowPro
 as WindowProps,patchClashConfig: null == patchClashConfig ? _self.patchClashConfig : patchClashConfig // ignore: cast_nullable_to_non_nullable
 as ClashConfig,scriptProps: null == scriptProps ? _self.scriptProps : scriptProps // ignore: cast_nullable_to_non_nullable
 as ScriptProps,nodeExcludeFilter: null == nodeExcludeFilter ? _self.nodeExcludeFilter : nodeExcludeFilter // ignore: cast_nullable_to_non_nullable
-as String,
+as String,healthCheckTimeout: null == healthCheckTimeout ? _self.healthCheckTimeout : healthCheckTimeout // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 

@@ -307,6 +307,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "使用优化的HarmonyOS Sans",
     ),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage("是否缓存修改"),
+    "healthCheckTimeout": MessageLookupByLibrary.simpleMessage("超时时间"),
+    "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(
+      "节点健康检查超时时间",
+    ),
     "host": MessageLookupByLibrary.simpleMessage("主机"),
     "hostsDesc": MessageLookupByLibrary.simpleMessage("追加当前配置Hosts"),
     "hotkeyConflict": MessageLookupByLibrary.simpleMessage("快捷键冲突"),

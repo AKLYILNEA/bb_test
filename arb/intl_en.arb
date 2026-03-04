@@ -329,6 +329,8 @@
   "nodeExclusion": "Node Exclusion",
   "nodeExclusionDesc": "Exclude all matched nodes",
   "nodeExclusionPlaceholder": "HK|Hong Kong|🇭🇰",
+  "healthCheckTimeout": "Timeout",
+  "healthCheckTimeoutDesc": "Node health check timeout",
   "concurrencyLimit": "Concurrency Limit",
   "concurrencyLimitDesc": "Maximum concurrent delay tests",
   "notRecommended": "Not Recommended",

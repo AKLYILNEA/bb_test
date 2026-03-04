@@ -329,6 +329,8 @@
   "nodeExclusion": "节点排除",
   "nodeExclusionDesc": "排除所有匹配到的节点",
   "nodeExclusionPlaceholder": "HK|香港|🇭🇰",
+  "healthCheckTimeout": "超时时间",
+  "healthCheckTimeoutDesc": "节点健康检查超时时间",
   "concurrencyLimit": "并发限制",
   "concurrencyLimitDesc": "延迟测试的最大并发数量",
   "notRecommended": "不推荐",

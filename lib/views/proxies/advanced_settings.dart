@@ -17,6 +17,7 @@ class ProxiesAdvancedSettings extends ConsumerWidget {
         items: [
           const _NodeExclusionItem(),
           const _ConcurrencyLimitItem(),
+          const _HealthCheckTimeoutItem(),
           const _DelayAnimationItem(),
         ],
       ),
@@ -87,6 +88,41 @@ class _ConcurrencyLimitItem extends ConsumerWidget {
             ref.read(proxiesStyleSettingProvider.notifier).updateState(
                   (state) => state.copyWith(concurrencyLimit: value),
                 );
+          }
+        },
+      ),
+    );
+  }
+}
+
+class _HealthCheckTimeoutItem extends ConsumerWidget {
+  const _HealthCheckTimeoutItem();
+
+  static const _options = [1000, 2000, 3000, 5000, 8000];
+
+  String _getDisplayText(int value) {
+    return '${value ~/ 1000}s';
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final timeout = globalState.config.healthCheckTimeout;
+
+    return ListItem<int>.options(
+      leading: const Icon(Icons.timer_outlined),
+      title: Text(appLocalizations.healthCheckTimeout),
+      subtitle: Text(appLocalizations.healthCheckTimeoutDesc),
+      delegate: OptionsDelegate(
+        title: appLocalizations.healthCheckTimeout,
+        options: _options,
+        value: timeout,
+        textBuilder: _getDisplayText,
+        onChanged: (value) {
+          if (value != null) {
+            globalState.config = globalState.config.copyWith(
+              healthCheckTimeout: value,
+            );
+            globalState.appController.applyProfileDebounce();
           }
         },
       ),
