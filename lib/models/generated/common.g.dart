@@ -254,10 +254,12 @@ _Script _$ScriptFromJson(Map<String, dynamic> json) => _Script(
   id: json['id'] as String,
   label: json['label'] as String,
   content: json['content'] as String,
+  url: json['url'] as String?,
 );
 
 Map<String, dynamic> _$ScriptToJson(_Script instance) => <String, dynamic>{
   'id': instance.id,
   'label': instance.label,
   'content': instance.content,
+  'url': instance.url,
 };

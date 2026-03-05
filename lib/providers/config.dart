@@ -334,6 +334,15 @@ class ScriptState extends _$ScriptState with AutoDisposeNotifierMixin {
   bool isExits(String label) {
     return state.scripts.indexWhere((item) => item.label == label) != -1;
   }
+
+  Future<void> syncScript(String id) async {
+    final script = state.scripts.firstWhere((item) => item.id == id);
+    final url = script.url;
+    if (url == null || url.isEmpty) return;
+    final res = await request.getTextResponseForUrl(url);
+    final updated = script.copyWith(content: res.data);
+    setScript(updated);
+  }
 }
 
 @riverpod

@@ -559,10 +559,11 @@ abstract class Script with _$Script {
     required String id,
     required String label,
     required String content,
+    String? url,
   }) = _Script;
 
-  factory Script.create({required String label, required String content}) {
-    return Script(id: utils.uuidV4, label: label, content: content);
+  factory Script.create({required String label, required String content, String? url}) {
+    return Script(id: utils.uuidV4, label: label, content: content, url: url);
   }
 
   factory Script.fromJson(Map<String, Object?> json) => _$ScriptFromJson(json);

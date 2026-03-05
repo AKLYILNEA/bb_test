@@ -525,17 +525,67 @@ class GlobalState {
     final healthCheckTimeout = globalState.config.healthCheckTimeout;
     if ((nodeExcludeFilter.isNotEmpty || healthCheckTimeout != 5000) &&
         rawConfig['proxy-groups'] != null) {
+      RegExp? filterRegex;
+      if (nodeExcludeFilter.isNotEmpty) {
+        try {
+          filterRegex = RegExp(nodeExcludeFilter);
+        } catch (_) {
+          filterRegex = null;
+        }
+      }
+
       final proxyGroups = rawConfig['proxy-groups'] as List;
+
+      final Set<String> protectedNames = {
+        'DIRECT', 'REJECT', 'REJECT-DROP', 'COMPATIBLE', 'PASS',
+      };
+      for (final g in proxyGroups) {
+        if (g is Map && g['name'] is String) {
+          protectedNames.add(g['name'] as String);
+        }
+      }
+
       for (final group in proxyGroups) {
-        if (group is Map) {
-          if (nodeExcludeFilter.isNotEmpty) {
-            // Use 'filter' when inverse is true, 'exclude-filter' when false
-            final filterKey = nodeFilterInverse ? 'filter' : 'exclude-filter';
+        if (group is! Map) continue;
+
+        if (filterRegex != null && group['use'] != null) {
+          final filterKey = nodeFilterInverse ? 'filter' : 'exclude-filter';
+          final existing = group[filterKey];
+          if (existing != null && existing is String && existing.isNotEmpty) {
+            group[filterKey] = '$existing|$nodeExcludeFilter';
+          } else {
             group[filterKey] = nodeExcludeFilter;
           }
-          // Only apply client timeout if group doesn't have one
-          if (healthCheckTimeout != 5000 && group['timeout'] == null) {
-            group['timeout'] = healthCheckTimeout;
+        }
+
+        if (filterRegex != null && group['proxies'] != null) {
+          final proxiesList = group['proxies'] as List;
+          final filtered = proxiesList.where((item) {
+            if (item is! String) return true; 
+            if (protectedNames.contains(item)) return true;
+            final matches = filterRegex!.hasMatch(item);
+            return nodeFilterInverse ? matches : !matches;
+          }).toList();
+          group['proxies'] = filtered;
+        }
+
+        if (healthCheckTimeout != 5000 && group['timeout'] == null) {
+          group['timeout'] = healthCheckTimeout;
+        }
+      }
+
+      if (filterRegex != null && rawConfig['proxy-providers'] != null) {
+        final proxyProviders = rawConfig['proxy-providers'] as Map;
+        for (final key in proxyProviders.keys) {
+          final provider = proxyProviders[key];
+          if (provider is Map) {
+            final filterKey = nodeFilterInverse ? 'filter' : 'exclude-filter';
+            final existing = provider[filterKey];
+            if (existing != null && existing is String && existing.isNotEmpty) {
+              provider[filterKey] = '$existing|$nodeExcludeFilter';
+            } else {
+              provider[filterKey] = nodeExcludeFilter;
+            }
           }
         }
       }

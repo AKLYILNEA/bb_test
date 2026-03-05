@@ -151,15 +151,22 @@ class _TestUrlDialog extends ConsumerWidget {
         children: [
           // Override switch
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: ListItem.switchItem(
-              title: Text(appLocalizations.overrideTestUrl),
-              delegate: SwitchDelegate(
-                value: overrideTestUrl,
-                onChanged: (bool value) {
-                  globalState.config = globalState.config.copyWith(overrideTestUrl: value);
-                },
-              ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  appLocalizations.overrideTestUrl,
+                  style: context.textTheme.bodyMedium,
+                ),
+                Switch(
+                  value: overrideTestUrl,
+                  onChanged: (bool value) {
+
+                    ref.read(overrideTestUrlProvider.notifier).value = value;
+                  },
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 8),

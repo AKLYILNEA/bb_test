@@ -29,6 +29,7 @@ class EditorPage extends ConsumerStatefulWidget {
     String content,
   )?
   onPop;
+  final void Function(String url)? onUrlImport;
 
   const EditorPage({
     super.key,
@@ -38,6 +39,7 @@ class EditorPage extends ConsumerStatefulWidget {
     this.readOnly = false,
     this.onSave,
     this.onPop,
+    this.onUrlImport,
     this.supportRemoteDownload = false,
     this.languages = const [Language.yaml],
   });
@@ -152,6 +154,7 @@ class _EditorPageState extends ConsumerState<EditorPage> {
     }
     final res = await request.getTextResponseForUrl(url);
     _controller.text = res.data;
+    widget.onUrlImport?.call(url);
   }
 
   @override
