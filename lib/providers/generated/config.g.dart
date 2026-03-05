@@ -312,5 +312,37 @@ final windowLockedProvider =
     );
 
 typedef _$WindowLocked = AutoDisposeNotifier<bool>;
+String _$nodeExcludeFilterHash() => r'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0';
+
+/// See also [NodeExcludeFilter].
+@ProviderFor(NodeExcludeFilter)
+final nodeExcludeFilterProvider =
+    AutoDisposeNotifierProvider<NodeExcludeFilter, String>.internal(
+      NodeExcludeFilter.new,
+      name: r'nodeExcludeFilterProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$nodeExcludeFilterHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$NodeExcludeFilter = AutoDisposeNotifier<String>;
+String _$nodeFilterInverseHash() => r'b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1';
+
+/// See also [NodeFilterInverse].
+@ProviderFor(NodeFilterInverse)
+final nodeFilterInverseProvider =
+    AutoDisposeNotifierProvider<NodeFilterInverse, bool>.internal(
+      NodeFilterInverse.new,
+      name: r'nodeFilterInverseProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$nodeFilterInverseHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$NodeFilterInverse = AutoDisposeNotifier<bool>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

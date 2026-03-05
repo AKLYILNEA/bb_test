@@ -45,7 +45,8 @@ class _NodeExclusionWithInverseItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final nodeExcludeFilter = globalState.config.nodeExcludeFilter;
+    // 通过响应式 provider 监听，对话框确认后立即重建
+    final nodeExcludeFilter = ref.watch(nodeExcludeFilterProvider);
 
     return ListItem(
       leading: const Icon(Icons.filter_alt_outlined),
@@ -79,11 +80,15 @@ class _NodeExclusionDialog extends ConsumerStatefulWidget {
 class _NodeExclusionDialogState extends ConsumerState<_NodeExclusionDialog> {
   late TextEditingController _controller;
   final _formKey = GlobalKey<FormState>();
+  // 本地状态管理 Switch，initState 从 provider 初始化
+  late bool _nodeFilterInverse;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController(text: widget.currentValue);
+    // 从 globalState 读取初始值（此时 provider 可能尚未 watch）
+    _nodeFilterInverse = globalState.config.nodeFilterInverse;
   }
 
   @override
@@ -94,19 +99,16 @@ class _NodeExclusionDialogState extends ConsumerState<_NodeExclusionDialog> {
 
   void _handleSubmit() {
     if (_formKey.currentState?.validate() == false) return;
-    
+
     final filter = _controller.text.trim();
-    globalState.config = globalState.config.copyWith(
-      nodeExcludeFilter: filter,
-    );
+    // 通过 provider notifier 更新，触发父 Widget 响应式重建
+    ref.read(nodeExcludeFilterProvider.notifier).value = filter;
     globalState.appController.applyProfileDebounce();
     Navigator.of(context, rootNavigator: true).pop();
   }
 
   @override
   Widget build(BuildContext context) {
-    final nodeFilterInverse = globalState.config.nodeFilterInverse;
-
     return CommonDialog(
       title: appLocalizations.nodeExclusion,
       actions: [
@@ -140,11 +142,11 @@ class _NodeExclusionDialogState extends ConsumerState<_NodeExclusionDialog> {
                   style: context.textTheme.bodyLarge,
                 ),
                 Switch(
-                  value: nodeFilterInverse,
+                  value: _nodeFilterInverse,
                   onChanged: (bool value) {
-                    globalState.config = globalState.config.copyWith(
-                      nodeFilterInverse: value,
-                    );
+                    // 同时更新本地状态（立即刷新 Switch UI）和 provider（持久化并通知其他监听者）
+                    setState(() => _nodeFilterInverse = value);
+                    ref.read(nodeFilterInverseProvider.notifier).value = value;
                     globalState.appController.applyProfileDebounce();
                   },
                 ),

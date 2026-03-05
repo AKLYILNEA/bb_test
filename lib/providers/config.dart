@@ -372,3 +372,35 @@ class WindowLocked extends _$WindowLocked with AutoDisposeNotifierMixin {
     );
   }
 }
+
+@riverpod
+class NodeExcludeFilter extends _$NodeExcludeFilter
+    with AutoDisposeNotifierMixin {
+  @override
+  String build() {
+    return globalState.config.nodeExcludeFilter;
+  }
+
+  @override
+  onUpdate(value) {
+    globalState.config = globalState.config.copyWith(nodeExcludeFilter: value);
+  }
+
+  void updateState(String Function(String state) builder) {
+    state = builder(state);
+  }
+}
+
+@riverpod
+class NodeFilterInverse extends _$NodeFilterInverse
+    with AutoDisposeNotifierMixin {
+  @override
+  bool build() {
+    return globalState.config.nodeFilterInverse;
+  }
+
+  @override
+  onUpdate(value) {
+    globalState.config = globalState.config.copyWith(nodeFilterInverse: value);
+  }
+}
