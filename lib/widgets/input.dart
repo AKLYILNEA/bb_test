@@ -155,7 +155,13 @@ class _InputDialogState extends State<InputDialog> {
   }
 
   Future<void> _handleUpdate() async {
-    if (_formKey.currentState?.validate() == false) return;
+    // Trigger validation and check result
+    final isValid = _formKey.currentState?.validate() ?? false;
+    if (!isValid) {
+      // Validation failed, keep dialog open
+      return;
+    }
+    // Validation passed, close dialog with value
     final text = textController.value.text;
     Navigator.of(context).pop<String>(text);
   }

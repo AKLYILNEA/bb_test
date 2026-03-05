@@ -473,6 +473,14 @@ class GlobalState {
             entry.value.splitByMultipleSeparators;
       }
     }
+    
+    // Android: protect port 53 (requires root), auto-change to 1053
+    if (system.isAndroid && rawConfig['dns']['listen'] != null) {
+      final listen = rawConfig['dns']['listen'] as String;
+      if (listen.endsWith(':53')) {
+        rawConfig['dns']['listen'] = listen.replaceAll(':53', ':1053');
+      }
+    }
 
     if (rawConfig['ntp'] == null) {
       rawConfig['ntp'] = {};

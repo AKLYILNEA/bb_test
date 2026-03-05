@@ -52,12 +52,14 @@ class _NodeExclusionItem extends ConsumerWidget {
         hintText: appLocalizations.nodeExclusionPlaceholder,
         validator: _validateRegex,
         onChanged: (String? value) {
-          if (value == null) return;
-          final filter = value.trim();
-          globalState.config = globalState.config.copyWith(
-            nodeExcludeFilter: filter,
-          );
-          globalState.appController.applyProfileDebounce();
+          // Only update if value is not null (validation passed)
+          if (value != null) {
+            final filter = value.trim();
+            globalState.config = globalState.config.copyWith(
+              nodeExcludeFilter: filter,
+            );
+            globalState.appController.applyProfileDebounce();
+          }
         },
       ),
     );

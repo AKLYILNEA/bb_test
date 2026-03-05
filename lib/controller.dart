@@ -804,11 +804,12 @@ class AppController {
       }
 
       commonPrint.log('Handling Recovery: $recoveryReason');
+      await clashCore.destroy();
       await Future.delayed(const Duration(milliseconds: 1000));
+      await _initCore();
       commonPrint.log('Force applying profile for Android');
       await applyProfile(silence: true);
       await clashService?.reStart();
-      await _initCore();
     }
 
     final shouldStart =
