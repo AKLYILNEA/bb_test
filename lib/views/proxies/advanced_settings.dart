@@ -34,7 +34,12 @@ class _NodeExclusionItem extends ConsumerWidget {
       RegExp(value.trim());
       return null;
     } catch (e) {
-      return appLocalizations.formatError;
+      final detail = e is FormatException && e.message.isNotEmpty
+          ? e.message
+          : null;
+      return detail != null
+          ? '${appLocalizations.formatError}: $detail'
+          : appLocalizations.formatError;
     }
   }
 

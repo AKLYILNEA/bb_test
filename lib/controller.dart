@@ -757,7 +757,16 @@ class AppController {
     updateTray(true);
 
     await _initCore();
-    await _initStatus();
+    try {
+      await _initStatus();
+    } catch (e) {
+      commonPrint.log('_initStatus failed, falling back to basic startup: $e');
+      try {
+        await applyProfile(silence: true);
+      } catch (e2) {
+        commonPrint.log('Fallback applyProfile also failed: $e2');
+      }
+    }
     autoLaunch?.updateStatus(_ref.read(appSettingProvider).autoLaunch);
     autoUpdateProfiles();
     autoCheckUpdate();
@@ -787,28 +796,32 @@ class AppController {
 
     final (needRecovery, recoveryReason, isUpgrade) = await _detectRecoveryReason();
 
+    bool recoveryApplied = false;
+
     if (system.isAndroid && needRecovery) {
       try {
-        final hasResidual =
+        final stillHasResidual =
             await (service?.checkAndCleanResidualVpn() ??
                 vpn?.checkAndCleanResidualVpn()) ??
             false;
-        if (hasResidual) {
+        if (stillHasResidual) {
           commonPrint.log('Cleaned residual VPN state');
-          final prefs = await preferences.sharedPreferencesCompleter.future;
-          await prefs?.setBool('is_vpn_running', false);
-          await prefs?.setBool('needs_tun_cleanup', false);
         }
+        final prefs = await preferences.sharedPreferencesCompleter.future;
+        await prefs?.setBool('is_vpn_running', false);
+        await prefs?.setBool('needs_tun_cleanup', false);
       } catch (e) {
         commonPrint.log('Failed to check/clean residual VPN: $e');
       }
 
       commonPrint.log('Handling Recovery: $recoveryReason');
-      await clashCore.destroy();
-      await Future.delayed(const Duration(milliseconds: 1000));
-      await _initCore();
       commonPrint.log('Force applying profile for Android');
-      await applyProfile(silence: true);
+      try {
+        await applyProfile(silence: true);
+        recoveryApplied = true;
+      } catch (e) {
+        commonPrint.log('Recovery applyProfile failed: $e');
+      }
       await clashService?.reStart();
     }
 
@@ -820,7 +833,9 @@ class AppController {
         await updateStatus(true);
       } catch (e) {
         commonPrint.log('Auto start failed: $e');
-        await applyProfile();
+        if (!recoveryApplied) {
+          await applyProfile();
+        }
         addCheckIpNumDebounce();
       }
     } else {
@@ -828,7 +843,9 @@ class AppController {
         final prefs = await preferences.sharedPreferencesCompleter.future;
         await prefs?.setBool('is_vpn_running', false);
       }
-      await applyProfile();
+      if (!recoveryApplied) {
+        await applyProfile();
+      }
       addCheckIpNumDebounce();
     }
   }
