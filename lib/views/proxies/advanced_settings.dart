@@ -15,8 +15,7 @@ class ProxiesAdvancedSettings extends ConsumerWidget {
       padding: const EdgeInsets.only(bottom: 20),
       children: generateSection(
         items: [
-          const _NodeExclusionItem(),
-          const _NodeFilterInverseItem(),
+          const _NodeExclusionWithInverseItem(),
           const _ConcurrencyLimitItem(),
           const _HealthCheckTimeoutItem(),
           const _DelayAnimationItem(),
@@ -26,8 +25,8 @@ class ProxiesAdvancedSettings extends ConsumerWidget {
   }
 }
 
-class _NodeExclusionItem extends ConsumerWidget {
-  const _NodeExclusionItem();
+class _NodeExclusionWithInverseItem extends ConsumerWidget {
+  const _NodeExclusionWithInverseItem();
 
   String? _validateRegex(String? value) {
     if (value == null || value.trim().isEmpty) return null;
@@ -47,50 +46,45 @@ class _NodeExclusionItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final nodeExcludeFilter = globalState.config.nodeExcludeFilter;
-
-    return ListItem.input(
-      leading: const Icon(Icons.filter_alt_outlined),
-      title: Text(appLocalizations.nodeExclusion),
-      subtitle: Text(appLocalizations.nodeExclusionDesc),
-      delegate: InputDelegate(
-        title: appLocalizations.nodeExclusion,
-        value: nodeExcludeFilter,
-        hintText: appLocalizations.nodeExclusionPlaceholder,
-        validator: _validateRegex,
-        onChanged: (String? value) {
-          // Only update if value is not null (validation passed)
-          if (value != null) {
-            final filter = value.trim();
-            globalState.config = globalState.config.copyWith(
-              nodeExcludeFilter: filter,
-            );
-            globalState.appController.applyProfileDebounce();
-          }
-        },
-      ),
-    );
-  }
-}
-
-class _NodeFilterInverseItem extends ConsumerWidget {
-  const _NodeFilterInverseItem();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
     final nodeFilterInverse = globalState.config.nodeFilterInverse;
 
-    return ListItem.switchItem(
-      title: Text(appLocalizations.nodeFilterInverse),
-      subtitle: Text(appLocalizations.nodeFilterInverseDesc),
-      delegate: SwitchDelegate(
-        value: nodeFilterInverse,
-        onChanged: (bool value) {
-          globalState.config = globalState.config.copyWith(
-            nodeFilterInverse: value,
-          );
-          globalState.appController.applyProfileDebounce();
-        },
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ListItem.input(
+          leading: const Icon(Icons.filter_alt_outlined),
+          title: Text(appLocalizations.nodeExclusion),
+          subtitle: Text(appLocalizations.nodeExclusionDesc),
+          delegate: InputDelegate(
+            title: appLocalizations.nodeExclusion,
+            value: nodeExcludeFilter,
+            hintText: appLocalizations.nodeExclusionPlaceholder,
+            validator: _validateRegex,
+            onChanged: (String? value) {
+              if (value != null) {
+                final filter = value.trim();
+                globalState.config = globalState.config.copyWith(
+                  nodeExcludeFilter: filter,
+                );
+                globalState.appController.applyProfileDebounce();
+              }
+            },
+          ),
+        ),
+        ListItem.switchItem(
+          title: Text(appLocalizations.nodeFilterInverse),
+          subtitle: Text(appLocalizations.nodeFilterInverseDesc),
+          delegate: SwitchDelegate(
+            value: nodeFilterInverse,
+            onChanged: (bool value) {
+              globalState.config = globalState.config.copyWith(
+                nodeFilterInverse: value,
+              );
+              globalState.appController.applyProfileDebounce();
+            },
+          ),
+        ),
+      ],
     );
   }
 }

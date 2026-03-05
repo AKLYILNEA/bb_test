@@ -122,7 +122,7 @@ class TestUrlItem extends ConsumerWidget {
       title: Text(appLocalizations.testUrl),
       subtitle: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: Text(testUrl, maxLines: 1),
+        child: Text(testUrl),
       ),
       onTap: () async {
         await globalState.showCommonDialog(
@@ -145,68 +145,135 @@ class _TestUrlDialog extends ConsumerWidget {
 
     return CommonDialog(
       title: appLocalizations.testUrl,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Override switch at top
-          ListItem.switchItem(
-            title: Text(appLocalizations.overrideTestUrl),
-            delegate: SwitchDelegate(
-              value: overrideTestUrl,
-              onChanged: (bool value) {
-                globalState.config = globalState.config.copyWith(overrideTestUrl: value);
-              },
+          // Override switch
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: ListItem.switchItem(
+              title: Text(appLocalizations.overrideTestUrl),
+              delegate: SwitchDelegate(
+                value: overrideTestUrl,
+                onChanged: (bool value) {
+                  globalState.config = globalState.config.copyWith(overrideTestUrl: value);
+                },
+              ),
             ),
           ),
-          const Divider(height: 0),
-          // URL options list
+          const SizedBox(height: 8),
+          // URL list
           ...presetTestUrls.map((url) {
-            return RadioListTile<String>(
-              title: Text(url),
-              value: url,
-              // ignore: deprecated_member_use
-              groupValue: currentUrl,
-              // ignore: deprecated_member_use
-              onChanged: (String? value) {
-                if (value != null) {
+            final isSelected = currentUrl == url;
+            return Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
                   ref
                       .read(appSettingProvider.notifier)
-                      .updateState((state) => state.copyWith(testUrl: value));
+                      .updateState((state) => state.copyWith(testUrl: url));
                   Navigator.of(context, rootNavigator: true).pop();
-                }
-              },
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        isSelected
+                            ? Icons.check_circle_rounded
+                            : Icons.circle_outlined,
+                        size: 21,
+                        color: isSelected
+                            ? context.colorScheme.primary
+                            : context.colorScheme.onSurfaceVariant.withValues(
+                                alpha: 0.6,
+                              ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: isSelected
+                            ? SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Text(
+                                  url,
+                                  style: context.textTheme.bodyMedium,
+                                ),
+                              )
+                            : Text(
+                                url,
+                                style: context.textTheme.bodyMedium,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             );
           }),
-          const Divider(height: 0),
           // Custom URL option
-          ListTile(
-            title: Text(appLocalizations.customUrl),
-            trailing: !isPresetUrl ? const Icon(Icons.check) : null,
-            onTap: () async {
-              Navigator.of(context, rootNavigator: true).pop();
-              final customUrl = await globalState.showCommonDialog<String>(
-                child: InputDialog(
-                  title: appLocalizations.customUrl,
-                  value: isPresetUrl ? '' : currentUrl,
-                  resetValue: defaultTestUrl,
-                  validator: (String? inputValue) {
-                    if (inputValue == null || inputValue.isEmpty) {
-                      return appLocalizations.emptyTip(appLocalizations.testUrl);
-                    }
-                    if (!inputValue.isUrl) {
-                      return appLocalizations.urlTip(appLocalizations.testUrl);
-                    }
-                    return null;
-                  },
-                ),
-              );
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () async {
+                Navigator.of(context, rootNavigator: true).pop();
+                final customUrl = await globalState.showCommonDialog<String>(
+                  child: InputDialog(
+                    title: appLocalizations.customUrl,
+                    value: isPresetUrl ? '' : currentUrl,
+                    resetValue: defaultTestUrl,
+                    validator: (String? inputValue) {
+                      if (inputValue == null || inputValue.isEmpty) {
+                        return appLocalizations.emptyTip(appLocalizations.testUrl);
+                      }
+                      if (!inputValue.isUrl) {
+                        return appLocalizations.urlTip(appLocalizations.testUrl);
+                      }
+                      return null;
+                    },
+                  ),
+                );
 
-              if (customUrl != null) {
-                ref
-                    .read(appSettingProvider.notifier)
-                    .updateState((state) => state.copyWith(testUrl: customUrl));
-              }
-            },
+                if (customUrl != null) {
+                  ref
+                      .read(appSettingProvider.notifier)
+                      .updateState((state) => state.copyWith(testUrl: customUrl));
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      !isPresetUrl
+                          ? Icons.check_circle_rounded
+                          : Icons.circle_outlined,
+                      size: 21,
+                      color: !isPresetUrl
+                          ? context.colorScheme.primary
+                          : context.colorScheme.onSurfaceVariant.withValues(
+                              alpha: 0.6,
+                            ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        appLocalizations.customUrl,
+                        style: context.textTheme.bodyMedium,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ],
       ),
