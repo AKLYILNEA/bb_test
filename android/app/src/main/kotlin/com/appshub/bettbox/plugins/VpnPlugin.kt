@@ -433,7 +433,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 kotlinx.coroutines.runBlocking {
                     VpnResidualCleaner.cleanResidualVpnStateSync()
                 }
-                Thread.sleep(200)
+                Thread.sleep(500)
             }
             GlobalState.updateRunState(RunState.START)
             lastStartForegroundParams = null

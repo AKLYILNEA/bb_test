@@ -431,6 +431,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "nodeExclusionPlaceholder": MessageLookupByLibrary.simpleMessage(
       "HK|香港|🇭🇰",
     ),
+    "nodeFilterInverse": MessageLookupByLibrary.simpleMessage("反向選擇"),
+    "nodeFilterInverseDesc": MessageLookupByLibrary.simpleMessage("僅保留匹配到的節點"),
     "none": MessageLookupByLibrary.simpleMessage("無"),
     "notRecommended": MessageLookupByLibrary.simpleMessage("不推薦"),
     "notSelectedTip": MessageLookupByLibrary.simpleMessage("目前的代理群組無法選取"),

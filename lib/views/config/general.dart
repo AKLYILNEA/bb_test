@@ -122,7 +122,7 @@ class TestUrlItem extends ConsumerWidget {
       title: Text(appLocalizations.testUrl),
       subtitle: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: Text(testUrl),
+        child: Text(testUrl, maxLines: 1),
       ),
       onTap: () async {
         await globalState.showCommonDialog(
@@ -150,7 +150,6 @@ class _TestUrlDialog extends ConsumerWidget {
         children: [
           // Override switch at top
           ListItem.switchItem(
-            leading: const Icon(Icons.swap_horiz),
             title: Text(appLocalizations.overrideTestUrl),
             delegate: SwitchDelegate(
               value: overrideTestUrl,
@@ -162,36 +161,25 @@ class _TestUrlDialog extends ConsumerWidget {
           const Divider(height: 0),
           // URL options list
           ...presetTestUrls.map((url) {
-            return ListTile(
+            return RadioListTile<String>(
               title: Text(url),
-              leading: Radio<String>(
-                // ignore: deprecated_member_use
-                value: url,
-                // ignore: deprecated_member_use
-                groupValue: currentUrl,
-                // ignore: deprecated_member_use
-                onChanged: (String? value) {
-                  if (value != null) {
-                    ref
-                        .read(appSettingProvider.notifier)
-                        .updateState((state) => state.copyWith(testUrl: value));
-                    Navigator.of(context, rootNavigator: true).pop();
-                  }
-                },
-              ),
-              selected: currentUrl == url,
-              onTap: () {
-                ref
-                    .read(appSettingProvider.notifier)
-                    .updateState((state) => state.copyWith(testUrl: url));
-                Navigator.of(context, rootNavigator: true).pop();
+              value: url,
+              // ignore: deprecated_member_use
+              groupValue: currentUrl,
+              // ignore: deprecated_member_use
+              onChanged: (String? value) {
+                if (value != null) {
+                  ref
+                      .read(appSettingProvider.notifier)
+                      .updateState((state) => state.copyWith(testUrl: value));
+                  Navigator.of(context, rootNavigator: true).pop();
+                }
               },
             );
           }),
           const Divider(height: 0),
           // Custom URL option
           ListTile(
-            leading: const Icon(Icons.edit),
             title: Text(appLocalizations.customUrl),
             trailing: !isPresetUrl ? const Icon(Icons.check) : null,
             onTap: () async {

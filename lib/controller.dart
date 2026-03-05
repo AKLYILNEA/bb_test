@@ -800,6 +800,7 @@ class AppController {
 
     if (system.isAndroid && needRecovery) {
       try {
+        // Clean residual VPN state
         final stillHasResidual =
             await (service?.checkAndCleanResidualVpn() ??
                 vpn?.checkAndCleanResidualVpn()) ??
@@ -807,21 +808,24 @@ class AppController {
         if (stillHasResidual) {
           commonPrint.log('Cleaned residual VPN state');
         }
+        
+        commonPrint.log('Handling Recovery: $recoveryReason');
+        commonPrint.log('Force applying profile for Android');
+        
+        // Apply profile first
+        await applyProfile(silence: true);
+        recoveryApplied = true;
+        
+        // Clear flags only after successful recovery
         final prefs = await preferences.sharedPreferencesCompleter.future;
         await prefs?.setBool('is_vpn_running', false);
         await prefs?.setBool('needs_tun_cleanup', false);
+        commonPrint.log('Recovery completed, flags cleared');
       } catch (e) {
-        commonPrint.log('Failed to check/clean residual VPN: $e');
+        commonPrint.log('Recovery failed: $e');
+        // Keep flags for next retry
       }
-
-      commonPrint.log('Handling Recovery: $recoveryReason');
-      commonPrint.log('Force applying profile for Android');
-      try {
-        await applyProfile(silence: true);
-        recoveryApplied = true;
-      } catch (e) {
-        commonPrint.log('Recovery applyProfile failed: $e');
-      }
+      
       await clashService?.reStart();
     }
 
@@ -839,7 +843,8 @@ class AppController {
         addCheckIpNumDebounce();
       }
     } else {
-      if (needRecovery) {
+      if (needRecovery && recoveryApplied) {
+        // Only clear flag if recovery was successful
         final prefs = await preferences.sharedPreferencesCompleter.future;
         await prefs?.setBool('is_vpn_running', false);
       }
@@ -854,10 +859,12 @@ class AppController {
     final results = await Future.wait<dynamic>([
       preferences.sharedPreferencesCompleter.future,
       system.isAndroid ? app.getSelfLastUpdateTime() : Future.value(0),
+      system.isAndroid ? (service?.isServiceEngineRunning() ?? Future.value(false)) : Future.value(false),
     ]);
 
     final prefs = results[0];
     final apkLastUpdateTime = results[1] as int;
+    final isTileRunning = results[2] as bool;
 
     if (system.isAndroid) {
       final savedApkUpdateTime = prefs?.getInt('apk_last_update_time') ?? 0;
@@ -870,6 +877,16 @@ class AppController {
       }
 
       final isVpnRunningFlag = prefs?.getBool('is_vpn_running') ?? false;
+      
+      // Fix: skip recovery if tile already started core
+      if (isTileRunning && globalState.isStart) {
+        commonPrint.log('Tile already started, skip recovery');
+        if (savedApkUpdateTime != apkLastUpdateTime) {
+          prefs?.setInt('apk_last_update_time', apkLastUpdateTime);
+        }
+        return (false, '', isReinstall);
+      }
+      
       final isAbnormalExit = !globalState.isStart && isVpnRunningFlag && !isReinstall;
       if (isAbnormalExit) {
         commonPrint.log('Abnormal exit detected');

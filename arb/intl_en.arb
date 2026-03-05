@@ -329,6 +329,8 @@
   "nodeExclusion": "Node Exclusion",
   "nodeExclusionDesc": "Exclude all matched nodes",
   "nodeExclusionPlaceholder": "HK|Hong Kong|🇭🇰",
+  "nodeFilterInverse": "Inverse Selection",
+  "nodeFilterInverseDesc": "Keep only matched nodes",
   "formatError": "Please check the format",
   "healthCheckTimeout": "Timeout",
   "healthCheckTimeoutDesc": "Node health check timeout",

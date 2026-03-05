@@ -605,6 +605,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "nodeExclusionPlaceholder": MessageLookupByLibrary.simpleMessage(
       "HK|Hong Kong|🇭🇰",
     ),
+    "nodeFilterInverse": MessageLookupByLibrary.simpleMessage(
+      "Inverse Selection",
+    ),
+    "nodeFilterInverseDesc": MessageLookupByLibrary.simpleMessage(
+      "Keep only matched nodes",
+    ),
     "none": MessageLookupByLibrary.simpleMessage("None"),
     "notRecommended": MessageLookupByLibrary.simpleMessage("Not Recommended"),
     "notSelectedTip": MessageLookupByLibrary.simpleMessage(

@@ -2609,6 +2609,26 @@ class AppLocalizations {
     );
   }
 
+  /// `Inverse Selection`
+  String get nodeFilterInverse {
+    return Intl.message(
+      'Inverse Selection',
+      name: 'nodeFilterInverse',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Keep only matched nodes`
+  String get nodeFilterInverseDesc {
+    return Intl.message(
+      'Keep only matched nodes',
+      name: 'nodeFilterInverseDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Please check the format`
   String get formatError {
     return Intl.message(

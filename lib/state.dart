@@ -519,8 +519,9 @@ class GlobalState {
       rawConfig['experimental'] = experimental.toJson();
     }
 
-    // Apply node exclude filter to all proxy groups
+    // Apply node filter to all proxy groups
     final nodeExcludeFilter = globalState.config.nodeExcludeFilter;
+    final nodeFilterInverse = globalState.config.nodeFilterInverse;
     final healthCheckTimeout = globalState.config.healthCheckTimeout;
     if ((nodeExcludeFilter.isNotEmpty || healthCheckTimeout != 5000) &&
         rawConfig['proxy-groups'] != null) {
@@ -528,7 +529,9 @@ class GlobalState {
       for (final group in proxyGroups) {
         if (group is Map) {
           if (nodeExcludeFilter.isNotEmpty) {
-            group['exclude-filter'] = nodeExcludeFilter;
+            // Use 'filter' when inverse is true, 'exclude-filter' when false
+            final filterKey = nodeFilterInverse ? 'filter' : 'exclude-filter';
+            group[filterKey] = nodeExcludeFilter;
           }
           // Only apply client timeout if group doesn't have one
           if (healthCheckTimeout != 5000 && group['timeout'] == null) {

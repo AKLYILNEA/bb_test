@@ -16,6 +16,7 @@ class ProxiesAdvancedSettings extends ConsumerWidget {
       children: generateSection(
         items: [
           const _NodeExclusionItem(),
+          const _NodeFilterInverseItem(),
           const _ConcurrencyLimitItem(),
           const _HealthCheckTimeoutItem(),
           const _DelayAnimationItem(),
@@ -65,6 +66,29 @@ class _NodeExclusionItem extends ConsumerWidget {
             );
             globalState.appController.applyProfileDebounce();
           }
+        },
+      ),
+    );
+  }
+}
+
+class _NodeFilterInverseItem extends ConsumerWidget {
+  const _NodeFilterInverseItem();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final nodeFilterInverse = globalState.config.nodeFilterInverse;
+
+    return ListItem.switchItem(
+      title: Text(appLocalizations.nodeFilterInverse),
+      subtitle: Text(appLocalizations.nodeFilterInverseDesc),
+      delegate: SwitchDelegate(
+        value: nodeFilterInverse,
+        onChanged: (bool value) {
+          globalState.config = globalState.config.copyWith(
+            nodeFilterInverse: value,
+          );
+          globalState.appController.applyProfileDebounce();
         },
       ),
     );
