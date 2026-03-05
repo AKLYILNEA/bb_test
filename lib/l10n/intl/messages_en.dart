@@ -411,6 +411,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "forceGCTitle": MessageLookupByLibrary.simpleMessage(
       "Force Garbage Collection",
     ),
+    "formatError": MessageLookupByLibrary.simpleMessage(
+      "Please check the format",
+    ),
     "fourColumns": MessageLookupByLibrary.simpleMessage("4 Columns"),
     "fruitSaladScheme": MessageLookupByLibrary.simpleMessage("Fruit Salad"),
     "general": MessageLookupByLibrary.simpleMessage("General"),
@@ -678,6 +681,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "overrideSniffer": MessageLookupByLibrary.simpleMessage("Override Sniffer"),
     "overrideSnifferDesc": MessageLookupByLibrary.simpleMessage(
       "Override profile\'s Sniffer settings",
+    ),
+    "overrideTestUrl": MessageLookupByLibrary.simpleMessage(
+      "Override Test URL",
     ),
     "overrideTunnel": MessageLookupByLibrary.simpleMessage("Override Tunnel"),
     "overrideTunnelDesc": MessageLookupByLibrary.simpleMessage(

@@ -2609,6 +2609,16 @@ class AppLocalizations {
     );
   }
 
+  /// `Please check the format`
+  String get formatError {
+    return Intl.message(
+      'Please check the format',
+      name: 'formatError',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Timeout`
   String get healthCheckTimeout {
     return Intl.message(
@@ -2674,6 +2684,16 @@ class AppLocalizations {
     return Intl.message(
       'Override profile\'s DNS settings',
       name: 'overrideDnsDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Override Test URL`
+  String get overrideTestUrl {
+    return Intl.message(
+      'Override Test URL',
+      name: 'overrideTestUrl',
       desc: '',
       args: [],
     );

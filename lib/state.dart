@@ -522,7 +522,8 @@ class GlobalState {
           if (nodeExcludeFilter.isNotEmpty) {
             group['exclude-filter'] = nodeExcludeFilter;
           }
-          if (healthCheckTimeout != 5000) {
+          // Only apply client timeout if group doesn't have one
+          if (healthCheckTimeout != 5000 && group['timeout'] == null) {
             group['timeout'] = healthCheckTimeout;
           }
         }

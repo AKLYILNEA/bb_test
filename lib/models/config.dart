@@ -291,6 +291,7 @@ abstract class Config with _$Config {
     @Default(false) bool overrideSniffer,
     @Default(false) bool overrideTunnel,
     @Default(false) bool overrideExperimental,
+    @Default(true) bool overrideTestUrl,
     DAV? dav,
     @Default(defaultNetworkProps) NetworkProps networkProps,
     @JsonKey(fromJson: VpnProps.safeFromJson)

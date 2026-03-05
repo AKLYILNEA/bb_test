@@ -196,6 +196,19 @@ class OverrideDns extends _$OverrideDns with AutoDisposeNotifierMixin {
 }
 
 @riverpod
+class OverrideTestUrl extends _$OverrideTestUrl with AutoDisposeNotifierMixin {
+  @override
+  bool build() {
+    return globalState.config.overrideTestUrl;
+  }
+
+  @override
+  onUpdate(value) {
+    globalState.config = globalState.config.copyWith(overrideTestUrl: value);
+  }
+}
+
+@riverpod
 class OverrideNtp extends _$OverrideNtp with AutoDisposeNotifierMixin {
   @override
   bool build() {

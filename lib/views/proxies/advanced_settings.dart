@@ -28,6 +28,16 @@ class ProxiesAdvancedSettings extends ConsumerWidget {
 class _NodeExclusionItem extends ConsumerWidget {
   const _NodeExclusionItem();
 
+  String? _validateRegex(String? value) {
+    if (value == null || value.trim().isEmpty) return null;
+    try {
+      RegExp(value.trim());
+      return null;
+    } catch (e) {
+      return appLocalizations.formatError;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final nodeExcludeFilter = globalState.config.nodeExcludeFilter;
@@ -35,14 +45,12 @@ class _NodeExclusionItem extends ConsumerWidget {
     return ListItem.input(
       leading: const Icon(Icons.filter_alt_outlined),
       title: Text(appLocalizations.nodeExclusion),
-      subtitle: Text(
-        nodeExcludeFilter.isEmpty
-            ? appLocalizations.nodeExclusionPlaceholder
-            : nodeExcludeFilter,
-      ),
+      subtitle: Text(appLocalizations.nodeExclusionDesc),
       delegate: InputDelegate(
         title: appLocalizations.nodeExclusion,
         value: nodeExcludeFilter,
+        hintText: appLocalizations.nodeExclusionPlaceholder,
+        validator: _validateRegex,
         onChanged: (String? value) {
           if (value == null) return;
           final filter = value.trim();

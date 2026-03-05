@@ -430,8 +430,16 @@ bool isCurrentPage(
 
 @riverpod
 String getRealTestUrl(Ref ref, [String? testUrl]) {
+  final overrideTestUrl = ref.watch(overrideTestUrlProvider);
   final currentTestUrl = ref.watch(appSettingProvider).testUrl;
-  return testUrl.getSafeValue(currentTestUrl);
+  
+  // If override is enabled or testUrl is null, use client setting
+  if (overrideTestUrl || testUrl == null) {
+    return currentTestUrl;
+  }
+  
+  // Otherwise use the provided testUrl from config file
+  return testUrl;
 }
 
 @riverpod

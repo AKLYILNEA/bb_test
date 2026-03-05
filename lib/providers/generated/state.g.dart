@@ -781,7 +781,7 @@ class _IsCurrentPageProviderElement extends AutoDisposeProviderElement<bool>
       (origin as IsCurrentPageProvider).handler;
 }
 
-String _$getRealTestUrlHash() => r'5c6513cabb53e5e6689cba5919f49aeaeff90247';
+String _$getRealTestUrlHash() => r'0b0f23a742282558cc12fd4d93d04832f15a0d2d';
 
 /// See also [getRealTestUrl].
 @ProviderFor(getRealTestUrl)

@@ -475,6 +475,12 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
     }
 
     private fun updateExcludeFromRecents(value: Boolean?) {
+        // Block for Android 13+ (API 33+)
+        if (Build.VERSION.SDK_INT >= 33) {
+            android.util.Log.d("AppPlugin", "ExcludeFromRecents blocked on Android 13+")
+            return
+        }
+        
         val am = getSystemService(BettboxApplication.getAppContext(), ActivityManager::class.java)
         val task = am?.appTasks?.firstOrNull {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

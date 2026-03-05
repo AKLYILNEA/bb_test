@@ -111,72 +111,116 @@ class KeepAliveIntervalItem extends ConsumerWidget {
 class TestUrlItem extends ConsumerWidget {
   const TestUrlItem({super.key});
 
-  // Custom URL marker
-  static const String _customUrlMarker = '__CUSTOM_URL__';
-
-  // Pre-computed options list to avoid recreating on every build
-  static final List<String> _options = [...presetTestUrls, _customUrlMarker];
-
   @override
   Widget build(BuildContext context, ref) {
     final testUrl = ref.watch(
       appSettingProvider.select((state) => state.testUrl),
     );
 
-    // Check if current URL is in preset list
-    final isPresetUrl = presetTestUrls.contains(testUrl);
-
-    return ListItem<String>.options(
+    return ListItem(
       leading: const Icon(Icons.timeline),
       title: Text(appLocalizations.testUrl),
       subtitle: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Text(testUrl),
       ),
-      delegate: OptionsDelegate<String>(
-        title: appLocalizations.testUrl,
-        options: _options,
-        value: isPresetUrl ? testUrl : _customUrlMarker,
-        onChanged: (String? value) async {
-          if (value == null) return;
+      onTap: () async {
+        await globalState.showCommonDialog(
+          child: _TestUrlDialog(currentUrl: testUrl),
+        );
+      },
+    );
+  }
+}
 
-          if (value == _customUrlMarker) {
-            // Show custom URL input dialog
-            final customUrl = await globalState.showCommonDialog<String>(
-              child: InputDialog(
-                title: appLocalizations.customUrl,
-                value: isPresetUrl ? '' : testUrl,
-                resetValue: defaultTestUrl,
-                validator: (String? inputValue) {
-                  if (inputValue == null || inputValue.isEmpty) {
-                    return appLocalizations.emptyTip(appLocalizations.testUrl);
+class _TestUrlDialog extends ConsumerWidget {
+  final String currentUrl;
+
+  const _TestUrlDialog({required this.currentUrl});
+
+  @override
+  Widget build(BuildContext context, ref) {
+    final overrideTestUrl = ref.watch(overrideTestUrlProvider);
+    final isPresetUrl = presetTestUrls.contains(currentUrl);
+
+    return CommonDialog(
+      title: appLocalizations.testUrl,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Override switch at top
+          ListItem.switchItem(
+            leading: const Icon(Icons.swap_horiz),
+            title: Text(appLocalizations.overrideTestUrl),
+            delegate: SwitchDelegate(
+              value: overrideTestUrl,
+              onChanged: (bool value) {
+                globalState.config = globalState.config.copyWith(overrideTestUrl: value);
+              },
+            ),
+          ),
+          const Divider(height: 0),
+          // URL options list
+          ...presetTestUrls.map((url) {
+            return ListTile(
+              title: Text(url),
+              leading: Radio<String>(
+                // ignore: deprecated_member_use
+                value: url,
+                // ignore: deprecated_member_use
+                groupValue: currentUrl,
+                // ignore: deprecated_member_use
+                onChanged: (String? value) {
+                  if (value != null) {
+                    ref
+                        .read(appSettingProvider.notifier)
+                        .updateState((state) => state.copyWith(testUrl: value));
+                    Navigator.of(context, rootNavigator: true).pop();
                   }
-                  if (!inputValue.isUrl) {
-                    return appLocalizations.urlTip(appLocalizations.testUrl);
-                  }
-                  return null;
                 },
               ),
+              selected: currentUrl == url,
+              onTap: () {
+                ref
+                    .read(appSettingProvider.notifier)
+                    .updateState((state) => state.copyWith(testUrl: url));
+                Navigator.of(context, rootNavigator: true).pop();
+              },
             );
+          }),
+          const Divider(height: 0),
+          // Custom URL option
+          ListTile(
+            leading: const Icon(Icons.edit),
+            title: Text(appLocalizations.customUrl),
+            trailing: !isPresetUrl ? const Icon(Icons.check) : null,
+            onTap: () async {
+              Navigator.of(context, rootNavigator: true).pop();
+              final customUrl = await globalState.showCommonDialog<String>(
+                child: InputDialog(
+                  title: appLocalizations.customUrl,
+                  value: isPresetUrl ? '' : currentUrl,
+                  resetValue: defaultTestUrl,
+                  validator: (String? inputValue) {
+                    if (inputValue == null || inputValue.isEmpty) {
+                      return appLocalizations.emptyTip(appLocalizations.testUrl);
+                    }
+                    if (!inputValue.isUrl) {
+                      return appLocalizations.urlTip(appLocalizations.testUrl);
+                    }
+                    return null;
+                  },
+                ),
+              );
 
-            if (customUrl != null) {
-              ref
-                  .read(appSettingProvider.notifier)
-                  .updateState((state) => state.copyWith(testUrl: customUrl));
-            }
-          } else {
-            // Use preset URL
-            ref
-                .read(appSettingProvider.notifier)
-                .updateState((state) => state.copyWith(testUrl: value));
-          }
-        },
-        textBuilder: (url) {
-          if (url == _customUrlMarker) {
-            return appLocalizations.customUrl;
-          }
-          return url;
-        },
+              if (customUrl != null) {
+                ref
+                    .read(appSettingProvider.notifier)
+                    .updateState((state) => state.copyWith(testUrl: customUrl));
+              }
+            },
+          ),
+        ],
       ),
     );
   }

@@ -98,6 +98,7 @@ class InputDelegate extends Delegate {
   final String title;
   final String value;
   final String? suffixText;
+  final String? hintText;
   final Function(String? value)? onChanged;
   final FormFieldValidator<String>? validator;
 
@@ -107,6 +108,7 @@ class InputDelegate extends Delegate {
     required this.title,
     required this.value,
     this.suffixText,
+    this.hintText,
     required this.onChanged,
     this.resetValue,
     this.validator,
@@ -372,6 +374,7 @@ class ListItem<T> extends StatelessWidget {
                     title: inputDelegate.title,
                     value: inputDelegate.value,
                     suffixText: inputDelegate.suffixText,
+                    hintText: inputDelegate.hintText,
                     resetValue: inputDelegate.resetValue,
                     validator: inputDelegate.validator,
                   ),

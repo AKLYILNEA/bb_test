@@ -150,6 +150,22 @@ final overrideDnsProvider =
     );
 
 typedef _$OverrideDns = AutoDisposeNotifier<bool>;
+String _$overrideTestUrlHash() => r'8a5a63f5abc3eee0293442891c92a5062c09206e';
+
+/// See also [OverrideTestUrl].
+@ProviderFor(OverrideTestUrl)
+final overrideTestUrlProvider =
+    AutoDisposeNotifierProvider<OverrideTestUrl, bool>.internal(
+      OverrideTestUrl.new,
+      name: r'overrideTestUrlProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$overrideTestUrlHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$OverrideTestUrl = AutoDisposeNotifier<bool>;
 String _$overrideNtpHash() => r'da4620088529c14a7ceeeaffb1c528aa4202ea46';
 
 /// See also [OverrideNtp].

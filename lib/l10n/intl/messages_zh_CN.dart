@@ -289,6 +289,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "是否进行强制内核垃圾回收？实验性功能，请谨慎使用",
     ),
     "forceGCTitle": MessageLookupByLibrary.simpleMessage("强制垃圾回收"),
+    "formatError": MessageLookupByLibrary.simpleMessage("请检查格式是否正确"),
     "fourColumns": MessageLookupByLibrary.simpleMessage("四列"),
     "fruitSaladScheme": MessageLookupByLibrary.simpleMessage("果缤纷"),
     "general": MessageLookupByLibrary.simpleMessage("常规"),
@@ -471,6 +472,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "overrideSnifferDesc": MessageLookupByLibrary.simpleMessage(
       "开启后将覆盖配置中的Sniffer选项",
     ),
+    "overrideTestUrl": MessageLookupByLibrary.simpleMessage("覆盖原始配置"),
     "overrideTunnel": MessageLookupByLibrary.simpleMessage("覆写Tunnel"),
     "overrideTunnelDesc": MessageLookupByLibrary.simpleMessage(
       "开启后将覆盖配置中的Tunnel选项",
