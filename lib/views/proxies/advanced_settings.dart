@@ -46,45 +46,113 @@ class _NodeExclusionWithInverseItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final nodeExcludeFilter = globalState.config.nodeExcludeFilter;
+
+    return ListItem(
+      leading: const Icon(Icons.filter_alt_outlined),
+      title: Text(appLocalizations.nodeExclusion),
+      subtitle: Text(appLocalizations.nodeExclusionDesc),
+      onTap: () async {
+        await globalState.showCommonDialog(
+          child: _NodeExclusionDialog(
+            currentValue: nodeExcludeFilter,
+            validator: _validateRegex,
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _NodeExclusionDialog extends ConsumerStatefulWidget {
+  final String currentValue;
+  final String? Function(String?)? validator;
+
+  const _NodeExclusionDialog({
+    required this.currentValue,
+    this.validator,
+  });
+
+  @override
+  ConsumerState<_NodeExclusionDialog> createState() => _NodeExclusionDialogState();
+}
+
+class _NodeExclusionDialogState extends ConsumerState<_NodeExclusionDialog> {
+  late TextEditingController _controller;
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.currentValue);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _handleSubmit() {
+    if (_formKey.currentState?.validate() == false) return;
+    
+    final filter = _controller.text.trim();
+    globalState.config = globalState.config.copyWith(
+      nodeExcludeFilter: filter,
+    );
+    globalState.appController.applyProfileDebounce();
+    Navigator.of(context, rootNavigator: true).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final nodeFilterInverse = globalState.config.nodeFilterInverse;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ListItem.input(
-          leading: const Icon(Icons.filter_alt_outlined),
-          title: Text(appLocalizations.nodeExclusion),
-          subtitle: Text(appLocalizations.nodeExclusionDesc),
-          delegate: InputDelegate(
-            title: appLocalizations.nodeExclusion,
-            value: nodeExcludeFilter,
-            hintText: appLocalizations.nodeExclusionPlaceholder,
-            validator: _validateRegex,
-            onChanged: (String? value) {
-              if (value != null) {
-                final filter = value.trim();
-                globalState.config = globalState.config.copyWith(
-                  nodeExcludeFilter: filter,
-                );
-                globalState.appController.applyProfileDebounce();
-              }
-            },
-          ),
-        ),
-        ListItem.switchItem(
-          title: Text(appLocalizations.nodeFilterInverse),
-          subtitle: Text(appLocalizations.nodeFilterInverseDesc),
-          delegate: SwitchDelegate(
-            value: nodeFilterInverse,
-            onChanged: (bool value) {
-              globalState.config = globalState.config.copyWith(
-                nodeFilterInverse: value,
-              );
-              globalState.appController.applyProfileDebounce();
-            },
-          ),
+    return CommonDialog(
+      title: appLocalizations.nodeExclusion,
+      actions: [
+        TextButton(
+          onPressed: _handleSubmit,
+          child: Text(appLocalizations.submit),
         ),
       ],
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextFormField(
+              controller: _controller,
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                labelText: appLocalizations.nodeExclusion,
+                hintText: appLocalizations.nodeExclusionPlaceholder,
+              ),
+              validator: widget.validator,
+              onFieldSubmitted: (_) => _handleSubmit(),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  appLocalizations.nodeFilterInverse,
+                  style: context.textTheme.bodyLarge,
+                ),
+                Switch(
+                  value: nodeFilterInverse,
+                  onChanged: (bool value) {
+                    globalState.config = globalState.config.copyWith(
+                      nodeFilterInverse: value,
+                    );
+                    globalState.appController.applyProfileDebounce();
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
