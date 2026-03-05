@@ -13,7 +13,7 @@ import com.appshub.bettbox.models.VpnOptions
 
 class BettboxService : Service(), BaseServiceInterface {
 
-    override fun start(options: VpnOptions) = 0
+    override suspend fun start(options: VpnOptions) = 0
 
     override fun stop() {
         stopSelf()

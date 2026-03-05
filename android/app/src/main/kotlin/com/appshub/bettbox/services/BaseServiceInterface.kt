@@ -23,7 +23,7 @@ import kotlinx.coroutines.async
 
 interface BaseServiceInterface {
 
-    fun start(options: VpnOptions): Int
+    suspend fun start(options: VpnOptions): Int
 
     fun stop()
 

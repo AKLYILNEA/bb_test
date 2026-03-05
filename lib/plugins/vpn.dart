@@ -101,6 +101,11 @@ class Vpn {
     return await methodChannel.invokeMethod<bool>('checkAndCleanResidualVpn') ?? false;
   }
 
+  /// Check if the VPN native thread/service is currently running
+  Future<bool> getStatus() async {
+    return await methodChannel.invokeMethod<bool>('status') ?? false;
+  }
+
   void addListener(VpnListener listener) {
     _listeners.add(listener);
   }

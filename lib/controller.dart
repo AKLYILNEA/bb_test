@@ -7,7 +7,6 @@ import 'package:archive/archive_io.dart';
 import 'package:bett_box/clash/clash.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/plugins/app.dart';
-import 'package:bett_box/plugins/service.dart';
 import 'package:bett_box/plugins/vpn.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
@@ -794,63 +793,44 @@ class AppController {
       await globalState.updateStartTime();
     }
 
-    final (needRecovery, recoveryReason, isUpgrade) = await _detectRecoveryReason();
-
-    bool recoveryApplied = false;
-
-    if (system.isAndroid && needRecovery) {
-      try {
-        // Clean residual VPN state
-        final stillHasResidual =
-            await (service?.checkAndCleanResidualVpn() ??
-                vpn?.checkAndCleanResidualVpn()) ??
-            false;
-        if (stillHasResidual) {
-          commonPrint.log('Cleaned residual VPN state');
-        }
-        
-        commonPrint.log('Handling Recovery: $recoveryReason');
-        commonPrint.log('Force applying profile for Android');
-        
-        // Apply profile first
-        await applyProfile(silence: true);
-        recoveryApplied = true;
-        
-        // Clear flags only after successful recovery
-        final prefs = await preferences.sharedPreferencesCompleter.future;
-        await prefs?.setBool('is_vpn_running', false);
-        await prefs?.setBool('needs_tun_cleanup', false);
-        commonPrint.log('Recovery completed, flags cleared');
-      } catch (e) {
-        commonPrint.log('Recovery failed: $e');
-        // Keep flags for next retry
-      }
+    if (system.isAndroid) {
+      final isNativeRunning = await vpn?.getStatus() ?? false;
       
-      await clashService?.reStart();
+      if (isNativeRunning && !globalState.isStart) {
+        commonPrint.log('Native VPN is running (Tile started). Hot-attaching UI state...');
+        
+        _ref.read(runTimeProvider.notifier).value = 0;
+        
+        await applyProfile(silence: true); 
+        await globalState.handleStart([updateRunTime, updateTraffic]);
+        addCheckIpNumDebounce();
+        _backgroundLoad();
+      }
     }
 
-    final shouldStart =
-        globalState.isStart || _ref.read(appSettingProvider).autoRun;
+    final (needRecovery, recoveryReason, isUpgrade) = await _detectRecoveryReason();
+
+    if (system.isAndroid && needRecovery) {
+      commonPrint.log('Handling Recovery: $recoveryReason');
+      
+      await applyProfile(silence: true);
+      
+      final prefs = await preferences.sharedPreferencesCompleter.future;
+      await prefs?.setBool('is_vpn_running', false);
+      await prefs?.setBool('needs_tun_cleanup', false);
+    }
+    final shouldStart = globalState.isStart || _ref.read(appSettingProvider).autoRun;
 
     if (shouldStart) {
       try {
         await updateStatus(true);
       } catch (e) {
         commonPrint.log('Auto start failed: $e');
-        if (!recoveryApplied) {
-          await applyProfile();
-        }
+        await applyProfile();
         addCheckIpNumDebounce();
       }
     } else {
-      if (needRecovery && recoveryApplied) {
-        // Only clear flag if recovery was successful
-        final prefs = await preferences.sharedPreferencesCompleter.future;
-        await prefs?.setBool('is_vpn_running', false);
-      }
-      if (!recoveryApplied) {
-        await applyProfile();
-      }
+      await applyProfile();
       addCheckIpNumDebounce();
     }
   }
@@ -859,12 +839,10 @@ class AppController {
     final results = await Future.wait<dynamic>([
       preferences.sharedPreferencesCompleter.future,
       system.isAndroid ? app.getSelfLastUpdateTime() : Future.value(0),
-      system.isAndroid ? (service?.isServiceEngineRunning() ?? Future.value(false)) : Future.value(false),
     ]);
 
     final prefs = results[0];
     final apkLastUpdateTime = results[1] as int;
-    final isTileRunning = results[2] as bool;
 
     if (system.isAndroid) {
       final savedApkUpdateTime = prefs?.getInt('apk_last_update_time') ?? 0;
@@ -878,16 +856,10 @@ class AppController {
 
       final isVpnRunningFlag = prefs?.getBool('is_vpn_running') ?? false;
       
-      // Fix: skip recovery if tile already started core
-      if (isTileRunning && globalState.isStart) {
-        commonPrint.log('Tile already started, skip recovery');
-        if (savedApkUpdateTime != apkLastUpdateTime) {
-          prefs?.setInt('apk_last_update_time', apkLastUpdateTime);
-        }
-        return (false, '', isReinstall);
-      }
+      final isNativeRunning = await vpn?.getStatus() ?? false;
+
+      final isAbnormalExit = !isNativeRunning && isVpnRunningFlag && !isReinstall;
       
-      final isAbnormalExit = !globalState.isStart && isVpnRunningFlag && !isReinstall;
       if (isAbnormalExit) {
         commonPrint.log('Abnormal exit detected');
         reason = 'Abnormal exit';
@@ -897,11 +869,11 @@ class AppController {
         prefs?.setInt('apk_last_update_time', apkLastUpdateTime);
       }
 
-      final needRecovery =
-          (!globalState.isStart && isReinstall) || isAbnormalExit;
+      final needRecovery = (!isNativeRunning && isReinstall) || isAbnormalExit;
       return (needRecovery, reason, isReinstall);
     }
 
+    // Desktop logic remains the same
     if (system.isDesktop) {
       bool needRecovery = false;
       String reason = '';

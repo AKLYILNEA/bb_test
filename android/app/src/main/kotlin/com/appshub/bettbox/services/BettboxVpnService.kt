@@ -28,7 +28,31 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
         GlobalState.initServiceEngine()
     }
 
-    override fun start(options: VpnOptions): Int {
+    override suspend fun start(options: VpnOptions): Int {
+        if (com.appshub.bettbox.modules.VpnResidualCleaner.isZombieTunAlive()) {
+            try {
+                Log.d("BettboxVpnService", "Found zombie TUN, applying cleanup profile")
+                val builder = Builder()
+                    .setSession("bettbox_cleanup")
+                    .addAddress("10.255.255.254", 30)
+                val interface_ = builder.establish()
+                interface_?.close()
+                Log.d("BettboxVpnService", "Cleanup profile closed, waiting for system to remove interface")
+                
+                var retryCount = 0
+                while (retryCount < 10) {
+                    kotlinx.coroutines.delay(200)
+                    retryCount++
+                    if (!com.appshub.bettbox.modules.VpnResidualCleaner.isZombieTunAlive()) {
+                        Log.d("BettboxVpnService", "Zombie TUN disappeared")
+                        break
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("BettboxVpnService", "Cleanup error: ${e.message}")
+            }
+        }
+
         return with(Builder()) {
             if (options.ipv4Address.isNotEmpty()) {
                 val cidr = options.ipv4Address.toCIDR()
@@ -87,7 +111,13 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
                     "IPv6 is not supported."
                 )
             }
-            addDnsServer(options.dnsServerAddress)
+            if (options.dnsServerAddress.isNotBlank()) {
+                try {
+                    addDnsServer(options.dnsServerAddress)
+                } catch (e: Exception) {
+                    Log.e("BettboxVpnService", "Invalid DNS: ${options.dnsServerAddress}")
+                }
+            }
             val validMtu = if (options.mtu in 1280..65535) options.mtu else 1480
             setMtu(validMtu)
             options.accessControl.let { accessControl ->
@@ -124,8 +154,12 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
                     )
                 )
             }
-            establish()?.detachFd()
-                ?: throw NullPointerException("Establish VPN rejected by system")
+            val fd = establish()?.detachFd()
+            if (fd == null) {
+                Log.e("BettboxVpnService", "Establish VPN rejected by system")
+                return 0
+            }
+            return fd
         }
     }
 
