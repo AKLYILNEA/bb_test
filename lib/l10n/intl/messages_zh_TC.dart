@@ -486,7 +486,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "overrideSnifferDesc": MessageLookupByLibrary.simpleMessage(
       "開啟後將覆蓋配置中的 Sniffer 選項",
     ),
-    "overrideTestUrl": MessageLookupByLibrary.simpleMessage("覆蓋原始配置"),
+    "overrideTestUrl": MessageLookupByLibrary.simpleMessage("覆蓋配置"),
     "overrideTunnel": MessageLookupByLibrary.simpleMessage("覆寫 Tunnel"),
     "overrideTunnelDesc": MessageLookupByLibrary.simpleMessage(
       "開啟後將覆蓋配置中的 Tunnel 選項",

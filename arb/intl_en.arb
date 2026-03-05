@@ -337,7 +337,7 @@
   "notRecommended": "Not Recommended",
   "overrideDns": "Override DNS",
   "overrideDnsDesc": "Override profile's DNS settings",
-  "overrideTestUrl": "Override Test URL",
+  "overrideTestUrl": "Override Config",
   "ntp": "NTP",
   "ntpDesc": "Use NTP time service",
   "overrideNtp": "Override NTP",

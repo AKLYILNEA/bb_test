@@ -2689,10 +2689,10 @@ class AppLocalizations {
     );
   }
 
-  /// `Override Test URL`
+  /// `Override Config`
   String get overrideTestUrl {
     return Intl.message(
-      'Override Test URL',
+      'Override Config',
       name: 'overrideTestUrl',
       desc: '',
       args: [],

@@ -682,9 +682,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "overrideSnifferDesc": MessageLookupByLibrary.simpleMessage(
       "Override profile\'s Sniffer settings",
     ),
-    "overrideTestUrl": MessageLookupByLibrary.simpleMessage(
-      "Override Test URL",
-    ),
+    "overrideTestUrl": MessageLookupByLibrary.simpleMessage("Override Config"),
     "overrideTunnel": MessageLookupByLibrary.simpleMessage("Override Tunnel"),
     "overrideTunnelDesc": MessageLookupByLibrary.simpleMessage(
       "Override profile\'s Tunnel settings",

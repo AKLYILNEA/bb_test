@@ -337,7 +337,7 @@
   "notRecommended": "不推薦",
   "overrideDns": "覆寫 DNS",
   "overrideDnsDesc": "開啟後將覆蓋配置中的 DNS 選項",
-  "overrideTestUrl": "覆蓋原始配置",
+  "overrideTestUrl": "覆蓋配置",
   "ntp": "NTP",
   "ntpDesc": "使用 NTP 時間服務",
   "overrideNtp": "覆寫 NTP",
