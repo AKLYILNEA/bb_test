@@ -266,6 +266,12 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
         return super.onUnbind(intent)
     }
 
+    override fun onRevoke() {
+        Log.d("BettboxVpnService", "VPN revoked by system")
+        VpnPlugin.handleStop(force = true)
+        super.onRevoke()
+    }
+
     override fun onDestroy() {
         stop()
         super.onDestroy()
