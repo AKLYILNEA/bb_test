@@ -3,6 +3,7 @@ package com.appshub.bettbox.plugins
 import android.os.Handler
 import android.os.Looper
 import com.appshub.bettbox.GlobalState
+import com.appshub.bettbox.RunState
 import com.appshub.bettbox.models.VpnOptions
 import com.appshub.bettbox.modules.VpnResidualCleaner
 import com.google.gson.Gson
