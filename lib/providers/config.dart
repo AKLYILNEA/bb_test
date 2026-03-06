@@ -400,16 +400,3 @@ class NodeExcludeFilter extends _$NodeExcludeFilter
   }
 }
 
-@riverpod
-class NodeFilterInverse extends _$NodeFilterInverse
-    with AutoDisposeNotifierMixin {
-  @override
-  bool build() {
-    return globalState.config.nodeFilterInverse;
-  }
-
-  @override
-  onUpdate(value) {
-    globalState.config = globalState.config.copyWith(nodeFilterInverse: value);
-  }
-}

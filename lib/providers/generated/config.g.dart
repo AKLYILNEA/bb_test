@@ -328,21 +328,5 @@ final nodeExcludeFilterProvider =
     );
 
 typedef _$NodeExcludeFilter = AutoDisposeNotifier<String>;
-String _$nodeFilterInverseHash() => r'6fb4b90be1c2436f54206aa98b44201df1196cfa';
-
-/// See also [NodeFilterInverse].
-@ProviderFor(NodeFilterInverse)
-final nodeFilterInverseProvider =
-    AutoDisposeNotifierProvider<NodeFilterInverse, bool>.internal(
-      NodeFilterInverse.new,
-      name: r'nodeFilterInverseProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$nodeFilterInverseHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
-
-typedef _$NodeFilterInverse = AutoDisposeNotifier<bool>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

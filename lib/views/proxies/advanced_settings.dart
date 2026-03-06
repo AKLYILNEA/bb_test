@@ -80,15 +80,11 @@ class _NodeExclusionDialog extends ConsumerStatefulWidget {
 class _NodeExclusionDialogState extends ConsumerState<_NodeExclusionDialog> {
   late TextEditingController _controller;
   final _formKey = GlobalKey<FormState>();
-  // 本地状态管理 Switch，initState 从 provider 初始化
-  late bool _nodeFilterInverse;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController(text: widget.currentValue);
-    // 从 globalState 读取初始值（此时 provider 可能尚未 watch）
-    _nodeFilterInverse = globalState.config.nodeFilterInverse;
   }
 
   @override
@@ -132,25 +128,6 @@ class _NodeExclusionDialogState extends ConsumerState<_NodeExclusionDialog> {
               ),
               validator: widget.validator,
               onFieldSubmitted: (_) => _handleSubmit(),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  appLocalizations.nodeFilterInverse,
-                  style: context.textTheme.bodyLarge,
-                ),
-                Switch(
-                  value: _nodeFilterInverse,
-                  onChanged: (bool value) {
-                    // 同时更新本地状态（立即刷新 Switch UI）和 provider（持久化并通知其他监听者）
-                    setState(() => _nodeFilterInverse = value);
-                    ref.read(nodeFilterInverseProvider.notifier).value = value;
-                    globalState.appController.applyProfileDebounce();
-                  },
-                ),
-              ],
             ),
           ],
         ),

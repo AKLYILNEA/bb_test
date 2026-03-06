@@ -329,8 +329,6 @@
   "nodeExclusion": "節點排除",
   "nodeExclusionDesc": "排除所有匹配到的節點",
   "nodeExclusionPlaceholder": "HK|香港|🇭🇰",
-  "nodeFilterInverse": "反向選擇",
-  "nodeFilterInverseDesc": "僅保留匹配到的節點",
   "formatError": "請檢查格式是否正確",
   "healthCheckTimeout": "超時時間",
   "healthCheckTimeoutDesc": "節點健康檢查超時時間",

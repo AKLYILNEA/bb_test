@@ -521,7 +521,6 @@ class GlobalState {
 
     // Apply node filter to all proxy groups
     final nodeExcludeFilter = globalState.config.nodeExcludeFilter;
-    final nodeFilterInverse = globalState.config.nodeFilterInverse;
     final healthCheckTimeout = globalState.config.healthCheckTimeout;
     if ((nodeExcludeFilter.isNotEmpty || healthCheckTimeout != 5000) &&
         rawConfig['proxy-groups'] != null) {
@@ -549,7 +548,7 @@ class GlobalState {
         if (group is! Map) continue;
 
         if (filterRegex != null && group['use'] != null) {
-          final filterKey = nodeFilterInverse ? 'filter' : 'exclude-filter';
+          const filterKey = 'exclude-filter';
           final existing = group[filterKey];
           if (existing != null && existing is String && existing.isNotEmpty) {
             group[filterKey] = '$existing|$nodeExcludeFilter';
@@ -564,7 +563,7 @@ class GlobalState {
             if (item is! String) return true; 
             if (protectedNames.contains(item)) return true;
             final matches = filterRegex!.hasMatch(item);
-            return nodeFilterInverse ? matches : !matches;
+            return !matches; // Exclude matching nodes
           }).toList();
           group['proxies'] = filtered;
         }
@@ -579,7 +578,7 @@ class GlobalState {
         for (final key in proxyProviders.keys) {
           final provider = proxyProviders[key];
           if (provider is Map) {
-            final filterKey = nodeFilterInverse ? 'filter' : 'exclude-filter';
+            const filterKey = 'exclude-filter';
             final existing = provider[filterKey];
             if (existing != null && existing is String && existing.isNotEmpty) {
               provider[filterKey] = '$existing|$nodeExcludeFilter';

@@ -426,7 +426,6 @@ _Config _$ConfigFromJson(Map<String, dynamic> json) => _Config(
       ? const ScriptProps()
       : ScriptProps.fromJson(json['scriptProps'] as Map<String, dynamic>),
   nodeExcludeFilter: json['nodeExcludeFilter'] as String? ?? '',
-  nodeFilterInverse: json['nodeFilterInverse'] as bool? ?? false,
   healthCheckTimeout: (json['healthCheckTimeout'] as num?)?.toInt() ?? 5000,
 );
 
@@ -450,6 +449,5 @@ Map<String, dynamic> _$ConfigToJson(_Config instance) => <String, dynamic>{
   'patchClashConfig': instance.patchClashConfig,
   'scriptProps': instance.scriptProps,
   'nodeExcludeFilter': instance.nodeExcludeFilter,
-  'nodeFilterInverse': instance.nodeFilterInverse,
   'healthCheckTimeout': instance.healthCheckTimeout,
 };
