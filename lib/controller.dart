@@ -7,7 +7,7 @@ import 'package:archive/archive_io.dart';
 import 'package:bett_box/clash/clash.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/plugins/app.dart';
-import 'package:bett_box/plugins/service.dart';
+import 'package:bett_box/plugins/service.dart' as vpn_service;
 import 'package:bett_box/plugins/vpn.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
@@ -795,7 +795,7 @@ class AppController {
     }
 
     if (system.isAndroid) {
-      final isNativeRunning = await (globalState.isService ? vpn?.getStatus() : service?.getStatus()) ?? false;
+      final isNativeRunning = await (globalState.isService ? vpn?.getStatus() : vpn_service.service?.getStatus()) ?? false;
       
       if (isNativeRunning && !globalState.isStart) {
         commonPrint.log('Native VPN is running (Tile started). Hot-attaching UI state...');
@@ -857,7 +857,7 @@ class AppController {
 
       final isVpnRunningFlag = prefs?.getBool('is_vpn_running') ?? false;
       
-      final isNativeRunning = await (globalState.isService ? vpn?.getStatus() : service?.getStatus()) ?? false;
+      final isNativeRunning = await (globalState.isService ? vpn?.getStatus() : vpn_service.service?.getStatus()) ?? false;
 
       final isAbnormalExit = !isNativeRunning && isVpnRunningFlag && !isReinstall;
       
