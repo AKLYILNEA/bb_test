@@ -130,6 +130,10 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             "isServiceEngineRunning" -> {
             result.success(GlobalState.isServiceEngineRunning())
         }
+            
+            "status" -> {
+            result.success(GlobalState.currentRunState == RunState.START)
+        }
 
             "reconnectIpc" -> {
             GlobalState.reconnectIpc()

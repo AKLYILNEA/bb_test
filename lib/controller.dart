@@ -794,17 +794,17 @@ class AppController {
     }
 
     if (system.isAndroid) {
-      final isNativeRunning = await vpn?.getStatus() ?? false;
+      final isNativeRunning = await (globalState.isService ? vpn?.getStatus() : service?.getStatus()) ?? false;
       
       if (isNativeRunning && !globalState.isStart) {
         commonPrint.log('Native VPN is running (Tile started). Hot-attaching UI state...');
         
         _ref.read(runTimeProvider.notifier).value = 0;
         
-        await applyProfile(silence: true); 
         await globalState.handleStart([updateRunTime, updateTraffic]);
         addCheckIpNumDebounce();
         _backgroundLoad();
+        return;
       }
     }
 
@@ -856,7 +856,7 @@ class AppController {
 
       final isVpnRunningFlag = prefs?.getBool('is_vpn_running') ?? false;
       
-      final isNativeRunning = await vpn?.getStatus() ?? false;
+      final isNativeRunning = await (globalState.isService ? vpn?.getStatus() : service?.getStatus()) ?? false;
 
       final isAbnormalExit = !isNativeRunning && isVpnRunningFlag && !isReinstall;
       

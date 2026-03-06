@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:convert';
 import 'dart:isolate';
 
@@ -113,6 +113,11 @@ class Service {
     return await methodChannel.invokeMethod<bool>('isServiceEngineRunning') ?? false;
   }
 
+  /// Check if the VPN native thread/service is currently running
+  Future<bool> getStatus() async {
+    return await methodChannel.invokeMethod<bool>('status') ?? false;
+  }
+
   /// Request Service Engine to re-establish IPC with UI Engine.
   Future<bool?> reconnectIpc() async {
     return await methodChannel.invokeMethod<bool>('reconnectIpc');
@@ -121,4 +126,6 @@ class Service {
 
 Service? get service =>
     system.isAndroid && !globalState.isService ? Service() : null;
+
+
 

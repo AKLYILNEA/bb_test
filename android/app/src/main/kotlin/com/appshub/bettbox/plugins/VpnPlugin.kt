@@ -168,6 +168,10 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 result.success(VpnResidualCleaner.isZombieTunAlive())
             }
 
+            "status" -> {
+                result.success(GlobalState.currentRunState == RunState.START)
+            }
+
             else -> {
                 result.notImplemented()
             }
