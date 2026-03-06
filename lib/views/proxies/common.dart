@@ -23,7 +23,7 @@ double getItemHeight(ProxyCardType proxyCardType) {
 Future<void> proxyDelayTest(Proxy proxy, [String? testUrl]) async {
   final appController = globalState.appController;
   final state = appController.getProxyCardState(proxy.name);
-  final url = state.testUrl.getSafeValue(appController.getRealTestUrl(testUrl));
+  final url = appController.getRealTestUrl(state.testUrl.getSafeValue(testUrl ?? ''));
   if (state.proxyName.isEmpty) {
     return;
   }
@@ -42,8 +42,8 @@ Future<void> delayTest(List<Proxy> proxies, [String? testUrl]) async {
   final delayTasks = proxyNames.map((proxyName) {
     return () async {
       final state = appController.getProxyCardState(proxyName);
-      final url = state.testUrl.getSafeValue(
-        appController.getRealTestUrl(testUrl),
+      final url = appController.getRealTestUrl(
+        state.testUrl.getSafeValue(testUrl ?? ''),
       );
       final name = state.proxyName;
       if (name.isEmpty) {
