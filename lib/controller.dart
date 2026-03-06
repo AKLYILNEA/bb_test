@@ -7,6 +7,7 @@ import 'package:archive/archive_io.dart';
 import 'package:bett_box/clash/clash.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/plugins/app.dart';
+import 'package:bett_box/plugins/service.dart';
 import 'package:bett_box/plugins/vpn.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
