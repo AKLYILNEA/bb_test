@@ -21,25 +21,29 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     private lateinit var flutterMethodChannel: MethodChannel
 
     companion object {
-        private var activeChannel: MethodChannel? = null
+        private val activeChannels = mutableListOf<MethodChannel>()
         private val mainHandler = Handler(Looper.getMainLooper())
 
         fun notifyNetworkChanged() {
             mainHandler.post {
-                try {
-                    activeChannel?.invokeMethod("networkChanged", null)
-                } catch (e: Exception) {
-                    android.util.Log.e("ServicePlugin", "networkChanged notify error: ${e.message}")
+                activeChannels.toList().forEach { channel ->
+                    try {
+                        channel.invokeMethod("networkChanged", null)
+                    } catch (e: Exception) {
+                        android.util.Log.e("ServicePlugin", "networkChanged notify error: ${e.message}")
+                    }
                 }
             }
         }
 
         fun notifyQuickResponse() {
             mainHandler.post {
-                try {
-                    activeChannel?.invokeMethod("quickResponse", null)
-                } catch (e: Exception) {
-                    android.util.Log.e("ServicePlugin", "quickResponse notify error: ${e.message}")
+                activeChannels.toList().forEach { channel ->
+                    try {
+                        channel.invokeMethod("quickResponse", null)
+                    } catch (e: Exception) {
+                        android.util.Log.e("ServicePlugin", "quickResponse notify error: ${e.message}")
+                    }
                 }
             }
         }
@@ -48,13 +52,15 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         flutterMethodChannel = MethodChannel(flutterPluginBinding.binaryMessenger, "service")
         flutterMethodChannel.setMethodCallHandler(this)
-        activeChannel = flutterMethodChannel
+        synchronized(activeChannels) {
+            activeChannels.add(flutterMethodChannel)
+        }
     }
 
     override fun onDetachedFromEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         flutterMethodChannel.setMethodCallHandler(null)
-        if (activeChannel == flutterMethodChannel) {
-            activeChannel = null
+        synchronized(activeChannels) {
+            activeChannels.remove(flutterMethodChannel)
         }
     }
 

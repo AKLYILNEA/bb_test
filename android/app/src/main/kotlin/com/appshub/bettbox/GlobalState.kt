@@ -91,17 +91,9 @@ object GlobalState {
     }
 
     fun syncStatus() {
-        CoroutineScope(Dispatchers.Default).launch {
-            val status = try {
-                VpnPlugin.getStatus() ?: false
-            } catch (e: Exception) {
-                false
-            }
-            withContext(Dispatchers.Main){
-                val newState = if (status) RunState.START else RunState.STOP
-                updateRunState(newState)
-            }
-        }
+        val status = VpnPlugin.getStatus()
+        val newState = if (status) RunState.START else RunState.STOP
+        updateRunState(newState)
     }
 
     suspend fun getText(text: String): String {
@@ -184,7 +176,7 @@ object GlobalState {
         }
     }
 
-    fun initServiceEngine() {
+    fun initServiceEngine(flags: List<String>? = null) {
         if (serviceEngine != null) return
         destroyServiceEngine()
         runLock.withLock {
@@ -198,9 +190,10 @@ object GlobalState {
                 FlutterInjector.instance().flutterLoader().findAppBundlePath(),
                 "_service"
             )
+            val args = flags ?: if (flutterEngine == null) listOf("quick") else null
             serviceEngine?.dartExecutor?.executeDartEntrypoint(
                 vpnService,
-                if (flutterEngine == null) listOf("quick") else null
+                args
             )
         }
     }

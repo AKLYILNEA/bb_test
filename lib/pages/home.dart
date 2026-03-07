@@ -241,10 +241,6 @@ class _HomeBackScopeState extends ConsumerState<HomeBackScope> {
         );
       }
 
-      if (sdkInt! >= 33) {
-        return widget.child;
-      }
-
       final backBlock = ref.watch(backBlockProvider);
       return PopScope(
         canPop: false,

@@ -1,5 +1,7 @@
 package com.appshub.bettbox.plugins
 
+import android.os.Handler
+import android.os.Looper
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -7,6 +9,7 @@ import io.flutter.plugin.common.MethodChannel
 class TilePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
     private lateinit var channel: MethodChannel
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "tile")
@@ -19,21 +22,32 @@ class TilePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }
 
     fun handleStart() {
-        channel.invokeMethod("start", null)
+        safeInvokeMethod("start")
     }
 
     fun handleStop() {
-        channel.invokeMethod("stop", null)
+        safeInvokeMethod("stop")
     }
 
     fun handleReconnectIpc() {
-        channel.invokeMethod("reconnectIpc", null)
+        safeInvokeMethod("reconnectIpc")
     }
 
     private fun handleDetached() {
-        channel.invokeMethod("detached", null)
+        safeInvokeMethod("detached")
     }
 
+    private fun safeInvokeMethod(method: String) {
+        mainHandler.post {
+            try {
+                channel.invokeMethod(method, null)
+            } catch (e: Exception) {
+                android.util.Log.e("TilePlugin", "Failed to invoke $method: ${e.message}")
+            }
+        }
+    }
 
-    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {}
+    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        result.notImplemented()
+    }
 }

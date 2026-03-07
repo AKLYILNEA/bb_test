@@ -794,31 +794,46 @@ class AppController {
       await globalState.updateStartTime();
     }
 
+    bool isNativeRunning = false;
     if (system.isAndroid) {
-      final isNativeRunning = await (globalState.isService ? vpn?.getStatus() : vpn_service.service?.getStatus()) ?? false;
+      isNativeRunning = await (globalState.isService ? vpn?.getStatus() : vpn_service.service?.getStatus()) ?? false;
       
       if (isNativeRunning && !globalState.isStart) {
         commonPrint.log('Native VPN is running (Tile started). Hot-attaching UI state...');
         
         _ref.read(runTimeProvider.notifier).value = 0;
         
-        await globalState.handleStart([updateRunTime, updateTraffic]);
+
+        await globalState.updateStartTime();
+        await clashCore.startListener();
+        
+        final prefs = await preferences.sharedPreferencesCompleter.future;
+        await prefs?.setBool('is_vpn_running', true);
+        
+        globalState.startUpdateTasks([updateRunTime, updateTraffic]);
+        
         addCheckIpNumDebounce();
         _backgroundLoad();
         return;
       }
     }
 
-    final (needRecovery, recoveryReason, isUpgrade) = await _detectRecoveryReason();
+    final (needRecovery, recoveryReason, isUpgrade) = await _detectRecoveryReason(isNativeRunning);
 
-    if (system.isAndroid && needRecovery) {
+    if (needRecovery) {
       commonPrint.log('Handling Recovery: $recoveryReason');
       
-      await applyProfile(silence: true);
-      
-      final prefs = await preferences.sharedPreferencesCompleter.future;
-      await prefs?.setBool('is_vpn_running', false);
-      await prefs?.setBool('needs_tun_cleanup', false);
+      try {
+        await applyProfile(silence: true);
+        
+        if (system.isAndroid) {
+          final prefs = await preferences.sharedPreferencesCompleter.future;
+          await prefs?.setBool('is_vpn_running', false);
+          await prefs?.setBool('needs_tun_cleanup', false);
+        }
+      } catch (e) {
+        commonPrint.log('Recovery applyProfile failed: $e');
+      }
     }
     final shouldStart = globalState.isStart || _ref.read(appSettingProvider).autoRun;
 
@@ -836,7 +851,7 @@ class AppController {
     }
   }
 
-  Future<(bool, String, bool)> _detectRecoveryReason() async {
+  Future<(bool, String, bool)> _detectRecoveryReason(bool isNativeRunning) async {
     final results = await Future.wait<dynamic>([
       preferences.sharedPreferencesCompleter.future,
       system.isAndroid ? app.getSelfLastUpdateTime() : Future.value(0),
@@ -857,8 +872,6 @@ class AppController {
 
       final isVpnRunningFlag = prefs?.getBool('is_vpn_running') ?? false;
       
-      final isNativeRunning = await (globalState.isService ? vpn?.getStatus() : vpn_service.service?.getStatus()) ?? false;
-
       final isAbnormalExit = !isNativeRunning && isVpnRunningFlag && !isReinstall;
       
       if (isAbnormalExit) {

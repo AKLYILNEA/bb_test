@@ -37,6 +37,7 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
                     .setSession("bettbox_cleanup")
                     .addAddress("10.255.255.254", 30)
                 val interface_ = builder.establish()
+                kotlinx.coroutines.delay(200)
                 interface_?.close()
                 Log.d("BettboxVpnService", "Cleanup profile closed, waiting for system to remove interface")
                 
@@ -208,30 +209,7 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
             builder.setContentTitle(spannable).setContentText(null).build()
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            try {
-                startForeground(
-                    GlobalState.NOTIFICATION_ID,
-                    notification,
-                    android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED
-                )
-            } catch (e: Exception) {
-                // Fallback to dataSync for compatibility
-                try {
-                    startForeground(
-                        GlobalState.NOTIFICATION_ID,
-                        notification,
-                        android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
-                    )
-                } catch (e2: Exception) {
-                    // Final fallback without type
-                    startForeground(GlobalState.NOTIFICATION_ID, notification)
-                }
-            }
-        } else {
-            // Android 13 - dataSync
-            startForeground(GlobalState.NOTIFICATION_ID, notification)
-        }
+        this.startForeground(notification)
     }
 
     override fun onTrimMemory(level: Int) {
@@ -269,7 +247,16 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
 
     override fun onRevoke() {
         Log.d("BettboxVpnService", "VPN revoked by system")
-        VpnPlugin.handleStop(force = true)
+        try {
+            if (GlobalState.isServiceEngineRunning()) {
+                VpnPlugin.handleStop(force = true)
+            } else {
+                stop()
+            }
+        } catch (e: Exception) {
+            Log.e("BettboxVpnService", "Error during onRevoke cleanup: ${e.message}")
+            stop()
+        }
         super.onRevoke()
     }
 

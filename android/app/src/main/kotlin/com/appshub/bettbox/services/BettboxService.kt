@@ -59,30 +59,8 @@ class BettboxService : Service(), BaseServiceInterface {
             builder.setContentTitle(spannable).setContentText(null).build()
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            try {
-                startForeground(
-                    GlobalState.NOTIFICATION_ID,
-                    notification,
-                    android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED
-                )
-            } catch (e: Exception) {
-                // Fallback to dataSync for compatibility
-                try {
-                    startForeground(
-                        GlobalState.NOTIFICATION_ID,
-                        notification,
-                        android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
-                    )
-                } catch (e2: Exception) {
-                    // Final fallback without type
-                    startForeground(GlobalState.NOTIFICATION_ID, notification)
-                }
-            }
-        } else {
-            // Android 13 - dataSync 
-            startForeground(GlobalState.NOTIFICATION_ID, notification)
-        }
+        // 调用公共扩展方法
+        this.startForeground(notification)
     }
 
     override fun onTrimMemory(level: Int) {

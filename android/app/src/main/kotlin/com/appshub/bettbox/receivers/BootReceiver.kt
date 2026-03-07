@@ -4,13 +4,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.appshub.bettbox.MainActivity
+import com.appshub.bettbox.GlobalState
 
 /**
  * Boot receiver to handle auto-launch functionality on device boot
- * 
- * This receiver listens for BOOT_COMPLETED broadcast and launches the app
- * if the user has enabled the autoLaunch setting.
+ *
+ * Instead of launching the UI (which is blocked on Android 10+),
+ * it silently initializes the service engine in the background.
  */
 class BootReceiver : BroadcastReceiver() {
     companion object {
@@ -34,19 +34,17 @@ class BootReceiver : BroadcastReceiver() {
             Log.d(TAG, "AutoLaunch setting: $autoLaunch")
 
             if (autoLaunch) {
-                Log.d(TAG, "AutoLaunch enabled, starting MainActivity")
+                Log.d(TAG, "AutoLaunch enabled, triggering silent background boot")
+
+                // Use GlobalState to initialize the background Flutter engine.
+                // This bypasses the Android 10+ background activity restriction
+                // and provides a smoother user experience.
+                // We pass "boot" flag to distinguish from Tile start.
+                GlobalState.initServiceEngine(listOf("boot"))
                 
-                // Launch the main activity
-                val launchIntent = Intent(context, MainActivity::class.java).apply {
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                }
-                
-                context.startActivity(launchIntent)
-                
-                Log.d(TAG, "MainActivity launch request sent")
+                Log.d(TAG, "Service engine initialization with 'boot' flag requested")
             } else {
-                Log.d(TAG, "AutoLaunch disabled, skipping app launch")
+                Log.d(TAG, "AutoLaunch disabled, skipping background boot")
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error in BootReceiver", e)

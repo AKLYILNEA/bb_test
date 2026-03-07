@@ -385,9 +385,9 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }
 
 
-    suspend fun getStatus(): Boolean? {
-        return withContext(Dispatchers.Default) {
-            flutterMethodChannel.awaitResult<Boolean>("status", null)
+    fun getStatus(): Boolean {
+        return GlobalState.runLock.withLock {
+            GlobalState.currentRunState == RunState.START && bettBoxService != null
         }
     }
 
@@ -427,7 +427,8 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             } catch (e: Exception) {
                 android.util.Log.e("VpnPlugin", "Start failed with exception: ${e.message}")
             }
-            if (fd == null || fd == 0) {
+            
+            if (fd == null || (currentOptions.enable && fd == 0)) {
                 android.util.Log.w("VpnPlugin", "VPN establish failed, retrying...")
                 delay(300)
                 try {
@@ -435,7 +436,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 } catch (e: Exception) {
                     android.util.Log.e("VpnPlugin", "Retry start failed with exception: ${e.message}")
                 }
-                if (fd == null || fd == 0) {
+                if (fd == null || (currentOptions.enable && fd == 0)) {
                     android.util.Log.e("VpnPlugin", "VPN start failed after retry")
                     GlobalState.runLock.withLock {
                         GlobalState.updateRunState(RunState.STOP)
