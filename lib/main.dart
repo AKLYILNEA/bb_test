@@ -127,7 +127,6 @@ Future<void> _service(List<String> flags) async {
       },
     ),
   );
-  final quickStart = flags.contains('quick');
   final bootStart = flags.contains('boot');
   
   if (!quickStart && !bootStart) {
