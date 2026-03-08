@@ -743,7 +743,7 @@ class AppController {
       }
     };
 
-    service?.addNativeEventCallback((method, arguments) async {
+    vpn_service.service?.addNativeEventCallback((method, arguments) async {
       if (method == 'vpnStartFailed') {
         globalState.showNotifier('Failed, Please try again later');
         await updateStatus(false);
