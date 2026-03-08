@@ -605,5 +605,7 @@
   "restartTip": "Restart the app for changes to take effect",
   "restart": "Restart",
   "restartCoreTitle": "Restart Core",
-  "restartCoreDesc": "Manually restart the core?"
+  "restartCoreDesc": "Manually restart the core?",
+  "highRefreshRate": "High Refresh Rate",
+  "highRefreshRateDesc": "Force high refresh rate support"
 }

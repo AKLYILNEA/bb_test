@@ -229,11 +229,36 @@ class NavBarHapticFeedbackItem extends ConsumerWidget {
       delegate: SwitchDelegate(
         value: enableNavBarHapticFeedback,
         onChanged: (value) {
-          ref
-              .read(appSettingProvider.notifier)
-              .updateState(
-                (state) => state.copyWith(enableNavBarHapticFeedback: value),
-              );
+          ref.read(appSettingProvider.notifier).updateState(
+            (state) => state.copyWith(enableNavBarHapticFeedback: value),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class HighRefreshRateItem extends ConsumerWidget {
+  const HighRefreshRateItem({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final enableHighRefreshRate = ref.watch(
+      appSettingProvider.select((state) => state.enableHighRefreshRate),
+    );
+    return ListItem.switchItem(
+      title: Text(appLocalizations.highRefreshRate),
+      subtitle: Text(appLocalizations.highRefreshRateDesc),
+      delegate: SwitchDelegate(
+        value: enableHighRefreshRate,
+        onChanged: (value) {
+          ref.read(appSettingProvider.notifier).updateState(
+            (state) => state.copyWith(enableHighRefreshRate: value),
+          );
+
+          if (context.mounted) {
+            context.showSnackBar(appLocalizations.restartTip);
+          }
         },
       ),
     );
@@ -315,7 +340,10 @@ class ApplicationSettingView extends StatelessWidget {
           AutoRunItem(),
           if (system.isAndroid) ...[HiddenItem()],
           AnimateTabItem(),
-          if (system.isAndroid) ...[NavBarHapticFeedbackItem()],
+          if (system.isAndroid) ...[
+            NavBarHapticFeedbackItem(),
+            HighRefreshRateItem(),
+          ],
           CloseConnectionsItem(),
           UsageItem(),
           EnableCrashReportItem(),

@@ -606,5 +606,7 @@
   "restartTip": "重啟APP後改變生效",
   "restart": "重啟",
   "restartCoreTitle": "重啟內核",
-  "restartCoreDesc": "是否手動重啟內核？"
+  "restartCoreDesc": "是否手動重啟內核？",
+  "highRefreshRate": "高重新整理率",
+  "highRefreshRateDesc": "強制啟用裝置高重新整理率支援"
 }

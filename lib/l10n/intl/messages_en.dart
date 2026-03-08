@@ -442,6 +442,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(
       "Node health check timeout",
     ),
+    "highRefreshRate": MessageLookupByLibrary.simpleMessage(
+      "High Refresh Rate",
+    ),
+    "highRefreshRateDesc": MessageLookupByLibrary.simpleMessage(
+      "Force high refresh rate support",
+    ),
     "host": MessageLookupByLibrary.simpleMessage("Host"),
     "hostsDesc": MessageLookupByLibrary.simpleMessage(
       "Append hosts to current config",

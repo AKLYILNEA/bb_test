@@ -320,6 +320,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(
       "節點健康檢查超時時間",
     ),
+    "highRefreshRate": MessageLookupByLibrary.simpleMessage("高重新整理率"),
+    "highRefreshRateDesc": MessageLookupByLibrary.simpleMessage(
+      "強制啟用裝置高重新整理率支援",
+    ),
     "host": MessageLookupByLibrary.simpleMessage("主機"),
     "hostsDesc": MessageLookupByLibrary.simpleMessage("附加目前配置 Hosts"),
     "hotkeyConflict": MessageLookupByLibrary.simpleMessage("快捷鍵衝突"),

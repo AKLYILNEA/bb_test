@@ -86,6 +86,7 @@ abstract class AppSettingProps with _$AppSettingProps {
     @Default(true) bool minimizeOnExit,
     @Default(false) bool hidden,
     @Default(false) bool developerMode,
+    @Default(true) bool enableHighRefreshRate,
     @Default(RecoveryStrategy.compatible) RecoveryStrategy recoveryStrategy,
   }) = _AppSettingProps;
 

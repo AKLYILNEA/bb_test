@@ -312,6 +312,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(
       "节点健康检查超时时间",
     ),
+    "highRefreshRate": MessageLookupByLibrary.simpleMessage("高刷新率"),
+    "highRefreshRateDesc": MessageLookupByLibrary.simpleMessage("强制启用设备高刷新率支持"),
     "host": MessageLookupByLibrary.simpleMessage("主机"),
     "hostsDesc": MessageLookupByLibrary.simpleMessage("追加当前配置Hosts"),
     "hotkeyConflict": MessageLookupByLibrary.simpleMessage("快捷键冲突"),
