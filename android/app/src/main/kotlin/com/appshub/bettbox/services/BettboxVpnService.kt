@@ -30,6 +30,17 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
     }
 
     override suspend fun start(options: VpnOptions): Int {
+        try {
+            val prepareIntent = android.net.VpnService.prepare(this)
+            if (prepareIntent != null) {
+                Log.w("BettboxVpnService", "Hack: VpnService.prepare() returned non-null!")
+            } else {
+                Log.d("BettboxVpnService", "Hack: System VPN state cleared successfully.")
+            }
+        } catch (e: Exception) {
+            Log.e("BettboxVpnService", "Hack Prepare failed: ${e.message}")
+        }
+
         if (com.appshub.bettbox.modules.VpnResidualCleaner.isZombieTunAlive()) {
             try {
                 Log.d("BettboxVpnService", "Found zombie TUN, applying cleanup profile")
@@ -37,7 +48,9 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
                     .setSession("bettbox_cleanup")
                     .addAddress("10.255.255.254", 30)
                 val interface_ = builder.establish()
+                
                 kotlinx.coroutines.delay(200)
+                
                 interface_?.close()
                 Log.d("BettboxVpnService", "Cleanup profile closed, waiting for system to remove interface")
                 
