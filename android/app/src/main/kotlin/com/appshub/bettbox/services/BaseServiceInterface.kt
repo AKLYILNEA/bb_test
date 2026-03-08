@@ -174,17 +174,27 @@ fun Service.startForeground(notification: Notification) {
     try {
         val sdkInt = Build.VERSION.SDK_INT
         
-        if (this is android.net.VpnService) {
-            startForeground(GlobalState.NOTIFICATION_ID, notification)
+        if (sdkInt >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // API 34 及以上 (Android 14+)
+            val foregroundServiceType = if (this is android.net.VpnService) {
+                android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC or 1024
+            } else {
+                android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+            }
+            
+            startForeground(
+                GlobalState.NOTIFICATION_ID, 
+                notification, 
+                foregroundServiceType
+            )
         } 
-        else if (sdkInt >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        else if (sdkInt >= Build.VERSION_CODES.Q) { 
             startForeground(
                 GlobalState.NOTIFICATION_ID, 
                 notification, 
                 android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
             )
         } 
-        else {
+        else { 
             startForeground(GlobalState.NOTIFICATION_ID, notification)
         }
     } catch (e: Exception) {
