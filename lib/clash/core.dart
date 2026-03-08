@@ -100,22 +100,25 @@ class ClashCore {
   Future<List<Group>> getProxiesGroups() async {
     final proxies = await clashInterface.getProxies();
     if (proxies.isEmpty) return [];
-    final groupNames = [
-      UsedProxy.GLOBAL.name,
-      ...(proxies[UsedProxy.GLOBAL.name]['all'] as List).where((e) {
-        final proxy = proxies[e] ?? {};
-        return GroupTypeExtension.valueList.contains(proxy['type']);
-      }),
-    ];
-    final groupsRaw = groupNames.map((groupName) {
-      final group = proxies[groupName];
-      group['all'] = ((group['all'] ?? []) as List)
-          .map((name) => proxies[name])
-          .where((proxy) => proxy != null)
-          .toList();
-      return group;
-    }).toList();
-    return groupsRaw.map((e) => Group.fromJson(e)).toList();
+
+    return Isolate.run<List<Group>>(() {
+      final groupNames = [
+        UsedProxy.GLOBAL.name,
+        ...(proxies[UsedProxy.GLOBAL.name]['all'] as List).where((e) {
+          final proxy = proxies[e] ?? {};
+          return GroupTypeExtension.valueList.contains(proxy['type']);
+        }),
+      ];
+      final groupsRaw = groupNames.map((groupName) {
+        final group = Map<String, dynamic>.from(proxies[groupName]);
+        group['all'] = ((group['all'] ?? []) as List)
+            .map((name) => proxies[name])
+            .where((proxy) => proxy != null)
+            .toList();
+        return group;
+      }).toList();
+      return groupsRaw.map((e) => Group.fromJson(e)).toList();
+    });
   }
 
   FutureOr<String> changeProxy(ChangeProxyParams changeProxyParams) async {

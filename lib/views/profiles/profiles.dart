@@ -348,7 +348,7 @@ class ProfileItem extends StatelessWidget {
         final file = await profile.getFile();
         final value = await picker.saveFile(
           profile.label ?? profile.id,
-          file.readAsBytesSync(),
+          await file.readAsBytes(),
         );
         if (value == null) return false;
         return true;

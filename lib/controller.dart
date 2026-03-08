@@ -1274,9 +1274,9 @@ class AppController {
       // Add profiles dir (valid subscriptions only)
       final profilesDir = Directory(profilesPath);
       if (await profilesDir.exists()) {
-        final files = profilesDir.listSync(
+        final files = await profilesDir.list(
           recursive: false,
-        ); // First level only
+        ).toList(); // First level only
 
         for (final file in files) {
           if (file is File) {
@@ -1309,7 +1309,7 @@ class AppController {
           );
 
           if (await providersDir.exists()) {
-            final providerFiles = providersDir.listSync(recursive: true);
+            final providerFiles = await providersDir.list(recursive: true).toList();
 
             for (final providerFile in providerFiles) {
               if (providerFile is File) {
