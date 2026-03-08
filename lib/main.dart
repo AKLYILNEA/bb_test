@@ -11,6 +11,7 @@ import 'package:bett_box/plugins/vpn.dart';
 import 'package:bett_box/state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'application.dart';
@@ -70,6 +71,13 @@ Future<void> main() async {
 }
 
 Future<void> _runApp(int version) async {
+  if (system.isAndroid) {
+    try {
+      await FlutterDisplayMode.setHighRefreshRate();
+    } catch (e) {
+      commonPrint.log('Failed to set high refresh rate: $e');
+    }
+  }
   await android?.init();
   await window?.init(version);
   HttpOverrides.global = BettboxHttpOverrides();
