@@ -554,7 +554,6 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
             val packageManager = BettboxApplication.getAppContext().packageManager
             
             try {
-                // 1. Get update time for cache key
                 val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     packageManager?.getPackageInfo(
                         packageName,
@@ -567,7 +566,6 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
                 val cacheKey = "${packageName}_${lastUpdateTime}"
                 val cacheFile = File(iconCacheDir, cacheKey)
                 
-                // 2. Check force refresh
                 val shouldRefresh = if (forceRefresh) {
                     val currentTime = System.currentTimeMillis()
                     val twentyFourHoursInMillis = 24 * 60 * 60 * 1000L
@@ -580,7 +578,6 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
                     cacheFile.delete()
                 }
                 
-                // 3. Check disk cache
                 if (cacheFile.exists() && cacheFile.length() > 0) {
                     try {
                         val cachedBytes = cacheFile.readBytes()
@@ -592,22 +589,26 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
                     }
                 }
                 
-                // 4. Load and cache icon
+                try {
+                    iconCacheDir.listFiles()?.forEach { file ->
+                        if (file.name.startsWith("${packageName}_") && file.name != cacheKey) {
+                            file.delete()
+                        }
+                    }
+                } catch (_: Exception) {}
+                
                 val drawable = packageManager?.getApplicationIcon(packageName)
                 if (drawable != null) {
                     val bytes = drawableToPngBytes(drawable, getIconSizePx())
                     
                     try {
-                        // Sync write since we are already on IO thread
                         cacheFile.writeBytes(bytes)
-                    } catch (_: Exception) {
-                        // Ignore write errors
-                    }
+                    } catch (_: Exception) {}
                     
                     return@withContext bytes
                 }
             } catch (e: Exception) {
-                // Ignore
+                e.printStackTrace()
             }
             
             return@withContext null
@@ -615,9 +616,9 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
     }
 
     private suspend fun getPackages(): List<Package> = withContext(Dispatchers.IO) {
+        val packageManager = BettboxApplication.getAppContext().packageManager
         if (packages.isNotEmpty()) return@withContext packages
         
-        val packageManager = BettboxApplication.getAppContext().packageManager
         val appContext = BettboxApplication.getAppContext()
         val selfPackageName = appContext.packageName
         
@@ -667,24 +668,19 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
     }
 
     private suspend fun getPackagesToList(): List<Map<String, Any>> {
-        return withContext(Dispatchers.Default) {
-            getPackages().map {
-                hashMapOf(
-                    "packageName" to it.packageName,
-                    "label" to it.label,
-                    "system" to it.system,
-                    "internet" to it.internet,
-                    "lastUpdateTime" to it.lastUpdateTime,
-                )
-            }
+        return getPackages().map {
+            hashMapOf(
+                "packageName" to it.packageName,
+                "label" to it.label,
+                "system" to it.system,
+                "internet" to it.internet,
+                "lastUpdateTime" to it.lastUpdateTime,
+            )
         }
     }
 
     private suspend fun getChinaPackageNamesList(): List<String> {
-        val pkgs = getPackages()
-        return withContext(Dispatchers.Default) {
-            pkgs.map { it.packageName }.filter { isChinaPackage(it) }
-        }
+        return getPackages().map { it.packageName }.filter { isChinaPackage(it) }
     }
 
     private fun cleanIconCache() {

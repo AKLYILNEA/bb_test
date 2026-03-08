@@ -441,6 +441,16 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                     GlobalState.runLock.withLock {
                         GlobalState.updateRunState(RunState.STOP)
                     }
+                    ServicePlugin.notifyVpnStartFailed()
+                    try {
+                        val prepareIntent = android.net.VpnService.prepare(BettboxApplication.getAppContext())
+                        if (prepareIntent != null) {
+                            android.util.Log.w("VpnPlugin", "VPN permission blocked. Calling prepare to reset state.")
+                            GlobalState.getCurrentAppPlugin()?.requestVpnPermission { }
+                        }
+                    } catch (e: Exception) {
+                        android.util.Log.e("VpnPlugin", "Failed to call prepare: ${e.message}")
+                    }
                     return@launch
                 }
             }

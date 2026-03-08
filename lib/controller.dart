@@ -743,6 +743,13 @@ class AppController {
       }
     };
 
+    service?.addNativeEventCallback((method, arguments) async {
+      if (method == 'vpnStartFailed') {
+        globalState.showNotifier('Failed, Please try again later');
+        await updateStatus(false);
+      }
+    });
+
     try {
       final wakelockEnabled = await WakelockPlus.enabled;
       _ref.read(wakelockStateProvider.notifier).state = wakelockEnabled;

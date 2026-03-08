@@ -47,6 +47,18 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 }
             }
         }
+
+        fun notifyVpnStartFailed() {
+            mainHandler.post {
+                activeChannels.toList().forEach { channel ->
+                    try {
+                        channel.invokeMethod("vpnStartFailed", null)
+                    } catch (e: Exception) {
+                        android.util.Log.e("ServicePlugin", "vpnStartFailed notify error: ${e.message}")
+                    }
+                }
+            }
+        }
     }
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
