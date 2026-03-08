@@ -228,6 +228,7 @@ class _TestUrlDialog extends ConsumerWidget {
             color: Colors.transparent,
             child: InkWell(
               onTap: () async {
+                final notifier = ref.read(appSettingProvider.notifier);
                 Navigator.of(context, rootNavigator: true).pop();
                 final customUrl = await globalState.showCommonDialog<String>(
                   child: InputDialog(
@@ -247,9 +248,7 @@ class _TestUrlDialog extends ConsumerWidget {
                 );
 
                 if (customUrl != null) {
-                  ref
-                      .read(appSettingProvider.notifier)
-                      .updateState((state) => state.copyWith(testUrl: customUrl));
+                  notifier.updateState((state) => state.copyWith(testUrl: customUrl));
                 }
               },
               child: Container(
