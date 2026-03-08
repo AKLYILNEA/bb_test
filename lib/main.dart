@@ -102,7 +102,6 @@ Future<void> _service(List<String> flags) async {
         await app.tip(appLocalizations.stopVpn);
         clashLibHandler.stopListener();
         await vpn?.stop();
-        exit(0);
       },
       onReconnectIpc: () {
         commonPrint.log('Service: reconnectIpc requested, re-establishing IPC');
@@ -174,7 +173,7 @@ Future<void> _service(List<String> flags) async {
       debugPrint(res);
       if (res.isNotEmpty) {
         await vpn?.stop();
-        exit(0);
+        return;
       }
       await vpn?.start(clashLibHandler.getAndroidVpnOptions());
       

@@ -44,7 +44,8 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     private var bettBoxService: BaseServiceInterface? = null
     private var options: VpnOptions? = null
     private var isBind: Boolean = false
-    private lateinit var scope: CoroutineScope
+    private var job = kotlinx.coroutines.SupervisorJob()
+    private var scope = CoroutineScope(Dispatchers.Default + job)
     private var lastStartForegroundParams: StartForegroundParams? = null
     private val uidPageNameMap = java.util.concurrent.ConcurrentHashMap<Int, String>()
     private var suspendModule: SuspendModule? = null
@@ -79,7 +80,11 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        scope = CoroutineScope(Dispatchers.Default)
+        // Reset job and scope for the new engine
+        job.cancel()
+        job = kotlinx.coroutines.SupervisorJob()
+        scope = CoroutineScope(Dispatchers.Default + job)
+        
         scope.launch {
             registerNetworkCallback()
         }
@@ -97,6 +102,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }
 
     override fun onDetachedFromEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        job.cancel()
         unRegisterNetworkCallback()
         flutterMethodChannel.setMethodCallHandler(null)
     }
@@ -534,7 +540,13 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 }
             }
 
-            GlobalState.handleTryDestroy()
+            // Give native Go threads a moment to finish cleanup before destroying engine
+            scope.launch {
+                delay(200)
+                withContext(Dispatchers.Main) {
+                    GlobalState.handleTryDestroy()
+                }
+            }
         }
     }
 
