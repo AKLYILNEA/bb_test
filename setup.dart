@@ -208,7 +208,7 @@ class Build {
           (item.target == Target.windows ||
               item.target == Target.linux ||
               item.target == Target.macos)) {
-        env['GOAMD64'] = compatible ? 'v2' : 'v3';
+        env['GOAMD64'] = compatible ? 'v1' : 'v3';
       }
       if (isLib) {
         env['CGO_ENABLED'] = '1';
