@@ -89,7 +89,7 @@ class MessageManagerState extends State<MessageManager> {
                 left: 12,
                 right: 12,
               ),
-              alignment: Alignment.topRight,
+              alignment: Alignment.topCenter,
               child: messages.isEmpty
                   ? SizedBox()
                   : LayoutBuilder(
@@ -111,8 +111,14 @@ class MessageManagerState extends State<MessageManager> {
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Expanded(child: Text(messages.last.text)),
+                                Expanded(
+                                  child: Text(
+                                    messages.last.text,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
                                 if (messages.last.actionLabel != null &&
                                     messages.last.onAction != null) ...[
                                   const SizedBox(width: 8),
