@@ -783,6 +783,7 @@ class DetectionState {
   void manualRefresh() {
     _isIpMasked = false;
     _originalIpInfo = null;
+    state.value = state.value.copyWith(ipInfo: null);
     startCheck();
   }
 
@@ -893,22 +894,20 @@ class DetectionState {
       return;
     }
 
+    final isStateChanged = _preIsStart != isStart;
     _preIsStart = isStart;
+    
     _cancelPreviousRequest();
     _cancelToken = CancelToken();
     final requestId = ++_requestId;
 
-    // Set loading state, clear old IP to show loading animation
     state.value = state.value.copyWith(
       isLoading: true,
       errorMessage: null,
-      ipInfo: null, // Clear old IP, show loading
+      ipInfo: isStateChanged ? null : state.value.ipInfo,
     );
 
-    // First launch uses shorter timeout for quick failure
-    final timeout = _isFirstLaunch
-        ? const Duration(seconds: 3) // First: 3s
-        : const Duration(seconds: 5); // Later: 5s
+    final timeout = const Duration(seconds: 5);
 
     // When off, use domestic API by default
     final res = isStart
