@@ -36,7 +36,10 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
   Future<void> _handleSyncScript(String id) async {
     await globalState.appController.safeRun(
       silence: false,
-      () => ref.read(scriptStateProvider.notifier).syncScript(id),
+      () async {
+        await ref.read(scriptStateProvider.notifier).syncScript(id);
+        globalState.showNotifier(appLocalizations.success);
+      },
     );
   }
 
