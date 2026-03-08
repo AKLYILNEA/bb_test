@@ -43,10 +43,14 @@ class _WindowContainerState extends ConsumerState<WindowManager>
     return widget.child;
   }
 
+  ProviderSubscription? _autoLaunchSub;
+  ProviderSubscription? _smartDelaySub;
+
   @override
   void initState() {
     super.initState();
-    ref.listenManual(appSettingProvider.select((state) => state.autoLaunch), (
+    _autoLaunchSub =
+        ref.listenManual(appSettingProvider.select((state) => state.autoLaunch), (
       prev,
       next,
     ) {
@@ -57,14 +61,13 @@ class _WindowContainerState extends ConsumerState<WindowManager>
         });
       }
     });
-    // 同时监听 smartDelayLaunch 的变化，立即生效
-    ref.listenManual(
+
+    _smartDelaySub = ref.listenManual(
       appSettingProvider.select((state) => state.smartDelayLaunch),
       (prev, next) {
         if (prev != next) {
           final autoLaunchEnabled = ref.read(appSettingProvider).autoLaunch;
           if (autoLaunchEnabled) {
-            // 立即更新任务计划，不使用 debouncer
             autoLaunch?.updateStatus(true, requireNetwork: next);
           }
         }
@@ -124,7 +127,6 @@ class _WindowContainerState extends ConsumerState<WindowManager>
   void onWindowMinimize() async {
     globalState.appController.savePreferencesDebounce();
     _scheduleRenderToggle(false);
-    // 窗口最小化时停止数据更新，节省资源
     globalState.stopUpdateTasks();
     super.onWindowMinimize();
   }
@@ -132,7 +134,6 @@ class _WindowContainerState extends ConsumerState<WindowManager>
   @override
   void onWindowRestore() {
     _scheduleRenderToggle(true);
-    // 窗口恢复时重新开始数据更新
     if (globalState.isStart) {
       globalState.startUpdateTasks([
         globalState.appController.updateRunTime,
@@ -144,6 +145,8 @@ class _WindowContainerState extends ConsumerState<WindowManager>
 
   @override
   Future<void> dispose() async {
+    _autoLaunchSub?.close();
+    _smartDelaySub?.close();
     windowManager.removeListener(this);
     windowExtManager.removeListener(this);
     _renderToggleTimer?.cancel();
@@ -233,7 +236,6 @@ class _WindowHeaderState extends State<WindowHeader> {
   }
 
   Widget _buildActions() {
-    // 只在 Windows 和 Linux 上应用悬停效果
     final shouldUseHoverEffect = system.isWindows || system.isLinux;
 
     return MouseRegion(
@@ -242,7 +244,6 @@ class _WindowHeaderState extends State<WindowHeader> {
           : null,
       onExit: shouldUseHoverEffect
           ? (_) {
-              // 延迟设置，避免点击时立即隐藏按钮
               Future.delayed(const Duration(milliseconds: 100), () {
                 if (mounted) {
                   isHoveringNotifier.value = false;
@@ -294,11 +295,8 @@ class _WindowHeaderState extends State<WindowHeader> {
                   ),
                   IconButton(
                     onPressed: () {
-                      // 清除焦点（例如搜索框）
                       FocusManager.instance.primaryFocus?.unfocus();
-                      // 强制解除退出阻塞状态（可能由搜索框等触发）
                       globalState.appController.unBackBlock();
-                      // 保持按钮可见状态直到窗口关闭
                       isHoveringNotifier.value = true;
                       globalState.appController.handleBackOrExit();
                     },
@@ -397,7 +395,7 @@ class AppIcon extends ConsumerWidget {
     final customIconPath = ref.watch(sidebarIconPathProvider);
 
     Widget icon;
-    if (customIconPath != null && File(customIconPath).existsSync()) {
+    if (customIconPath != null && customIconPath.isNotEmpty) {
       icon = ClipOval(
         child: Image.file(
           File(customIconPath),
