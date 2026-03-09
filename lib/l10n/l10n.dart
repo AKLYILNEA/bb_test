@@ -4909,10 +4909,10 @@ class AppLocalizations {
     );
   }
 
-  /// `Force high refresh rate support`
+  /// `Enable highest refresh rate support`
   String get highRefreshRateDesc {
     return Intl.message(
-      'Force high refresh rate support',
+      'Enable highest refresh rate support',
       name: 'highRefreshRateDesc',
       desc: '',
       args: [],

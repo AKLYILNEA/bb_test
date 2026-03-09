@@ -446,7 +446,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "High Refresh Rate",
     ),
     "highRefreshRateDesc": MessageLookupByLibrary.simpleMessage(
-      "Force high refresh rate support",
+      "Enable highest refresh rate support",
     ),
     "host": MessageLookupByLibrary.simpleMessage("Host"),
     "hostsDesc": MessageLookupByLibrary.simpleMessage(

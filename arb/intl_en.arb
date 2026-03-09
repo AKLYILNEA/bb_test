@@ -607,5 +607,5 @@
   "restartCoreTitle": "Restart Core",
   "restartCoreDesc": "Manually restart the core?",
   "highRefreshRate": "High Refresh Rate",
-  "highRefreshRateDesc": "Force high refresh rate support"
+  "highRefreshRateDesc": "Enable highest refresh rate support"
 }

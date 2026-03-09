@@ -322,7 +322,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "highRefreshRate": MessageLookupByLibrary.simpleMessage("高重新整理率"),
     "highRefreshRateDesc": MessageLookupByLibrary.simpleMessage(
-      "強制啟用裝置高重新整理率支援",
+      "啟用裝置最高重新整理率支援",
     ),
     "host": MessageLookupByLibrary.simpleMessage("主機"),
     "hostsDesc": MessageLookupByLibrary.simpleMessage("附加目前配置 Hosts"),
