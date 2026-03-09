@@ -7,6 +7,7 @@ import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_acrylic/widgets/transparent_macos_sidebar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -268,38 +269,68 @@ class AppSidebarContainer extends ConsumerWidget {
                         behavior: HiddenBarScrollBehavior(),
                         child: SingleChildScrollView(
                           child: IntrinsicHeight(
-                            child: NavigationRail(
-                              backgroundColor: Colors.transparent,
-                              selectedLabelTextStyle: context
-                                  .textTheme
-                                  .labelLarge!
-                                  .copyWith(
-                                    color: context.colorScheme.onSurface,
+                            child: FocusScope(
+                              child: CallbackShortcuts(
+                                bindings: <ShortcutActivator, VoidCallback>{
+                                  // TV remote control support
+                                  const SingleActivator(LogicalKeyboardKey.arrowUp): () {
+                                    if (currentIndex > 0) {
+                                      globalState.appController.toPage(
+                                        navigationItems[currentIndex - 1].label,
+                                      );
+                                    }
+                                  },
+                                  const SingleActivator(LogicalKeyboardKey.arrowDown): () {
+                                    if (currentIndex < navigationItems.length - 1) {
+                                      globalState.appController.toPage(
+                                        navigationItems[currentIndex + 1].label,
+                                      );
+                                    }
+                                  },
+                                  const SingleActivator(LogicalKeyboardKey.select): () {
+                                    // Confirm selection
+                                  },
+                                  const SingleActivator(LogicalKeyboardKey.enter): () {
+                                    // Confirm selection
+                                  },
+                                },
+                                child: Focus(
+                                  autofocus: true,
+                                  child: NavigationRail(
+                                    backgroundColor: Colors.transparent,
+                                    selectedLabelTextStyle: context
+                                        .textTheme
+                                        .labelLarge!
+                                        .copyWith(
+                                          color: context.colorScheme.onSurface,
+                                        ),
+                                    unselectedLabelTextStyle: context
+                                        .textTheme
+                                        .labelLarge!
+                                        .copyWith(
+                                          color: context.colorScheme.onSurface,
+                                        ),
+                                    destinations: navigationItems
+                                        .map(
+                                          (e) => NavigationRailDestination(
+                                            icon: e.icon,
+                                            label: Text(Intl.message(e.label.name)),
+                                          ),
+                                        )
+                                        .toList(),
+                                    onDestinationSelected: (index) {
+                                      globalState.appController.toPage(
+                                        navigationItems[index].label,
+                                      );
+                                    },
+                                    extended: showLabel,
+                                    selectedIndex: currentIndex,
+                                    labelType: showLabel
+                                        ? NavigationRailLabelType.none
+                                        : NavigationRailLabelType.all,
                                   ),
-                              unselectedLabelTextStyle: context
-                                  .textTheme
-                                  .labelLarge!
-                                  .copyWith(
-                                    color: context.colorScheme.onSurface,
-                                  ),
-                              destinations: navigationItems
-                                  .map(
-                                    (e) => NavigationRailDestination(
-                                      icon: e.icon,
-                                      label: Text(Intl.message(e.label.name)),
-                                    ),
-                                  )
-                                  .toList(),
-                              onDestinationSelected: (index) {
-                                globalState.appController.toPage(
-                                  navigationItems[index].label,
-                                );
-                              },
-                              extended: showLabel,
-                              selectedIndex: currentIndex,
-                              labelType: showLabel
-                                  ? NavigationRailLabelType.none
-                                  : NavigationRailLabelType.all,
+                                ),
+                              ),
                             ),
                           ),
                         ),
