@@ -740,6 +740,23 @@ class AppController {
     _wakelockSyncTimer = null;
   }
 
+  Future<void> _initHighRefreshRateDefault() async {
+    try {
+      final androidVersion = await system.version;
+      final currentSetting = _ref.read(appSettingProvider);
+      
+      final bool shouldEnableHighRefreshRate = androidVersion >= 31; // Android 12+
+      
+      if (currentSetting.enableHighRefreshRate != shouldEnableHighRefreshRate) {
+        _ref.read(appSettingProvider.notifier).updateState(
+          (state) => state.copyWith(enableHighRefreshRate: shouldEnableHighRefreshRate),
+        );
+      }
+    } catch (e) {
+      commonPrint.log('Failed to initialize high refresh rate default: $e');
+    }
+  }
+
   Future<void> init() async {
     FlutterError.onError = (details) {
       if (kDebugMode) {
@@ -753,6 +770,10 @@ class AppController {
         await updateStatus(false);
       }
     });
+
+    if (system.isAndroid) {
+      await _initHighRefreshRateDefault();
+    }
 
     try {
       final wakelockEnabled = await WakelockPlus.enabled;

@@ -30,7 +30,7 @@ _AppSettingProps _$AppSettingPropsFromJson(Map<String, dynamic> json) =>
       minimizeOnExit: json['minimizeOnExit'] as bool? ?? true,
       hidden: json['hidden'] as bool? ?? false,
       developerMode: json['developerMode'] as bool? ?? false,
-      enableHighRefreshRate: json['enableHighRefreshRate'] as bool? ?? true,
+      enableHighRefreshRate: json['enableHighRefreshRate'] as bool? ?? false,
       recoveryStrategy:
           $enumDecodeNullable(
             _$RecoveryStrategyEnumMap,
