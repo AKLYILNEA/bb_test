@@ -524,9 +524,10 @@ class BuildCommand extends Command {
 
         final flavor = arch == Arch.arm64 ? 'impeller' : 'skia';
 
+
         final buildArgs = archName == 'universal'
             ? ' --build-flavor=$flavor --build-target-platform=${defaultTargets.join(",")} --description universal'
-            : ' --build-flavor=$flavor --build-target-platform=${defaultTargets.join(",")} --flutter-build-args=split-per-abi';
+            : ' --build-flavor=$flavor --build-target-platform=${defaultTargets.join(",")}';
 
         _buildDistributor(
           target: target,

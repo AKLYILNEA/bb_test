@@ -42,25 +42,29 @@ android {
         targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        ndk {
+            abiFilters.clear()
+        }
     }
 
     flavorDimensions += "renderer"
     productFlavors {
         create("impeller") {
             dimension = "renderer"
-            ndk {
-                abiFilters.clear()
-                abiFilters += listOf("arm64-v8a")
-            }
             manifestPlaceholders["enableImpeller"] = "true"
         }
         create("skia") {
             dimension = "renderer"
-            ndk {
-                abiFilters.clear()
-                abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86_64")
-            }
             manifestPlaceholders["enableImpeller"] = "false"
+        }
+    }
+
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("armeabi-v7a", "arm64-v8a", "x86_64")
+            isUniversalApk = false
         }
     }
 
