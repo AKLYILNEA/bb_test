@@ -384,6 +384,46 @@ class BuildCommand extends Command {
     await Build.exec(Build.getExecutable('npm install -g appdmg'));
   }
 
+  Future<void> _setMacOSCompatibleBuild(bool enable) async {
+    final infoPlistPath = 'macos/Runner/Info.plist';
+    final file = File(infoPlistPath);
+    
+    if (!await file.exists()) {
+      print('Warning: Info.plist not found at $infoPlistPath');
+      return;
+    }
+    
+    var content = await file.readAsString();
+    
+    // Check if FLTDisableImpeller key exists
+    if (content.contains('<key>FLTDisableImpeller</key>')) {
+      // Update existing key
+      if (enable) {
+        content = content.replaceAll(
+          RegExp(r'<key>FLTDisableImpeller</key>\s*<(?:true|false)/>'),
+          '<key>FLTDisableImpeller</key>\n\t<true/>',
+        );
+      } else {
+        content = content.replaceAll(
+          RegExp(r'<key>FLTDisableImpeller</key>\s*<(?:true|false)/>'),
+          '<key>FLTDisableImpeller</key>\n\t<false/>',
+        );
+      }
+    } else {
+      // Add new key before </dict>
+      final impellerEntry = enable
+          ? '\t<key>FLTDisableImpeller</key>\n\t<true/>\n'
+          : '\t<key>FLTDisableImpeller</key>\n\t<false/>\n';
+      content = content.replaceFirst(
+        '</dict>\n</plist>',
+        '$impellerEntry</dict>\n</plist>',
+      );
+    }
+    
+    await file.writeAsString(content);
+    print('macOS ${enable ? "Compatible" : "Standard"} build: FLTDisableImpeller set to $enable');
+  }
+
   Future<void> _buildDistributor({
     required Target target,
     required String targets,
@@ -402,43 +442,6 @@ class BuildCommand extends Command {
         'flutter_distributor package --skip-clean --platform ${target.name} --targets $targets --flutter-build-args=verbose$args$sentryArg --build-dart-define=APP_ENV=$env',
       ),
     );
-  }
-
-  Future<void> _setMacOSCompatibleBuild(bool enable) async {
-    final infoPlistPath = 'macos/Runner/Info.plist';
-    final file = File(infoPlistPath);
-    
-    if (!await file.exists()) {
-      print('Warning: Info.plist not found at $infoPlistPath');
-      return;
-    }
-    
-    var content = await file.readAsString();
-    
-    if (content.contains('<key>FLTDisableImpeller</key>')) {
-      if (enable) {
-        content = content.replaceAll(
-          RegExp(r'<key>FLTDisableImpeller</key>\s*<(?:true|false)/>'),
-          '<key>FLTDisableImpeller</key>\n\t<true/>',
-        );
-      } else {
-        content = content.replaceAll(
-          RegExp(r'<key>FLTDisableImpeller</key>\s*<(?:true|false)/>'),
-          '<key>FLTDisableImpeller</key>\n\t<false/>',
-        );
-      }
-    } else {
-      final impellerEntry = enable
-          ? '\t<key>FLTDisableImpeller</key>\n\t<true/>\n'
-          : '\t<key>FLTDisableImpeller</key>\n\t<false/>\n';
-      content = content.replaceFirst(
-        '</dict>\n</plist>',
-        '$impellerEntry</dict>\n</plist>',
-      );
-    }
-    
-    await file.writeAsString(content);
-    print('macOS ${enable ? "Compatible" : "Standard"} build: FLTDisableImpeller set to $enable');
   }
 
   Future<String?> get systemArch async {
@@ -523,8 +526,8 @@ class BuildCommand extends Command {
             .toList();
 
         final buildArgs = archName == 'universal'
-            ? ' --build-target-platform=${defaultTargets.join(",")} --description universal'
-            : ' --build-target-platform=${defaultTargets.join(",")}';
+            ? ' --build-target-platform ${defaultTargets.join(",")} --description universal'
+            : ',split-per-abi --build-target-platform ${defaultTargets.join(",")}';
 
         _buildDistributor(
           target: target,
@@ -535,6 +538,7 @@ class BuildCommand extends Command {
         return;
       case Target.macos:
         await _getMacosDependencies();
+        // For compatible build, disable Impeller and use Skia renderer
         if (compatible) {
           await _setMacOSCompatibleBuild(true);
         } else {
