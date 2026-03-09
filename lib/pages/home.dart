@@ -227,13 +227,19 @@ class _HomeBackScopeState extends ConsumerState<HomeBackScope> {
 
       final backBlock = ref.watch(backBlockProvider);
       final currentPage = ref.watch(currentPageLabelProvider);
+      final rootPageLabels = ref.watch(
+        currentNavigationItemsStateProvider.select(
+          (state) => state.value.map((item) => item.label).toSet(),
+        ),
+      );
+      final isCurrentRootPage = rootPageLabels.contains(currentPage);
 
       if (sdkInt! >= 31) {
         return PopScope(
-          canPop: !backBlock && currentPage == PageLabel.dashboard,
+          canPop: !backBlock && isCurrentRootPage,
           onPopInvokedWithResult: (didPop, _) async {
             if (didPop || backBlock) return;
-            if (currentPage != PageLabel.dashboard) {
+            if (!isCurrentRootPage) {
               globalState.appController.toPage(PageLabel.dashboard);
             }
           },
@@ -245,7 +251,7 @@ class _HomeBackScopeState extends ConsumerState<HomeBackScope> {
         canPop: false,
         onPopInvokedWithResult: (didPop, _) async {
           if (didPop || backBlock) return;
-          if (currentPage != PageLabel.dashboard) {
+          if (!isCurrentRootPage) {
             globalState.appController.toPage(PageLabel.dashboard);
             return;
           }

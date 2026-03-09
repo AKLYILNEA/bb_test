@@ -1,6 +1,7 @@
 package com.appshub.bettbox.services
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.net.ProxyInfo
 import android.net.VpnService
@@ -12,6 +13,7 @@ import android.os.RemoteException
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.appshub.bettbox.GlobalState
+import com.appshub.bettbox.modules.VpnResidualCleaner
 import com.appshub.bettbox.plugins.VpnPlugin
 import com.appshub.bettbox.extensions.getIpv4RouteAddress
 import com.appshub.bettbox.extensions.getIpv6RouteAddress
@@ -20,54 +22,45 @@ import com.appshub.bettbox.models.AccessControlMode
 import com.appshub.bettbox.models.VpnOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
 class BettboxVpnService : VpnService(), BaseServiceInterface {
+    companion object {
+        private const val TAG = "BettboxVpnService"
+        private const val PREFS_NAME = "FlutterSharedPreferences"
+        private const val KEY_NEEDS_TUN_CLEANUP = "flutter.needs_tun_cleanup"
+        private const val KEY_VPN_RUNNING_BEFORE_UPGRADE = "flutter.vpn_running_before_upgrade"
+    }
     override fun onCreate() {
         super.onCreate()
         GlobalState.initServiceEngine()
     }
 
     override suspend fun start(options: VpnOptions): Int {
+        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val shouldForceCleanup = prefs.getBoolean(KEY_NEEDS_TUN_CLEANUP, false)
+
         try {
             val prepareIntent = android.net.VpnService.prepare(this)
             if (prepareIntent != null) {
-                Log.w("BettboxVpnService", "Hack: VpnService.prepare() returned non-null!")
+                Log.w(TAG, "Hack: VpnService.prepare() returned non-null!")
             } else {
-                Log.d("BettboxVpnService", "Hack: System VPN state cleared successfully.")
+                Log.d(TAG, "Hack: System VPN state cleared successfully.")
             }
         } catch (e: Exception) {
-            Log.e("BettboxVpnService", "Hack Prepare failed: ${e.message}")
+            Log.e(TAG, "Hack Prepare failed: ${e.message}")
         }
 
-        if (com.appshub.bettbox.modules.VpnResidualCleaner.isZombieTunAlive()) {
-            try {
-                Log.d("BettboxVpnService", "Found zombie TUN, applying cleanup profile")
-                val builder = Builder()
-                    .setSession("bettbox_cleanup")
-                    .addAddress("10.255.255.254", 30)
-                val interface_ = builder.establish()
-                
-                kotlinx.coroutines.delay(200)
-                
-                interface_?.close()
-                Log.d("BettboxVpnService", "Cleanup profile closed, waiting for system to remove interface")
-                
-                var retryCount = 0
-                while (retryCount < 10) {
-                    kotlinx.coroutines.delay(200)
-                    retryCount++
-                    if (!com.appshub.bettbox.modules.VpnResidualCleaner.isZombieTunAlive()) {
-                        Log.d("BettboxVpnService", "Zombie TUN disappeared")
-                        break
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("BettboxVpnService", "Cleanup error: ${e.message}")
-            }
+        val hasZombieTun = VpnResidualCleaner.isZombieTunAlive()
+        if (shouldForceCleanup || hasZombieTun) {
+            val released = performResidualCleanup(forceFullCleanup = shouldForceCleanup)
+            prefs.edit()
+                .putBoolean(KEY_NEEDS_TUN_CLEANUP, !released && shouldForceCleanup)
+                .putBoolean(KEY_VPN_RUNNING_BEFORE_UPGRADE, false)
+                .apply()
         }
-
         return with(Builder()) {
             if (options.ipv4Address.isNotEmpty()) {
                 val cidr = options.ipv4Address.toCIDR()
@@ -178,6 +171,44 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
         }
     }
 
+
+    private suspend fun performResidualCleanup(forceFullCleanup: Boolean): Boolean {
+        return try {
+            Log.d(TAG, "Starting residual VPN cleanup, forceFullCleanup=$forceFullCleanup")
+            val cleanupInterface = Builder()
+                .setSession("bettbox_cleanup")
+                .addAddress("192.0.2.1", 24)
+                .addRoute("0.0.0.0", 0)
+                .apply {
+                    setBlocking(true)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        setMetered(false)
+                    }
+                    try {
+                        addDnsServer("1.1.1.1")
+                    } catch (_: Exception) {}
+                }
+                .establish()
+
+            delay(if (forceFullCleanup) 800 else 300)
+            cleanupInterface?.close()
+            Log.d(TAG, "Cleanup profile closed, waiting for system to release stale VPN state")
+
+            val released = VpnResidualCleaner.waitForTunRelease(
+                checkAnyTun = forceFullCleanup,
+                timeoutMs = if (forceFullCleanup) 6000L else 3000L
+            )
+            if (released) {
+                Log.d(TAG, "Residual VPN cleanup completed")
+            } else {
+                Log.w(TAG, "Residual VPN cleanup timed out")
+            }
+            released
+        } catch (e: Exception) {
+            Log.e(TAG, "Cleanup error: ${e.message}")
+            false
+        }
+    }
     override fun stop() {
         stopSelf()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
