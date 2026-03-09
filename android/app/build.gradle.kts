@@ -42,9 +42,6 @@ android {
         targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        ndk {
-            abiFilters.clear()
-        }
     }
 
     flavorDimensions += "renderer"
@@ -56,6 +53,13 @@ android {
         create("skia") {
             dimension = "renderer"
             manifestPlaceholders["enableImpeller"] = "false"
+        }
+    }
+
+    afterEvaluate {
+        defaultConfig.ndk.abiFilters.clear()
+        productFlavors.forEach { flavor ->
+            flavor.ndk.abiFilters.clear()
         }
     }
 
