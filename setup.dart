@@ -404,6 +404,43 @@ class BuildCommand extends Command {
     );
   }
 
+  Future<void> _setMacOSCompatibleBuild(bool enable) async {
+    final infoPlistPath = 'macos/Runner/Info.plist';
+    final file = File(infoPlistPath);
+    
+    if (!await file.exists()) {
+      print('Warning: Info.plist not found at $infoPlistPath');
+      return;
+    }
+    
+    var content = await file.readAsString();
+    
+    if (content.contains('<key>FLTDisableImpeller</key>')) {
+      if (enable) {
+        content = content.replaceAll(
+          RegExp(r'<key>FLTDisableImpeller</key>\s*<(?:true|false)/>'),
+          '<key>FLTDisableImpeller</key>\n\t<true/>',
+        );
+      } else {
+        content = content.replaceAll(
+          RegExp(r'<key>FLTDisableImpeller</key>\s*<(?:true|false)/>'),
+          '<key>FLTDisableImpeller</key>\n\t<false/>',
+        );
+      }
+    } else {
+      final impellerEntry = enable
+          ? '\t<key>FLTDisableImpeller</key>\n\t<true/>\n'
+          : '\t<key>FLTDisableImpeller</key>\n\t<false/>\n';
+      content = content.replaceFirst(
+        '</dict>\n</plist>',
+        '$impellerEntry</dict>\n</plist>',
+      );
+    }
+    
+    await file.writeAsString(content);
+    print('macOS ${enable ? "Compatible" : "Standard"} build: FLTDisableImpeller set to $enable');
+  }
+
   Future<String?> get systemArch async {
     if (Platform.isWindows) {
       return Platform.environment['PROCESSOR_ARCHITECTURE'];
@@ -489,7 +526,7 @@ class BuildCommand extends Command {
 
         final buildArgs = archName == 'universal'
             ? ' --build-flavor=$flavor --build-target-platform=${defaultTargets.join(",")} --description universal'
-            : ' --build-flavor=$flavor --build-target-platform=${defaultTargets.join(",")},split-per-abi';
+            : ' --build-flavor=$flavor --build-target-platform=${defaultTargets.join(",")} --flutter-build-args=split-per-abi';
 
         _buildDistributor(
           target: target,
@@ -500,11 +537,15 @@ class BuildCommand extends Command {
         return;
       case Target.macos:
         await _getMacosDependencies();
-        final compatibleArg = compatible ? ' --build-dart-define=COMPATIBLE_BUILD=true --build-xcconfig=COMPATIBLE_BUILD=true' : '';
+        if (compatible) {
+          await _setMacOSCompatibleBuild(true);
+        } else {
+          await _setMacOSCompatibleBuild(false);
+        }
         _buildDistributor(
           target: target,
           targets: 'dmg',
-          args: ' --description $desc$compatibleArg',
+          args: ' --description $desc',
           env: env,
         );
         return;
