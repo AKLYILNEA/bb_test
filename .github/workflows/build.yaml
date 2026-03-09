@@ -50,7 +50,7 @@ jobs:
             arch: amd64
             compatible: true
           - platform: macos
-            os: macos-15
+            os: macos-15-intel
             arch: amd64
             compatible: true
 

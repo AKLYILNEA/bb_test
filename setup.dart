@@ -522,12 +522,9 @@ class BuildCommand extends Command {
             .map((e) => targetMap[e])
             .toList();
 
-        final flavor = arch == Arch.arm64 ? 'impeller' : 'skia';
-
-
         final buildArgs = archName == 'universal'
-            ? ' --build-flavor=$flavor --build-target-platform=${defaultTargets.join(",")} --description universal'
-            : ' --build-flavor=$flavor --build-target-platform=${defaultTargets.join(",")}';
+            ? ' --build-target-platform=${defaultTargets.join(",")} --description universal'
+            : ' --build-target-platform=${defaultTargets.join(",")}';
 
         _buildDistributor(
           target: target,

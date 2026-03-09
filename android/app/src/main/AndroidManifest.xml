@@ -89,10 +89,6 @@
             </intent-filter>
         </activity-alias>
 
-        <meta-data
-            android:name="io.flutter.embedding.android.EnableImpeller"
-            android:value="${enableImpeller}" />
-
         <activity
             android:name=".TempActivity"
             android:exported="true"
