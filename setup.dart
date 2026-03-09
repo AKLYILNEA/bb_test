@@ -488,8 +488,8 @@ class BuildCommand extends Command {
         final flavor = arch == Arch.arm64 ? 'impeller' : 'skia';
 
         final buildArgs = archName == 'universal'
-            ? ' --flavor $flavor --build-target-platform ${defaultTargets.join(",")} --description universal'
-            : ' --flavor $flavor --build-target-platform ${defaultTargets.join(",")},split-per-abi';
+            ? ' --build-flavor=$flavor --build-target-platform=${defaultTargets.join(",")} --description universal'
+            : ' --build-flavor=$flavor --build-target-platform=${defaultTargets.join(",")},split-per-abi';
 
         _buildDistributor(
           target: target,
