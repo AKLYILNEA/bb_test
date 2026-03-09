@@ -30,6 +30,7 @@ _AppSettingProps _$AppSettingPropsFromJson(Map<String, dynamic> json) =>
       minimizeOnExit: json['minimizeOnExit'] as bool? ?? true,
       hidden: json['hidden'] as bool? ?? false,
       developerMode: json['developerMode'] as bool? ?? false,
+      enableHighRefreshRate: json['enableHighRefreshRate'] as bool? ?? true,
       recoveryStrategy:
           $enumDecodeNullable(
             _$RecoveryStrategyEnumMap,
@@ -61,6 +62,7 @@ Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>
       'minimizeOnExit': instance.minimizeOnExit,
       'hidden': instance.hidden,
       'developerMode': instance.developerMode,
+      'enableHighRefreshRate': instance.enableHighRefreshRate,
       'recoveryStrategy': _$RecoveryStrategyEnumMap[instance.recoveryStrategy]!,
     };
 
