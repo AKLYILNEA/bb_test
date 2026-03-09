@@ -83,9 +83,13 @@ class AppController {
 
   Future<void> restartCore() async {
     commonPrint.log('restart core');
+    final wasRunning = _ref.read(runTimeProvider.notifier).isStart;
+    if (wasRunning) {
+      await globalState.handleStop();
+    }
     await clashService?.reStart();
     await _initCore();
-    if (_ref.read(runTimeProvider.notifier).isStart) {
+    if (wasRunning) {
       await globalState.handleStart();
     }
   }
