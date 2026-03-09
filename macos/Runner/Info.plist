@@ -43,5 +43,7 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>CompatibleBuild</key>
+	<string>$(COMPATIBLE_BUILD)</string>
 </dict>
 </plist>

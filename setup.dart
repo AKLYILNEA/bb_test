@@ -485,9 +485,11 @@ class BuildCommand extends Command {
             .map((e) => targetMap[e])
             .toList();
 
+        final flavor = arch == Arch.arm64 ? 'impeller' : 'skia';
+
         final buildArgs = archName == 'universal'
-            ? ' --build-target-platform ${defaultTargets.join(",")} --description universal'
-            : ',split-per-abi --build-target-platform ${defaultTargets.join(",")}';
+            ? ' --flavor $flavor --build-target-platform ${defaultTargets.join(",")} --description universal'
+            : ' --flavor $flavor --build-target-platform ${defaultTargets.join(",")},split-per-abi';
 
         _buildDistributor(
           target: target,
@@ -498,10 +500,11 @@ class BuildCommand extends Command {
         return;
       case Target.macos:
         await _getMacosDependencies();
+        final compatibleArg = compatible ? ' --build-dart-define=COMPATIBLE_BUILD=true --build-xcconfig=COMPATIBLE_BUILD=true' : '';
         _buildDistributor(
           target: target,
           targets: 'dmg',
-          args: ' --description $desc',
+          args: ' --description $desc$compatibleArg',
           env: env,
         );
         return;

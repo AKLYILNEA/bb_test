@@ -44,6 +44,26 @@ android {
         versionName = flutter.versionName
     }
 
+    flavorDimensions += "renderer"
+    productFlavors {
+        create("impeller") {
+            dimension = "renderer"
+            ndk {
+                abiFilters.clear()
+                abiFilters += listOf("arm64-v8a")
+            }
+            manifestPlaceholders["enableImpeller"] = "true"
+        }
+        create("skia") {
+            dimension = "renderer"
+            ndk {
+                abiFilters.clear()
+                abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86_64")
+            }
+            manifestPlaceholders["enableImpeller"] = "false"
+        }
+    }
+
     signingConfigs {
         if (isRelease) {
             create("release") {
