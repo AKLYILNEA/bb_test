@@ -10,6 +10,7 @@ import 'package:bett_box/plugins/app.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -23,7 +24,8 @@ class Application extends ConsumerStatefulWidget {
   ConsumerState<Application> createState() => ApplicationState();
 }
 
-class ApplicationState extends ConsumerState<Application> {
+class ApplicationState extends ConsumerState<Application>
+    with WidgetsBindingObserver {
   Timer? _autoUpdateGroupTaskTimer;
   Timer? _autoUpdateProfilesTaskTimer;
 
@@ -46,6 +48,7 @@ class ApplicationState extends ConsumerState<Application> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _autoUpdateGroupTask();
     _autoUpdateProfilesTask();
     globalState.appController = AppController(context, ref);
@@ -60,6 +63,23 @@ class ApplicationState extends ConsumerState<Application> {
         app.initShortcuts();
       }
     });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed &&
+        system.isAndroid &&
+        globalState.config.appSetting.enableHighRefreshRate) {
+      _restoreHighRefreshRate();
+    }
+  }
+
+  Future<void> _restoreHighRefreshRate() async {
+    try {
+      await FlutterDisplayMode.setHighRefreshRate();
+    } catch (e) {
+      commonPrint.log('Failed to restore high refresh rate: $e');
+    }
   }
 
   void _autoUpdateGroupTask() {
@@ -183,6 +203,7 @@ class ApplicationState extends ConsumerState<Application> {
 
   @override
   Future<void> dispose() async {
+    WidgetsBinding.instance.removeObserver(this);
     linkManager.destroy();
     _autoUpdateGroupTaskTimer?.cancel();
     _autoUpdateProfilesTaskTimer?.cancel();
