@@ -783,7 +783,11 @@ class DetectionState {
   void manualRefresh() {
     _isIpMasked = false;
     _originalIpInfo = null;
-    state.value = state.value.copyWith(ipInfo: null);
+    state.value = state.value.copyWith(
+      isLoading: true,
+      ipInfo: null,
+      errorMessage: null,
+    );
     startCheck();
   }
 
