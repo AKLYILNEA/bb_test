@@ -241,6 +241,8 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
         "com.cmbchina",
         "com.mx",
         "com.qq",
+        "app.eleven.com.fastfiletransfer",
+        "org.localsend.localsend_app",
     )
 
     private val chinaAppRegex by lazy {
