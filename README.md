@@ -5,7 +5,7 @@
 
 Bettbox 是一款使用Mihomo(Clash Meta)内核、基于FlClash二次开发的多平台代理客户端
 
-秉承“Better Experience更优体验”的原则，Bettbox在继承原版优秀界面的基础上，深度优化了诸多细节与实用功能/逻辑。前台精致流畅、后台省电无感，致力于成为体验更好且可长期运行的 Mihomo 客户端
+秉承“Better Experience更优体验”的原则，Bettbox在继承原版优秀界面的基础上，深度优化了诸多细节与实用功能/逻辑。前台丝滑流畅、后台省电无感，致力于成为体验更好且可长期稳定运行的 Mihomo 客户端
 
 <p align="center">
   <img src="snapshots/readme.jpg" alt="Snapshots" width="800">
