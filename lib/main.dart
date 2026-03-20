@@ -60,13 +60,7 @@ Future<void> main() async {
     options.enableAutoSessionTracking = true;
     options.attachStacktrace = true;
 
-    if (enableAdvancedAnalytics) {
-      options.tracesSampleRate = 0.2;
-      options.profilesSampleRate = 0.1;
-    } else {
-      options.tracesSampleRate = 0;
-      options.profilesSampleRate = 0;
-    }
+    options.tracesSampleRate = enableAdvancedAnalytics ? 0.2 : 0;
   }, appRunner: () => _runApp(version));
 }
 
@@ -154,10 +148,6 @@ Future<void> _service(List<String> flags) async {
     final clashConfig = globalState.config.patchClashConfig.copyWith.tun(
       enable: false,
     );
-    
-    if (system.isAndroid) {
-      await vpn?.checkAndCleanResidualVpn();
-    }
     
     final params = await globalState.getSetupParams(pathConfig: clashConfig);
     Future(() async {

@@ -1,97 +1,44 @@
 package com.appshub.bettbox.modules
 
+import android.content.Context
+import android.content.Intent
+import android.net.VpnService
+import android.os.Build
 import android.util.Log
-import kotlinx.coroutines.delay
-import java.net.NetworkInterface
+import com.appshub.bettbox.TempActivity
+import com.appshub.bettbox.extensions.wrapAction
 
 object VpnResidualCleaner {
     private const val TAG = "VpnResidualCleaner"
-    private const val ZOMBIE_IP = "198.51.100.1"
-    private const val POLL_INTERVAL_MS = 250L
 
-    private fun scanTunInterfaces(): List<Pair<String, List<String>>> {
-        return try {
-            val interfaces = NetworkInterface.getNetworkInterfaces() ?: return emptyList()
-            val result = mutableListOf<Pair<String, List<String>>>()
-            for (intf in interfaces) {
-                if (!intf.name.startsWith("tun", ignoreCase = true)) continue
-
-                val addresses = mutableListOf<String>()
-                val inetAddresses = intf.inetAddresses
-                while (inetAddresses.hasMoreElements()) {
-                    val inetAddress = inetAddresses.nextElement()
-                    if (!inetAddress.isLoopbackAddress) {
-                        addresses.add(inetAddress.hostAddress ?: "")
-                    }
-                }
-
-                val isInterfaceUp = try {
-                    intf.isUp
-                } catch (_: Exception) {
-                    false
-                }
-
-                if (addresses.isNotEmpty() || isInterfaceUp) {
-                    result.add(intf.name to addresses)
-                }
-            }
-            result
-        } catch (e: Exception) {
-            Log.w(TAG, "Error scanning tun interfaces: ${e.message}")
-            emptyList()
+    fun forceCleanup(context: Context) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            Log.d(TAG, "Skip cleanup: Android version < 15")
+            return
         }
-    }
 
-    private fun hasAnyTunInterfaceInternal(): Boolean {
-        return scanTunInterfaces().isNotEmpty()
-    }
+        Log.i(TAG, "Starting force cleanup for Android 15+")
 
-    private fun hasZombieTunAliveInternal(): Boolean {
-        return scanTunInterfaces().any { (_, addresses) ->
-            addresses.any { address ->
-                address.substringBefore('%') == ZOMBIE_IP
-            }
-        }
-    }
-
-    fun hasAnyTunInterface(): Boolean {
-        val interfaces = scanTunInterfaces()
-        if (interfaces.isNotEmpty()) {
-            Log.d(
-                TAG,
-                "Detected tun interfaces: ${interfaces.joinToString { "${it.first}=${it.second.joinToString()}" }}"
-            )
-            return true
-        }
-        return false
-    }
-
-    fun isZombieTunAlive(): Boolean {
-        val hasZombie = hasZombieTunAliveInternal()
-        if (hasZombie) {
-            Log.d(TAG, "Found zombie TUN interface with sentinel IP $ZOMBIE_IP")
-        }
-        return hasZombie
-    }
-
-    suspend fun waitForTunRelease(checkAnyTun: Boolean, timeoutMs: Long): Boolean {
-        val attempts = (timeoutMs / POLL_INTERVAL_MS).toInt().coerceAtLeast(1)
-        repeat(attempts) {
-            val stillPresent = if (checkAnyTun) {
-                hasAnyTunInterfaceInternal()
+        try {
+            val prepareIntent = VpnService.prepare(context)
+            if (prepareIntent != null) {
+                Log.w(TAG, "VpnService.prepare() returned non-null, VPN permission needed")
             } else {
-                hasZombieTunAliveInternal()
+                Log.d(TAG, "VpnService.prepare() succeeded, system VPN state cleared")
             }
-            if (!stillPresent) {
-                return true
-            }
-            delay(POLL_INTERVAL_MS)
+        } catch (e: Exception) {
+            Log.e(TAG, "VpnService.prepare() failed: ${e.message}")
         }
 
-        return if (checkAnyTun) {
-            !hasAnyTunInterfaceInternal()
-        } else {
-            !hasZombieTunAliveInternal()
+        try {
+            val stopIntent = Intent(context, TempActivity::class.java).apply {
+                action = context.wrapAction("STOP")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_MULTIPLE_TASK
+            }
+            context.startActivity(stopIntent)
+            Log.i(TAG, "TempActivity STOP triggered")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start TempActivity: ${e.message}")
         }
     }
 }

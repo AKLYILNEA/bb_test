@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:convert';
 import 'dart:isolate';
 
@@ -101,11 +101,6 @@ class Service {
     return await methodChannel.invokeMethod<bool>('setQuickResponse', {
       'enabled': enabled,
     });
-  }
-
-  Future<bool> checkAndCleanResidualVpn() async {
-    return await methodChannel.invokeMethod<bool>('checkAndCleanResidualVpn') ??
-        false;
   }
 
   /// Check if Service Engine is already running (e.g. from tile quick start).

@@ -5,7 +5,6 @@ import android.os.Looper
 import com.appshub.bettbox.GlobalState
 import com.appshub.bettbox.RunState
 import com.appshub.bettbox.models.VpnOptions
-import com.appshub.bettbox.modules.VpnResidualCleaner
 import com.google.gson.Gson
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
@@ -126,17 +125,6 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             val enabled = call.argument<Boolean>("enabled") ?: false
             VpnPlugin.setQuickResponse(enabled)
             result.success(true)
-        }
-
-            "checkAndCleanResidualVpn" -> {
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    val hasResidual = VpnResidualCleaner.isZombieTunAlive()
-                    mainHandler.post { result.success(hasResidual) }
-                } catch (e: Exception) {
-                    mainHandler.post { result.error("CLEANUP_ERROR", e.message, null) }
-                }
-            }
         }
 
             "init" -> {

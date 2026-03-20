@@ -8,7 +8,6 @@ import 'package:bett_box/clash/clash.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/plugins/app.dart';
 import 'package:bett_box/plugins/service.dart' as vpn_service;
-import 'package:bett_box/plugins/vpn.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/dialog.dart';
@@ -826,57 +825,12 @@ class AppController {
       await globalState.updateStartTime();
     }
 
-    bool isNativeRunning = false;
-    if (system.isAndroid) {
-      isNativeRunning =
-          await (globalState.isService
-                  ? vpn?.getStatus()
-                  : vpn_service.service?.getStatus()) ??
-              false;
-    }
-
-    final (needRecovery, recoveryReason, isUpgrade) = await _detectRecoveryReason(
-      isNativeRunning,
-    );
-    final (needsTunCleanup, wasRunningBeforeUpgrade) = system.isAndroid
-        ? await _readAndroidUpgradeRecoveryFlags()
-        : (false, false);
-
-    if (system.isAndroid &&
-        isUpgrade &&
-        (needsTunCleanup || wasRunningBeforeUpgrade)) {
-      await _recoverAndroidVpnAfterUpgrade(
-        shouldRestoreVpn: wasRunningBeforeUpgrade || isNativeRunning,
-      );
-      return;
-    }
-
-    if (system.isAndroid && isNativeRunning && !globalState.isStart) {
-      _ref.read(runTimeProvider.notifier).value = 0;
-
-      await globalState.updateStartTime();
-      await clashCore.startListener();
-
-      final prefs = await preferences.sharedPreferencesCompleter.future;
-      await prefs?.setBool('is_vpn_running', true);
-
-      globalState.startUpdateTasks([updateRunTime, updateTraffic]);
-
-      addCheckIpNumDebounce();
-      _backgroundLoad();
-      return;
-    }
+    final needRecovery = await _detectAbnormalExit();
 
     if (needRecovery) {
-      commonPrint.log('Handling Recovery: $recoveryReason');
-
+      commonPrint.log('Abnormal exit detected');
       try {
         await applyProfile(silence: true);
-
-        if (system.isAndroid) {
-          final prefs = await preferences.sharedPreferencesCompleter.future;
-          await prefs?.setBool('is_vpn_running', false);
-        }
       } catch (e) {
         commonPrint.log('Recovery applyProfile failed: $e');
       }
@@ -896,104 +850,23 @@ class AppController {
       addCheckIpNumDebounce();
     }
   }
-  Future<(bool, String, bool)> _detectRecoveryReason(bool isNativeRunning) async {
-    final results = await Future.wait<dynamic>([
-      preferences.sharedPreferencesCompleter.future,
-      system.isAndroid ? app.getSelfLastUpdateTime() : Future.value(0),
-    ]);
 
-    final prefs = results[0];
-    final apkLastUpdateTime = results[1] as int;
+  Future<bool> _detectAbnormalExit() async {
+    final prefs = await preferences.sharedPreferencesCompleter.future;
 
     if (system.isAndroid) {
-      final savedApkUpdateTime = prefs?.getInt('apk_last_update_time') ?? 0;
-      bool isReinstall = false;
-      String reason = '';
-
-      if (savedApkUpdateTime != 0 && savedApkUpdateTime != apkLastUpdateTime) {
-        isReinstall = true;
-        reason = 'APK Upgrade';
-      }
-
       final isVpnRunningFlag = prefs?.getBool('is_vpn_running') ?? false;
-      
-      final isAbnormalExit = !isNativeRunning && isVpnRunningFlag && !isReinstall;
-      
-      if (isAbnormalExit) {
-        commonPrint.log('Abnormal exit detected');
-        reason = 'Abnormal exit';
-      }
-
-      if (savedApkUpdateTime != apkLastUpdateTime) {
-        prefs?.setInt('apk_last_update_time', apkLastUpdateTime);
-      }
-
-      final needRecovery = (!isNativeRunning && isReinstall) || isAbnormalExit;
-      return (needRecovery, reason, isReinstall);
+      // Abnormal exit: flag says VPN was running, but app state shows not started
+      return !globalState.isStart && isVpnRunningFlag;
     }
 
-    // Desktop logic remains the same
     if (system.isDesktop) {
-      bool needRecovery = false;
-      String reason = '';
-
       final wasTunRunning = prefs?.getBool('is_tun_running') ?? false;
-      final isTunConflict = !globalState.isStart && wasTunRunning;
-      if (isTunConflict) {
-        commonPrint.log('Desktop TUN resource conflict detected');
-        needRecovery = true;
-        reason = 'TUN resource conflict';
-      }
-
-      return (needRecovery, reason, false);
+      // Abnormal exit: flag says TUN was running, but app state shows not started
+      return !globalState.isStart && wasTunRunning;
     }
 
-    return (false, '', false);
-  }
-
-
-  Future<(bool, bool)> _readAndroidUpgradeRecoveryFlags() async {
-    final prefs = await preferences.sharedPreferencesCompleter.future;
-    final needsTunCleanup = prefs?.getBool('needs_tun_cleanup') ?? false;
-    final wasRunningBeforeUpgrade =
-        prefs?.getBool('vpn_running_before_upgrade') ?? false;
-    return (needsTunCleanup, wasRunningBeforeUpgrade);
-  }
-
-  Future<void> _recoverAndroidVpnAfterUpgrade({
-    required bool shouldRestoreVpn,
-  }) async {
-    final prefs = await preferences.sharedPreferencesCompleter.future;
-    try {
-      try {
-        await vpn_service.service?.setSmartStopped(false);
-      } catch (e) {
-        commonPrint.log('Reset smart-stopped flag failed: $e');
-      }
-
-      try {
-        await vpn_service.service?.stopVpn();
-      } catch (e) {
-        commonPrint.log('Stop stale VPN after upgrade failed: $e');
-      }
-
-      globalState.startTime = null;
-      _ref.read(runTimeProvider.notifier).value = null;
-      clashCore.resetTraffic();
-      _ref.read(trafficsProvider.notifier).clear();
-      _ref.read(totalTrafficProvider.notifier).value = Traffic();
-
-      await Future.delayed(const Duration(milliseconds: 1500));
-      await applyProfile(silence: true);
-
-      if (shouldRestoreVpn) {
-        await updateStatus(true);
-      } else {
-        addCheckIpNumDebounce();
-      }
-    } finally {
-      await prefs?.setBool('vpn_running_before_upgrade', false);
-    }
+    return false;
   }
 
   void setDelay(Delay delay) {
@@ -1415,7 +1288,7 @@ class AppController {
 
       // Encode as ZIP (same as old version)
       final zipEncoder = ZipEncoder();
-      return zipEncoder.encode(archive) ?? [];
+      return zipEncoder.encode(archive);
     });
   }
 
@@ -1454,14 +1327,9 @@ class AppController {
       commonPrint.log('Starting recovery from file: $path');
 
       final archive = await Isolate.run<Archive>(() {
-        final input = InputFileStream(path);
-        try {
-          final zipDecoder = ZipDecoder();
-          final archive = zipDecoder.decodeBuffer(input);
-          return archive;
-        } finally {
-          input.close();
-        }
+        final bytes = File(path).readAsBytesSync();
+        final zipDecoder = ZipDecoder();
+        return zipDecoder.decodeBytes(bytes);
       });
 
       commonPrint.log('Archive decoded: ${archive.files.length} files');

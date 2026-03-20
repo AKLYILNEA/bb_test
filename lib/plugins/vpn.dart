@@ -93,14 +93,6 @@ class Vpn {
     });
   }
 
-  /// Check if there is a residual zombie TUN interface.
-  Future<bool> isZombieTunAlive() async {
-    return await methodChannel.invokeMethod<bool>('isZombieTunAlive') ?? false;
-  }
-  Future<bool> checkAndCleanResidualVpn() async {
-    return await methodChannel.invokeMethod<bool>('checkAndCleanResidualVpn') ?? false;
-  }
-
   /// Check if the VPN native thread/service is currently running
   Future<bool> getStatus() async {
     return await methodChannel.invokeMethod<bool>('status') ?? false;
