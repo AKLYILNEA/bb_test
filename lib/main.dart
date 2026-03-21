@@ -107,10 +107,12 @@ Future<void> _service(List<String> flags) async {
 
   vpn?.handleGetStartForegroundParams = () async {
     if (AppLocalizations.currentOrNull == null) {
-      final locale = globalState.config.appSetting.locale.isNotEmpty
-          ? utils.getLocaleForString(globalState.config.appSetting.locale)
+      final locale = globalState.config.appSetting.locale?.isNotEmpty == true
+          ? utils.getLocaleForString(globalState.config.appSetting.locale!)
           : WidgetsBinding.instance.platformDispatcher.locale;
-      await AppLocalizations.load(locale);
+      if (locale != null) {
+        await AppLocalizations.load(locale);
+      }
     }
 
     // Check if smart-stopped from native side

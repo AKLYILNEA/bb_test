@@ -140,7 +140,7 @@ abstract class LogsState with _$LogsState {
     @Default([]) List<Log> logs,
     @Default([]) List<String> keywords,
     @Default('') String query,
-    @Default(true) bool autoScrollToEnd,
+    @Default(false) bool autoScrollToEnd,
   }) = _LogsState;
 }
 
@@ -162,7 +162,7 @@ abstract class TrackerInfosState with _$TrackerInfosState {
     @Default([]) List<TrackerInfo> trackerInfos,
     @Default([]) List<String> keywords,
     @Default('') String query,
-    @Default(true) bool autoScrollToEnd,
+    @Default(false) bool autoScrollToEnd,
   }) = _TrackerInfosState;
 }
 
