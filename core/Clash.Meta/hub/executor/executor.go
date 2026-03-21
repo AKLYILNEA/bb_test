@@ -351,6 +351,7 @@ func loadProvider[T P.Provider](providers map[string]T) {
 			load(pv)
 		}()
 	}
+	wg.Wait()
 }
 
 func updateSniffer(snifferConfig *sniffer.Config) {

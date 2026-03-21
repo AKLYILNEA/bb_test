@@ -18,9 +18,9 @@ import (
 
 	"github.com/metacubex/mihomo/common/buf"
 	"github.com/metacubex/mihomo/common/pool"
-	"github.com/metacubex/mihomo/component/ech"
 	tlsC "github.com/metacubex/mihomo/component/tls"
 	C "github.com/metacubex/mihomo/constant"
+	"github.com/metacubex/mihomo/transport/vmess"
 
 	"github.com/metacubex/http"
 	"github.com/metacubex/http/httptrace"
@@ -33,17 +33,17 @@ var (
 )
 
 var defaultHeader = http.Header{
-	"content-type": []string{"application/grpc"},
-	"user-agent":   []string{"grpc-go/1.36.0"},
+	"Content-Type": []string{"application/grpc"},
+	"User-Agent":   []string{"grpc-go/1.36.0"},
 }
 
 type DialFn = func(ctx context.Context, network, addr string) (net.Conn, error)
 
 type Conn struct {
-	initFn func() (io.ReadCloser, netAddr, error)
+	initFn func() (io.ReadCloser, NetAddr, error)
 	writer io.Writer // writer must not nil
 	closer io.Closer
-	netAddr
+	NetAddr
 
 	initOnce sync.Once
 	initErr  error
@@ -59,10 +59,10 @@ type Conn struct {
 }
 
 type Config struct {
-	ServiceName       string
-	UserAgent         string
-	Host              string
-	ClientFingerprint string
+	ServiceName  string
+	UserAgent    string
+	Host         string
+	PingInterval int
 }
 
 func (g *Conn) initReader() {
@@ -74,7 +74,7 @@ func (g *Conn) initReader() {
 		}
 		return
 	}
-	g.netAddr = addr
+	g.NetAddr = addr
 
 	g.closeMutex.Lock()
 	defer g.closeMutex.Unlock()
@@ -247,7 +247,7 @@ func (g *Conn) SetDeadline(t time.Time) error {
 	return nil
 }
 
-func NewHTTP2Client(dialFn DialFn, tlsConfig *tls.Config, clientFingerprint string, echConfig *ech.Config, realityConfig *tlsC.RealityConfig) *TransportWrap {
+func NewTransport(dialFn DialFn, tlsConfig *vmess.TLSConfig, gunCfg *Config) *Transport {
 	dialFunc := func(ctx context.Context, network, addr string, cfg *tls.Config) (net.Conn, error) {
 		ctx, cancel := context.WithTimeout(ctx, C.DefaultTLSTimeout)
 		defer cancel()
@@ -260,75 +260,45 @@ func NewHTTP2Client(dialFn DialFn, tlsConfig *tls.Config, clientFingerprint stri
 			return pconn, nil
 		}
 
-		if clientFingerprint, ok := tlsC.GetFingerprint(clientFingerprint); ok {
-			if realityConfig == nil {
-				tlsConfig := tlsC.UConfig(cfg)
-				err := echConfig.ClientHandleUTLS(ctx, tlsConfig)
-				if err != nil {
-					pconn.Close()
-					return nil, err
-				}
-				tlsConn := tlsC.UClient(pconn, tlsConfig, clientFingerprint)
-				if err := tlsConn.HandshakeContext(ctx); err != nil {
-					pconn.Close()
-					return nil, err
-				}
+		conn, err := vmess.StreamTLSConn(ctx, pconn, tlsConfig)
+		if err != nil {
+			_ = pconn.Close()
+			return nil, err
+		}
+
+		if tlsConfig.Reality == nil { // reality doesn't return the negotiated ALPN
+			switch tlsConn := conn.(type) {
+			case interface{ ConnectionState() tls.ConnectionState }:
 				state := tlsConn.ConnectionState()
 				if p := state.NegotiatedProtocol; p != http.Http2NextProtoTLS {
-					tlsConn.Close()
+					_ = conn.Close()
 					return nil, fmt.Errorf("http2: unexpected ALPN protocol %s, want %s", p, http.Http2NextProtoTLS)
 				}
-				return tlsConn, nil
-			} else {
-				realityConn, err := tlsC.GetRealityConn(ctx, pconn, clientFingerprint, cfg.ServerName, realityConfig)
-				if err != nil {
-					pconn.Close()
-					return nil, err
+			case interface{ ConnectionState() tlsC.ConnectionState }:
+				state := tlsConn.ConnectionState()
+				if p := state.NegotiatedProtocol; p != http.Http2NextProtoTLS {
+					_ = conn.Close()
+					return nil, fmt.Errorf("http2: unexpected ALPN protocol %s, want %s", p, http.Http2NextProtoTLS)
 				}
-				//state := realityConn.(*utls.UConn).ConnectionState()
-				//if p := state.NegotiatedProtocol; p != http.Http2NextProtoTLS {
-				//	realityConn.Close()
-				//	return nil, fmt.Errorf("http2: unexpected ALPN protocol %s, want %s", p, http.Http2NextProtoTLS)
-				//}
-				return realityConn, nil
 			}
-		}
-		if realityConfig != nil {
-			return nil, errors.New("REALITY is based on uTLS, please set a client-fingerprint")
-		}
-
-		err = echConfig.ClientHandle(ctx, cfg)
-		if err != nil {
-			pconn.Close()
-			return nil, err
-		}
-
-		conn := tls.Client(pconn, cfg)
-		if err := conn.HandshakeContext(ctx); err != nil {
-			pconn.Close()
-			return nil, err
-		}
-		state := conn.ConnectionState()
-		if p := state.NegotiatedProtocol; p != http.Http2NextProtoTLS {
-			conn.Close()
-			return nil, fmt.Errorf("http2: unexpected ALPN protocol %s, want %s", p, http.Http2NextProtoTLS)
 		}
 		return conn, nil
 	}
 
 	transport := &http.Http2Transport{
 		DialTLSContext:     dialFunc,
-		TLSClientConfig:    tlsConfig,
 		AllowHTTP:          false,
 		DisableCompression: true,
+		ReadIdleTimeout:    time.Duration(gunCfg.PingInterval) * time.Second, // If zero, no health check is performed
 		PingTimeout:        0,
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	wrap := &TransportWrap{
-		Http2Transport: transport,
-		ctx:            ctx,
-		cancel:         cancel,
+	wrap := &Transport{
+		transport: transport,
+		cfg:       gunCfg,
+		ctx:       ctx,
+		cancel:    cancel,
 	}
 	return wrap
 }
@@ -340,18 +310,18 @@ func ServiceNameToPath(serviceName string) string {
 	return "/" + serviceName + "/Tun"
 }
 
-func StreamGunWithTransport(transport *TransportWrap, cfg *Config) (net.Conn, error) {
+func (t *Transport) Dial() (net.Conn, error) {
 	serviceName := "GunService"
-	if cfg.ServiceName != "" {
-		serviceName = cfg.ServiceName
+	if t.cfg.ServiceName != "" {
+		serviceName = t.cfg.ServiceName
 	}
 	path := ServiceNameToPath(serviceName)
 
 	reader, writer := io.Pipe()
 
 	header := defaultHeader.Clone()
-	if cfg.UserAgent != "" {
-		header["user-agent"] = []string{cfg.UserAgent}
+	if t.cfg.UserAgent != "" {
+		header.Set("User-Agent", t.cfg.UserAgent)
 	}
 
 	request := &http.Request{
@@ -359,29 +329,29 @@ func StreamGunWithTransport(transport *TransportWrap, cfg *Config) (net.Conn, er
 		Body:   reader,
 		URL: &url.URL{
 			Scheme: "https",
-			Host:   cfg.Host,
+			Host:   t.cfg.Host,
 			Path:   path,
 			// for unescape path
-			Opaque: "//" + cfg.Host + path,
+			Opaque: "//" + t.cfg.Host + path,
 		},
 		Proto:      "HTTP/2",
 		ProtoMajor: 2,
 		ProtoMinor: 0,
 		Header:     header,
 	}
-	request = request.WithContext(transport.ctx)
+	request = request.WithContext(t.ctx)
 
 	conn := &Conn{
-		initFn: func() (io.ReadCloser, netAddr, error) {
-			nAddr := netAddr{}
+		initFn: func() (io.ReadCloser, NetAddr, error) {
+			nAddr := NetAddr{}
 			trace := &httptrace.ClientTrace{
 				GotConn: func(connInfo httptrace.GotConnInfo) {
-					nAddr.localAddr = connInfo.Conn.LocalAddr()
-					nAddr.remoteAddr = connInfo.Conn.RemoteAddr()
+					nAddr.SetLocalAddr(connInfo.Conn.LocalAddr())
+					nAddr.SetRemoteAddr(connInfo.Conn.RemoteAddr())
 				},
 			}
 			request = request.WithContext(httptrace.WithClientTrace(request.Context(), trace))
-			response, err := transport.RoundTrip(request)
+			response, err := t.transport.RoundTrip(request)
 			if err != nil {
 				return nil, nAddr, err
 			}
@@ -394,13 +364,13 @@ func StreamGunWithTransport(transport *TransportWrap, cfg *Config) (net.Conn, er
 	return conn, nil
 }
 
-func StreamGunWithConn(conn net.Conn, tlsConfig *tls.Config, cfg *Config, echConfig *ech.Config, realityConfig *tlsC.RealityConfig) (net.Conn, error) {
+func StreamGunWithConn(conn net.Conn, tlsConfig *vmess.TLSConfig, gunCfg *Config) (net.Conn, error) {
 	dialFn := func(ctx context.Context, network, addr string) (net.Conn, error) {
 		return conn, nil
 	}
 
-	transport := NewHTTP2Client(dialFn, tlsConfig, cfg.ClientFingerprint, echConfig, realityConfig)
-	c, err := StreamGunWithTransport(transport, cfg)
+	transport := NewTransport(dialFn, tlsConfig, gunCfg)
+	c, err := transport.Dial()
 	if err != nil {
 		return nil, err
 	}

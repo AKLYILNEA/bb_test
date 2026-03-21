@@ -39,7 +39,7 @@ type tcpTracker struct {
 	manager *Manager
 
 	pushToManager bool        `json:"-"`
-	closed        atomic.Bool `json:"-"` // 防止重复通知
+	closed        atomic.Bool `json:"-"`
 }
 
 func (tt *tcpTracker) ID() string {
@@ -109,7 +109,6 @@ func (tt *tcpTracker) UnwrapWriter() (io.Writer, []N.CountFunc) {
 }
 
 func (tt *tcpTracker) Close() error {
-	// 使用原子操作确保只通知一次
 	if tt.closed.CompareAndSwap(false, true) {
 		tt.manager.Leave(tt)
 	}
@@ -165,7 +164,7 @@ type udpTracker struct {
 	manager *Manager
 
 	pushToManager bool        `json:"-"`
-	closed        atomic.Bool `json:"-"` // 防止重复通知
+	closed        atomic.Bool `json:"-"`
 }
 
 func (ut *udpTracker) ID() string {
@@ -207,7 +206,6 @@ func (ut *udpTracker) WriteTo(b []byte, addr net.Addr) (int, error) {
 }
 
 func (ut *udpTracker) Close() error {
-	// 使用原子操作确保只通知一次
 	if ut.closed.CompareAndSwap(false, true) {
 		ut.manager.Leave(ut)
 	}

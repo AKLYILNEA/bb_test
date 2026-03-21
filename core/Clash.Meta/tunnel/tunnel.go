@@ -208,6 +208,11 @@ func Proxies() map[string]C.Proxy {
 	return proxies
 }
 
+// Providers return all compatible providers
+func Providers() map[string]P.ProxyProvider {
+	return providers
+}
+
 // ProxiesWithProviders return all proxies and providers
 func ProxiesWithProviders() map[string]C.Proxy {
 	allProxies := make(map[string]C.Proxy)
@@ -221,11 +226,6 @@ func ProxiesWithProviders() map[string]C.Proxy {
 		}
 	}
 	return allProxies
-}
-
-// Providers return all compatible providers
-func Providers() map[string]P.ProxyProvider {
-	return providers
 }
 
 // RuleProviders return all loaded rule providers
@@ -359,7 +359,7 @@ func resolveMetadata(metadata *C.Metadata) (proxy C.Proxy, rule C.Rule, err erro
 			if attemptProcessLookup {
 				attemptProcessLookup = false
 				if !features.Android {
-					// normal check for process
+				// normal check for process
 					uid, path, err := process.FindProcessName(metadata.NetWork.String(), metadata.SrcIP, int(metadata.SrcPort))
 					if err != nil {
 						log.Debugln("[Process] find process error for %s: %v", metadata.String(), err)

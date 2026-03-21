@@ -13,13 +13,19 @@ var DefaultManager *Manager
 
 func init() {
 	DefaultManager = &Manager{
-		uploadTemp:    atomic.NewInt64(0),
-		downloadTemp:  atomic.NewInt64(0),
-		uploadBlip:    atomic.NewInt64(0),
-		downloadBlip:  atomic.NewInt64(0),
-		uploadTotal:   atomic.NewInt64(0),
-		downloadTotal: atomic.NewInt64(0),
-		pid:           int32(os.Getpid()),
+		uploadTemp:         atomic.NewInt64(0),
+		downloadTemp:       atomic.NewInt64(0),
+		uploadBlip:         atomic.NewInt64(0),
+		downloadBlip:       atomic.NewInt64(0),
+		uploadTotal:        atomic.NewInt64(0),
+		downloadTotal:      atomic.NewInt64(0),
+		proxyUploadTemp:    atomic.NewInt64(0),
+		proxyDownloadTemp:  atomic.NewInt64(0),
+		proxyUploadBlip:    atomic.NewInt64(0),
+		proxyDownloadBlip:  atomic.NewInt64(0),
+		proxyUploadTotal:   atomic.NewInt64(0),
+		proxyDownloadTotal: atomic.NewInt64(0),
+		pid:                int32(os.Getpid()),
 	}
 
 	go DefaultManager.handle()
@@ -44,6 +50,9 @@ type Manager struct {
 }
 
 func (m *Manager) Join(c Tracker) {
+	if DefaultRequestNotify != nil {
+		DefaultRequestNotify(c)
+	}
 	m.connections.Store(c.ID(), c)
 }
 
@@ -98,26 +107,6 @@ func (m *Manager) Memory() uint64 {
 	return m.memory
 }
 
-func (m *Manager) Snapshot() *Snapshot {
-	var connections []*TrackerInfo
-	m.Range(func(c Tracker) bool {
-		connections = append(connections, c.Info())
-		return true
-	})
-	return &Snapshot{
-		UploadTotal:   m.uploadTotal.Load(),
-		DownloadTotal: m.downloadTotal.Load(),
-		Connections:   connections,
-		Memory:        m.memory,
-	}
-}
-
-func (m *Manager) updateMemory() {
-	var memStats runtime.MemStats
-	runtime.ReadMemStats(&memStats)
-	m.memory = memStats.StackInuse + memStats.HeapInuse
-}
-
 func (m *Manager) ResetStatistic() {
 	m.uploadTemp.Store(0)
 	m.uploadBlip.Store(0)
@@ -132,7 +121,12 @@ func (m *Manager) ResetStatistic() {
 	m.proxyDownloadTemp.Store(0)
 	m.proxyDownloadBlip.Store(0)
 	m.proxyDownloadTotal.Store(0)
+}
 
+func (m *Manager) updateMemory() {
+	var memStats runtime.MemStats
+	runtime.ReadMemStats(&memStats)
+	m.memory = memStats.StackInuse + memStats.HeapInuse
 }
 
 func (m *Manager) handle() {
@@ -147,8 +141,25 @@ func (m *Manager) handle() {
 }
 
 type Snapshot struct {
-	DownloadTotal int64          `json:"downloadTotal"`
-	UploadTotal   int64          `json:"uploadTotal"`
-	Connections   []*TrackerInfo `json:"connections"`
-	Memory        uint64         `json:"memory"`
+	DownloadTotal   int64         `json:"downloadTotal"`
+	UploadTotal     int64         `json:"uploadTotal"`
+	Connections     []TrackerInfo `json:"connections"`
+	Memory          uint64        `json:"memory"`
+}
+
+func (m *Manager) Snapshot() *Snapshot {
+	m.updateMemory()
+
+	connections := make([]TrackerInfo, 0)
+	m.connections.Range(func(key string, value Tracker) bool {
+		connections = append(connections, *value.Info())
+		return true
+	})
+
+	return &Snapshot{
+		DownloadTotal:   m.downloadTotal.Load(),
+		UploadTotal:     m.uploadTotal.Load(),
+		Connections:     connections,
+		Memory:          m.memory,
+	}
 }
