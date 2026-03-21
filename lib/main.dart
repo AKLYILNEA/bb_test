@@ -18,6 +18,7 @@ import 'application.dart';
 import 'clash/core.dart';
 import 'clash/lib.dart';
 import 'common/common.dart';
+import 'l10n/l10n.dart';
 import 'models/models.dart';
 
 const String _sentryDsn = String.fromEnvironment('SENTRY_DSN');
@@ -105,6 +106,13 @@ Future<void> _service(List<String> flags) async {
   );
 
   vpn?.handleGetStartForegroundParams = () async {
+    if (AppLocalizations.currentOrNull == null) {
+      final locale = globalState.config.appSetting.locale.isNotEmpty
+          ? utils.getLocaleForString(globalState.config.appSetting.locale)
+          : WidgetsBinding.instance.platformDispatcher.locale;
+      await AppLocalizations.load(locale);
+    }
+
     // Check if smart-stopped from native side
     final isSmartStopped = await vpn?.isSmartStopped() ?? false;
 
