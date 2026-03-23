@@ -28,6 +28,10 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
     companion object {
         private const val TAG = "BettboxVpnService"
     }
+
+    @Volatile
+    private var isStopped = false
+
     override fun onCreate() {
         super.onCreate()
         GlobalState.initServiceEngine()
@@ -138,13 +142,33 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
             val fd = establish()?.detachFd()
             if (fd == null) {
                 Log.e("BettboxVpnService", "Establish VPN rejected by system")
-                return 0
+                return -1
             }
             return fd
         }
     }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == "ACTION_FORCE_STOP") {
+            val latch = java.util.concurrent.CountDownLatch(1)
+            CoroutineScope(Dispatchers.Default).launch {
+                try {
+                    VpnPlugin.handleStop(force = true)
+                } finally {
+                    latch.countDown()
+                    stop()
+                }
+            }
+            latch.await(2, java.util.concurrent.TimeUnit.SECONDS)
+            return START_NOT_STICKY
+        }
+        return super.onStartCommand(intent, flags, startId)
+    }
+
     override fun stop() {
+        if (isStopped) return
+        isStopped = true
+        runCatching { com.appshub.bettbox.core.Core.stopTun() }
         stopSelf()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             stopForeground(STOP_FOREGROUND_REMOVE)
@@ -188,7 +212,7 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
             builder.setContentTitle(spannable).setContentText(null).build()
         }
 
-        this.startForeground(notification)
+        this.startForeground(GlobalState.NOTIFICATION_ID, notification)
     }
 
     override fun onTrimMemory(level: Int) {
@@ -205,7 +229,7 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
             try {
                 val isSuccess = super.onTransact(code, data, reply, flags)
                 if (!isSuccess) {
-                    CoroutineScope(Dispatchers.Main).launch {
+                    CoroutineScope(Dispatchers.Main + kotlinx.coroutines.SupervisorJob()).launch {
                         GlobalState.getCurrentTilePlugin()?.handleStop()
                     }
                 }

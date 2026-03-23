@@ -381,6 +381,10 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }
 
     private fun handleStartService() {
+        if (GlobalState.isCurrentlyStopping()) {
+            android.util.Log.w("VpnPlugin", "VPN is in stopping state, ignore start request")
+            return
+        }
         if (bettBoxService == null) {
             bindService()
             return
@@ -504,6 +508,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     fun handleStop(force: Boolean = false) {
         GlobalState.runLock.withLock {
             if (!force && GlobalState.currentRunState == RunState.STOP) return
+            GlobalState.updateIsStopping(true)
             GlobalState.updateRunState(RunState.STOP)
             lastStartForegroundParams = null
             // Uninstall SuspendModule
@@ -525,6 +530,8 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
             // Give native Go threads a moment to finish cleanup before destroying engine
             scope.launch {
+                delay(300)
+                GlobalState.updateIsStopping(false)
                 delay(200)
                 withContext(Dispatchers.Main) {
                     GlobalState.handleTryDestroy()

@@ -85,6 +85,36 @@ object GlobalState {
     @Volatile
     var isSmartStopped: Boolean = false
 
+    @Volatile var isStopping: Boolean = false
+
+    fun updateIsStopping(value: Boolean) {
+        isStopping = value
+        runCatching {
+            val ts = if (value) System.currentTimeMillis() else 0L
+            BettboxApplication.getAppContext()
+                .getSharedPreferences("vpn_state", android.content.Context.MODE_PRIVATE)
+                .edit().putLong("stop_lock_ts", ts).apply()
+        }
+    }
+
+    fun isCurrentlyStopping(): Boolean {
+        if (isStopping) return true
+        return runCatching {
+            val sp = BettboxApplication.getAppContext()
+                .getSharedPreferences("vpn_state", android.content.Context.MODE_PRIVATE)
+            val ts = sp.getLong("stop_lock_ts", 0L)
+            if (ts == 0L) return false
+
+            val now = System.currentTimeMillis()
+            if (now - ts > 5000) {
+                sp.edit().remove("stop_lock_ts").apply()
+                false
+            } else {
+                true
+            }
+        }.getOrDefault(false)
+    }
+
     fun getCurrentAppPlugin(): AppPlugin? {
         val currentEngine = if (flutterEngine != null) flutterEngine else serviceEngine
         return currentEngine?.plugins?.get(AppPlugin::class.java) as AppPlugin?
