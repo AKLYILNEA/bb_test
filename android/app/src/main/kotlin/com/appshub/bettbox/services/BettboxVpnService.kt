@@ -146,33 +146,32 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
             }
             return fd
         }
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent?.action == "ACTION_FORCE_STOP") {
-            val latch = java.util.concurrent.CountDownLatch(1)
-            CoroutineScope(Dispatchers.Default).launch {
-                try {
-                    VpnPlugin.handleStop(force = true)
-                } finally {
-                    latch.countDown()
-                    stop()
-                }
-            }
-            latch.await(2, java.util.concurrent.TimeUnit.SECONDS)
-            return START_NOT_STICKY
-        }
-        return super.onStartCommand(intent, flags, startId)
+        return START_NOT_STICKY
     }
 
     override fun stop() {
         if (isStopped) return
         isStopped = true
-        runCatching { com.appshub.bettbox.core.Core.stopTun() }
-        stopSelf()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            stopForeground(STOP_FOREGROUND_REMOVE)
+        
+        runCatching { 
+            com.appshub.bettbox.core.Core.stopTun() 
+        }.onFailure {
+            Log.e(TAG, "Failed to stop TUN: ${it.message}")
         }
+        
+        runCatching {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                stopForeground(STOP_FOREGROUND_REMOVE)
+            }
+        }.onFailure {
+            Log.e(TAG, "Failed to stop foreground: ${it.message}")
+        }
+        
+        stopSelf()
     }
 
     private var cachedBuilder: NotificationCompat.Builder? = null

@@ -255,8 +255,12 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }.build()
 
     private fun registerNetworkCallback() {
-        networks.clear()
-        connectivity?.registerNetworkCallback(request, callback)
+        try {
+            networks.clear()
+            connectivity?.registerNetworkCallback(request, callback)
+        } catch (e: Exception) {
+            android.util.Log.e("VpnPlugin", "Failed to register network callback: ${e.message}")
+        }
     }
 
     private fun unRegisterNetworkCallback() {
@@ -391,6 +395,23 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         }
         
         scope.launch {
+            val prepareIntent = try {
+                android.net.VpnService.prepare(BettboxApplication.getAppContext())
+            } catch (e: Exception) {
+                null
+            }
+
+            if (prepareIntent != null) {
+                android.util.Log.w("VpnPlugin", "VPN permission required before start")
+                GlobalState.updateRunState(RunState.STOP)
+                withContext(Dispatchers.Main) {
+                    GlobalState.getCurrentAppPlugin()?.requestVpnPermission {
+                        handleStartService()
+                    }
+                }
+                return@launch
+            }
+
             val startAllowed = GlobalState.runLock.withLock {
                 if (GlobalState.currentRunState == RunState.START) {
                     android.util.Log.d("VpnPlugin", "Service reconnected, updating notification")
@@ -435,17 +456,10 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                         GlobalState.updateRunState(RunState.STOP)
                     }
                     ServicePlugin.notifyVpnStartFailed()
-                    try {
-                        val prepareIntent = android.net.VpnService.prepare(BettboxApplication.getAppContext())
-                        if (prepareIntent != null) {
-                            android.util.Log.w("VpnPlugin", "VPN permission blocked. Calling prepare to reset state.")
-                            GlobalState.getCurrentAppPlugin()?.requestVpnPermission { }
-                        }
-                    } catch (e: Exception) {
-                        android.util.Log.e("VpnPlugin", "Failed to call prepare: ${e.message}")
-                    }
-                    return@launch
                 }
+            } catch (e: Exception) {
+                android.util.Log.e("VpnPlugin", "Fatal error during start sequence: ${e.message}")
+                GlobalState.updateRunState(RunState.STOP)
             }
             
             GlobalState.runLock.withLock {

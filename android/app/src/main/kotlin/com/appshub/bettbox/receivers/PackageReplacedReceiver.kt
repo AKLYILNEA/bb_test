@@ -18,14 +18,16 @@ class PackageReplacedReceiver : BroadcastReceiver() {
 
         val pendingResult = goAsync()
         try {
-            val stopIntent = Intent(context, BettboxVpnService::class.java).apply {
-                action = "ACTION_FORCE_STOP"
-            }
-            context.startService(stopIntent)
+            Log.d(TAG, "App updated. Resetting VPN states.")
+            
+            GlobalState.updateIsStopping(false)
+            GlobalState.updateRunState(RunState.STOP)
+            
+            val sp = context.getSharedPreferences("vpn_state", Context.MODE_PRIVATE)
+            sp.edit().remove("stop_lock_ts").apply()
+
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to send force stop signal", e)
-            context.stopService(Intent(context, BettboxVpnService::class.java))
-            runCatching { com.appshub.bettbox.core.Core.stopTun() }
+            Log.e(TAG, "Failed to reset state after package replaced", e)
         } finally {
             pendingResult.finish()
         }
