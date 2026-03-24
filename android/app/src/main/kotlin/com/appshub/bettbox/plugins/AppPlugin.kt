@@ -244,11 +244,10 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
     }
 
     private fun updateExcludeFromRecents(value: Boolean?) {
-        if (Build.VERSION.SDK_INT >= 33) {
-            android.util.Log.d("AppPlugin", "ExcludeFromRecents blocked on Android 13+")
+        if (Build.VERSION.SDK_INT >= 38) {
             return
         }
-        val am = getSystemService<ActivityManager>(BettboxApplication.getAppContext())
+        val am = BettboxApplication.getAppContext().getSystemService<ActivityManager>()
         val taskId = activityRef?.get()?.taskId ?: return
         val task = am?.appTasks?.firstOrNull {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -338,7 +337,7 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
             }.getOrDefault(false)
             val lastUpdateTime = runCatching { appInfo.sourceDir?.let { File(it).lastModified() } ?: 0L }.getOrDefault(0L)
 
-            Package(packageName, label, system, lastUpdateTime, internet)
+            Package(packageName, label, system, internet, lastUpdateTime)
         })
         packages
     }

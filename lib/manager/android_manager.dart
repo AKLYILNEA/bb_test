@@ -43,8 +43,7 @@ class _AndroidContainerState extends ConsumerState<AndroidManager> {
       prev,
       next,
     ) {
-      // Block hidden feature for Android 13+ (SDK 33+)
-      if (_sdkInt != null && _sdkInt! >= 33 && next) {
+      if (_sdkInt != null && _sdkInt! >= 38 && next) {
         return;
       }
       app.updateExcludeFromRecents(next);
