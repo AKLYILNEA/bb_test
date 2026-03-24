@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
+import 'package:bett_box/plugins/smooth_scroll.dart';
 import 'package:bett_box/state.dart';
 import 'package:flutter/material.dart';
 
@@ -22,7 +23,7 @@ class CommonScrollBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scrollbar(
+    Widget result = Scrollbar(
       controller: controller,
       thumbVisibility: thumbVisibility,
       trackVisibility: trackVisibility,
@@ -31,6 +32,14 @@ class CommonScrollBar extends StatelessWidget {
       interactive: true,
       child: child,
     );
+
+    if (controller != null) {
+      result = DesktopSmoothScroll(
+        controller: controller!,
+        child: result,
+      );
+    }
+    return result;
   }
 }
 

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"net"
-	"net/url"
 	"strings"
 
 	"github.com/metacubex/mihomo/adapter/inbound"
@@ -20,6 +19,7 @@ import (
 
 	"github.com/metacubex/http"
 	vmess "github.com/metacubex/sing-vmess"
+	"github.com/metacubex/mhurl"
 	"github.com/metacubex/sing/common"
 	"github.com/metacubex/sing/common/metadata"
 	"github.com/metacubex/tls"
@@ -230,7 +230,7 @@ func HandleVmess(conn net.Conn, tunnel C.Tunnel, additions ...inbound.Addition) 
 }
 
 func ParseVmessURL(s string) (addr, username, password string, err error) {
-	u, err := url.Parse(s)
+	u, err := mhurl.Parse(s)
 	if err != nil {
 		return
 	}
