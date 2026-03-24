@@ -23,7 +23,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
 class BettboxVpnService : VpnService(), BaseServiceInterface {
     companion object {
         private const val TAG = "BettboxVpnService"
@@ -146,7 +145,6 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
             }
             return fd
         }
-        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -211,7 +209,8 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
             builder.setContentTitle(spannable).setContentText(null).build()
         }
 
-        this.startForeground(GlobalState.NOTIFICATION_ID, notification)
+
+        this.startForeground(notification)
     }
 
     override fun onTrimMemory(level: Int) {
@@ -228,36 +227,28 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
             try {
                 val isSuccess = super.onTransact(code, data, reply, flags)
                 if (!isSuccess) {
-                    CoroutineScope(Dispatchers.Main + kotlinx.coroutines.SupervisorJob()).launch {
-                        GlobalState.getCurrentTilePlugin()?.handleStop()
-                    }
+                    GlobalState.getCurrentTilePlugin()?.handleStop()
                 }
                 return isSuccess
-            } catch (e: RemoteException) {
-                throw e
+            } catch (e: Exception) {
+                Log.e(TAG, "onTransact failed: ${e.message}")
+                return false
             }
         }
     }
 
-    override fun onBind(intent: Intent): IBinder {
+    override fun onBind(intent: Intent?): IBinder {
         return binder
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
-        return super.onUnbind(intent)
+        super.onUnbind(intent)
+        return true
     }
 
     override fun onRevoke() {
-        Log.d("BettboxVpnService", "VPN revoked by system")
-        try {
-            if (GlobalState.isServiceEngineRunning()) {
-                VpnPlugin.handleStop(force = true)
-            } else {
-                stop()
-            }
-        } catch (e: Exception) {
-            Log.e("BettboxVpnService", "Error during onRevoke cleanup: ${e.message}")
-            stop()
+        runCatching {
+            VpnPlugin.handleStop()
         }
         super.onRevoke()
     }
