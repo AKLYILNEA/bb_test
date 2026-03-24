@@ -10,7 +10,6 @@ import androidx.core.app.NotificationCompat
 import com.appshub.bettbox.GlobalState
 import com.appshub.bettbox.models.VpnOptions
 
-
 class BettboxService : Service(), BaseServiceInterface {
 
     override suspend fun start(options: VpnOptions) = 0
@@ -21,7 +20,7 @@ class BettboxService : Service(), BaseServiceInterface {
             stopForeground(STOP_FOREGROUND_REMOVE)
         }
     }
-    
+
     private var cachedBuilder: NotificationCompat.Builder? = null
 
     fun resetNotificationBuilder() {
@@ -38,7 +37,7 @@ class BettboxService : Service(), BaseServiceInterface {
     @SuppressLint("ForegroundServiceType")
     override suspend fun startForeground(title: String, content: String) {
         ensureNotificationChannel()
-        val safeTitle = if (title.isBlank()) "Bettbox" else title
+        val safeTitle = title.ifBlank { "Bettbox" }
         val safeContent = content.trim()
         val builder = notificationBuilder()
         val notification = if (safeContent.isBlank()) {
@@ -58,8 +57,6 @@ class BettboxService : Service(), BaseServiceInterface {
             }
             builder.setContentTitle(spannable).setContentText(null).build()
         }
-
-        // 调用公共扩展方法
         this.startForeground(notification)
     }
 
@@ -68,20 +65,13 @@ class BettboxService : Service(), BaseServiceInterface {
         GlobalState.getCurrentVPNPlugin()?.requestGc()
     }
 
-
     private val binder = LocalBinder()
 
     inner class LocalBinder : Binder() {
         fun getService(): BettboxService = this@BettboxService
     }
 
-    override fun onBind(intent: Intent): IBinder {
-        return binder
-    }
-
-    override fun onUnbind(intent: Intent?): Boolean {
-        return super.onUnbind(intent)
-    }
+    override fun onBind(intent: Intent): IBinder = binder
 
     override fun onDestroy() {
         stop()

@@ -9,16 +9,16 @@ import android.content.pm.ComponentInfo
 import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.Build
+import android.provider.Settings
 import android.util.Base64
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.FileProvider
+import androidx.core.content.getSystemService
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
-import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile
 import com.appshub.bettbox.BettboxApplication
 import com.appshub.bettbox.GlobalState
 import com.appshub.bettbox.R
@@ -40,266 +40,110 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.lang.ref.WeakReference
-import java.util.zip.ZipFile
+import java.security.cert.CertificateFactory
+import java.security.cert.X509Certificate
+import java.util.concurrent.ConcurrentHashMap
+import android.content.res.Configuration
+import android.net.Uri
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.Drawable
 
 class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware {
 
     private var activityRef: WeakReference<Activity>? = null
-
     private lateinit var channel: MethodChannel
-
     private lateinit var scope: CoroutineScope
-
     private var vpnCallBack: (() -> Unit)? = null
-
     private val packages = mutableListOf<Package>()
-    
-    // Icon cache dir
+    private val chinaPackageCache = ConcurrentHashMap<String, Boolean>()
+
     private val iconCacheDir by lazy {
         File(BettboxApplication.getAppContext().cacheDir, "app_icons").apply {
             if (!exists()) mkdirs()
         }
     }
-    
-    // Icon size (48dp)
-    private val ICON_SIZE = 48
 
-    private val skipPrefixList = listOf(
-        "com.google",
-        "com.android.chrome",
-        "com.android.vending",
-        "com.facebook",
-        "com.instagram",
-        "com.whatsapp",
-        "com.twitter",
-        "com.linkedin",
-        "com.snapchat",
-        "com.amazon",
-        "com.microsoft",
-        "com.apple",
-        "com.dropbox",
-        "com.mozilla",
-        "com.brave",
-        "com.duckduckgo",
-        "com.vivaldi",
-        "com.kiwibrowser",
-        "org.torproject.torbrowser",
-        "com.opera.browser",
-        "com.lemon.browser",
-        "net.waterfox",
-        "ch.protonmail",
-        "org.thoughtcrime.securesms",
-        "org.telegram",
-        "com.surfshark",
-        "com.netflix",
-        "com.spotify",
-        "tv.twitch",
-        "com.hulu",
-        "com.disney",
-        "com.hbo",
-        "com.primevideo",
-        "com.zhiliaoapp.musically",
-        "com.nytimes",
-        "bbc.mobile",
-        "com.wsj",
-        "com.bloomberg",
-        "com.medium",
-        "com.quora",
-        "com.github",
-        "io.github",
-        "com.slack",
-        "com.notion",
-        "us.zoom",
-        "com.discord",
-        "com.reddit",
-        "com.pinterest",
-        "com.tumblr",
-        "jp.naver.line",
-        "com.skype",
-        "com.box",
-        "org.wikipedia",
-        "com.gitlab",
-        "com.openai",
-        "com.valvesoftware",
-        "com.roblox",
-        "com.ea.gp",
-        "com.ubisoft",
-        "com.sogou.activity.src",
-        "com.qihoo.browser",
-        "com.qihoo.haosou",
-        "com.liebao",
-        "com.mx.browser",
-        "com.browser2345",
-        "com.ijinshan.browser",
-        "com.quark.browser",
-        "com.ylmf.androidclient",
-        "mark.via",
-        "com.xbrowser.play",
-        "com.mycompany.app.soulbrowser",
-        "com.hshentong.alook",
-        "info.bmmk.mbrowser",
-        "com.rainsee.browser",
-        "com.liuzh.browser",
-        "com.yuzhe.browser",
-        "org.easyweb.browser",
-        "any.browser",
-        "us.spotco.fennec_dos",
-        "app.grapheneos.vanadium",
-        "org.ironfoxoss",
-        "com.samsung.android.app.sbrowser",
-        "com.mi.global.browser",
-        "com.android.browser",
-        "com.huawei.browser",
-        "com.hihonor.browser",
-        "com.heytap.browser",
-        "com.coloros.browser",
-        "com.oppo.browser",
-        "com.vivo.browser",
-        "com.bbk.browser",
-        "com.meizu.browser",
-        "com.meizu.mbrowser",
-        "com.lenovo.browser",
-        "com.zte.browser",
-        "com.gionee.browser",
-    )
+    companion object {
+        private const val ICON_SIZE_DP = 48
+        private const val VPN_PERMISSION_REQUEST_CODE = 1001
+        private const val NOTIFICATION_PERMISSION_REQUEST_CODE = 1002
+        private const val CACHE_MAX_FILES = 500
+        private const val PNG_MAGIC_SIZE = 8
 
-    private val chinaAppPrefixList = listOf(
-        "com.tencent",
-        "com.alibaba",
-        "com.ali",
-        "com.alipay",
-        "com.taobao",
-        "com.baidu",
-        "com.iqiyi",
-        "com.bytedance",
-        "com.ss.android",
-        "com.kuaishou",
-        "com.smile.gifmaker",
-        "com.xunmeng",
-        "com.pinduoduo",
-        "com.sankuai",
-        "com.meituan",
-        "com.jingdong",
-        "com.jd",
-        "tv.danmaku",
-        "com.sina",
-        "com.weibo",
-        "com.sohu",
-        "com.netease",
-        "com.zhihu",
-        "com.xingin",
-        "com.huawei",
-        "com.xiaomi",
-        "com.miui",
-        "com.oppo",
-        "com.coloros",
-        "com.oplus",
-        "andes.oplus",
-        "com.vivo",
-        "com.bbk",
-        "com.iqoo",
-        "com.meizu",
-        "com.flyme",
-        "com.gionee",
-        "cn.nubia",
-        "com.zte",
-        "com.lenovo",
-        "com.oneplus",
-        "com.qihoo",
-        "com.360",
-        "com.ijiami",
-        "com.bangcle",
-        "com.secneo",
-        "com.kiwisec",
-        "com.stub",
-        "com.wrapper",
-        "cn.securitystack",
-        "com.mogosec",
-        "com.secoen",
-        "com.secshell",
-        "com.umeng",
-        "com.igexin",
-        "cn.jpush",
-        "cn.jiguang",
-        "com.bugly",
-        "com.mob",
-        "cn.wps",
-        "com.kingsoft",
-        "com.xunlei",
-        "com.unionpay",
-        "com.cainiao",
-        "com.sf",
-        "com.sdu",
-        "com.xiaojukeji",
-        "com.autonavi",
-        "com.amap",
-        "com.chinamobile",
-        "com.chinaunicom",
-        "com.chinatelecom",
-        "com.icbc",
-        "com.ccb",
-        "com.cmbchina",
-        "com.mx",
-        "com.qq",
-        "app.eleven.com.fastfiletransfer",
-        "org.localsend.localsend_app",
-    )
+        private val SKIP_PREFIX_LIST = listOf(
+            "com.google", "com.android.chrome", "com.android.vending", "com.facebook",
+            "com.instagram", "com.whatsapp", "com.twitter", "com.linkedin", "com.snapchat",
+            "com.amazon", "com.microsoft", "com.apple", "com.dropbox", "com.mozilla",
+            "com.brave", "com.duckduckgo", "com.vivaldi", "com.kiwibrowser",
+            "org.torproject.torbrowser", "com.opera.browser", "com.lemon.browser",
+            "net.waterfox", "ch.protonmail", "org.thoughtcrime.securesms", "org.telegram",
+            "com.surfshark", "com.netflix", "com.spotify", "tv.twitch", "com.hulu",
+            "com.disney", "com.hbo", "com.primevideo", "com.zhiliaoapp.musically",
+            "com.nytimes", "bbc.mobile", "com.wsj", "com.bloomberg", "com.medium",
+            "com.quora", "com.github", "io.github", "com.slack", "com.notion", "us.zoom",
+            "com.discord", "com.reddit", "com.pinterest", "com.tumblr", "jp.naver.line",
+            "com.skype", "com.box", "org.wikipedia", "com.gitlab", "com.openai",
+            "com.valvesoftware", "com.roblox", "com.ea.gp", "com.ubisoft",
+            "com.sogou.activity.src", "com.qihoo.browser", "com.qihoo.haosou",
+            "com.liebao", "com.mx.browser", "com.browser2345", "com.ijinshan.browser",
+            "com.quark.browser", "com.ylmf.androidclient", "mark.via", "com.xbrowser.play",
+            "com.mycompany.app.soulbrowser", "com.hshentong.alook", "info.bmmk.mbrowser",
+            "com.rainsee.browser", "com.liuzh.browser", "com.yuzhe.browser",
+            "org.easyweb.browser", "any.browser", "us.spotco.fennec_dos",
+            "app.grapheneos.vanadium", "org.ironfoxoss", "com.samsung.android.app.sbrowser",
+            "com.mi.global.browser", "com.android.browser", "com.huawei.browser",
+            "com.hihonor.browser", "com.heytap.browser", "com.coloros.browser",
+            "com.oppo.browser", "com.vivo.browser", "com.bbk.browser", "com.meizu.browser",
+            "com.meizu.mbrowser", "com.lenovo.browser", "com.zte.browser", "com.gionee.browser"
+        )
 
-    private val chinaAppRegex by lazy {
-        ("(" + chinaAppPrefixList.joinToString("|").replace(".", "\\.") + ").*").toRegex()
+        private val CHINA_APP_PREFIX_LIST = listOf(
+            "com.tencent", "com.alibaba", "com.ali", "com.alipay", "com.taobao", "com.baidu",
+            "com.iqiyi", "com.bytedance", "com.ss.android", "com.kuaishou", "com.smile.gifmaker",
+            "com.xunmeng", "com.pinduoduo", "com.sankuai", "com.meituan", "com.jingdong",
+            "com.jd", "tv.danmaku", "com.sina", "com.weibo", "com.sohu", "com.netease",
+            "com.zhihu", "com.xingin", "com.huawei", "com.xiaomi", "com.miui", "com.oppo",
+            "com.coloros", "com.oplus", "andes.oplus", "com.vivo", "com.bbk", "com.iqoo",
+            "com.meizu", "com.flyme", "com.gionee", "cn.nubia", "com.zte", "com.lenovo",
+            "com.oneplus", "com.qihoo", "com.360", "com.ijiami", "com.bangcle", "com.secneo",
+            "com.kiwisec", "com.stub", "com.wrapper", "cn.securitystack", "com.mogosec",
+            "com.secoen", "com.secshell", "com.umeng", "com.igexin", "cn.jpush", "cn.jiguang",
+            "com.bugly", "com.mob", "cn.wps", "com.kingsoft", "com.xunlei", "com.unionpay",
+            "com.cainiao", "com.sf", "com.sdu", "com.xiaojukeji", "com.autonavi", "com.amap",
+            "com.chinamobile", "com.chinaunicom", "com.chinatelecom", "com.icbc", "com.ccb",
+            "com.cmbchina", "com.mx", "com.qq", "app.eleven.com.fastfiletransfer",
+            "org.localsend.localsend_app"
+        )
+
+        private val CHINA_APP_REGEX by lazy {
+            ("(" + CHINA_APP_PREFIX_LIST.joinToString("|").replace(".", "\\.") + ").*").toRegex()
+        }
     }
 
-    // Cache scan results
-    private val chinaPackageCache = java.util.concurrent.ConcurrentHashMap<String, Boolean>()
-
-    val VPN_PERMISSION_REQUEST_CODE = 1001
-
-    val NOTIFICATION_PERMISSION_REQUEST_CODE = 1002
-
-    private var isBlockNotification: Boolean = false
+    private var isBlockNotification = false
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "app")
         channel.setMethodCallHandler(this)
-        
-        // Background clean icon cache on startup
-        scope.launch(Dispatchers.IO) {
-            cleanIconCache()
-        }
+        scope.launch(Dispatchers.IO) { cleanIconCache() }
     }
 
     private fun initShortcuts(label: String) {
-        // Select icon by theme
-        val iconRes = if (isSystemInDarkMode()) {
-            R.mipmap.ic_launcher_round
-        } else {
-            R.mipmap.ic_launcher_round_light
-        }
-        
+        val iconRes = if (isSystemInDarkMode()) R.mipmap.ic_launcher_round else R.mipmap.ic_launcher_round_light
         val shortcut = ShortcutInfoCompat.Builder(BettboxApplication.getAppContext(), "toggle")
             .setShortLabel(label)
-            .setIcon(
-                IconCompat.createWithResource(
-                    BettboxApplication.getAppContext(),
-                    iconRes
-                )
-            )
+            .setIcon(IconCompat.createWithResource(BettboxApplication.getAppContext(), iconRes))
             .setIntent(BettboxApplication.getAppContext().getActionIntent("CHANGE"))
             .build()
-        ShortcutManagerCompat.setDynamicShortcuts(
-            BettboxApplication.getAppContext(),
-            listOf(shortcut)
-        )
+        ShortcutManagerCompat.setDynamicShortcuts(BettboxApplication.getAppContext(), listOf(shortcut))
     }
-    
-    /**
-     * Check dark mode
-     */
+
     private fun isSystemInDarkMode(): Boolean {
-        val nightModeFlags = BettboxApplication.getAppContext().resources.configuration.uiMode and 
-            android.content.res.Configuration.UI_MODE_NIGHT_MASK
-        return nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES
+        val nightModeFlags = BettboxApplication.getAppContext().resources.configuration.uiMode and
+            Configuration.UI_MODE_NIGHT_MASK
+        return nightModeFlags == Configuration.UI_MODE_NIGHT_YES
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
@@ -319,129 +163,67 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
                 activityRef?.get()?.moveTaskToBack(true)
                 result.success(true)
             }
-
             "updateExcludeFromRecents" -> {
-                val value = call.argument<Boolean>("value")
-                updateExcludeFromRecents(value)
+                updateExcludeFromRecents(call.argument<Boolean>("value"))
                 result.success(true)
             }
-
             "initShortcuts" -> {
                 initShortcuts(call.arguments as String)
                 result.success(true)
             }
-
-            "getPackages" -> {
-                scope.launch {
-                    try {
-                        result.success(getPackagesToList())
-                    } catch (e: SecurityException) {
-                        result.error("PACKAGE_LIST_PERMISSION", e.message, null)
-                    } catch (e: Exception) {
-                        result.error("GET_PACKAGES_FAILED", e.message, null)
-                    }
-                }
+            "getPackages" -> scope.launch {
+                runCatching { result.success(getPackagesToList()) }
+                    .onFailure { result.error("GET_PACKAGES_FAILED", it.message, null) }
             }
-
-            "getChinaPackageNames" -> {
-                scope.launch {
-                    try {
-                        result.success(getChinaPackageNamesList())
-                    } catch (e: SecurityException) {
-                        result.error("PACKAGE_LIST_PERMISSION", e.message, null)
-                    } catch (e: Exception) {
-                        result.error("GET_CHINA_PACKAGES_FAILED", e.message, null)
-                    }
-                }
+            "getChinaPackageNames" -> scope.launch {
+                runCatching { result.success(getChinaPackageNamesList()) }
+                    .onFailure { result.error("GET_CHINA_PACKAGES_FAILED", it.message, null) }
             }
-
-            "getPackageIcon" -> {
-                scope.launch {
-                    try {
-                        val packageName = call.argument<String>("packageName")
-                        val forceRefresh = call.argument<Boolean>("forceRefresh") ?: false
-                        if (packageName == null) {
-                            result.success(null)
-                            return@launch
-                        }
-                        val packageIcon = getPackageIconBytes(packageName, forceRefresh)
-                        if (packageIcon != null) {
-                            result.success(packageIcon)
-                            return@launch
-                        }
-                        result.success(getDefaultIconBytes())
-                    } catch (e: Exception) {
-                        result.success(getDefaultIconBytes())
-                    }
-                }
+            "getPackageIcon" -> scope.launch {
+                val packageName = call.argument<String>("packageName")
+                val forceRefresh = call.argument<Boolean>("forceRefresh") ?: false
+                val icon = runCatching {
+                    packageName?.let { getPackageIconBytes(it, forceRefresh) } ?: getDefaultIconBytes()
+                }.getOrDefault(getDefaultIconBytes())
+                result.success(icon)
             }
-
             "tip" -> {
-                val message = call.argument<String>("message")
-                tip(message)
+                tip(call.argument<String>("message"))
                 result.success(true)
             }
-
             "openFile" -> {
-                val path = call.argument<String>("path")!!
-                openFile(path)
+                openFile(call.argument<String>("path")!!)
                 result.success(true)
             }
-
             "getSelfLastUpdateTime" -> {
-                // Get APK last update time
-                // Detect reinstall/update
-                val packageManager = BettboxApplication.getAppContext().packageManager
-                val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    packageManager?.getPackageInfo(
-                        BettboxApplication.getAppContext().packageName,
-                        PackageManager.PackageInfoFlags.of(0)
-                    )
-                } else {
-                    packageManager?.getPackageInfo(
-                        BettboxApplication.getAppContext().packageName,
-                        0
-                    )
-                }
-                result.success(packageInfo?.lastUpdateTime ?: 0L)
+                result.success(getSelfLastUpdateTime())
             }
-
             "isIgnoringBatteryOptimizations" -> {
                 result.success(isIgnoringBatteryOptimizations())
             }
-
             "requestIgnoreBatteryOptimizations" -> {
                 requestIgnoreBatteryOptimizations()
                 result.success(true)
             }
-
             "setLauncherIcon" -> {
-                val useLightIcon = call.argument<Boolean>("useLightIcon") ?: false
-                setLauncherIcon(useLightIcon)
+                setLauncherIcon(call.argument<Boolean>("useLightIcon") ?: false)
                 result.success(true)
             }
-
             "hasPackageListPermission" -> {
                 result.success(hasPackageListPermission())
             }
-
             "requestPackageListPermission" -> {
                 requestPackageListPermission()
                 result.success(true)
             }
-
             "hasCameraPermission" -> {
                 result.success(hasCameraPermission())
             }
-
             "openAppSettings" -> {
                 openAppSettings()
                 result.success(true)
             }
-
-            else -> {
-                result.notImplemented()
-            }
+            else -> result.notImplemented()
         }
     }
 
@@ -452,248 +234,127 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
             "${BettboxApplication.getAppContext().packageName}.fileProvider",
             file
         )
-
-        val intent = Intent(Intent.ACTION_VIEW).setDataAndType(
-            uri,
-            "text/plain"
-        )
-
-        val flags =
-            Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION
-
-        val resInfoList = BettboxApplication.getAppContext().packageManager.queryIntentActivities(
-            intent, PackageManager.MATCH_DEFAULT_ONLY
-        )
-
-        for (resolveInfo in resInfoList) {
-            val packageName = resolveInfo.activityInfo.packageName
-            BettboxApplication.getAppContext().grantUriPermission(
-                packageName,
-                uri,
-                flags
-            )
-        }
-
-        try {
-            activityRef?.get()?.startActivity(intent)
-        } catch (e: Exception) {
-            println(e)
-        }
+        val intent = Intent(Intent.ACTION_VIEW).setDataAndType(uri, "text/plain")
+        val flags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION
+        BettboxApplication.getAppContext().packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+            .forEach {
+                BettboxApplication.getAppContext().grantUriPermission(it.activityInfo.packageName, uri, flags)
+            }
+        runCatching { activityRef?.get()?.startActivity(intent) }
     }
 
     private fun updateExcludeFromRecents(value: Boolean?) {
-        // Block for Android 13+ (API 33+)
         if (Build.VERSION.SDK_INT >= 33) {
             android.util.Log.d("AppPlugin", "ExcludeFromRecents blocked on Android 13+")
             return
         }
-        
-        val am = getSystemService(BettboxApplication.getAppContext(), ActivityManager::class.java)
+        val am = getSystemService<ActivityManager>(BettboxApplication.getAppContext())
+        val taskId = activityRef?.get()?.taskId ?: return
         val task = am?.appTasks?.firstOrNull {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                it.taskInfo.taskId == activityRef?.get()?.taskId
+                it.taskInfo.taskId == taskId
             } else {
-                it.taskInfo.id == activityRef?.get()?.taskId
+                it.taskInfo.id == taskId
             }
         }
-
-        when (value) {
-            true -> task?.setExcludeFromRecents(value)
-            false -> task?.setExcludeFromRecents(value)
-            null -> task?.setExcludeFromRecents(false)
-        }
+        task?.setExcludeFromRecents(value ?: false)
     }
 
     private fun getIconSizePx(): Int {
         val density = BettboxApplication.getAppContext().resources.displayMetrics.density
-        return (ICON_SIZE * density).toInt().coerceAtLeast(1)
+        return (ICON_SIZE_DP * density).toInt().coerceAtLeast(1)
     }
 
-    private fun drawableToPngBytes(
-        drawable: android.graphics.drawable.Drawable,
-        sizePx: Int,
-    ): ByteArray {
-        val bitmap = android.graphics.Bitmap.createBitmap(
-            sizePx, sizePx, android.graphics.Bitmap.Config.ARGB_8888
-        )
-        val canvas = android.graphics.Canvas(bitmap)
+    private fun drawableToPngBytes(drawable: Drawable, sizePx: Int): ByteArray {
+        val bitmap = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
         drawable.setBounds(0, 0, sizePx, sizePx)
         drawable.draw(canvas)
-        val outputStream = java.io.ByteArrayOutputStream()
-        bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 80, outputStream)
-        val bytes = outputStream.toByteArray()
-        try {
-            outputStream.close()
-        } catch (_: Exception) {
+        return java.io.ByteArrayOutputStream().use { outputStream ->
+            bitmap.compress(Bitmap.CompressFormat.PNG, 80, outputStream)
+            bitmap.recycle()
+            outputStream.toByteArray()
         }
-        bitmap.recycle()
-        return bytes
     }
 
-    private fun getDefaultIconBytes(): ByteArray? {
-        val drawable = BettboxApplication.getAppContext().packageManager?.defaultActivityIcon ?: return null
-        return try {
-            drawableToPngBytes(drawable, getIconSizePx())
-        } catch (_: Exception) {
-            null
-        }
-    }
+    private fun getDefaultIconBytes(): ByteArray? = runCatching {
+        drawableToPngBytes(BettboxApplication.getAppContext().packageManager.defaultActivityIcon, getIconSizePx())
+    }.getOrNull()
 
     private fun isPngBytes(bytes: ByteArray): Boolean {
-        if (bytes.size < 8) return false
-        return (bytes[0].toInt() and 0xFF) == 0x89 &&
-                (bytes[1].toInt() and 0xFF) == 0x50 &&
-                (bytes[2].toInt() and 0xFF) == 0x4E &&
-                (bytes[3].toInt() and 0xFF) == 0x47 &&
-                (bytes[4].toInt() and 0xFF) == 0x0D &&
-                (bytes[5].toInt() and 0xFF) == 0x0A &&
-                (bytes[6].toInt() and 0xFF) == 0x1A &&
-                (bytes[7].toInt() and 0xFF) == 0x0A
+        if (bytes.size < PNG_MAGIC_SIZE) return false
+        return bytes[0].toInt() == 0x89 && bytes[1].toInt() == 0x50 && bytes[2].toInt() == 0x4E &&
+            bytes[3].toInt() == 0x47 && bytes[4].toInt() == 0x0D && bytes[5].toInt() == 0x0A &&
+            bytes[6].toInt() == 0x1A && bytes[7].toInt() == 0x0A
     }
 
-    private suspend fun getPackageIconBytes(packageName: String, forceRefresh: Boolean = false): ByteArray? {
-        return withContext(Dispatchers.IO) {
-            val packageManager = BettboxApplication.getAppContext().packageManager
-            
-            try {
+    private suspend fun getPackageIconBytes(packageName: String, forceRefresh: Boolean = false): ByteArray? =
+        withContext(Dispatchers.IO) {
+            val pm = BettboxApplication.getAppContext().packageManager ?: return@withContext null
+            runCatching {
                 val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    packageManager?.getPackageInfo(
-                        packageName,
-                        PackageManager.PackageInfoFlags.of(0)
-                    )
+                    pm.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0))
                 } else {
-                    packageManager?.getPackageInfo(packageName, 0)
+                    pm.getPackageInfo(packageName, 0)
                 }
                 val lastUpdateTime = packageInfo?.lastUpdateTime ?: 0L
                 val cacheKey = "${packageName}_${lastUpdateTime}"
                 val cacheFile = File(iconCacheDir, cacheKey)
-                
-                val shouldRefresh = if (forceRefresh) {
-                    val currentTime = System.currentTimeMillis()
-                    val twentyFourHoursInMillis = 24 * 60 * 60 * 1000L
-                    (currentTime - lastUpdateTime) < twentyFourHoursInMillis
-                } else {
-                    false
-                }
-                
-                if (shouldRefresh && cacheFile.exists()) {
+
+                if (forceRefresh && cacheFile.exists() && (System.currentTimeMillis() - lastUpdateTime) < 24 * 60 * 60 * 1000) {
                     cacheFile.delete()
                 }
-                
+
                 if (cacheFile.exists() && cacheFile.length() > 0) {
-                    try {
-                        val cachedBytes = cacheFile.readBytes()
-                        if (isPngBytes(cachedBytes)) {
-                            return@withContext cachedBytes
-                        }
-                    } catch (_: Exception) {
-                        cacheFile.delete()
-                    }
+                    val cachedBytes = cacheFile.readBytes()
+                    if (isPngBytes(cachedBytes)) return@withContext cachedBytes
+                    cacheFile.delete()
                 }
-                
-                try {
-                    iconCacheDir.listFiles()?.forEach { file ->
-                        if (file.name.startsWith("${packageName}_") && file.name != cacheKey) {
-                            file.delete()
-                        }
-                    }
-                } catch (_: Exception) {}
-                
-                val drawable = packageManager?.getApplicationIcon(packageName)
-                if (drawable != null) {
+
+                iconCacheDir.listFiles()?.forEach { if (it.name.startsWith("${packageName}_") && it.name != cacheKey) it.delete() }
+
+                pm.getApplicationIcon(packageName)?.let { drawable ->
                     val bytes = drawableToPngBytes(drawable, getIconSizePx())
-                    
-                    try {
-                        cacheFile.writeBytes(bytes)
-                    } catch (_: Exception) {}
-                    
+                    runCatching { cacheFile.writeBytes(bytes) }
                     return@withContext bytes
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
             }
-            
-            return@withContext null
+            null
         }
-    }
 
     private suspend fun getPackages(): List<Package> = withContext(Dispatchers.IO) {
-        val packageManager = BettboxApplication.getAppContext().packageManager
         if (packages.isNotEmpty()) return@withContext packages
-        
-        val appContext = BettboxApplication.getAppContext()
-        val selfPackageName = appContext.packageName
-        
-        val apps = packageManager?.getInstalledApplications(PackageManager.GET_META_DATA).orEmpty()
-        val results = ArrayList<Package>(apps.size)
+        val pm = BettboxApplication.getAppContext().packageManager ?: return@withContext emptyList()
+        val selfPackageName = BettboxApplication.getAppContext().packageName
 
-        for (appInfo in apps) {
-            val packageName = appInfo.packageName ?: continue
-            if (packageName == selfPackageName) continue
+        packages.addAll(pm.getInstalledApplications(PackageManager.GET_META_DATA).mapNotNull { appInfo ->
+            val packageName = appInfo.packageName ?: return@mapNotNull null
+            if (packageName == selfPackageName) return@mapNotNull null
 
-            val label = try {
-                appInfo.loadLabel(packageManager).toString()
-            } catch (_: Exception) {
-                packageName
-            }
-
+            val label = runCatching { appInfo.loadLabel(pm).toString() }.getOrDefault(packageName)
             val system = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
+            val internet = runCatching {
+                pm.checkPermission(Manifest.permission.INTERNET, packageName) == PackageManager.PERMISSION_GRANTED
+            }.getOrDefault(false)
+            val lastUpdateTime = runCatching { appInfo.sourceDir?.let { File(it).lastModified() } ?: 0L }.getOrDefault(0L)
 
-            val internet = try {
-                packageManager?.checkPermission(
-                    Manifest.permission.INTERNET,
-                    packageName
-                ) == PackageManager.PERMISSION_GRANTED
-            } catch (_: Exception) {
-                false
-            }
-
-            val lastUpdateTime = try {
-                appInfo.sourceDir?.let { File(it).lastModified() } ?: 0L
-            } catch (_: Exception) {
-                0L
-            }
-
-            results.add(
-                Package(
-                    packageName = packageName,
-                    label = label,
-                    system = system,
-                    lastUpdateTime = lastUpdateTime,
-                    internet = internet
-                )
-            )
-        }
-
-        packages.addAll(results)
-        return@withContext packages
+            Package(packageName, label, system, lastUpdateTime, internet)
+        })
+        packages
     }
 
-    private suspend fun getPackagesToList(): List<Map<String, Any>> {
-        return getPackages().map {
-            hashMapOf(
-                "packageName" to it.packageName,
-                "label" to it.label,
-                "system" to it.system,
-                "internet" to it.internet,
-                "lastUpdateTime" to it.lastUpdateTime,
-            )
-        }
-    }
+    private suspend fun getPackagesToList(): List<Map<String, Any>> =
+        getPackages().map { mapOf("packageName" to it.packageName, "label" to it.label, "system" to it.system, "internet" to it.internet, "lastUpdateTime" to it.lastUpdateTime) }
 
-    private suspend fun getChinaPackageNamesList(): List<String> {
-        return getPackages().map { it.packageName }.filter { isChinaPackage(it) }
-    }
+    private suspend fun getChinaPackageNamesList(): List<String> =
+        getPackages().map { it.packageName }.filter { isChinaPackage(it) }
 
     private fun cleanIconCache() {
-        try {
-            val cacheFiles = iconCacheDir.listFiles()
-            if (cacheFiles != null && cacheFiles.size > 500) {
-                cacheFiles.sortedBy { it.lastModified() }
-                    .take(cacheFiles.size - 500)
-                    .forEach { it.delete() }
+        runCatching {
+            iconCacheDir.listFiles()?.takeIf { it.size > CACHE_MAX_FILES }?.let { files ->
+                files.sortedBy { it.lastModified() }.take(files.size - CACHE_MAX_FILES).forEach { it.delete() }
             }
-        } catch (_: Exception) {}
+        }
     }
 
     fun requestVpnPermission(callBack: () -> Unit) {
@@ -707,139 +368,65 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
     }
 
     fun requestNotificationsPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val permission = ContextCompat.checkSelfPermission(
-                BettboxApplication.getAppContext(),
-                Manifest.permission.POST_NOTIFICATIONS
-            )
-            if (permission != PackageManager.PERMISSION_GRANTED) {
-                if (isBlockNotification) return
-                if (activityRef?.get() == null) return
-                activityRef?.get()?.let {
-                    ActivityCompat.requestPermissions(
-                        it,
-                        arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                        NOTIFICATION_PERMISSION_REQUEST_CODE
-                    )
-                    return
-                }
-            }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        if (isBlockNotification || activityRef?.get() == null) return
+        if (ContextCompat.checkSelfPermission(BettboxApplication.getAppContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) return
+        activityRef?.get()?.let {
+            ActivityCompat.requestPermissions(it, arrayOf(Manifest.permission.POST_NOTIFICATIONS), NOTIFICATION_PERMISSION_REQUEST_CODE)
         }
     }
 
-    suspend fun getText(text: String): String? {
-        return withContext(Dispatchers.Default) {
-            channel.awaitResult<String>("getText", text)
-        }
+    suspend fun getText(text: String): String? = withContext(Dispatchers.Default) {
+        channel.awaitResult<String>("getText", text)
     }
 
-    private fun isChinaPackage(packageName: String): Boolean {
-        // Check cache
-        chinaPackageCache[packageName]?.let { return it }
-        
-        // Detect and cache
-        val result = isChinaPackageInternal(packageName)
-        chinaPackageCache[packageName] = result
-        return result
-    }
+    private fun isChinaPackage(packageName: String): Boolean =
+        chinaPackageCache.getOrPut(packageName) { isChinaPackageInternal(packageName) }
 
     private fun isChinaPackageInternal(packageName: String): Boolean {
-        val packageManager = BettboxApplication.getAppContext().packageManager ?: return false
-        
-        // 1. Fast exclusion
-        skipPrefixList.forEach {
-            if (packageName == it || packageName.startsWith("$it.")) return false
-        }
-        
-        // 2. Prefix matching
-        if (packageName.matches(chinaAppRegex)) {
-            return true
-        }
-        
-        // 3. Certificate country check
-        if (isChinaCertificate(packageName, packageManager)) {
-            return true
-        }
-        
-        // 4. Component name check
-        // Note: only scan installed apps
-        val packageManagerFlags = 
-            PackageManager.GET_ACTIVITIES or 
-            PackageManager.GET_SERVICES or 
-            PackageManager.GET_RECEIVERS or 
-            PackageManager.GET_PROVIDERS
-        
-        try {
+        val pm = BettboxApplication.getAppContext().packageManager ?: return false
+        if (SKIP_PREFIX_LIST.any { packageName == it || packageName.startsWith("$it.") }) return false
+        if (packageName.matches(CHINA_APP_REGEX)) return true
+        if (isChinaCertificate(packageName, pm)) return true
+
+        val flags = PackageManager.GET_ACTIVITIES or PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or PackageManager.GET_PROVIDERS
+        runCatching {
             val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                packageManager.getPackageInfo(
-                    packageName,
-                    PackageManager.PackageInfoFlags.of(packageManagerFlags.toLong())
-                )
+                pm.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(flags.toLong()))
             } else {
-                packageManager.getPackageInfo(
-                    packageName, packageManagerFlags
-                )
+                pm.getPackageInfo(packageName, flags)
             }
-            
-            // Check component class names
-            mutableListOf<ComponentInfo>().apply {
+            val components = mutableListOf<ComponentInfo>().apply {
                 packageInfo.services?.let { addAll(it) }
                 packageInfo.activities?.let { addAll(it) }
                 packageInfo.receivers?.let { addAll(it) }
                 packageInfo.providers?.let { addAll(it) }
-            }.forEach {
-                if (it.name.matches(chinaAppRegex)) return true
             }
-        } catch (_: Exception) {
-            return false
+            if (components.any { it.name.matches(CHINA_APP_REGEX) }) return true
         }
-        
         return false
     }
 
-    /**
-     * Check certificate country code (CN/86)
-     */
-    private fun isChinaCertificate(packageName: String, packageManager: PackageManager): Boolean {
-        try {
-            val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                packageManager.getPackageInfo(
-                    packageName,
-                    PackageManager.GET_SIGNING_CERTIFICATES
-                )
-            } else {
-                @Suppress("DEPRECATION")
-                packageManager.getPackageInfo(
-                    packageName,
-                    PackageManager.GET_SIGNATURES
-                )
-            }
-            
-            val signatures = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                packageInfo.signingInfo?.apkContentsSigners
-            } else {
-                @Suppress("DEPRECATION")
-                packageInfo.signatures
-            }
-            
-            signatures?.forEach { signature ->
-                val cert = java.security.cert.CertificateFactory.getInstance("X.509")
-                    .generateCertificate(java.io.ByteArrayInputStream(signature.toByteArray()))
-                
-                if (cert is java.security.cert.X509Certificate) {
-                    val subject = cert.subjectDN.name
-                    // Check C=CN or C=86
-                    if (subject.contains("C=CN", ignoreCase = true) || 
-                        subject.contains("C=86", ignoreCase = true)) {
-                        return true
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            // Ignore errors, continue detection
+    private fun isChinaCertificate(packageName: String, pm: PackageManager): Boolean = runCatching {
+        val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            pm.getPackageInfo(packageName, PackageManager.GET_SIGNING_CERTIFICATES)
+        } else {
+            @Suppress("DEPRECATION")
+            pm.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
         }
-        return false
-    }
+        val signatures = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            packageInfo.signingInfo?.apkContentsSigners
+        } else {
+            @Suppress("DEPRECATION")
+            packageInfo.signatures
+        }
+        signatures?.any { signature ->
+            val cert = CertificateFactory.getInstance("X.509")
+                .generateCertificate(java.io.ByteArrayInputStream(signature.toByteArray()))
+            cert is X509Certificate && (cert.subjectDN.name.contains("C=CN", ignoreCase = true) ||
+                cert.subjectDN.name.contains("C=86", ignoreCase = true))
+        } == true
+    }.getOrDefault(false)
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         activityRef = WeakReference(binding.activity)
@@ -847,189 +434,104 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
         binding.addRequestPermissionsResultListener(::onRequestPermissionsResultListener)
     }
 
-    override fun onDetachedFromActivityForConfigChanges() {
-        activityRef = null
-    }
-
-    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-        activityRef = WeakReference(binding.activity)
-    }
-
+    override fun onDetachedFromActivityForConfigChanges() { activityRef = null }
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) { activityRef = WeakReference(binding.activity) }
     override fun onDetachedFromActivity() {
         channel.invokeMethod("exit", null)
         activityRef = null
     }
 
     private fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-        if (requestCode == VPN_PERMISSION_REQUEST_CODE) {
-            if (resultCode == FlutterActivity.RESULT_OK) {
-                GlobalState.initServiceEngine()
-                vpnCallBack?.invoke()
-            }
+        if (requestCode == VPN_PERMISSION_REQUEST_CODE && resultCode == FlutterActivity.RESULT_OK) {
+            GlobalState.initServiceEngine()
+            vpnCallBack?.invoke()
         }
         return true
     }
 
-    private fun onRequestPermissionsResultListener(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ): Boolean {
-        if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) {
-            isBlockNotification = true
-        }
+    private fun onRequestPermissionsResultListener(requestCode: Int, permissions: Array<String>, grantResults: IntArray): Boolean {
+        if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) isBlockNotification = true
         return true
     }
 
-    private fun isIgnoringBatteryOptimizations(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+    private fun isIgnoringBatteryOptimizations(): Boolean =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val powerManager = BettboxApplication.getAppContext().getSystemService(android.content.Context.POWER_SERVICE) as? android.os.PowerManager
             powerManager?.isIgnoringBatteryOptimizations(BettboxApplication.getAppContext().packageName) ?: false
-        } else {
-            true // No permission needed below Android M
-        }
-    }
+        } else true
 
     private fun requestIgnoreBatteryOptimizations() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            try {
-                val intent = Intent().apply {
-                    action = android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-                    data = android.net.Uri.parse("package:${BettboxApplication.getAppContext().packageName}")
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                }
-                BettboxApplication.getAppContext().startActivity(intent)
-            } catch (e: Exception) {
-                // Fallback to battery optimization list
-                try {
-                    val intent = Intent().apply {
-                        action = android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
+        val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+            data = Uri.parse("package:${BettboxApplication.getAppContext().packageName}")
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        runCatching { BettboxApplication.getAppContext().startActivity(intent) }
+            .onFailure {
+                runCatching {
+                    BettboxApplication.getAppContext().startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS).apply {
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    }
-                    BettboxApplication.getAppContext().startActivity(intent)
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                    })
                 }
             }
-        }
     }
 
-    /**
-     * Switch launcher icon
-     * @param useLightIcon true: light, false: dark
-     */
     private fun setLauncherIcon(useLightIcon: Boolean) {
-        val packageManager = BettboxApplication.getAppContext().packageManager
+        val pm = BettboxApplication.getAppContext().packageManager
         val packageName = BettboxApplication.getAppContext().packageName
-        
-        // Default icon (dark)
-        val defaultComponent = android.content.ComponentName(
-            packageName,
-            "com.appshub.bettbox.MainActivity"
-        )
-        
-        // Light icon
-        val lightComponent = android.content.ComponentName(
-            packageName,
-            "com.appshub.bettbox.MainActivityLight"
-        )
-        
+        val defaultComponent = android.content.ComponentName(packageName, "com.appshub.bettbox.MainActivity")
+        val lightComponent = android.content.ComponentName(packageName, "com.appshub.bettbox.MainActivityLight")
+
         if (useLightIcon) {
-            // Enable light icon
-            packageManager.setComponentEnabledSetting(
-                lightComponent,
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                PackageManager.DONT_KILL_APP
-            )
-            // Disable default icon
-            packageManager.setComponentEnabledSetting(
-                defaultComponent,
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                PackageManager.DONT_KILL_APP
-            )
+            pm.setComponentEnabledSetting(lightComponent, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
+            pm.setComponentEnabledSetting(defaultComponent, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
         } else {
-            // Enable default icon
-            packageManager.setComponentEnabledSetting(
-                defaultComponent,
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                PackageManager.DONT_KILL_APP
-            )
-            // Disable light icon
-            packageManager.setComponentEnabledSetting(
-                lightComponent,
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                PackageManager.DONT_KILL_APP
-            )
+            pm.setComponentEnabledSetting(defaultComponent, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
+            pm.setComponentEnabledSetting(lightComponent, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
         }
-        
-        // Update notification icon if VPN running
         VpnPlugin.updateNotificationIcon()
     }
 
-    /**
-     * Check package list permission (Android 11+)
-     */
     private fun hasPackageListPermission(): Boolean {
-        // Not needed below Android 11
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-            return true
-        }
-
-        val packageManager = BettboxApplication.getAppContext().packageManager
-        val candidates = arrayOf(
-            "com.android.settings",
-            "com.android.systemui",
-        )
-
-        for (pkg in candidates) {
-            try {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return true
+        val pm = BettboxApplication.getAppContext().packageManager
+        return arrayOf("com.android.settings", "com.android.systemui").any { pkg ->
+            runCatching {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    packageManager.getPackageInfo(
-                        pkg,
-                        PackageManager.PackageInfoFlags.of(0)
-                    )
+                    pm.getPackageInfo(pkg, PackageManager.PackageInfoFlags.of(0))
                 } else {
-                    packageManager.getPackageInfo(pkg, 0)
+                    pm.getPackageInfo(pkg, 0)
                 }
-                return true
-            } catch (_: Exception) {
-            }
+                true
+            }.getOrDefault(false)
         }
-
-        return false
     }
 
-    /**
-     * Request package list permission (Open settings)
-     */
     private fun requestPackageListPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            openAppSettings()
-        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) openAppSettings()
     }
 
-    private fun hasCameraPermission(): Boolean {
-        val permission = ContextCompat.checkSelfPermission(
-            BettboxApplication.getAppContext(),
-            Manifest.permission.CAMERA
-        )
-        return permission == PackageManager.PERMISSION_GRANTED
-    }
+    private fun hasCameraPermission(): Boolean =
+        ContextCompat.checkSelfPermission(BettboxApplication.getAppContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
 
     private fun openAppSettings() {
-        try {
-            val intent = Intent().apply {
-                action = android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                data = android.net.Uri.parse("package:${BettboxApplication.getAppContext().packageName}")
-            }
-            val activity = activityRef?.get()
-            if (activity != null) {
-                activity.startActivity(intent)
-            } else {
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                BettboxApplication.getAppContext().startActivity(intent)
-            }
-        } catch (_: Exception) {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.parse("package:${BettboxApplication.getAppContext().packageName}")
         }
+        activityRef?.get()?.startActivity(intent) ?: run {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            BettboxApplication.getAppContext().startActivity(intent)
+        }
+    }
+
+    private fun getSelfLastUpdateTime(): Long {
+        val pm = BettboxApplication.getAppContext().packageManager
+        return runCatching {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                pm?.getPackageInfo(BettboxApplication.getAppContext().packageName, PackageManager.PackageInfoFlags.of(0))
+            } else {
+                pm?.getPackageInfo(BettboxApplication.getAppContext().packageName, 0)
+            }?.lastUpdateTime
+        }.getOrDefault(0L) ?: 0L
     }
 }

@@ -6,21 +6,15 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-val localPropertiesFile = rootProject.file("local.properties")
 val localProperties = Properties().apply {
-    if (localPropertiesFile.exists()) {
-        localPropertiesFile.inputStream().use { load(it) }
-    }
+    rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
 }
 
-val mStoreFile: File = file("keystore.jks")
+val mStoreFile = file("keystore.jks")
 val mStorePassword: String? = localProperties.getProperty("storePassword")
 val mKeyAlias: String? = localProperties.getProperty("keyAlias")
 val mKeyPassword: String? = localProperties.getProperty("keyPassword")
-val isRelease = mStoreFile.exists()
-        && mStorePassword != null
-        && mKeyAlias != null
-        && mKeyPassword != null
+val isRelease = mStoreFile.exists() && mStorePassword != null && mKeyAlias != null && mKeyPassword != null
 
 android {
     namespace = "com.appshub.bettbox"
@@ -60,21 +54,11 @@ android {
             isMinifyEnabled = false
             applicationIdSuffix = ".debug"
         }
-
         release {
             isMinifyEnabled = true
             isDebuggable = false
-
-            signingConfig = if (isRelease) {
-                signingConfigs.getByName("release")
-            } else {
-                signingConfigs.getByName("debug")
-            }
-
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            signingConfig = signingConfigs.getByName(if (isRelease) "release" else "debug")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 
@@ -100,9 +84,7 @@ dependencies {
 configurations.all {
     resolutionStrategy {
         eachDependency {
-            if (requested.group == "androidx.datastore") {
-                useVersion("1.1.2")
-            }
+            if (requested.group == "androidx.datastore") useVersion("1.1.2")
         }
     }
 }

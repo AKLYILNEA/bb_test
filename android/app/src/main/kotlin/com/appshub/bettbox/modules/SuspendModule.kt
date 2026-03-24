@@ -18,59 +18,39 @@ class SuspendModule(private val context: Context) {
     private var isInstalled = false
     private var isSuspended = false
 
-    private val powerManager: PowerManager? by lazy {
-        context.getSystemService<PowerManager>()
-    }
+    private val powerManager: PowerManager? by lazy { context.getSystemService<PowerManager>() }
 
-    private fun isScreenOn(): Boolean {
-        return powerManager?.isInteractive ?: true
-    }
+    private fun isScreenOn(): Boolean = powerManager?.isInteractive ?: true
 
     private val isDeviceIdleMode: Boolean
-        get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            powerManager?.isDeviceIdleMode ?: false
-        } else {
-            false
-        }
+        get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && powerManager?.isDeviceIdleMode == true
 
     private fun updateSuspendState() {
         val screenOn = isScreenOn()
         val deviceIdle = isDeviceIdleMode
-        
+
         Log.d(TAG, "updateSuspendState - screenOn: $screenOn, deviceIdle: $deviceIdle, isSuspended: $isSuspended")
-        
-        if (!screenOn && deviceIdle) {
-            if (!isSuspended) {
+
+        when {
+            !screenOn && deviceIdle && !isSuspended -> {
                 Log.i(TAG, "Entering Doze - Suspending core")
                 Core.suspended(true)
                 isSuspended = true
             }
-            return
-        }
-        
-        if (screenOn || !deviceIdle) {
-            if (isSuspended) {
+            (screenOn || !deviceIdle) && isSuspended -> {
                 Log.i(TAG, "Exiting Doze (screenOn: $screenOn, deviceIdle: $deviceIdle) - Resuming core")
                 Core.suspended(false)
                 isSuspended = false
             }
-            return
         }
     }
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
-                Intent.ACTION_SCREEN_ON -> {
-                    Log.d(TAG, "Received ACTION_SCREEN_ON")
-                    updateSuspendState()
-                }
-                Intent.ACTION_SCREEN_OFF -> {
-                    Log.d(TAG, "Received ACTION_SCREEN_OFF")
-                    updateSuspendState()
-                }
+                Intent.ACTION_SCREEN_ON, Intent.ACTION_SCREEN_OFF,
                 PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED -> {
-                    Log.d(TAG, "Received ACTION_DEVICE_IDLE_MODE_CHANGED")
+                    Log.d(TAG, "Received ${intent.action}")
                     updateSuspendState()
                 }
             }
@@ -81,7 +61,7 @@ class SuspendModule(private val context: Context) {
         if (isInstalled) return
         isInstalled = true
         isSuspended = false
-        
+
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_SCREEN_ON)
             addAction(Intent.ACTION_SCREEN_OFF)
@@ -90,8 +70,6 @@ class SuspendModule(private val context: Context) {
             }
         }
         context.registerReceiver(receiver, filter)
-        
-        // Initial state
         updateSuspendState()
         Log.i(TAG, "SuspendModule installed - SDK: ${Build.VERSION.SDK_INT}")
     }
@@ -99,18 +77,15 @@ class SuspendModule(private val context: Context) {
     fun uninstall() {
         if (!isInstalled) return
         isInstalled = false
-        
-        try {
+
+        runCatching {
             context.unregisterReceiver(receiver)
-            // Resume on uninstall if suspended
             if (isSuspended) {
                 Log.i(TAG, "Uninstalling - Resume from suspend")
                 Core.suspended(false)
                 isSuspended = false
             }
-        } catch (e: Exception) {
-            Log.w(TAG, "Failed to unregister receiver: ${e.message}")
-        }
+        }.onFailure { Log.w(TAG, "Failed to unregister receiver: ${it.message}") }
         Log.i(TAG, "SuspendModule uninstalled")
     }
 }

@@ -27,184 +27,108 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-suspend fun Drawable.getBase64(maxSizePx: Int = 128): String {
-    val drawable = this
-    return withContext(Dispatchers.IO) {
-        val defaultSize = 96
-        val intrinsicWidth =
-            if (drawable.intrinsicWidth > 0) drawable.intrinsicWidth else defaultSize
-        val intrinsicHeight =
-            if (drawable.intrinsicHeight > 0) drawable.intrinsicHeight else defaultSize
-        val maxDim = maxOf(intrinsicWidth, intrinsicHeight)
-        val targetSize = if (maxDim > maxSizePx) maxSizePx else maxDim
-        val scale = targetSize.toFloat() / maxDim.toFloat()
-        val targetWidth = (intrinsicWidth * scale).toInt().coerceAtLeast(1)
-        val targetHeight = (intrinsicHeight * scale).toInt().coerceAtLeast(1)
-        val bitmap = drawable.toBitmap(targetWidth, targetHeight, Bitmap.Config.ARGB_8888)
-        val byteArrayOutputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 80, byteArrayOutputStream)
-        Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP)
-    }
+suspend fun Drawable.getBase64(maxSizePx: Int = 128): String = withContext(Dispatchers.IO) {
+    val defaultSize = 96
+    val intrinsicWidth = if (intrinsicWidth > 0) intrinsicWidth else defaultSize
+    val intrinsicHeight = if (intrinsicHeight > 0) intrinsicHeight else defaultSize
+    val maxDim = maxOf(intrinsicWidth, intrinsicHeight)
+    val targetSize = minOf(maxDim, maxSizePx)
+    val scale = targetSize.toFloat() / maxDim.toFloat()
+    val targetWidth = (intrinsicWidth * scale).toInt().coerceAtLeast(1)
+    val targetHeight = (intrinsicHeight * scale).toInt().coerceAtLeast(1)
+    val bitmap = toBitmap(targetWidth, targetHeight, Bitmap.Config.ARGB_8888)
+    val byteArrayOutputStream = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.PNG, 80, byteArrayOutputStream)
+    Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP)
 }
 
-fun Metadata.getProtocol(): Int? {
-    if (network.startsWith("tcp")) return IPPROTO_TCP
-    if (network.startsWith("udp")) return IPPROTO_UDP
-    return null
+fun Metadata.getProtocol(): Int? = when {
+    network.startsWith("tcp") -> IPPROTO_TCP
+    network.startsWith("udp") -> IPPROTO_UDP
+    else -> null
 }
 
-fun VpnOptions.getIpv4RouteAddress(): List<CIDR> {
-    return routeAddress.filter {
-        it.isIpv4()
-    }.map {
-        it.toCIDR()
-    }
-}
+fun VpnOptions.getIpv4RouteAddress(): List<CIDR> = routeAddress.filter { it.isIpv4() }.map { it.toCIDR() }
 
-fun VpnOptions.getIpv6RouteAddress(): List<CIDR> {
-    return routeAddress.filter {
-        it.isIpv6()
-    }.map {
-        it.toCIDR()
-    }
-}
+fun VpnOptions.getIpv6RouteAddress(): List<CIDR> = routeAddress.filter { it.isIpv6() }.map { it.toCIDR() }
 
 fun String.isIpv4(): Boolean {
     val parts = split("/")
-    if (parts.size != 2) {
-        throw IllegalArgumentException("Invalid CIDR format")
-    }
-    val address = InetAddress.getByName(parts[0])
-    return address.address.size == 4
+    require(parts.size == 2) { "Invalid CIDR format" }
+    return InetAddress.getByName(parts[0]).address.size == 4
 }
 
 fun String.isIpv6(): Boolean {
     val parts = split("/")
-    if (parts.size != 2) {
-        throw IllegalArgumentException("Invalid CIDR format")
-    }
-    val address = InetAddress.getByName(parts[0])
-    return address.address.size == 16
+    require(parts.size == 2) { "Invalid CIDR format" }
+    return InetAddress.getByName(parts[0]).address.size == 16
 }
 
 fun String.toCIDR(): CIDR {
     val parts = split("/")
-    if (parts.size != 2) {
-        throw IllegalArgumentException("Invalid CIDR format")
-    }
+    require(parts.size == 2) { "Invalid CIDR format" }
     val ipAddress = parts[0]
-    val prefixLength = parts[1].toIntOrNull()
-        ?: throw IllegalArgumentException("Invalid prefix length")
-
+    val prefixLength = parts[1].toIntOrNull() ?: throw IllegalArgumentException("Invalid prefix length")
     val address = InetAddress.getByName(ipAddress)
-
     val maxPrefix = if (address.address.size == 4) 32 else 128
-    if (prefixLength < 0 || prefixLength > maxPrefix) {
-        throw IllegalArgumentException("Invalid prefix length for IP version")
-    }
-
+    require(prefixLength in 0..maxPrefix) { "Invalid prefix length for IP version" }
     return CIDR(address, prefixLength)
 }
 
-fun ConnectivityManager.resolveDns(network: Network?): List<String> {
-    val properties = getLinkProperties(network) ?: return listOf()
-    return properties.dnsServers.map { it.asSocketAddressText(53) }
+fun ConnectivityManager.resolveDns(network: Network?): List<String> =
+    getLinkProperties(network)?.dnsServers?.map { it.asSocketAddressText(53) } ?: emptyList()
+
+fun InetAddress.asSocketAddressText(port: Int): String = when (this) {
+    is Inet6Address -> "[${numericToTextFormat(this)}]:$port"
+    is Inet4Address -> "$hostAddress:$port"
+    else -> throw IllegalArgumentException("Unsupported Inet type ${javaClass}")
 }
 
-fun InetAddress.asSocketAddressText(port: Int): String {
-    return when (this) {
-        is Inet6Address ->
-            "[${numericToTextFormat(this)}]:$port"
+fun Context.wrapAction(action: String): String = "${packageName}.action.$action"
 
-        is Inet4Address ->
-            "${this.hostAddress}:$port"
-
-        else -> throw IllegalArgumentException("Unsupported Inet type ${this.javaClass}")
+fun Context.getActionIntent(action: String): Intent =
+    Intent(this, TempActivity::class.java).apply {
+        this.action = wrapAction(action)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
     }
-}
-
-fun Context.wrapAction(action: String): String {
-    return "${this.packageName}.action.$action"
-}
-
-fun Context.getActionIntent(action: String): Intent {
-    val actionIntent = Intent(this, TempActivity::class.java)
-    actionIntent.action = wrapAction(action)
-    return actionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
-}
 
 fun Context.getActionPendingIntent(action: String): PendingIntent {
-    return if (Build.VERSION.SDK_INT >= 31) {
-        PendingIntent.getActivity(
-            this,
-            0,
-            getActionIntent(action),
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
+    val flags = if (Build.VERSION.SDK_INT >= 31) {
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
     } else {
-        PendingIntent.getActivity(
-            this,
-            0,
-            getActionIntent(action),
-            PendingIntent.FLAG_UPDATE_CURRENT
-        )
+        PendingIntent.FLAG_UPDATE_CURRENT
     }
+    return PendingIntent.getActivity(this, 0, getActionIntent(action), flags)
 }
 
-private fun numericToTextFormat(address: Inet6Address): String {
+private fun numericToTextFormat(address: Inet6Address): String = buildString(39) {
     val src = address.address
-    val sb = StringBuilder(39)
     for (i in 0 until 8) {
-        sb.append(
-            Integer.toHexString(
-                src[i shl 1].toInt() shl 8 and 0xff00
-                        or (src[(i shl 1) + 1].toInt() and 0xff)
-            )
-        )
-        if (i < 7) {
-            sb.append(":")
-        }
+        append(Integer.toHexString(src[i shl 1].toInt() shl 8 and 0xff00 or (src[(i shl 1) + 1].toInt() and 0xff)))
+        if (i < 7) append(":")
     }
     if (address.scopeId > 0) {
-        sb.append("%")
-        sb.append(address.scopeId)
+        append("%")
+        append(address.scopeId)
     }
-    return sb.toString()
 }
 
-suspend fun <T> MethodChannel.awaitResult(
-    method: String,
-    arguments: Any? = null
-): T? = withContext(Dispatchers.Main) { // Switch to main thread
-    suspendCoroutine { continuation ->
-        invokeMethod(method, arguments, object : MethodChannel.Result {
-            override fun success(result: Any?) {
+suspend fun <T> MethodChannel.awaitResult(method: String, arguments: Any? = null): T? =
+    withContext(Dispatchers.Main) {
+        suspendCoroutine { continuation ->
+            invokeMethod(method, arguments, object : MethodChannel.Result {
                 @Suppress("UNCHECKED_CAST")
-                continuation.resume(result as T)
-            }
-
-            override fun error(code: String, message: String?, details: Any?) {
-                continuation.resume(null)
-            }
-
-            override fun notImplemented() {
-                continuation.resume(null)
-            }
-        })
+                override fun success(result: Any?) = continuation.resume(result as T)
+                override fun error(code: String, message: String?, details: Any?) = continuation.resume(null)
+                override fun notImplemented() = continuation.resume(null)
+            })
+        }
     }
-}
 
 fun ReentrantLock.safeLock() {
-    if (this.isLocked) {
-        return
-    }
-    this.lock()
+    if (!isLocked) lock()
 }
 
 fun ReentrantLock.safeUnlock() {
-    if (!this.isLocked) {
-        return
-    }
-
-    this.unlock()
+    if (isLocked) unlock()
 }

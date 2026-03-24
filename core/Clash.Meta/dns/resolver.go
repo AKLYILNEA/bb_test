@@ -200,8 +200,6 @@ func (r *Resolver) exchangeWithoutCache(ctx context.Context, m *D.Msg) (msg *D.M
 				return
 			}
 
-			msg := result
-
 			if cache {
 				putMsgToCache(r.cache, q, result)
 			}

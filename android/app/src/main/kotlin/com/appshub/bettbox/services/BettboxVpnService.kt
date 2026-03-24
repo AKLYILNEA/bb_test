@@ -1,7 +1,6 @@
 package com.appshub.bettbox.services
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.net.ProxyInfo
 import android.net.VpnService
@@ -9,19 +8,16 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.os.Parcel
-import android.os.RemoteException
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.appshub.bettbox.GlobalState
-import com.appshub.bettbox.plugins.VpnPlugin
+import com.appshub.bettbox.core.Core
 import com.appshub.bettbox.extensions.getIpv4RouteAddress
 import com.appshub.bettbox.extensions.getIpv6RouteAddress
 import com.appshub.bettbox.extensions.toCIDR
 import com.appshub.bettbox.models.AccessControlMode
 import com.appshub.bettbox.models.VpnOptions
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.appshub.bettbox.plugins.VpnPlugin
 
 class BettboxVpnService : VpnService(), BaseServiceInterface {
     companion object {
@@ -36,139 +32,75 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
         GlobalState.initServiceEngine()
     }
 
-    override suspend fun start(options: VpnOptions): Int {
-        return with(Builder()) {
-            if (options.ipv4Address.isNotEmpty()) {
-                val cidr = options.ipv4Address.toCIDR()
-                addAddress(cidr.address, cidr.prefixLength)
-                Log.d(
-                    "addAddress",
-                    "address: ${cidr.address} prefixLength:${cidr.prefixLength}"
-                )
-                val routeAddress = options.getIpv4RouteAddress()
-                if (routeAddress.isNotEmpty()) {
-                    try {
-                        routeAddress.forEach { i ->
-                            Log.d(
-                                "addRoute4",
-                                "address: ${i.address} prefixLength:${i.prefixLength}"
-                            )
-                            addRoute(i.address, i.prefixLength)
-                        }
-                    } catch (_: Exception) {
-                        addRoute("0.0.0.0", 0)
-                    }
-                } else {
-                    addRoute("0.0.0.0", 0)
-                }
+    override suspend fun start(options: VpnOptions): Int = with(Builder()) {
+        options.ipv4Address.takeIf { it.isNotEmpty() }?.let { ipv4 ->
+            val cidr = ipv4.toCIDR()
+            addAddress(cidr.address, cidr.prefixLength)
+            Log.d("addAddress", "address: ${cidr.address} prefixLength:${cidr.prefixLength}")
+            val routes = options.getIpv4RouteAddress()
+            if (routes.isNotEmpty()) {
+                runCatching { routes.forEach { addRoute(it.address, it.prefixLength) } }
+                    .onFailure { addRoute("0.0.0.0", 0) }
             } else {
                 addRoute("0.0.0.0", 0)
             }
-            try {
-                if (options.ipv6Address.isNotEmpty()) {
-                    val cidr = options.ipv6Address.toCIDR()
-                    Log.d(
-                        "addAddress6",
-                        "address: ${cidr.address} prefixLength:${cidr.prefixLength}"
-                    )
-                    addAddress(cidr.address, cidr.prefixLength)
-                    val routeAddress = options.getIpv6RouteAddress()
-                    if (routeAddress.isNotEmpty()) {
-                        try {
-                            routeAddress.forEach { i ->
-                                Log.d(
-                                    "addRoute6",
-                                    "address: ${i.address} prefixLength:${i.prefixLength}"
-                                )
-                                addRoute(i.address, i.prefixLength)
-                            }
-                        } catch (_: Exception) {
-                            addRoute("::", 0)
-                        }
-                    } else {
-                        addRoute("::", 0)
-                    }
-                }
-            }catch (_:Exception){
-                Log.d(
-                    "addAddress6",
-                    "IPv6 is not supported."
-                )
-            }
-            if (options.dnsServerAddress.isNotBlank()) {
-                try {
-                    addDnsServer(options.dnsServerAddress)
-                } catch (e: Exception) {
-                    Log.e("BettboxVpnService", "Invalid DNS: ${options.dnsServerAddress}")
-                }
-            }
-            val validMtu = if (options.mtu in 1280..65535) options.mtu else 1480
-            setMtu(validMtu)
-            options.accessControl.let { accessControl ->
-                if (accessControl.enable) {
-                    when (accessControl.mode) {
-                        AccessControlMode.acceptSelected -> {
-                            (accessControl.acceptList + packageName).forEach {
-                                addAllowedApplication(it)
-                            }
-                        }
+        } ?: addRoute("0.0.0.0", 0)
 
-                        AccessControlMode.rejectSelected -> {
-                            (accessControl.rejectList - packageName).forEach {
-                                addDisallowedApplication(it)
-                            }
-                        }
-                    }
+        if (options.ipv6Address.isNotEmpty()) {
+            runCatching {
+                val cidr = options.ipv6Address.toCIDR()
+                Log.d("addAddress6", "address: ${cidr.address} prefixLength:${cidr.prefixLength}")
+                addAddress(cidr.address, cidr.prefixLength)
+                val routes = options.getIpv6RouteAddress()
+                if (routes.isNotEmpty()) {
+                    runCatching { routes.forEach { addRoute(it.address, it.prefixLength) } }
+                        .onFailure { addRoute("::", 0) }
+                } else {
+                    addRoute("::", 0)
                 }
-            }
-            setSession("Bettbox")
-            setBlocking(false)
-            if (Build.VERSION.SDK_INT >= 29) {
-                setMetered(false)
-            }
-            if (options.allowBypass) {
-                allowBypass()
-            }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && options.systemProxy) {
-                setHttpProxy(
-                    ProxyInfo.buildDirectProxy(
-                        "127.0.0.1",
-                        options.port,
-                        options.bypassDomain
-                    )
-                )
-            }
-            val fd = establish()?.detachFd()
-            if (fd == null) {
-                Log.e("BettboxVpnService", "Establish VPN rejected by system")
-                return -1
-            }
-            return fd
+            }.onFailure { Log.d("addAddress6", "IPv6 is not supported.") }
         }
+
+        if (options.dnsServerAddress.isNotBlank()) {
+            runCatching { addDnsServer(options.dnsServerAddress) }
+                .onFailure { Log.e(TAG, "Invalid DNS: ${options.dnsServerAddress}") }
+        }
+
+        setMtu(options.mtu.coerceIn(1280..65535).takeIf { it > 0 } ?: 1480)
+
+        options.accessControl.takeIf { it.enable }?.let { ac ->
+            when (ac.mode) {
+                AccessControlMode.acceptSelected -> (ac.acceptList + packageName).forEach { addAllowedApplication(it) }
+                AccessControlMode.rejectSelected -> (ac.rejectList - packageName).forEach { addDisallowedApplication(it) }
+            }
+        }
+
+        setSession("Bettbox")
+        setBlocking(false)
+        if (Build.VERSION.SDK_INT >= 29) setMetered(false)
+        if (options.allowBypass) allowBypass()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && options.systemProxy) {
+            setHttpProxy(ProxyInfo.buildDirectProxy("127.0.0.1", options.port, options.bypassDomain))
+        }
+
+        establish()?.detachFd()?.also { return it }
+        Log.e(TAG, "Establish VPN rejected by system")
+        -1
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        return START_NOT_STICKY
-    }
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int) = START_NOT_STICKY
 
     override fun stop() {
         if (isStopped) return
         isStopped = true
-        
-        runCatching { 
-            com.appshub.bettbox.core.Core.stopTun() 
-        }.onFailure {
-            Log.e(TAG, "Failed to stop TUN: ${it.message}")
-        }
-        
+
+        runCatching { Core.stopTun() }.onFailure { Log.e(TAG, "Failed to stop TUN: ${it.message}") }
         runCatching {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 stopForeground(STOP_FOREGROUND_REMOVE)
             }
-        }.onFailure {
-            Log.e(TAG, "Failed to stop foreground: ${it.message}")
-        }
-        
+        }.onFailure { Log.e(TAG, "Failed to stop foreground: ${it.message}") }
         stopSelf()
     }
 
@@ -188,7 +120,7 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
     @SuppressLint("ForegroundServiceType")
     override suspend fun startForeground(title: String, content: String) {
         ensureNotificationChannel()
-        val safeTitle = if (title.isBlank()) "Bettbox" else title
+        val safeTitle = title.ifBlank { "Bettbox" }
         val safeContent = content.trim()
         val builder = notificationBuilder()
         val notification = if (safeContent.isBlank()) {
@@ -208,8 +140,6 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
             }
             builder.setContentTitle(spannable).setContentText(null).build()
         }
-
-
         this.startForeground(notification)
     }
 
@@ -223,23 +153,15 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
     inner class LocalBinder : Binder() {
         fun getService(): BettboxVpnService = this@BettboxVpnService
 
-        override fun onTransact(code: Int, data: Parcel, reply: Parcel?, flags: Int): Boolean {
-            try {
-                val isSuccess = super.onTransact(code, data, reply, flags)
-                if (!isSuccess) {
-                    GlobalState.getCurrentTilePlugin()?.handleStop()
+        override fun onTransact(code: Int, data: Parcel, reply: Parcel?, flags: Int): Boolean =
+            runCatching {
+                super.onTransact(code, data, reply, flags).also { success ->
+                    if (!success) GlobalState.getCurrentTilePlugin()?.handleStop()
                 }
-                return isSuccess
-            } catch (e: Exception) {
-                Log.e(TAG, "onTransact failed: ${e.message}")
-                return false
-            }
-        }
+            }.getOrElse { Log.e(TAG, "onTransact failed: ${it.message}"); false }
     }
 
-    override fun onBind(intent: Intent?): IBinder {
-        return binder
-    }
+    override fun onBind(intent: Intent?): IBinder = binder
 
     override fun onUnbind(intent: Intent?): Boolean {
         super.onUnbind(intent)
@@ -247,9 +169,7 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
     }
 
     override fun onRevoke() {
-        runCatching {
-            VpnPlugin.handleStop()
-        }
+        runCatching { VpnPlugin.handleStop() }
         super.onRevoke()
     }
 

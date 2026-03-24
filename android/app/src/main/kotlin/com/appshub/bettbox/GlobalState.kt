@@ -1,5 +1,6 @@
 package com.appshub.bettbox
 
+import android.os.Looper
 import android.os.SystemClock
 import androidx.lifecycle.MutableLiveData
 import com.appshub.bettbox.plugins.AppPlugin
@@ -13,6 +14,7 @@ import io.flutter.plugins.GeneratedPluginRegistrant
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -25,16 +27,15 @@ enum class RunState {
     STOP
 }
 
-
 object GlobalState {
     val runLock = ReentrantLock()
 
     const val NOTIFICATION_CHANNEL = "Bettbox"
-
     const val NOTIFICATION_ID = 1
 
     private const val TOGGLE_DEBOUNCE_MS = 1000L
-    private const val PENDING_TIMEOUT_MS = 5000L // 5秒 PENDING
+    private const val PENDING_TIMEOUT_MS = 5000L
+    private const val STOP_LOCK_TIMEOUT_MS = 5000L
 
     @Volatile
     private var lastToggleAt = 0L
@@ -43,29 +44,37 @@ object GlobalState {
     var currentRunState: RunState = RunState.STOP
         private set
 
-    val runState: MutableLiveData<RunState> = MutableLiveData<RunState>(RunState.STOP)
+    val runState = MutableLiveData(RunState.STOP)
 
-    // PENDING 
     private var pendingTimeoutJob: Job? = null
+
+    var flutterEngine: FlutterEngine? = null
+    private var serviceEngine: FlutterEngine? = null
+
+    @Volatile
+    var isSmartStopped = false
+
+    @Volatile
+    var isStopping = false
 
     fun updateRunState(newState: RunState) {
         if (newState != RunState.PENDING) {
             pendingTimeoutJob?.cancel()
             pendingTimeoutJob = null
         }
-
         currentRunState = newState
-        try {
-            if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
-                runState.value = newState
-            } else {
-                runState.postValue(newState)
-            }
-        } catch (e: Exception) {
-            runState.postValue(newState)
-        }
+        runState.postValueSafe(newState)
     }
 
+    private fun MutableLiveData<RunState>.postValueSafe(value: RunState) = try {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            this.value = value
+        } else {
+            postValue(value)
+        }
+    } catch (_: Exception) {
+        postValue(value)
+    }
 
     private fun startPendingTimeout() {
         pendingTimeoutJob?.cancel()
@@ -78,22 +87,15 @@ object GlobalState {
         }
     }
 
-    var flutterEngine: FlutterEngine? = null
-    private var serviceEngine: FlutterEngine? = null
-    
-    // Smart Auto Stop state - when true, VPN was stopped by smart auto stop feature
-    @Volatile
-    var isSmartStopped: Boolean = false
-
-    @Volatile var isStopping: Boolean = false
-
     fun updateIsStopping(value: Boolean) {
         isStopping = value
         runCatching {
             val ts = if (value) System.currentTimeMillis() else 0L
             BettboxApplication.getAppContext()
                 .getSharedPreferences("vpn_state", android.content.Context.MODE_PRIVATE)
-                .edit().putLong("stop_lock_ts", ts).apply()
+                .edit()
+                .putLong("stop_lock_ts", ts)
+                .apply()
         }
     }
 
@@ -106,7 +108,7 @@ object GlobalState {
             if (ts == 0L) return false
 
             val now = System.currentTimeMillis()
-            if (now - ts > 5000) {
+            if (now - ts > STOP_LOCK_TIMEOUT_MS) {
                 sp.edit().remove("stop_lock_ts").apply()
                 false
             } else {
@@ -116,87 +118,67 @@ object GlobalState {
     }
 
     fun getCurrentAppPlugin(): AppPlugin? {
-        val currentEngine = if (flutterEngine != null) flutterEngine else serviceEngine
-        return currentEngine?.plugins?.get(AppPlugin::class.java) as AppPlugin?
+        val currentEngine = flutterEngine ?: serviceEngine
+        return currentEngine?.plugins?.get(AppPlugin::class.java) as? AppPlugin
     }
 
     fun syncStatus() {
         val status = VpnPlugin.getStatus()
-        val newState = if (status) RunState.START else RunState.STOP
-        updateRunState(newState)
+        updateRunState(if (status) RunState.START else RunState.STOP)
     }
 
-    suspend fun getText(text: String): String {
-        return getCurrentAppPlugin()?.getText(text) ?: ""
-    }
+    suspend fun getText(text: String): String = getCurrentAppPlugin()?.getText(text) ?: ""
 
     fun getCurrentTilePlugin(): TilePlugin? {
-        val currentEngine = if (flutterEngine != null) flutterEngine else serviceEngine
-        return currentEngine?.plugins?.get(TilePlugin::class.java) as TilePlugin?
+        val currentEngine = flutterEngine ?: serviceEngine
+        return currentEngine?.plugins?.get(TilePlugin::class.java) as? TilePlugin
     }
 
     fun getCurrentVPNPlugin(): VpnPlugin? {
-        return serviceEngine?.plugins?.get(VpnPlugin::class.java) as VpnPlugin?
+        return serviceEngine?.plugins?.get(VpnPlugin::class.java) as? VpnPlugin
     }
 
     fun handleToggle() {
         if (!acquireToggleSlot()) return
-        val starting = handleStart(skipDebounce = true)
-        if (!starting) {
+        if (!handleStart(skipDebounce = true)) {
             handleStop(skipDebounce = true)
         }
     }
 
     fun handleStart(skipDebounce: Boolean = false): Boolean {
         if (!skipDebounce && !acquireToggleSlot()) return false
-        if (currentRunState == RunState.STOP) {
-            updateRunState(RunState.PENDING)
-            startPendingTimeout() 
-            runLock.lock()
-            try {
-                val tilePlugin = getCurrentTilePlugin()
-                if (tilePlugin != null) {
-                    tilePlugin.handleStart()
-                } else {
-                    initServiceEngine()
-                }
-            } finally {
-                runLock.unlock()
-            }
-            return true
+        if (currentRunState != RunState.STOP) return false
+
+        updateRunState(RunState.PENDING)
+        startPendingTimeout()
+        runLock.withLock {
+            getCurrentTilePlugin()?.handleStart() ?: initServiceEngine()
         }
-        return false
+        return true
     }
 
     fun handleStop(skipDebounce: Boolean = false) {
         if (!skipDebounce && !acquireToggleSlot()) return
-        if (currentRunState == RunState.START) {
-            updateRunState(RunState.PENDING)
-            startPendingTimeout() 
-            runLock.lock()
-            try {
-                getCurrentTilePlugin()?.handleStop()
-            } finally {
-                runLock.unlock()
-            }
+        if (currentRunState != RunState.START) return
+
+        updateRunState(RunState.PENDING)
+        startPendingTimeout()
+        runLock.withLock {
+            getCurrentTilePlugin()?.handleStop()
         }
     }
 
     private fun acquireToggleSlot(): Boolean {
         val now = SystemClock.elapsedRealtime()
         synchronized(this) {
-            if (now - lastToggleAt < TOGGLE_DEBOUNCE_MS) {
-                return false
-            }
+            if (now - lastToggleAt < TOGGLE_DEBOUNCE_MS) return false
             lastToggleAt = now
             return true
         }
     }
 
     fun handleTryDestroy() {
-        if (flutterEngine == null) {
-            destroyServiceEngine()
-        }
+        if (flutterEngine == null) destroyServiceEngine()
     }
 
     fun destroyServiceEngine() {
@@ -210,31 +192,26 @@ object GlobalState {
         if (serviceEngine != null) return
         destroyServiceEngine()
         runLock.withLock {
-            serviceEngine = FlutterEngine(BettboxApplication.getAppContext())
-            serviceEngine?.plugins?.add(VpnPlugin)
-            serviceEngine?.plugins?.add(AppPlugin())
-            serviceEngine?.plugins?.add(TilePlugin())
-            serviceEngine?.plugins?.add(ServicePlugin())
-            serviceEngine?.let { GeneratedPluginRegistrant.registerWith(it) }
+            serviceEngine = FlutterEngine(BettboxApplication.getAppContext()).apply {
+                plugins.add(VpnPlugin)
+                plugins.add(AppPlugin())
+                plugins.add(TilePlugin())
+                plugins.add(ServicePlugin())
+                GeneratedPluginRegistrant.registerWith(this)
+            }
             val vpnService = DartExecutor.DartEntrypoint(
                 FlutterInjector.instance().flutterLoader().findAppBundlePath(),
                 "_service"
             )
             val defaultArgs = if (flutterEngine == null && !isCurrentlyStopping()) listOf("quick") else null
             val args = flags ?: defaultArgs
-            serviceEngine?.dartExecutor?.executeDartEntrypoint(
-                vpnService,
-                args
-            )
+            serviceEngine?.dartExecutor?.executeDartEntrypoint(vpnService, args)
         }
     }
 
-    fun isServiceEngineRunning(): Boolean {
-        return serviceEngine != null
-    }
+    fun isServiceEngineRunning(): Boolean = serviceEngine != null
 
     fun reconnectIpc() {
-        val tilePlugin = serviceEngine?.plugins?.get(TilePlugin::class.java) as TilePlugin?
-        tilePlugin?.handleReconnectIpc()
+        (serviceEngine?.plugins?.get(TilePlugin::class.java) as? TilePlugin)?.handleReconnectIpc()
     }
 }

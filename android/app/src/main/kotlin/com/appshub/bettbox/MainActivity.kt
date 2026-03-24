@@ -23,18 +23,15 @@ class MainActivity : FlutterActivity() {
 
     override fun provideFlutterEngine(context: Context): FlutterEngine {
         val engineCache = FlutterEngineCache.getInstance()
-        val cachedEngine = engineCache.get(MAIN_ENGINE_ID)
-        if (cachedEngine != null) {
-            GlobalState.flutterEngine = cachedEngine
-            return cachedEngine
-        }
+        return engineCache.get(MAIN_ENGINE_ID) ?: createAndCacheEngine(context, engineCache)
+    }
 
-        val engine = FlutterEngine(context.applicationContext)
-        GeneratedPluginRegistrant.registerWith(engine)
-        engine.dartExecutor.executeDartEntrypoint(
-            DartExecutor.DartEntrypoint.createDefault()
-        )
-        engineCache.put(MAIN_ENGINE_ID, engine)
+    private fun createAndCacheEngine(context: Context, cache: FlutterEngineCache): FlutterEngine {
+        val engine = FlutterEngine(context.applicationContext).apply {
+            GeneratedPluginRegistrant.registerWith(this)
+            dartExecutor.executeDartEntrypoint(DartExecutor.DartEntrypoint.createDefault())
+        }
+        cache.put(MAIN_ENGINE_ID, engine)
         GlobalState.flutterEngine = engine
         return engine
     }
@@ -42,17 +39,15 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
-        if (flutterEngine.plugins.get(VpnPlugin::class.java) == null) {
-            flutterEngine.plugins.add(VpnPlugin)
-        }
-        if (flutterEngine.plugins.get(AppPlugin::class.java) == null) {
-            flutterEngine.plugins.add(AppPlugin())
-        }
-        if (flutterEngine.plugins.get(ServicePlugin::class.java) == null) {
-            flutterEngine.plugins.add(ServicePlugin())
-        }
-        if (flutterEngine.plugins.get(TilePlugin::class.java) == null) {
-            flutterEngine.plugins.add(TilePlugin())
+        listOf(
+            VpnPlugin to VpnPlugin::class.java,
+            AppPlugin() to AppPlugin::class.java,
+            ServicePlugin() to ServicePlugin::class.java,
+            TilePlugin() to TilePlugin::class.java,
+        ).forEach { (plugin, clazz) ->
+            if (flutterEngine.plugins.get(clazz) == null) {
+                flutterEngine.plugins.add(plugin)
+            }
         }
 
         GlobalState.flutterEngine = flutterEngine
