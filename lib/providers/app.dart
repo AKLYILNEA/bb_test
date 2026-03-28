@@ -42,6 +42,31 @@ class Logs extends _$Logs with AutoDisposeNotifierMixin {
   }
 }
 
+// Search and filter providers for logs
+final logsSearchProvider = StateProvider<String>((ref) => '');
+final logsKeywordsProvider = StateProvider<List<String>>((ref) => []);
+
+final filteredLogsProvider = Provider<List<Log>>((ref) {
+  final logs = ref.watch(logsProvider.select((s) => s.list));
+  final query = ref.watch(logsSearchProvider).toLowerCase();
+  final keywords = ref.watch(logsKeywordsProvider);
+
+  return logs.where((item) {
+    if (query.isNotEmpty) {
+      final matchesQuery = item.payload.toLowerCase().contains(query) ||
+          item.logLevel.name.toLowerCase().contains(query) ||
+          item.dateTime.toLowerCase().contains(query);
+      if (!matchesQuery) return false;
+    }
+    if (keywords.isNotEmpty) {
+      final itemStr = '${item.payload} ${item.logLevel.name} ${item.dateTime}'.toLowerCase();
+      final matchesKeywords = keywords.every((keyword) => itemStr.contains(keyword.toLowerCase()));
+      if (!matchesKeywords) return false;
+    }
+    return true;
+  }).toList();
+});
+
 @riverpod
 class Requests extends _$Requests with AutoDisposeNotifierMixin {
   @override
@@ -62,6 +87,39 @@ class Requests extends _$Requests with AutoDisposeNotifierMixin {
     state = FixedList(500);
   }
 }
+
+// Search and filter providers for requests
+final requestsSearchProvider = StateProvider<String>((ref) => '');
+final requestsKeywordsProvider = StateProvider<List<String>>((ref) => []);
+
+final filteredRequestsProvider = Provider<List<TrackerInfo>>((ref) {
+  final requests = ref.watch(requestsProvider.select((s) => s.list));
+  final query = ref.watch(requestsSearchProvider).toLowerCase().trim();
+  final keywords = ref.watch(requestsKeywordsProvider);
+
+  return requests.where((item) {
+    if (query.isNotEmpty) {
+      final networkText = item.metadata.network.toLowerCase();
+      final hostText = item.metadata.host.toLowerCase();
+      final destinationIPText = item.metadata.destinationIP.toLowerCase();
+      final processText = item.metadata.process.toLowerCase();
+      final chainsText = item.chains.join('').toLowerCase();
+      final matchesQuery = networkText.contains(query) ||
+          hostText.contains(query) ||
+          destinationIPText.contains(query) ||
+          processText.contains(query) ||
+          chainsText.contains(query);
+      if (!matchesQuery) return false;
+    }
+    if (keywords.isNotEmpty) {
+      final chains = item.chains;
+      final process = item.metadata.process;
+      final matchesKeywords = {...chains, process}.containsAll(keywords);
+      if (!matchesKeywords) return false;
+    }
+    return true;
+  }).toList();
+});
 
 @riverpod
 class Providers extends _$Providers with AutoDisposeNotifierMixin {
@@ -383,3 +441,37 @@ class IsSmartStopped extends _$IsSmartStopped {
     state = value;
   }
 }
+
+// Connections providers
+final connectionsProvider = StateProvider<List<TrackerInfo>>((ref) => []);
+final connectionsSearchProvider = StateProvider<String>((ref) => '');
+final connectionsKeywordsProvider = StateProvider<List<String>>((ref) => []);
+
+final filteredConnectionsProvider = Provider<List<TrackerInfo>>((ref) {
+  final connections = ref.watch(connectionsProvider);
+  final query = ref.watch(connectionsSearchProvider).toLowerCase().trim();
+  final keywords = ref.watch(connectionsKeywordsProvider);
+
+  return connections.where((item) {
+    if (query.isNotEmpty) {
+      final networkText = item.metadata.network.toLowerCase();
+      final hostText = item.metadata.host.toLowerCase();
+      final destinationIPText = item.metadata.destinationIP.toLowerCase();
+      final processText = item.metadata.process.toLowerCase();
+      final chainsText = item.chains.join('').toLowerCase();
+      final matchesQuery = networkText.contains(query) ||
+          hostText.contains(query) ||
+          destinationIPText.contains(query) ||
+          processText.contains(query) ||
+          chainsText.contains(query);
+      if (!matchesQuery) return false;
+    }
+    if (keywords.isNotEmpty) {
+      final chains = item.chains;
+      final process = item.metadata.process;
+      final matchesKeywords = {...chains, process}.containsAll(keywords);
+      if (!matchesKeywords) return false;
+    }
+    return true;
+  }).toList();
+});

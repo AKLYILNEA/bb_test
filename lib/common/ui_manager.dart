@@ -21,7 +21,7 @@ class UiManager {
       final uiPath = await appPath.uiPath;
       final uiDir = Directory(uiPath);
       final versionFile = File(join(uiPath, '.ui_version'));
-      const currentVersion = '2.8.0';
+      const currentVersion = '2.8.1';
 
       if (await uiDir.exists()) {
         if (await versionFile.exists()) {

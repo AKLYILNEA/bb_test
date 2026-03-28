@@ -145,35 +145,11 @@ class AutoRunItem extends ConsumerWidget {
   }
 }
 
-class HiddenItem extends ConsumerStatefulWidget {
+class HiddenItem extends ConsumerWidget {
   const HiddenItem({super.key});
 
   @override
-  ConsumerState<HiddenItem> createState() => _HiddenItemState();
-}
-
-class _HiddenItemState extends ConsumerState<HiddenItem> {
-  int? _sdkInt;
-
-  @override
-  void initState() {
-    super.initState();
-    system.version.then((version) {
-      if (mounted) {
-        setState(() {
-          _sdkInt = version;
-        });
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // Hide for Android 13+ (SDK 33+)
-    if (_sdkInt != null && _sdkInt! >= 33) {
-      return const SizedBox.shrink();
-    }
-
+  Widget build(BuildContext context, WidgetRef ref) {
     final hidden = ref.watch(
       appSettingProvider.select((state) => state.hidden),
     );

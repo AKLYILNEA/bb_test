@@ -1,5 +1,4 @@
 import 'package:bett_box/common/common.dart';
-import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
@@ -17,170 +16,125 @@ class RequestsView extends ConsumerStatefulWidget {
 }
 
 class _RequestsViewState extends ConsumerState<RequestsView> {
-  final _requestsStateNotifier = ValueNotifier<TrackerInfosState>(
-    const TrackerInfosState(),
-  );
-  List<TrackerInfo> _requests = [];
-  late ScrollController _scrollController;
-
-  void _onSearch(String value) {
-    _requestsStateNotifier.value = _requestsStateNotifier.value.copyWith(
-      query: value,
-    );
-  }
-
-  void _onKeywordsUpdate(List<String> keywords) {
-    _requestsStateNotifier.value = _requestsStateNotifier.value.copyWith(
-      keywords: keywords,
-    );
-  }
+  late final ScrollController _scrollController;
+  var _autoScrollToEnd = false;
 
   @override
   void initState() {
     super.initState();
-    _requests = globalState.appState.requests.list;
+    final requests = globalState.appState.requests.list;
     _scrollController = ScrollController(
-      initialScrollOffset: _requests.length * TrackerInfoItem.height,
+      initialScrollOffset: requests.length * TrackerInfoItem.height,
     );
-    _requestsStateNotifier.value = _requestsStateNotifier.value.copyWith(
-      trackerInfos: _requests,
-    );
-    ref.listenManual(requestsProvider.select((state) => state.list), (
-      prev,
-      next,
-    ) {
-      _requests = next;
-      updateRequestsThrottler();
-    });
   }
 
   @override
   void dispose() {
-    _requestsStateNotifier.dispose();
     _scrollController.dispose();
     super.dispose();
   }
 
-  void updateRequestsThrottler() {
-    throttler.call(FunctionTag.requests, () {
-      if (!mounted) {
-        return;
-      }
-      final isEquality = trackerInfoListEquality.equals(
-        _requests,
-        _requestsStateNotifier.value.trackerInfos,
-      );
-      if (isEquality) {
-        return;
-      }
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _requestsStateNotifier.value = _requestsStateNotifier.value.copyWith(
-            trackerInfos: _requests,
-          );
-        }
-      });
-    }, duration: commonDuration);
+  void _onSearch(String value) {
+    ref.read(requestsSearchProvider.notifier).state = value;
   }
 
-  List<Widget> _buildActions() {
-    return [
-      IconButton(
-        onPressed: () {
-          ref.read(requestsProvider.notifier).clearRequests();
-        },
-        icon: const Icon(Icons.delete_sweep_outlined),
-      ),
-      ValueListenableBuilder(
-        valueListenable: _requestsStateNotifier,
-        builder: (_, state, _) {
-          return IconButton(
-            style: state.autoScrollToEnd
-                ? ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll(
-                      context.colorScheme.secondaryContainer,
-                    ),
-                  )
-                : null,
-            onPressed: () {
-              _requestsStateNotifier.value = _requestsStateNotifier.value
-                  .copyWith(
-                    autoScrollToEnd:
-                        !_requestsStateNotifier.value.autoScrollToEnd,
-                  );
-            },
-            icon: const Icon(Icons.vertical_align_top_outlined),
-          );
-        },
-      ),
-    ];
+  void _onKeywordsUpdate(List<String> keywords) {
+    ref.read(requestsKeywordsProvider.notifier).state = keywords;
+  }
+
+  void _toggleAutoScroll() {
+    setState(() {
+      _autoScrollToEnd = !_autoScrollToEnd;
+    });
+  }
+
+  void _cancelAutoScroll() {
+    if (_autoScrollToEnd) {
+      setState(() {
+        _autoScrollToEnd = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final requests = ref.watch(filteredRequestsProvider);
+    final hasRequests = requests.isNotEmpty;
+
     return CommonScaffold(
       title: appLocalizations.requests,
-      actions: _buildActions(),
+      actions: [
+        IconButton(
+          onPressed: () {
+            ref.read(requestsProvider.notifier).clearRequests();
+          },
+          icon: const Icon(Icons.delete_sweep_outlined),
+        ),
+        IconButton(
+          style: _autoScrollToEnd
+              ? ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(
+                    context.colorScheme.secondaryContainer,
+                  ),
+                )
+              : null,
+          onPressed: _toggleAutoScroll,
+          icon: const Icon(Icons.vertical_align_top_outlined),
+        ),
+      ],
       searchState: AppBarSearchState(onSearch: _onSearch),
       onKeywordsUpdate: _onKeywordsUpdate,
-      body: ValueListenableBuilder<TrackerInfosState>(
-        valueListenable: _requestsStateNotifier,
-        builder: (context, state, _) {
-          final requests = state.list;
-          if (requests.isEmpty) {
-            return NullStatus(
+      body: !hasRequests
+          ? NullStatus(
               label: appLocalizations.nullTip(appLocalizations.requests),
-            );
-          }
-          final items = requests
-              .map<Widget>(
-                (trackerInfo) => TrackerInfoItem(
-                  key: Key(trackerInfo.id),
-                  trackerInfo: trackerInfo,
-                  onClickKeyword: (value) {
-                    context.commonScaffoldState?.addKeyword(value);
-                  },
-                  detailTitle: appLocalizations.details(
-                    appLocalizations.request,
-                  ),
-                ),
-              )
-              .separated(const Divider(height: 0))
-              .toList();
-          return Align(
-            alignment: Alignment.topCenter,
-            child: CommonScrollBar(
-              trackVisibility: false,
-              controller: _scrollController,
-              child: ScrollToEndBox(
+            )
+          : Align(
+              alignment: Alignment.topCenter,
+              child: CommonScrollBar(
+                trackVisibility: false,
                 controller: _scrollController,
-                dataSource: requests,
-                enable: state.autoScrollToEnd,
-                onCancelToEnd: () {
-                  _requestsStateNotifier.value = _requestsStateNotifier.value
-                      .copyWith(autoScrollToEnd: false);
-                },
-                child: ListView.builder(
-                  reverse: true,
-                  shrinkWrap: true,
-                  physics: NextClampingScrollPhysics(),
+                child: ScrollToEndBox(
                   controller: _scrollController,
-                  itemBuilder: (_, index) {
-                    return items[index];
-                  },
-                  itemExtentBuilder: (index, _) {
-                    if (index.isOdd) {
-                      return 0;
-                    }
-                    return TrackerInfoItem.height;
-                  },
-                  itemCount: items.length,
+                  dataSource: requests,
+                  enable: _autoScrollToEnd,
+                  onCancelToEnd: _cancelAutoScroll,
+                  child: ListView.builder(
+                    reverse: true,
+                    shrinkWrap: true,
+                    physics: const NextClampingScrollPhysics(),
+                    controller: _scrollController,
+                    itemBuilder: (_, index) {
+                      // Even indices are items, odd indices are dividers
+                      if (index.isOdd) {
+                        return const Divider(height: 0);
+                      }
+                      final itemIndex = index ~/ 2;
+                      if (itemIndex >= requests.length) {
+                        return const SizedBox.shrink();
+                      }
+                      final trackerInfo = requests[itemIndex];
+                      return TrackerInfoItem(
+                        key: ValueKey(trackerInfo.id),
+                        trackerInfo: trackerInfo,
+                        onClickKeyword: (value) {
+                          context.commonScaffoldState?.addKeyword(value);
+                        },
+                        detailTitle: appLocalizations.details(
+                          appLocalizations.request,
+                        ),
+                      );
+                    },
+                    itemExtentBuilder: (index, _) {
+                      if (index.isOdd) {
+                        return 0;
+                      }
+                      return TrackerInfoItem.height;
+                    },
+                    itemCount: requests.length * 2 - 1,
+                  ),
                 ),
               ),
             ),
-          );
-        },
-      ),
     );
   }
 }

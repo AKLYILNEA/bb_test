@@ -16,66 +16,44 @@ class LogsView extends ConsumerStatefulWidget {
 }
 
 class _LogsViewState extends ConsumerState<LogsView> {
-  final _logsStateNotifier = ValueNotifier<LogsState>(LogsState());
-  late ScrollController _scrollController;
-
-  List<Log> _logs = [];
+  late final ScrollController _scrollController;
+  var _autoScrollToEnd = false;
 
   @override
   void initState() {
     super.initState();
-    _logs = globalState.appState.logs.list;
+    final logs = globalState.appState.logs.list;
     _scrollController = ScrollController(
-      initialScrollOffset: _logs.length * LogItem.height,
+      initialScrollOffset: logs.length * LogItem.height,
     );
-    _logsStateNotifier.value = _logsStateNotifier.value.copyWith(logs: _logs);
-    ref.listenManual(logsProvider.select((state) => state.list), (prev, next) {
-      if (prev != next) {
-        final isEquality = logListEquality.equals(prev, next);
-        if (!isEquality) {
-          _logs = next;
-          updateLogsThrottler();
-        }
-      }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onSearch(String value) {
+    ref.read(logsSearchProvider.notifier).state = value;
+  }
+
+  void _onKeywordsUpdate(List<String> keywords) {
+    ref.read(logsKeywordsProvider.notifier).state = keywords;
+  }
+
+  void _toggleAutoScroll() {
+    setState(() {
+      _autoScrollToEnd = !_autoScrollToEnd;
     });
   }
 
-  List<Widget> _buildActions() {
-    return [
-      ValueListenableBuilder(
-        valueListenable: _logsStateNotifier,
-        builder: (_, state, _) {
-          return IconButton(
-            style: state.autoScrollToEnd
-                ? ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll(
-                      context.colorScheme.secondaryContainer,
-                    ),
-                  )
-                : null,
-            onPressed: () {
-              _logsStateNotifier.value = _logsStateNotifier.value.copyWith(
-                autoScrollToEnd: !_logsStateNotifier.value.autoScrollToEnd,
-              );
-            },
-            icon: const Icon(Icons.vertical_align_top_outlined),
-          );
-        },
-      ),
-      InkWell(
-        onTap: _handleExport,
-        onLongPress: _handleClearLogs,
-        borderRadius: BorderRadius.circular(20),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: const Icon(Icons.save_as_outlined, size: 24),
-        ),
-      ),
-    ];
-  }
-
-  void _handleClearLogs() {
-    ref.read(logsProvider.notifier).clearLogs();
+  void _cancelAutoScroll() {
+    if (_autoScrollToEnd) {
+      setState(() {
+        _autoScrollToEnd = false;
+      });
+    }
   }
 
   Future<void> _handleLogLevelSettings() async {
@@ -96,26 +74,8 @@ class _LogsViewState extends ConsumerState<LogsView> {
       ref
           .read(patchClashConfigProvider.notifier)
           .updateState((state) => state.copyWith(logLevel: selectedLogLevel));
-      // Sync config to core immediately
       globalState.appController.updateClashConfigDebounce();
     }
-  }
-
-  void _onSearch(String value) {
-    _logsStateNotifier.value = _logsStateNotifier.value.copyWith(query: value);
-  }
-
-  void _onKeywordsUpdate(List<String> keywords) {
-    _logsStateNotifier.value = _logsStateNotifier.value.copyWith(
-      keywords: keywords,
-    );
-  }
-
-  @override
-  void dispose() {
-    _logsStateNotifier.dispose();
-    _scrollController.dispose();
-    super.dispose();
   }
 
   Future<void> _handleExport() async {
@@ -133,30 +93,15 @@ class _LogsViewState extends ConsumerState<LogsView> {
     );
   }
 
-  void updateLogsThrottler() {
-    throttler.call(FunctionTag.logs, () {
-      if (!mounted) {
-        return;
-      }
-      final isEquality = logListEquality.equals(
-        _logs,
-        _logsStateNotifier.value.logs,
-      );
-      if (isEquality) {
-        return;
-      }
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _logsStateNotifier.value = _logsStateNotifier.value.copyWith(
-            logs: _logs,
-          );
-        }
-      });
-    }, duration: commonDuration);
+  void _handleClearLogs() {
+    ref.read(logsProvider.notifier).clearLogs();
   }
 
   @override
   Widget build(BuildContext context) {
+    final logs = ref.watch(filteredLogsProvider);
+    final hasLogs = logs.isNotEmpty;
+
     return CommonScaffold(
       actions: [
         IconButton(
@@ -164,66 +109,76 @@ class _LogsViewState extends ConsumerState<LogsView> {
           icon: const Icon(Icons.settings_outlined),
           tooltip: appLocalizations.logLevel,
         ),
-        ..._buildActions(),
+        IconButton(
+          style: _autoScrollToEnd
+              ? ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(
+                    context.colorScheme.secondaryContainer,
+                  ),
+                )
+              : null,
+          onPressed: _toggleAutoScroll,
+          icon: const Icon(Icons.vertical_align_top_outlined),
+        ),
+        InkWell(
+          onTap: _handleExport,
+          onLongPress: _handleClearLogs,
+          borderRadius: BorderRadius.circular(20),
+          child: const Padding(
+            padding: EdgeInsets.all(12),
+            child: Icon(Icons.save_as_outlined, size: 24),
+          ),
+        ),
       ],
       onKeywordsUpdate: _onKeywordsUpdate,
       searchState: AppBarSearchState(onSearch: _onSearch),
       title: appLocalizations.logs,
-      body: ValueListenableBuilder<LogsState>(
-        valueListenable: _logsStateNotifier,
-        builder: (context, state, _) {
-          final logs = state.list;
-          if (logs.isEmpty) {
-            return NullStatus(
+      body: !hasLogs
+          ? NullStatus(
               label: appLocalizations.nullTip(appLocalizations.logs),
-            );
-          }
-          final items = logs
-              .map<Widget>(
-                (log) => LogItem(
-                  key: Key(log.dateTime),
-                  log: log,
-                  onClick: (value) {
-                    context.commonScaffoldState?.addKeyword(value);
-                  },
-                ),
-              )
-              .separated(const Divider(height: 0))
-              .toList();
-          return Align(
-            alignment: Alignment.topCenter,
-            child: ScrollToEndBox(
-              onCancelToEnd: () {
-                _logsStateNotifier.value = _logsStateNotifier.value.copyWith(
-                  autoScrollToEnd: false,
-                );
-              },
-              controller: _scrollController,
-              enable: state.autoScrollToEnd,
-              dataSource: logs,
-              child: CommonScrollBar(
+            )
+          : Align(
+              alignment: Alignment.topCenter,
+              child: ScrollToEndBox(
+                onCancelToEnd: _cancelAutoScroll,
                 controller: _scrollController,
-                child: ListView.builder(
-                  physics: NextClampingScrollPhysics(),
-                  reverse: true,
-                  shrinkWrap: true,
+                enable: _autoScrollToEnd,
+                dataSource: logs,
+                child: CommonScrollBar(
                   controller: _scrollController,
-                  itemBuilder: (_, index) {
-                    return items[index];
-                  },
-                  itemExtentBuilder: (index, _) {
-                    if (index.isOdd) {
-                      return 0;
-                    }
-                    return LogItem.height;
-                  },
-                  itemCount: items.length,
+                  child: ListView.builder(
+                    physics: const NextClampingScrollPhysics(),
+                    reverse: true,
+                    shrinkWrap: true,
+                    controller: _scrollController,
+                    itemBuilder: (_, index) {
+                      if (index.isOdd) {
+                        return const Divider(height: 0);
+                      }
+                      final itemIndex = index ~/ 2;
+                      if (itemIndex >= logs.length) {
+                        return const SizedBox.shrink();
+                      }
+                      final log = logs[itemIndex];
+                      return LogItem(
+                        key: ValueKey(log.dateTime),
+                        log: log,
+                        onClick: (value) {
+                          context.commonScaffoldState?.addKeyword(value);
+                        },
+                      );
+                    },
+                    itemExtentBuilder: (index, _) {
+                      if (index.isOdd) {
+                        return 0;
+                      }
+                      return LogItem.height;
+                    },
+                    itemCount: logs.length * 2 - 1,
+                  ),
                 ),
               ),
             ),
-          );
-        },
-      ),
     );
   }
 }
@@ -264,14 +219,13 @@ class LogItem extends StatelessWidget {
       ),
       subtitle: Column(
         children: [
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               CommonChip(
                 onPressed: () {
-                  if (onClick == null) return;
-                  onClick!(log.logLevel.name);
+                  onClick?.call(log.logLevel.name);
                 },
                 label: log.logLevel.name,
               ),
