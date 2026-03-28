@@ -173,7 +173,7 @@ object GlobalState {
         synchronized(this) {
             if (now - lastToggleAt < TOGGLE_DEBOUNCE_MS) return false
             lastToggleAt = now
-            true
+            return true
         }
     }
 

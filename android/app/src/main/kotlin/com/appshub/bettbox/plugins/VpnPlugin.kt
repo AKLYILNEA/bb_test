@@ -28,8 +28,10 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import java.util.Collections
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -49,7 +51,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     private var isBinding = false
 
     private var job = SupervisorJob()
-    private var scope = CoroutineScope(Dispatchers.Default + job)
+    private var scope = CoroutineScope(Dispatchers.Default + job as kotlin.coroutines.CoroutineContext)
     private var lastStartForegroundParams: StartForegroundParams? = null
     private val uidPageNameMap = ConcurrentHashMap<Int, String>()
     private var suspendModule: SuspendModule? = null
@@ -89,7 +91,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         job.cancel()
         job = SupervisorJob()
-        scope = CoroutineScope(Dispatchers.Default + job)
+        scope = CoroutineScope(Dispatchers.Default + job as kotlin.coroutines.CoroutineContext)
 
         scope.launch { registerNetworkCallback() }
         flutterMethodChannel = MethodChannel(flutterPluginBinding.binaryMessenger, "vpn")

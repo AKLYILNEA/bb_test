@@ -315,7 +315,7 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
 
     private fun isPngBytes(bytes: ByteArray): Boolean {
         if (bytes.size < PNG_MAGIC_SIZE) return false
-        val magic = byteArrayOf(0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A)
+        val magic = byteArrayOf(0x89.toByte(), 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A)
         return bytes.take(PNG_MAGIC_SIZE).toByteArray().contentEquals(magic)
     }
 
