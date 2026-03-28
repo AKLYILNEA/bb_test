@@ -216,7 +216,10 @@ class _ProcessIcon extends StatelessWidget {
             future: _getPackageIcon(process),
             builder: (context, snapshot) {
               if (!snapshot.hasData || snapshot.data == null) {
-                return const SizedBox.shrink();
+                return const Icon(
+                  Icons.apps,
+                  size: 32,
+                );
               }
               return Image(
                 image: ResizeImage(

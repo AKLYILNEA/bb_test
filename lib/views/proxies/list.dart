@@ -245,42 +245,33 @@ class _GroupHeader extends ConsumerWidget {
 
   Widget _buildIcon(BuildContext context, ProxiesIconStyle style, String icon) {
     if (style == ProxiesIconStyle.none) return const SizedBox();
+    const iconSize = 40.0;
     if (style == ProxiesIconStyle.standard) {
       return Container(
         margin: const EdgeInsets.only(right: 16),
-        child: LayoutBuilder(
-          builder: (_, constraints) {
-            return AspectRatio(
-              aspectRatio: 1,
-              child: Container(
-                height: constraints.maxHeight,
-                width: constraints.maxHeight,
-                alignment: Alignment.center,
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: context.colorScheme.secondaryContainer,
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: CommonTargetIcon(
-                  src: icon,
-                  size: constraints.maxHeight - 12.ap,
-                ),
-              ),
-            );
-          },
+        width: iconSize,
+        height: iconSize,
+        alignment: Alignment.center,
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: context.colorScheme.secondaryContainer,
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: CommonTargetIcon(
+          src: icon,
+          size: iconSize - 12,
         ),
       );
     }
     return Container(
       margin: const EdgeInsets.only(right: 16),
-      child: LayoutBuilder(
-        builder: (_, constraints) {
-          return CommonTargetIcon(
-            src: icon,
-            size: constraints.maxHeight - 8,
-          );
-        },
+      width: iconSize,
+      height: iconSize,
+      alignment: Alignment.center,
+      child: CommonTargetIcon(
+        src: icon,
+        size: iconSize - 8,
       ),
     );
   }
@@ -337,16 +328,20 @@ class _ProxyGrid extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: chunks
           .map<Widget>((proxies) {
+            final itemHeight = getItemHeight(cardType);
             final children = proxies
                 .map<Widget>(
                   (proxy) => Flexible(
-                    child: ProxyCard(
-                      key: ValueKey('${group.name}.${proxy.name}'),
-                      proxy: proxy,
-                      groupName: group.name,
-                      type: cardType,
-                      groupType: group.type,
-                      testUrl: group.testUrl,
+                    child: SizedBox(
+                      height: itemHeight,
+                      child: ProxyCard(
+                        key: ValueKey('${group.name}.${proxy.name}'),
+                        proxy: proxy,
+                        groupName: group.name,
+                        type: cardType,
+                        groupType: group.type,
+                        testUrl: group.testUrl,
+                      ),
                     ),
                   ),
                 )
