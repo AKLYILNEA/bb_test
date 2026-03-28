@@ -3,7 +3,7 @@
 # ⚡ Bettbox Release / 版本发布
 
 [![Latest Release](https://img.shields.io/github/v/release/appshubcc/Bettbox?style=for-the-badge&logo=github&color=238636&label=Release)](https://github.com/appshubcc/Bettbox/releases/latest) 
-[![Core](https://img.shields.io/badge/Core-V1.19.20-8A2BE2?style=for-the-badge&logo=go&logoColor=white)](https://github.com/MetaCubeX/mihomo) 
+[![Core](https://img.shields.io/badge/ALPHA-v.7fdc122-8A2BE2?style=for-the-badge&logo=go&logoColor=white)](https://github.com/MetaCubeX/mihomo/tree/Alpha) 
 [![Downloads](https://img.shields.io/github/downloads/appshubcc/Bettbox/total?style=for-the-badge&logo=github&color=007ec6)](https://github.com/appshubcc/Bettbox/releases) 
 
 ---
@@ -22,8 +22,8 @@
 
 ### ⬇️ Download Links / 下载链接
 
-Note: For desktop CPUs from 2012 or earlier, please download the Compatible version
-<br>注意：桌面端(大约)2012年同期及之前的CPU需要下载Compatible兼容版本
+**Note: For desktop CPUs from 2012 or earlier, please download the Compatible version**
+<br>**注意：桌面端2012年同期及之前的CPU需要下载Compatible兼容版本**
 
 ---
 

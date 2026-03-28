@@ -205,8 +205,8 @@ class _ProcessIcon extends StatelessWidget {
 
     Widget buildPlaceholder() {
       return const Icon(
-        Icons.language,
-        size: 32,
+        Icons.apps,
+        size: 42,
       );
     }
 

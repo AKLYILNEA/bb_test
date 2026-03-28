@@ -170,8 +170,8 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
                 result.success(true)
             }
             "updateExcludeFromRecents" -> {
-                val success = updateExcludeFromRecents(call.argument<Boolean>("value"))
-                result.success(success)
+                updateExcludeFromRecents(call.argument<Boolean>("value"))
+                result.success(true)
             }
             "initShortcuts" -> {
                 initShortcuts(call.arguments as String)
@@ -254,42 +254,21 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
         runCatching { activityRef?.get()?.startActivity(intent) }
     }
 
-    private fun updateExcludeFromRecents(value: Boolean?): Boolean {
-        return runCatching {
-            val am = BettboxApplication.getAppContext().getSystemService<ActivityManager>()
-
-            var taskId = cachedTaskId
-            if (taskId == null) {
-                taskId = activityRef?.get()?.taskId
-                if (taskId != null) {
-                    cachedTaskId = taskId
-                }
+    private fun updateExcludeFromRecents(value: Boolean?) {
+        val am = getSystemService(BettboxApplication.getAppContext(), ActivityManager::class.java)
+        val task = am?.appTasks?.firstOrNull {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                it.taskInfo.taskId == activityRef?.get()?.taskId
+            } else {
+                it.taskInfo.id == activityRef?.get()?.taskId
             }
+        }
 
-            if (taskId == null) {
-                return@runCatching false
-            }
-
-            val task = runCatching {
-                am?.appTasks?.firstOrNull {
-                    runCatching {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            it.taskInfo.taskId == taskId
-                        } else {
-                            it.taskInfo.id == taskId
-                        }
-                    }.getOrDefault(false)
-                }
-            }.getOrNull()
-
-            if (task == null) {
-                cachedTaskId = null
-                return@runCatching false
-            }
-
-            task.setExcludeFromRecents(value ?: false)
-            true
-        }.getOrDefault(false)
+        when (value) {
+            true -> task?.setExcludeFromRecents(value)
+            false -> task?.setExcludeFromRecents(value)
+            null -> task?.setExcludeFromRecents(false)
+        }
     }
 
     private fun getIconSizePx(): Int {
