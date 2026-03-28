@@ -195,7 +195,7 @@ class _GroupHeader extends ConsumerWidget {
                         const SizedBox(width: 8),
                         Flexible(
                           child: EmojiText(
-                            '路 $selectedProxyName',
+                            '- $selectedProxyName',
                             style: context.textTheme.labelMedium?.toLight,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -248,22 +248,39 @@ class _GroupHeader extends ConsumerWidget {
     if (style == ProxiesIconStyle.standard) {
       return Container(
         margin: const EdgeInsets.only(right: 16),
-        padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: context.colorScheme.secondaryContainer,
-        ),
-        child: CommonTargetIcon(
-          src: icon,
-          size: 24,
+        child: LayoutBuilder(
+          builder: (_, constraints) {
+            return AspectRatio(
+              aspectRatio: 1,
+              child: Container(
+                height: constraints.maxHeight,
+                width: constraints.maxHeight,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: context.colorScheme.secondaryContainer,
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: CommonTargetIcon(
+                  src: icon,
+                  size: constraints.maxHeight - 12.ap,
+                ),
+              ),
+            );
+          },
         ),
       );
     }
     return Container(
       margin: const EdgeInsets.only(right: 16),
-      child: CommonTargetIcon(
-        src: icon,
-        size: 32,
+      child: LayoutBuilder(
+        builder: (_, constraints) {
+          return CommonTargetIcon(
+            src: icon,
+            size: constraints.maxHeight - 8,
+          );
+        },
       ),
     );
   }
@@ -318,33 +335,33 @@ class _ProxyGrid extends StatelessWidget {
 
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: chunks.map((proxies) {
-        final children = proxies
-            .map<Widget>((proxy) => ProxyCard(
-                  key: ValueKey('${group.name}.${proxy.name}'),
-                  proxy: proxy,
-                  groupName: group.name,
-                  type: cardType,
-                  groupType: group.type,
-                  testUrl: group.testUrl,
-                ))
-            .toList();
+      children: chunks
+          .map<Widget>((proxies) {
+            final children = proxies
+                .map<Widget>(
+                  (proxy) => Flexible(
+                    child: ProxyCard(
+                      key: ValueKey('${group.name}.${proxy.name}'),
+                      proxy: proxy,
+                      groupName: group.name,
+                      type: cardType,
+                      groupType: group.type,
+                      testUrl: group.testUrl,
+                    ),
+                  ),
+                )
+                .fill(
+                  columns,
+                  filler: (_) => const Flexible(child: SizedBox()),
+                )
+                .separated(const SizedBox(width: 8));
 
-        while (children.length < columns) {
-          children.add(const SizedBox());
-        }
-
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: Row(
-            children: children
-                .map((w) => Expanded(child: w))
-                .expand((w) => [w, const SizedBox(width: 8)])
-                .toList()
-              ..removeLast(),
-          ),
-        );
-      }).toList(),
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(children: children.toList()),
+            );
+          })
+          .toList(),
     );
   }
 }

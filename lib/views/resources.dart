@@ -145,7 +145,7 @@ class _GeoDataListItemState extends State<GeoDataListItem> {
           map[geoItem.key] = newUrl;
           return state.copyWith(geoXUrl: GeoXUrl.fromJson(map));
         });
-        globalState.appController.setupClashConfigDebounce();
+        await globalState.appController.setupClashConfig();
       } catch (e) {
         globalState.showMessage(
           title: geoItem.label,

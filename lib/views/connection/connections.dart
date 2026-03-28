@@ -67,9 +67,6 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView> {
 
   @override
   Widget build(BuildContext context) {
-    final connections = ref.watch(filteredConnectionsProvider);
-    final hasConnections = connections.isNotEmpty;
-
     return CommonScaffold(
       title: appLocalizations.connections,
       onKeywordsUpdate: _onKeywordsUpdate,
@@ -80,49 +77,58 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView> {
           icon: const Icon(Icons.delete_sweep_outlined),
         ),
       ],
-      body: !hasConnections
-          ? NullStatus(
+      body: Consumer(
+        builder: (_, ref, _) {
+          final connections = ref.watch(filteredConnectionsProvider);
+          final hasConnections = connections.isNotEmpty;
+
+          if (!hasConnections) {
+            return NullStatus(
               label: appLocalizations.nullTip(appLocalizations.connections),
-            )
-          : ListView.builder(
-              controller: _scrollController,
-              itemBuilder: (context, index) {
-                if (index.isOdd) {
-                  return const Divider(height: 0);
-                }
-                final itemIndex = index ~/ 2;
-                if (itemIndex >= connections.length) {
-                  return const SizedBox.shrink();
-                }
-                final trackerInfo = connections[itemIndex];
-                return TrackerInfoItem(
-                  key: ValueKey(trackerInfo.id),
-                  trackerInfo: trackerInfo,
-                  onClickKeyword: (value) {
-                    context.commonScaffoldState?.addKeyword(value);
-                  },
-                  trailing: IconButton(
-                    padding: EdgeInsets.zero,
-                    visualDensity: VisualDensity.compact,
-                    style: const ButtonStyle(
-                      minimumSize: WidgetStatePropertyAll(Size.zero),
-                    ),
-                    icon: const Icon(Icons.block),
-                    onPressed: () => _handleBlockConnection(trackerInfo.id),
+            );
+          }
+
+          return ListView.builder(
+            controller: _scrollController,
+            itemBuilder: (context, index) {
+              if (index.isOdd) {
+                return const Divider(height: 0);
+              }
+              final itemIndex = index ~/ 2;
+              if (itemIndex >= connections.length) {
+                return const SizedBox.shrink();
+              }
+              final trackerInfo = connections[itemIndex];
+              return TrackerInfoItem(
+                key: ValueKey(trackerInfo.id),
+                trackerInfo: trackerInfo,
+                onClickKeyword: (value) {
+                  context.commonScaffoldState?.addKeyword(value);
+                },
+                trailing: IconButton(
+                  padding: EdgeInsets.zero,
+                  visualDensity: VisualDensity.compact,
+                  style: const ButtonStyle(
+                    minimumSize: WidgetStatePropertyAll(Size.zero),
                   ),
-                  detailTitle: appLocalizations.details(
-                    appLocalizations.connection,
-                  ),
-                );
-              },
-              itemExtentBuilder: (index, _) {
-                if (index.isOdd) {
-                  return 0;
-                }
-                return TrackerInfoItem.height;
-              },
-              itemCount: connections.length * 2 - 1,
-            ),
+                  icon: const Icon(Icons.block),
+                  onPressed: () => _handleBlockConnection(trackerInfo.id),
+                ),
+                detailTitle: appLocalizations.details(
+                  appLocalizations.connection,
+                ),
+              );
+            },
+            itemExtentBuilder: (index, _) {
+              if (index.isOdd) {
+                return 0;
+              }
+              return TrackerInfoItem.height;
+            },
+            itemCount: connections.length * 2 - 1,
+          );
+        },
+      ),
     );
   }
 }

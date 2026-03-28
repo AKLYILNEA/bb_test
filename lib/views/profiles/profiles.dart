@@ -208,8 +208,11 @@ class ProfileItem extends StatelessWidget {
   Future<void> _handlePreviewRuntimeConfig(BuildContext context) async {
     await globalState.appController.safeRun(
       () async {
-        final configMap = await globalState.getProfileConfig(profile.id);
-        final content = await encodeYamlTask(configMap);
+        final patchConfig = globalState.config.patchClashConfig;
+        final runtimeConfig = await globalState.patchRawConfig(
+          patchConfig: patchConfig,
+        );
+        final content = await encodeYamlTask(runtimeConfig);
         if (!context.mounted) {
           return;
         }

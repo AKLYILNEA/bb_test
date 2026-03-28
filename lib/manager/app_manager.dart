@@ -269,66 +269,59 @@ class AppSidebarContainer extends ConsumerWidget {
                         behavior: HiddenBarScrollBehavior(),
                         child: SingleChildScrollView(
                           child: IntrinsicHeight(
-                            child: FocusScope(
-                              child: CallbackShortcuts(
-                                bindings: <ShortcutActivator, VoidCallback>{
-                                  // TV remote control support
-                                  const SingleActivator(LogicalKeyboardKey.arrowUp): () {
-                                    if (currentIndex > 0) {
-                                      globalState.appController.toPage(
-                                        navigationItems[currentIndex - 1].label,
-                                      );
-                                    }
-                                  },
-                                  const SingleActivator(LogicalKeyboardKey.arrowDown): () {
-                                    if (currentIndex < navigationItems.length - 1) {
-                                      globalState.appController.toPage(
-                                        navigationItems[currentIndex + 1].label,
-                                      );
-                                    }
-                                  },
-                                  const SingleActivator(LogicalKeyboardKey.select): () {
-                                    // Confirm selection
-                                  },
-                                  const SingleActivator(LogicalKeyboardKey.enter): () {
-                                    // Confirm selection
-                                  },
+                            child: CallbackShortcuts(
+                              bindings: <ShortcutActivator, VoidCallback>{
+                                const SingleActivator(LogicalKeyboardKey.arrowUp): () {
+                                  if (currentIndex > 0) {
+                                    globalState.appController.toPage(
+                                      navigationItems[currentIndex - 1].label,
+                                    );
+                                  }
                                 },
-                                child: Focus(
-                                  autofocus: true,
-                                  child: NavigationRail(
-                                    backgroundColor: Colors.transparent,
-                                    selectedLabelTextStyle: context
-                                        .textTheme
-                                        .labelLarge!
-                                        .copyWith(
-                                          color: context.colorScheme.onSurface,
+                                const SingleActivator(LogicalKeyboardKey.arrowDown): () {
+                                  if (currentIndex < navigationItems.length - 1) {
+                                    globalState.appController.toPage(
+                                      navigationItems[currentIndex + 1].label,
+                                    );
+                                  }
+                                },
+                                const SingleActivator(LogicalKeyboardKey.select): () {},
+                                const SingleActivator(LogicalKeyboardKey.enter): () {},
+                              },
+                              child: Focus(
+                                autofocus: true,
+                                child: NavigationRail(
+                                  backgroundColor: Colors.transparent,
+                                  selectedLabelTextStyle: context
+                                      .textTheme
+                                      .labelLarge!
+                                      .copyWith(
+                                        color: context.colorScheme.onSurface,
+                                      ),
+                                  unselectedLabelTextStyle: context
+                                      .textTheme
+                                      .labelLarge!
+                                      .copyWith(
+                                        color: context.colorScheme.onSurface,
+                                      ),
+                                  destinations: navigationItems
+                                      .map(
+                                        (e) => NavigationRailDestination(
+                                          icon: e.icon,
+                                          label: Text(Intl.message(e.label.name)),
                                         ),
-                                    unselectedLabelTextStyle: context
-                                        .textTheme
-                                        .labelLarge!
-                                        .copyWith(
-                                          color: context.colorScheme.onSurface,
-                                        ),
-                                    destinations: navigationItems
-                                        .map(
-                                          (e) => NavigationRailDestination(
-                                            icon: e.icon,
-                                            label: Text(Intl.message(e.label.name)),
-                                          ),
-                                        )
-                                        .toList(),
-                                    onDestinationSelected: (index) {
-                                      globalState.appController.toPage(
-                                        navigationItems[index].label,
-                                      );
-                                    },
-                                    extended: showLabel,
-                                    selectedIndex: currentIndex,
-                                    labelType: showLabel
-                                        ? NavigationRailLabelType.none
-                                        : NavigationRailLabelType.all,
-                                  ),
+                                      )
+                                      .toList(),
+                                  onDestinationSelected: (index) {
+                                    globalState.appController.toPage(
+                                      navigationItems[index].label,
+                                    );
+                                  },
+                                  extended: showLabel,
+                                  selectedIndex: currentIndex,
+                                  labelType: showLabel
+                                      ? NavigationRailLabelType.none
+                                      : NavigationRailLabelType.all,
                                 ),
                               ),
                             ),

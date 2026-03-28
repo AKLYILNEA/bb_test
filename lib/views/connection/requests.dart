@@ -98,39 +98,49 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
                   dataSource: requests,
                   enable: _autoScrollToEnd,
                   onCancelToEnd: _cancelAutoScroll,
-                  child: ListView.builder(
-                    reverse: true,
-                    shrinkWrap: true,
-                    physics: const NextClampingScrollPhysics(),
-                    controller: _scrollController,
-                    itemBuilder: (_, index) {
-                      // Even indices are items, odd indices are dividers
-                      if (index.isOdd) {
-                        return const Divider(height: 0);
-                      }
-                      final itemIndex = index ~/ 2;
-                      if (itemIndex >= requests.length) {
-                        return const SizedBox.shrink();
-                      }
-                      final trackerInfo = requests[itemIndex];
-                      return TrackerInfoItem(
-                        key: ValueKey(trackerInfo.id),
-                        trackerInfo: trackerInfo,
-                        onClickKeyword: (value) {
-                          context.commonScaffoldState?.addKeyword(value);
-                        },
-                        detailTitle: appLocalizations.details(
-                          appLocalizations.request,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final contentHeight = requests.length * TrackerInfoItem.height;
+                      final listViewHeight = contentHeight < constraints.maxHeight
+                          ? contentHeight
+                          : constraints.maxHeight;
+
+                      return SizedBox(
+                        height: listViewHeight,
+                        child: ListView.builder(
+                          reverse: true,
+                          physics: const NextClampingScrollPhysics(),
+                          controller: _scrollController,
+                          itemBuilder: (_, index) {
+                            if (index.isOdd) {
+                              return const Divider(height: 0);
+                            }
+                            final itemIndex = index ~/ 2;
+                            if (itemIndex >= requests.length) {
+                              return const SizedBox.shrink();
+                            }
+                            final trackerInfo = requests[itemIndex];
+                            return TrackerInfoItem(
+                              key: ValueKey(trackerInfo.id),
+                              trackerInfo: trackerInfo,
+                              onClickKeyword: (value) {
+                                context.commonScaffoldState?.addKeyword(value);
+                              },
+                              detailTitle: appLocalizations.details(
+                                appLocalizations.request,
+                              ),
+                            );
+                          },
+                          itemExtentBuilder: (index, _) {
+                            if (index.isOdd) {
+                              return 0;
+                            }
+                            return TrackerInfoItem.height;
+                          },
+                          itemCount: requests.length * 2 - 1,
                         ),
                       );
                     },
-                    itemExtentBuilder: (index, _) {
-                      if (index.isOdd) {
-                        return 0;
-                      }
-                      return TrackerInfoItem.height;
-                    },
-                    itemCount: requests.length * 2 - 1,
                   ),
                 ),
               ),

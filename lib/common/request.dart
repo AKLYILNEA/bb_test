@@ -32,17 +32,43 @@ class Request {
   }
 
   Future<Response> getFileResponseForUrl(String url) async {
+    final uri = Uri.parse(url);
+    final userInfo = uri.userInfo;
+
+    Options? options;
+    if (userInfo.isNotEmpty) {
+      final auth = base64Encode(utf8.encode(userInfo));
+      options = Options(
+        responseType: ResponseType.bytes,
+        headers: {'Authorization': 'Basic $auth'},
+      );
+      url = uri.replace(userInfo: '').toString();
+    }
+
     final response = await _clashDio.get(
       url,
-      options: Options(responseType: ResponseType.bytes),
+      options: options ?? Options(responseType: ResponseType.bytes),
     );
     return response;
   }
 
   Future<Response> getTextResponseForUrl(String url) async {
+    final uri = Uri.parse(url);
+    final userInfo = uri.userInfo;
+
+    Options? options;
+    if (userInfo.isNotEmpty) {
+      final auth = base64Encode(utf8.encode(userInfo));
+      options = Options(
+        responseType: ResponseType.plain,
+        headers: {'Authorization': 'Basic $auth'},
+      );
+      url = uri.replace(userInfo: '').toString();
+    }
+
     final response = await _clashDio.get(
       url,
-      options: Options(responseType: ResponseType.plain),
+      options: options ?? Options(responseType: ResponseType.plain),
     );
     return response;
   }

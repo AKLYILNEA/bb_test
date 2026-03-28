@@ -146,35 +146,46 @@ class _LogsViewState extends ConsumerState<LogsView> {
                 dataSource: logs,
                 child: CommonScrollBar(
                   controller: _scrollController,
-                  child: ListView.builder(
-                    physics: const NextClampingScrollPhysics(),
-                    reverse: true,
-                    shrinkWrap: true,
-                    controller: _scrollController,
-                    itemBuilder: (_, index) {
-                      if (index.isOdd) {
-                        return const Divider(height: 0);
-                      }
-                      final itemIndex = index ~/ 2;
-                      if (itemIndex >= logs.length) {
-                        return const SizedBox.shrink();
-                      }
-                      final log = logs[itemIndex];
-                      return LogItem(
-                        key: ValueKey(log.dateTime),
-                        log: log,
-                        onClick: (value) {
-                          context.commonScaffoldState?.addKeyword(value);
-                        },
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final contentHeight = logs.length * LogItem.height;
+                      final listViewHeight = contentHeight < constraints.maxHeight
+                          ? contentHeight
+                          : constraints.maxHeight;
+
+                      return SizedBox(
+                        height: listViewHeight,
+                        child: ListView.builder(
+                          physics: const NextClampingScrollPhysics(),
+                          reverse: true,
+                          controller: _scrollController,
+                          itemBuilder: (_, index) {
+                            if (index.isOdd) {
+                              return const Divider(height: 0);
+                            }
+                            final itemIndex = index ~/ 2;
+                            if (itemIndex >= logs.length) {
+                              return const SizedBox.shrink();
+                            }
+                            final log = logs[itemIndex];
+                            return LogItem(
+                              key: ValueKey(log.dateTime),
+                              log: log,
+                              onClick: (value) {
+                                context.commonScaffoldState?.addKeyword(value);
+                              },
+                            );
+                          },
+                          itemExtentBuilder: (index, _) {
+                            if (index.isOdd) {
+                              return 0;
+                            }
+                            return LogItem.height;
+                          },
+                          itemCount: logs.length * 2 - 1,
+                        ),
                       );
                     },
-                    itemExtentBuilder: (index, _) {
-                      if (index.isOdd) {
-                        return 0;
-                      }
-                      return LogItem.height;
-                    },
-                    itemCount: logs.length * 2 - 1,
                   ),
                 ),
               ),

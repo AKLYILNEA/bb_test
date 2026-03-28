@@ -10,6 +10,27 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+final _iconCache = <String, Uint8List?>{};
+final _iconCacheKeys = <String>[];
+const _maxIconCacheSize = 50;
+
+void _addToIconCache(String key, Uint8List? value) {
+  if (_iconCache.containsKey(key)) {
+    _iconCacheKeys.remove(key);
+    _iconCacheKeys.add(key);
+    _iconCache[key] = value;
+    return;
+  }
+
+  while (_iconCacheKeys.length >= _maxIconCacheSize) {
+    final oldestKey = _iconCacheKeys.removeAt(0);
+    _iconCache.remove(oldestKey);
+  }
+
+  _iconCacheKeys.add(key);
+  _iconCache[key] = value;
+}
+
 class TrackerInfoItem extends ConsumerWidget {
   final TrackerInfo trackerInfo;
   final Function(String)? onClickKeyword;
@@ -36,10 +57,6 @@ class TrackerInfoItem extends ConsumerWidget {
         measure.bodyLargeHeight +
         subTitleHeight +
         16 * 2;
-  }
-
-  Future<Uint8List?> _getPackageIcon(TrackerInfo connection) async {
-    return await app.getPackageIcon(connection.metadata.process);
   }
 
   String _getSourceText(TrackerInfo trackerInfo) {
@@ -126,40 +143,9 @@ class TrackerInfoItem extends ConsumerWidget {
       ),
     );
     final icon = value
-        ? GestureDetector(
-            onTap: () {
-              if (onClickKeyword == null) return;
-              final process = trackerInfo.metadata.process;
-              if (process.isEmpty) return;
-              onClickKeyword!(process);
-            },
-            child: Container(
-              margin: const EdgeInsets.only(top: 4),
-              width: 42,
-              height: 42,
-              child: FutureBuilder<Uint8List?>(
-                future: _getPackageIcon(trackerInfo),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData || snapshot.data == null) {
-                    return Container();
-                  } else {
-                    final devicePixelRatio = MediaQuery.of(
-                      context,
-                    ).devicePixelRatio;
-                    final cacheSize = (42 * devicePixelRatio).ceil();
-
-                    return Image.memory(
-                      snapshot.data!,
-                      gaplessPlayback: true,
-                      width: 42,
-                      height: 42,
-                      cacheWidth: cacheSize,
-                      cacheHeight: cacheSize,
-                    );
-                  }
-                },
-              ),
-            ),
+        ? _ProcessIcon(
+            process: trackerInfo.metadata.process,
+            onClick: onClickKeyword,
           )
         : null;
     return ListItem(
@@ -192,6 +178,60 @@ class TrackerInfoItem extends ConsumerWidget {
           const SizedBox(height: 8),
           subTitle,
         ],
+      ),
+    );
+  }
+}
+
+Future<Uint8List?> _getPackageIcon(String process) async {
+  if (_iconCache.containsKey(process)) {
+    return _iconCache[process];
+  }
+  final icon = await app.getPackageIcon(process);
+  _addToIconCache(process, icon);
+  return icon;
+}
+
+class _ProcessIcon extends StatelessWidget {
+  final String process;
+  final Function(String)? onClick;
+
+  const _ProcessIcon({required this.process, this.onClick});
+
+  @override
+  Widget build(BuildContext context) {
+    if (process.isEmpty) return const SizedBox(width: 42, height: 42);
+
+    final devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
+    final cacheSize = (42 * devicePixelRatio).ceil();
+
+    return RepaintBoundary(
+      child: GestureDetector(
+        onTap: () => onClick?.call(process),
+        child: Container(
+          margin: const EdgeInsets.only(top: 4),
+          width: 42,
+          height: 42,
+          child: FutureBuilder<Uint8List?>(
+            future: _getPackageIcon(process),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData || snapshot.data == null) {
+                return const SizedBox.shrink();
+              }
+              return Image(
+                image: ResizeImage(
+                  MemoryImage(snapshot.data!),
+                  width: cacheSize,
+                  height: cacheSize,
+                  allowUpscaling: false,
+                ),
+                width: 42,
+                height: 42,
+                gaplessPlayback: true,
+              );
+            },
+          ),
+        ),
       ),
     );
   }

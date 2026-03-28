@@ -1327,6 +1327,18 @@ class AppController {
       commonPrint.log('Starting recovery from file: $path');
 
       final archive = await Isolate.run<Archive>(() {
+        try {
+          final input = InputFileStream(path);
+          final zipDecoder = ZipDecoder();
+          final result = zipDecoder.decodeStream(input);
+          input.close();
+          if (result.files.isNotEmpty) {
+            return result;
+          }
+        } catch (e) {
+          commonPrint.log('Stream decoding failed: $e');
+        }
+
         final bytes = File(path).readAsBytesSync();
         final zipDecoder = ZipDecoder();
         return zipDecoder.decodeBytes(bytes);
