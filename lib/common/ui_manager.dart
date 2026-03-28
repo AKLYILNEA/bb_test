@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:archive/archive_io.dart';
 import 'package:flutter/services.dart';
@@ -15,95 +16,85 @@ class UiManager {
     return _instance!;
   }
 
-  /// 初始化 UI 文件
   Future<void> initializeUI() async {
     try {
       final uiPath = await appPath.uiPath;
       final uiDir = Directory(uiPath);
-
-      // Check version file
       final versionFile = File(join(uiPath, '.ui_version'));
-      const currentVersion = '2.7.0'; // Update version
+      const currentVersion = '2.8.0';
 
       if (await uiDir.exists()) {
-        final files = await uiDir.list().toList();
-        if (files.isNotEmpty) {
-          // Check version
-          if (await versionFile.exists()) {
-            final existingVersion = await versionFile.readAsString();
-            if (existingVersion.trim() == currentVersion) {
-              commonPrint.log('UI already up to date (v$currentVersion)');
-              return;
-            }
-            commonPrint.log('UI version mismatch: $existingVersion -> $currentVersion');
+        if (await versionFile.exists()) {
+          final existingVersion = await versionFile.readAsString();
+          if (existingVersion.trim() == currentVersion) {
+            commonPrint.log('UI already up to date (v$currentVersion)');
+            return;
           }
-          // Clear old UI for update
-          await clearUI();
+          commonPrint.log('UI version mismatch: $existingVersion -> $currentVersion');
         }
+        await clearUI();
       }
 
       commonPrint.log('Extracting UI from assets...');
 
-      // 创建 UI 目录
       await uiDir.create(recursive: true);
 
-      // 从 assets 读取 zip 文件
       final zipData = await rootBundle.load('assets/data/zash.zip');
-      final bytes = zipData.buffer.asUint8List();
+      
+      final bytes = Uint8List.fromList(zipData.buffer.asUint8List());
 
-      // 解压到临时目录
       final tempPath = await appPath.tempPath;
       final tempExtractPath = join(
         tempPath,
         'ui_extract_${DateTime.now().millisecondsSinceEpoch}',
       );
-      final tempExtractDir = Directory(tempExtractPath);
-      await tempExtractDir.create(recursive: true);
 
-      try {
-        // 解压 zip 文件
-        final archive = ZipDecoder().decodeBytes(bytes);
+      await Isolate.run(() async {
+        final tempExtractDir = Directory(tempExtractPath);
+        await tempExtractDir.create(recursive: true);
 
-        for (final file in archive) {
-          final filename = file.name;
-          final filePath = join(tempExtractPath, filename);
+        try {
+          final archive = ZipDecoder().decodeBytes(bytes);
 
-          if (file.isFile) {
-            final outFile = File(filePath);
-            await outFile.create(recursive: true);
-            await outFile.writeAsBytes(file.content as List<int>);
-          } else {
-            await Directory(filePath).create(recursive: true);
+          for (final file in archive) {
+            final filename = file.name;
+            final filePath = join(tempExtractPath, filename);
+
+            if (file.isFile) {
+              final outFile = File(filePath);
+              await outFile.create(recursive: true);
+              await outFile.writeAsBytes(file.content as List<int>);
+            } else {
+              await Directory(filePath).create(recursive: true);
+            }
+          }
+
+          final extractedFiles = await tempExtractDir.list().toList();
+          String sourceDir = tempExtractPath;
+
+          if (extractedFiles.length == 1 && extractedFiles.first is Directory) {
+            sourceDir = extractedFiles.first.path;
+          }
+
+          await _copyDirectory(Directory(sourceDir), Directory(uiPath));
+
+          final vFile = File(join(uiPath, '.ui_version'));
+          await vFile.writeAsString(currentVersion);
+        } finally {
+          if (await tempExtractDir.exists()) {
+            await tempExtractDir.delete(recursive: true);
           }
         }
+      });
 
-        // 移动文件到目标目录
-        final extractedFiles = await tempExtractDir.list().toList();
-        String sourceDir = tempExtractPath;
-
-        if (extractedFiles.length == 1 && extractedFiles.first is Directory) {
-          sourceDir = extractedFiles.first.path;
-        }
-
-        await _copyDirectory(Directory(sourceDir), uiDir);
-
-        final versionFile = File(join(uiPath, '.ui_version'));
-        await versionFile.writeAsString(currentVersion);
-
-        commonPrint.log('UI extracted successfully to: $uiPath (v$currentVersion)');
-      } finally {
-        if (await tempExtractDir.exists()) {
-          await tempExtractDir.delete(recursive: true);
-        }
-      }
+      commonPrint.log('UI extracted successfully to: $uiPath (v$currentVersion)');
     } catch (e) {
       commonPrint.log('Error extracting UI: $e');
       rethrow;
     }
   }
 
-  /// 递归复制目录
-  Future<void> _copyDirectory(Directory source, Directory destination) async {
+  static Future<void> _copyDirectory(Directory source, Directory destination) async {
     await for (final entity in source.list(recursive: false)) {
       if (entity is Directory) {
         final newDirectory = Directory(
@@ -118,7 +109,6 @@ class UiManager {
     }
   }
 
-  /// 清理 UI 文件
   Future<void> clearUI() async {
     try {
       final uiPath = await appPath.uiPath;

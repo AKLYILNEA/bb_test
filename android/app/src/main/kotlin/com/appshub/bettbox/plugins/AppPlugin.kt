@@ -244,9 +244,6 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
     }
 
     private fun updateExcludeFromRecents(value: Boolean?) {
-        if (Build.VERSION.SDK_INT >= 38) {
-            return
-        }
         val am = BettboxApplication.getAppContext().getSystemService<ActivityManager>()
         val taskId = activityRef?.get()?.taskId ?: return
         val task = am?.appTasks?.firstOrNull {

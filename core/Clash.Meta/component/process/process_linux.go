@@ -1,14 +1,17 @@
 package process
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"net/netip"
 	"os"
 	"path"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"syscall"
 	"unicode"
@@ -61,10 +64,29 @@ type inetDiagResponse struct {
 
 func findProcessName(network string, ip netip.Addr, srcPort int) (uint32, string, error) {
 	uid, inode, err := resolveSocketByNetlink(network, ip, srcPort)
+	if runtime.GOOS == "android" {
+		// on Android (especially recent releases), netlink INET_DIAG can fail or return UID 0 / empty process info for some apps
+		// so trying fallback to resolve /proc/net/{tcp,tcp6,udp,udp6}
+		if err != nil {
+			uid, inode, err = resolveSocketByProcFS(network, ip, srcPort)
+		} else if uid == 0 {
+			pUID, pInode, pErr := resolveSocketByProcFS(network, ip, srcPort)
+			if pErr == nil && pUID != 0 {
+				uid, inode, err = pUID, pInode, nil
+			}
+		}
+	}
 	if err != nil {
 		return 0, "", err
 	}
 	pp, err := resolveProcessNameByProcSearch(inode, uid)
+	if runtime.GOOS == "android" {
+		// if inode-based /proc/<pid>/fd resolution fails but UID is known,
+		// fall back to resolving the process/package name by UID (typical on Android where all app processes share one UID).
+		if err != nil && uid != 0 {
+			pp, err = resolveProcessNameByUID(uid)
+		}
+	}
 	return uid, pp, err
 }
 
@@ -180,6 +202,47 @@ func resolveProcessNameByProcSearch(inode, uid uint32) (string, error) {
 	return "", fmt.Errorf("process of uid(%d),inode(%d) not found", uid, inode)
 }
 
+// resolveProcessNameByUID returns a process name for any process with uid.
+// On Android all processes of one app share the same UID; used when inode
+// lookup fails (socket closed / TIME_WAIT).
+func resolveProcessNameByUID(uid uint32) (string, error) {
+	files, err := os.ReadDir("/proc")
+	if err != nil {
+		return "", err
+	}
+
+	for _, f := range files {
+		if !f.IsDir() || !isPid(f.Name()) {
+			continue
+		}
+
+		info, err := f.Info()
+		if err != nil {
+			continue
+		}
+		if info.Sys().(*syscall.Stat_t).Uid != uid {
+			continue
+		}
+
+		processPath := filepath.Join("/proc", f.Name())
+		if runtime.GOOS == "android" {
+			cmdline, err := os.ReadFile(path.Join(processPath, "cmdline"))
+			if err != nil {
+				continue
+			}
+			if name := splitCmdline(cmdline); name != "" {
+				return name, nil
+			}
+		} else {
+			if exe, err := os.Readlink(filepath.Join(processPath, "exe")); err == nil {
+				return exe, nil
+			}
+		}
+	}
+
+	return "", fmt.Errorf("no process found with uid %d", uid)
+}
+
 func splitCmdline(cmdline []byte) string {
 	cmdline = bytes.Trim(cmdline, " ")
 
@@ -197,4 +260,144 @@ func isPid(s string) bool {
 	return strings.IndexFunc(s, func(r rune) bool {
 		return !unicode.IsDigit(r)
 	}) == -1
+}
+
+// resolveSocketByProcFS finds UID and inode from /proc/net/{tcp,tcp6,udp,udp6}.
+// In TUN mode metadata sourceIP is often the gateway (e.g. fake-ip range), not
+// the socket's real local address; we match by local port first and prefer
+// exact IP+port when it matches.
+func resolveSocketByProcFS(network string, ip netip.Addr, srcPort int) (uint32, uint32, error) {
+	var proto string
+	switch {
+	case strings.HasPrefix(network, "tcp"):
+		proto = "tcp"
+	case strings.HasPrefix(network, "udp"):
+		proto = "udp"
+	default:
+		return 0, 0, ErrInvalidNetwork
+	}
+
+	targetPort := uint16(srcPort)
+	unmapped := ip.Unmap()
+	files := []string{"/proc/net/" + proto, "/proc/net/" + proto + "6"}
+
+	var bestUID, bestInode uint32
+	found := false
+
+	for _, path := range files {
+		isV6 := strings.HasSuffix(path, "6")
+
+		var matchIP netip.Addr
+		if unmapped.Is4() {
+			if isV6 {
+				matchIP = netip.AddrFrom16(unmapped.As16())
+			} else {
+				matchIP = unmapped
+			}
+		} else {
+			if !isV6 {
+				continue
+			}
+			matchIP = unmapped
+		}
+
+		uid, inode, exact, err := searchProcNetFileByPort(path, matchIP, targetPort)
+		if err != nil {
+			continue
+		}
+
+		if exact {
+			return uid, inode, nil
+		}
+
+		if !found || (bestUID == 0 && uid != 0) {
+			bestUID = uid
+			bestInode = inode
+			found = true
+		}
+	}
+
+	if found {
+		return bestUID, bestInode, nil
+	}
+	return 0, 0, ErrNotFound
+}
+
+// searchProcNetFileByPort scans /proc/net/* for local_address matching targetPort.
+// Exact IP+port wins; else port-only (skips inode==0 entries used by TIME_WAIT).
+func searchProcNetFileByPort(path string, targetIP netip.Addr, targetPort uint16) (uid, inode uint32, exact bool, err error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return 0, 0, false, err
+	}
+	defer f.Close()
+
+	isV6 := strings.HasSuffix(path, "6")
+	scanner := bufio.NewScanner(f)
+	// skip header
+	scanner.Scan()
+
+	for scanner.Scan() {
+		fields := strings.Fields(scanner.Text())
+		if len(fields) < 10 {
+			continue
+		}
+
+		localAddr := fields[1]
+		parts := strings.Split(localAddr, ":")
+		if len(parts) != 2 {
+			continue
+		}
+
+		portHex := parts[1]
+		port, err := strconv.ParseUint(portHex, 16, 16)
+		if err != nil || uint16(port) != targetPort {
+			continue
+		}
+
+		inodeStr := fields[9]
+		if inodeStr == "0" {
+			continue // TIME_WAIT entries have inode 0
+		}
+		inode64, err := strconv.ParseUint(inodeStr, 10, 32)
+		if err != nil {
+			continue
+		}
+
+		uid64, _ := strconv.ParseUint(fields[7], 10, 32)
+
+		addrHex := parts[0]
+		if isV6 {
+			addrBytes, err := hex.DecodeString(addrHex)
+			if err != nil || len(addrBytes) != 16 {
+				continue
+			}
+			// IPv6 addresses in /proc/net/tcp6 are in network byte order (big-endian)
+			var addr [16]byte
+			copy(addr[:], addrBytes)
+			parsedIP := netip.AddrFrom16(addr)
+			if parsedIP == targetIP {
+				return uint32(uid64), uint32(inode64), true, nil
+			}
+		} else {
+			addrBytes, err := hex.DecodeString(addrHex)
+			if err != nil || len(addrBytes) != 4 {
+				continue
+			}
+			// IPv4 addresses in /proc/net/tcp are in little-endian order
+			parsedIP := netip.AddrFrom4([4]byte{addrBytes[3], addrBytes[2], addrBytes[1], addrBytes[0]})
+			if parsedIP == targetIP {
+				return uint32(uid64), uint32(inode64), true, nil
+			}
+		}
+
+		// port matched but IP didn't - save as best effort
+		if !exact {
+			uid = uint32(uid64)
+			inode = uint32(inode64)
+			exact = false
+		}
+	}
+
+	return uid, inode, exact, scanner.Err()
 }

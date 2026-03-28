@@ -18,8 +18,8 @@ import (
 	mihomoVMess "github.com/metacubex/mihomo/transport/vmess"
 
 	"github.com/metacubex/http"
-	vmess "github.com/metacubex/sing-vmess"
 	"github.com/metacubex/mhurl"
+	vmess "github.com/metacubex/sing-vmess"
 	"github.com/metacubex/sing/common"
 	"github.com/metacubex/sing/common/metadata"
 	"github.com/metacubex/tls"
@@ -230,7 +230,7 @@ func HandleVmess(conn net.Conn, tunnel C.Tunnel, additions ...inbound.Addition) 
 }
 
 func ParseVmessURL(s string) (addr, username, password string, err error) {
-	u, err := mhurl.Parse(s)
+	u, err := mhurl.Parse(s) // we need multiple hosts url supports
 	if err != nil {
 		return
 	}

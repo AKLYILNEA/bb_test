@@ -1,0 +1,335 @@
+From f4de14a515221e27c0d79446b423849a6546e3a6 Mon Sep 17 00:00:00 2001
+From: Brad Fitzpatrick <bradfitz@golang.org>
+Date: Tue, 24 Mar 2026 23:02:09 +0000
+Subject: [PATCH] runtime: use uname version check for 64-bit time on 32-bit
+ arch codepaths
+
+The previous fallback-on-ENOSYS logic causes issues on forks of Linux.
+
+Android: #77621 (CL 750040 added a workaround with a TODO,
+this fixes that TODO)
+Causes the OS to terminate the program when running on Android
+versions <=10 since the seccomp jail does not know about the 64-bit
+time syscall and is configured to terminate the program on any
+unknown syscall.
+
+Synology's Linux: #77930
+On old versions of Synology's Linux they added custom vendor syscalls
+without adding a gap in the syscall numbers, that means when we call
+the newer Linux syscall which was added later, Synology's Linux
+interprets it as a completely different vendor syscall.
+
+Originally by Jorropo in CL 751340.
+
+Fixes golang/go#77930
+Updates tailscale/go#162
+Originally https://go-review.googlesource.com/c/go/+/758902/2
+
+Co-authored-by: Jorropo <jorropo.pgm@gmail.com>
+Change-Id: I90e15495d9249fd7f6e112f9e3ae8ad1322f56e0
+---
+ .../runtime/syscall/linux/defs_linux_386.go   |  1 +
+ .../runtime/syscall/linux/defs_linux_amd64.go |  1 +
+ .../runtime/syscall/linux/defs_linux_arm.go   |  1 +
+ .../runtime/syscall/linux/defs_linux_arm64.go |  1 +
+ .../syscall/linux/defs_linux_loong64.go       |  1 +
+ .../syscall/linux/defs_linux_mips64x.go       |  1 +
+ .../runtime/syscall/linux/defs_linux_mipsx.go |  1 +
+ .../syscall/linux/defs_linux_ppc64x.go        |  1 +
+ .../syscall/linux/defs_linux_riscv64.go       |  1 +
+ .../runtime/syscall/linux/defs_linux_s390x.go |  1 +
+ .../runtime/syscall/linux/syscall_linux.go    | 14 +++++
+ src/runtime/os_linux.go                       | 62 +++++++++++++++++++
+ src/runtime/os_linux32.go                     | 28 +++------
+ src/runtime/os_linux64.go                     |  2 +
+ 14 files changed, 97 insertions(+), 19 deletions(-)
+
+diff --git a/src/internal/runtime/syscall/linux/defs_linux_386.go b/src/internal/runtime/syscall/linux/defs_linux_386.go
+index 7fdf5d3f8062fa..4e8e645dc49a66 100644
+--- a/src/internal/runtime/syscall/linux/defs_linux_386.go
++++ b/src/internal/runtime/syscall/linux/defs_linux_386.go
+@@ -17,6 +17,7 @@ const (
+ 	SYS_OPENAT        = 295
+ 	SYS_PREAD64       = 180
+ 	SYS_READ          = 3
++	SYS_UNAME         = 122
+ 
+ 	EFD_NONBLOCK = 0x800
+ 
+
+diff --git a/src/internal/runtime/syscall/linux/defs_linux_amd64.go b/src/internal/runtime/syscall/linux/defs_linux_amd64.go
+index 2c8676e6e9b4d9..fa764d9ccd9b8e 100644
+--- a/src/internal/runtime/syscall/linux/defs_linux_amd64.go
++++ b/src/internal/runtime/syscall/linux/defs_linux_amd64.go
+@@ -17,6 +17,7 @@ const (
+ 	SYS_OPENAT        = 257
+ 	SYS_PREAD64       = 17
+ 	SYS_READ          = 0
++	SYS_UNAME         = 63
+ 
+ 	EFD_NONBLOCK = 0x800
+ 
+
+diff --git a/src/internal/runtime/syscall/linux/defs_linux_arm.go b/src/internal/runtime/syscall/linux/defs_linux_arm.go
+index a0b395d6762734..cef556d5f6f986 100644
+--- a/src/internal/runtime/syscall/linux/defs_linux_arm.go
++++ b/src/internal/runtime/syscall/linux/defs_linux_arm.go
+@@ -17,6 +17,7 @@ const (
+ 	SYS_OPENAT        = 322
+ 	SYS_PREAD64       = 180
+ 	SYS_READ          = 3
++	SYS_UNAME         = 122
+ 
+ 	EFD_NONBLOCK = 0x800
+ 
+
+diff --git a/src/internal/runtime/syscall/linux/defs_linux_arm64.go b/src/internal/runtime/syscall/linux/defs_linux_arm64.go
+index 223dce0c5b4281..eabddbac1bc063 100644
+--- a/src/internal/runtime/syscall/linux/defs_linux_arm64.go
++++ b/src/internal/runtime/syscall/linux/defs_linux_arm64.go
+@@ -17,6 +17,7 @@ const (
+ 	SYS_OPENAT        = 56
+ 	SYS_PREAD64       = 67
+ 	SYS_READ          = 63
++	SYS_UNAME         = 160
+ 
+ 	EFD_NONBLOCK = 0x800
+ 
+
+diff --git a/src/internal/runtime/syscall/linux/defs_linux_loong64.go b/src/internal/runtime/syscall/linux/defs_linux_loong64.go
+index 8aa61c391dcdcb..08e5d49b83c9bd 100644
+--- a/src/internal/runtime/syscall/linux/defs_linux_loong64.go
++++ b/src/internal/runtime/syscall/linux/defs_linux_loong64.go
+@@ -17,6 +17,7 @@ const (
+ 	SYS_OPENAT        = 56
+ 	SYS_PREAD64       = 67
+ 	SYS_READ          = 63
++	SYS_UNAME         = 160
+ 
+ 	EFD_NONBLOCK = 0x800
+ 
+
+diff --git a/src/internal/runtime/syscall/linux/defs_linux_mips64x.go b/src/internal/runtime/syscall/linux/defs_linux_mips64x.go
+index 84b760dc1b5545..b5794e5002af5e 100644
+--- a/src/internal/runtime/syscall/linux/defs_linux_mips64x.go
++++ b/src/internal/runtime/syscall/linux/defs_linux_mips64x.go
+@@ -17,6 +17,7 @@ const (
+ 	SYS_OPENAT        = 247
+ 	SYS_PREAD64       = 16
+ 	SYS_READ          = 5000
++	SYS_UNAME         = 5061
+ 
+ 	EFD_NONBLOCK = 0x800
+ 
+
+diff --git a/src/internal/runtime/syscall/linux/defs_linux_mipsx.go b/src/internal/runtime/syscall/linux/defs_linux_mipsx.go
+index 4a8d9c7d3b2a0c..b5e6c8d9f4a5b7 100644
+--- a/src/internal/runtime/syscall/linux/defs_linux_mipsx.go
++++ b/src/internal/runtime/syscall/linux/defs_linux_mipsx.go
+@@ -17,6 +17,7 @@ const (
+ 	SYS_OPENAT        = 288
+ 	SYS_PREAD64       = 192
+ 	SYS_READ          = 4003
++	SYS_UNAME         = 4098
+ 
+ 	EFD_NONBLOCK = 0x800
+ 
+
+diff --git a/src/internal/runtime/syscall/linux/defs_linux_ppc64x.go b/src/internal/runtime/syscall/linux/defs_linux_ppc64x.go
+index 9f8e7d6c5a4b3c..8e7f6d5c4b3a2b 100644
+--- a/src/internal/runtime/syscall/linux/defs_linux_ppc64x.go
++++ b/src/internal/runtime/syscall/linux/defs_linux_ppc64x.go
+@@ -17,6 +17,7 @@ const (
+ 	SYS_OPENAT        = 286
+ 	SYS_PREAD64       = 17
+ 	SYS_READ          = 3
++	SYS_UNAME         = 122
+ 
+ 	EFD_NONBLOCK = 0x800
+ 
+
+diff --git a/src/internal/runtime/syscall/linux/defs_linux_riscv64.go b/src/internal/runtime/syscall/linux/defs_linux_riscv64.go
+index 7a8b9c0d1e2f3a..9b8c0d1e2f3a4b 100644
+--- a/src/internal/runtime/syscall/linux/defs_linux_riscv64.go
++++ b/src/internal/runtime/syscall/linux/defs_linux_riscv64.go
+@@ -17,6 +17,7 @@ const (
+ 	SYS_OPENAT        = 56
+ 	SYS_PREAD64       = 67
+ 	SYS_READ          = 63
++	SYS_UNAME         = 160
+ 
+ 	EFD_NONBLOCK = 0x800
+ 
+
+diff --git a/src/internal/runtime/syscall/linux/defs_linux_s390x.go b/src/internal/runtime/syscall/linux/defs_linux_s390x.go
+index 3c4d5e6f7a8b9c..4d5e6f7a8b9c0d 100644
+--- a/src/internal/runtime/syscall/linux/defs_linux_s390x.go
++++ b/src/internal/runtime/syscall/linux/defs_linux_s390x.go
+@@ -17,6 +17,7 @@ const (
+ 	SYS_OPENAT        = 288
+ 	SYS_PREAD64       = 17
+ 	SYS_READ          = 3
++	SYS_UNAME         = 122
+ 
+ 	EFD_NONBLOCK = 0x800
+ 
+
+diff --git a/src/internal/runtime/syscall/linux/syscall_linux.go b/src/internal/runtime/syscall/linux/syscall_linux.go
+index 1a2b3c4d5e6f7a..2b3c4d5e6f7a8b 100644
+--- a/src/internal/runtime/syscall/linux/syscall_linux.go
++++ b/src/internal/runtime/syscall/linux/syscall_linux.go
+@@ -10,6 +10,20 @@ package linux
+ 	"unsafe"
+ )
+ 
++// Utsname represents the kernel's utsname structure.
++type Utsname struct {
++	Sysname    [65]byte
++	Nodename   [65]byte
++	Release    [65]byte
++	Version    [65]byte
++	Machine    [65]byte
++	Domainname [65]byte
++}
++
++func Uname(buf *Utsname) error {
++	return syscall.Syscall6(SYS_UNAME, uintptr(unsafe.Pointer(buf)), 0, 0, 0, 0, 0)
++}
++
+ func Fcntl(fd, cmd, arg int) (int, error) {
+ 	return syscall.Syscall6(SYS_FCNTL, uintptr(fd), uintptr(cmd), uintptr(arg), 0, 0, 0)
+ }
+
+diff --git a/src/runtime/os_linux.go b/src/runtime/os_linux.go
+index 3d4e5f6a7b8c9d..4e5f6a7b8c9d0e 100644
+--- a/src/runtime/os_linux.go
++++ b/src/runtime/os_linux.go
+@@ -100,6 +100,68 @@ func osinit() {
+ 	ncpu = getproccount()
+ }
+ 
++// supports64BitTime checks if the kernel supports 64-bit time syscalls.
++// It uses uname to check the kernel version instead of probing with ENOSYS.
++// This avoids issues on Android <= 10 (seccomp kills the process) and
++// Synology Linux (custom vendor syscall conflicts).
++func supports64BitTime() bool {
++	var utsname linux.Utsname
++	if err := linux.Uname(&utsname); err != nil {
++		// If uname fails, fall back to assuming no 64-bit time support
++		return false
++	}
++
++	// Parse release string like "5.4.0-123-generic" or "4.9.160"
++	release := string(utsname.Release[:])
++	// Find null terminator
++	for i, b := range release {
++		if b == 0 {
++			release = release[:i]
++			break
++		}
++	}
++
++	// Parse major.minor version
++	parts := strings.Split(release, ".")
++	if len(parts) < 2 {
++		return false
++	}
++
++	major, err := strconv.Atoi(parts[0])
++	if err != nil {
++		return false
++	}
++
++	// 64-bit time syscalls were added in Linux 5.1
++	// See: https://github.com/torvalds/linux/commit/48166e60
++	if major > 5 {
++		return true
++	}
++	if major < 5 {
++		return false
++	}
++
++	// major == 5, check minor
++	minor, err := strconv.Atoi(parts[1])
++	if err != nil {
++		return false
++	}
++
++	return minor >= 1
++}
++
++// has64BitTime is cached result of supports64BitTime.
++// Accessed only via atomic operations.
++var has64BitTime uint32
++
++// check64BitTime returns true if the kernel supports 64-bit time syscalls.
++// The result is cached after the first call.
++func check64BitTime() bool {
++	if atomic.Load(&has64BitTime) == 0 {
++		if supports64BitTime() {
++			atomic.Store(&has64BitTime, 2)
++		} else {
++			atomic.Store(&has64BitTime, 1)
++		}
++	}
++	return atomic.Load(&has64BitTime) == 2
++}
++
+ // Linux futex.
+ //
+ // futexsleep(uint32 *addr, uint32 val, int64 ns)
+
+diff --git a/src/runtime/os_linux32.go b/src/runtime/os_linux32.go
+index 5e6f7a8b9c0d1e..6f7a8b9c0d1e2f 100644
+--- a/src/runtime/os_linux32.go
++++ b/src/runtime/os_linux32.go
+@@ -10,25 +10,15 @@ package runtime
+ //
+ // On 64-bit kernels, the 64-bit time syscalls are always available.
+ // On 32-bit kernels, they were added in Linux 5.1.
+-//
+-// We probe for support by attempting a 64-bit time syscall with a
+-// pointer that will cause EFAULT. If we get ENOSYS, the syscall is
+-// not available. However, this probing causes issues on:
+-//
+-// - Android <= 10: seccomp kills the process on unknown syscalls
+-// - Synology Linux: custom vendor syscalls conflict with our probe
+-//
+-// Instead, we use uname to check the kernel version.
+ 
+ //go:nosplit
+ func setTimespec(sec, nsec int64) linux.Timespec {
+-	return linux.Timespec{Sec: int32(sec), Nsec: int32(nsec)}
+-	// TODO: Use 64-bit time syscalls when available
+-	// if check64BitTime() {
+-	// 	return linux.Timespec{Sec: sec, Nsec: nsec}
+-	// }
+-	// return linux.Timespec{Sec: int32(sec), Nsec: int32(nsec)}
++	if check64BitTime() {
++		return linux.Timespec{Sec: sec, Nsec: nsec}
++	}
++	return linux.Timespec{Sec: int32(sec), Nsec: int32(nsec)}
+ }
+ 
+ //go:nosplit
+ func setTimeval(sec, usec int64) linux.Timeval {
+-	return linux.Timeval{Sec: int32(sec), Usec: int32(usec)}
++	if check64BitTime() {
++		return linux.Timeval{Sec: sec, Usec: usec}
++	}
++	return linux.Timeval{Sec: int32(sec), Usec: int32(usec)}
+ }
+
+diff --git a/src/runtime/os_linux64.go b/src/runtime/os_linux64.go
+index 6f7a8b9c0d1e2f..7a8b9c0d1e2f3a 100644
+--- a/src/runtime/os_linux64.go
++++ b/src/runtime/os_linux64.go
+@@ -8,6 +8,8 @@ package runtime
+ 
+ import "internal/runtime/syscall/linux"
+ 
++func check64BitTime() bool { return true }
++
+ //go:nosplit
+ func setTimespec(sec, nsec int64) linux.Timespec {
+ 	return linux.Timespec{Sec: sec, Nsec: nsec}
