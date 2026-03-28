@@ -162,10 +162,7 @@ class _AccessViewState extends ConsumerState<AccessView>
           _packageListPermissionDenied = false;
         });
       }
-      if (forceReload) {
-        ref.read(packagesProvider.notifier).value = [];
-      }
-      await globalState.appController.getPackages();
+      await globalState.appController.getPackages(forceRefresh: forceReload);
       if (!mounted) return;
       if (system.isAndroid && ref.read(packagesProvider).isEmpty) {
         if (!_packageListPermissionDenied) {

@@ -200,10 +200,25 @@ class _ProcessIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (process.isEmpty) return const SizedBox(width: 42, height: 42);
-
     final devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
     final cacheSize = (42 * devicePixelRatio).ceil();
+
+    Widget buildPlaceholder() {
+      return const Icon(
+        Icons.language,
+        size: 32,
+      );
+    }
+
+    if (process.isEmpty) {
+      return Container(
+        margin: const EdgeInsets.only(top: 4),
+        width: 42,
+        height: 42,
+        alignment: Alignment.center,
+        child: buildPlaceholder(),
+      );
+    }
 
     return RepaintBoundary(
       child: GestureDetector(
@@ -212,14 +227,15 @@ class _ProcessIcon extends StatelessWidget {
           margin: const EdgeInsets.only(top: 4),
           width: 42,
           height: 42,
+          alignment: Alignment.center,
           child: FutureBuilder<Uint8List?>(
             future: _getPackageIcon(process),
             builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return buildPlaceholder();
+              }
               if (!snapshot.hasData || snapshot.data == null) {
-                return const Icon(
-                  Icons.apps,
-                  size: 32,
-                );
+                return buildPlaceholder();
               }
               return Image(
                 image: ResizeImage(

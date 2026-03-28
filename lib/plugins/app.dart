@@ -39,9 +39,11 @@ class App {
     return await methodChannel.invokeMethod<bool>('moveTaskToBack');
   }
 
-  Future<List<Package>> getPackages() async {
+  Future<List<Package>> getPackages({bool forceRefresh = false}) async {
     final packagesRaw =
-        await methodChannel.invokeMethod<List<dynamic>>('getPackages') ??
+        await methodChannel.invokeMethod<List<dynamic>>('getPackages', {
+          'forceRefresh': forceRefresh,
+        }) ??
         const <dynamic>[];
     return packagesRaw
         .map((e) => Package.fromJson(Map<String, Object?>.from(e as Map)))
@@ -146,6 +148,12 @@ class App {
     final result = await methodChannel.invokeMethod<bool>('setLauncherIcon', {
       'useLightIcon': useLightIcon,
     });
+    return result ?? false;
+  }
+
+  /// 检测是否为 Android TV
+  Future<bool> isAndroidTV() async {
+    final result = await methodChannel.invokeMethod<bool>('isAndroidTV');
     return result ?? false;
   }
 }

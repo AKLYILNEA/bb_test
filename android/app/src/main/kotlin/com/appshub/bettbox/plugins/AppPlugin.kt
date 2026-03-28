@@ -52,6 +52,7 @@ import android.graphics.drawable.Drawable
 class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware {
 
     private var activityRef: WeakReference<Activity>? = null
+    private var cachedTaskId: Int? = null
     private lateinit var channel: MethodChannel
     private lateinit var scope: CoroutineScope
     private var vpnCallBack: (() -> Unit)? = null
@@ -146,6 +147,11 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
         return nightModeFlags == Configuration.UI_MODE_NIGHT_YES
     }
 
+    private fun isAndroidTV(): Boolean {
+        val uiMode = BettboxApplication.getAppContext().resources.configuration.uiMode
+        return (uiMode and Configuration.UI_MODE_TYPE_MASK) == Configuration.UI_MODE_TYPE_TELEVISION
+    }
+
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
         scope.cancel()
@@ -164,15 +170,16 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
                 result.success(true)
             }
             "updateExcludeFromRecents" -> {
-                updateExcludeFromRecents(call.argument<Boolean>("value"))
-                result.success(true)
+                val success = updateExcludeFromRecents(call.argument<Boolean>("value"))
+                result.success(success)
             }
             "initShortcuts" -> {
                 initShortcuts(call.arguments as String)
                 result.success(true)
             }
             "getPackages" -> scope.launch {
-                runCatching { result.success(getPackagesToList()) }
+                val forceRefresh = call.argument<Boolean>("forceRefresh") ?: false
+                runCatching { result.success(getPackagesToList(forceRefresh)) }
                     .onFailure { result.error("GET_PACKAGES_FAILED", it.message, null) }
             }
             "getChinaPackageNames" -> scope.launch {
@@ -223,37 +230,66 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
                 openAppSettings()
                 result.success(true)
             }
+            "isAndroidTV" -> {
+                result.success(isAndroidTV())
+            }
             else -> result.notImplemented()
         }
     }
 
     private fun openFile(path: String) {
+        val context = BettboxApplication.getAppContext()
         val file = File(path)
         val uri = FileProvider.getUriForFile(
-            BettboxApplication.getAppContext(),
-            "${BettboxApplication.getAppContext().packageName}.fileProvider",
+            context,
+            "${context.packageName}.fileProvider",
             file
         )
         val intent = Intent(Intent.ACTION_VIEW).setDataAndType(uri, "text/plain")
         val flags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION
-        BettboxApplication.getAppContext().packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+        context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
             .forEach {
-                BettboxApplication.getAppContext().grantUriPermission(it.activityInfo.packageName, uri, flags)
+                context.grantUriPermission(it.activityInfo.packageName, uri, flags)
             }
         runCatching { activityRef?.get()?.startActivity(intent) }
     }
 
-    private fun updateExcludeFromRecents(value: Boolean?) {
-        val am = BettboxApplication.getAppContext().getSystemService<ActivityManager>()
-        val taskId = activityRef?.get()?.taskId ?: return
-        val task = am?.appTasks?.firstOrNull {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                it.taskInfo.taskId == taskId
-            } else {
-                it.taskInfo.id == taskId
+    private fun updateExcludeFromRecents(value: Boolean?): Boolean {
+        return runCatching {
+            val am = BettboxApplication.getAppContext().getSystemService<ActivityManager>()
+
+            var taskId = cachedTaskId
+            if (taskId == null) {
+                taskId = activityRef?.get()?.taskId
+                if (taskId != null) {
+                    cachedTaskId = taskId
+                }
             }
-        }
-        task?.setExcludeFromRecents(value ?: false)
+
+            if (taskId == null) {
+                return@runCatching false
+            }
+
+            val task = runCatching {
+                am?.appTasks?.firstOrNull {
+                    runCatching {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            it.taskInfo.taskId == taskId
+                        } else {
+                            it.taskInfo.id == taskId
+                        }
+                    }.getOrDefault(false)
+                }
+            }.getOrNull()
+
+            if (task == null) {
+                cachedTaskId = null
+                return@runCatching false
+            }
+
+            task.setExcludeFromRecents(value ?: false)
+            true
+        }.getOrDefault(false)
     }
 
     private fun getIconSizePx(): Int {
@@ -318,7 +354,10 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
             null
         }
 
-    private suspend fun getPackages(): List<Package> = withContext(Dispatchers.IO) {
+    private suspend fun getPackages(forceRefresh: Boolean = false): List<Package> = withContext(Dispatchers.IO) {
+        if (forceRefresh) {
+            packages.clear()
+        }
         if (packages.isNotEmpty()) return@withContext packages
         val pm = BettboxApplication.getAppContext().packageManager ?: return@withContext emptyList()
         val selfPackageName = BettboxApplication.getAppContext().packageName
@@ -339,8 +378,8 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
         packages
     }
 
-    private suspend fun getPackagesToList(): List<Map<String, Any>> =
-        getPackages().map { mapOf("packageName" to it.packageName, "label" to it.label, "system" to it.system, "internet" to it.internet, "lastUpdateTime" to it.lastUpdateTime) }
+    private suspend fun getPackagesToList(forceRefresh: Boolean = false): List<Map<String, Any>> =
+        getPackages(forceRefresh).map { mapOf("packageName" to it.packageName, "label" to it.label, "system" to it.system, "internet" to it.internet, "lastUpdateTime" to it.lastUpdateTime) }
 
     private suspend fun getChinaPackageNamesList(): List<String> =
         getPackages().map { it.packageName }.filter { isChinaPackage(it) }
@@ -380,7 +419,8 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
         chinaPackageCache.getOrPut(packageName) { isChinaPackageInternal(packageName) }
 
     private fun isChinaPackageInternal(packageName: String): Boolean {
-        val pm = BettboxApplication.getAppContext().packageManager ?: return false
+        val context = BettboxApplication.getAppContext()
+        val pm = context.packageManager ?: return false
         if (SKIP_PREFIX_LIST.any { packageName == it || packageName.startsWith("$it.") }) return false
         if (packageName.matches(CHINA_APP_REGEX)) return true
         if (isChinaCertificate(packageName, pm)) return true
@@ -430,11 +470,16 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
         binding.addRequestPermissionsResultListener(::onRequestPermissionsResultListener)
     }
 
-    override fun onDetachedFromActivityForConfigChanges() { activityRef = null }
-    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) { activityRef = WeakReference(binding.activity) }
+    override fun onDetachedFromActivityForConfigChanges() {
+        activityRef = null
+    }
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+        activityRef = WeakReference(binding.activity)
+    }
     override fun onDetachedFromActivity() {
         channel.invokeMethod("exit", null)
         activityRef = null
+        cachedTaskId = null
     }
 
     private fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
@@ -473,8 +518,9 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
     }
 
     private fun setLauncherIcon(useLightIcon: Boolean) {
-        val pm = BettboxApplication.getAppContext().packageManager
-        val packageName = BettboxApplication.getAppContext().packageName
+        val context = BettboxApplication.getAppContext()
+        val pm = context.packageManager
+        val packageName = context.packageName
         val defaultComponent = android.content.ComponentName(packageName, "com.appshub.bettbox.MainActivity")
         val lightComponent = android.content.ComponentName(packageName, "com.appshub.bettbox.MainActivityLight")
 
@@ -490,7 +536,8 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
 
     private fun hasPackageListPermission(): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return true
-        val pm = BettboxApplication.getAppContext().packageManager
+        val context = BettboxApplication.getAppContext()
+        val pm = context.packageManager
         return arrayOf("com.android.settings", "com.android.systemui").any { pkg ->
             runCatching {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -521,12 +568,13 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
     }
 
     private fun getSelfLastUpdateTime(): Long {
-        val pm = BettboxApplication.getAppContext().packageManager
+        val context = BettboxApplication.getAppContext()
+        val pm = context.packageManager
         return runCatching {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                pm?.getPackageInfo(BettboxApplication.getAppContext().packageName, PackageManager.PackageInfoFlags.of(0))
+                pm?.getPackageInfo(context.packageName, PackageManager.PackageInfoFlags.of(0))
             } else {
-                pm?.getPackageInfo(BettboxApplication.getAppContext().packageName, 0)
+                pm?.getPackageInfo(context.packageName, 0)
             }?.lastUpdateTime
         }.getOrDefault(0L) ?: 0L
     }

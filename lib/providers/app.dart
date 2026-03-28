@@ -266,11 +266,17 @@ double viewWidth(Ref ref) {
 
 @riverpod
 ViewMode viewMode(Ref ref) {
+  if (globalState.isAndroidTV) {
+    return ViewMode.mobile;
+  }
   return utils.getViewMode(ref.watch(viewWidthProvider));
 }
 
 @riverpod
 bool isMobileView(Ref ref) {
+  if (globalState.isAndroidTV) {
+    return true;
+  }
   return ref.watch(viewModeProvider) == ViewMode.mobile;
 }
 

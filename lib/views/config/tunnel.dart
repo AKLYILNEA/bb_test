@@ -15,17 +15,7 @@ class TunnelListWidget extends ConsumerWidget {
     );
 
     if (tunnels.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.all(16),
-        child: Center(
-          child: Text(
-            appLocalizations.noData,
-            style: context.textTheme.bodyMedium?.copyWith(
-              color: context.colorScheme.onSurface.withValues(alpha: 0.6),
-            ),
-          ),
-        ),
-      );
+      return NullStatus(label: appLocalizations.noData);
     }
 
     return ListView.builder(

@@ -251,7 +251,7 @@ class Utils {
   }
 
   int getProfilesColumns(double viewWidth) {
-    return max((viewWidth / 320).floor(), 1);
+    return min(max((viewWidth / 320).floor(), 1), 3);
   }
 
   final _indexPrimary = [50, 100, 200, 300, 400, 500, 600, 700, 800, 850, 900];

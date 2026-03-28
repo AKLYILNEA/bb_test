@@ -830,9 +830,13 @@ class AppController {
     if (needRecovery) {
       commonPrint.log('Abnormal exit detected');
       try {
-        await applyProfile(silence: true);
+        if (system.isDesktop) {
+          await restartCore();
+        } else {
+          await applyProfile(silence: true);
+        }
       } catch (e) {
-        commonPrint.log('Recovery applyProfile failed: $e');
+        commonPrint.log('Recovery failed: $e');
       }
     }
     final shouldStart = globalState.isStart || _ref.read(appSettingProvider).autoRun;
@@ -1079,10 +1083,10 @@ class AppController {
         );
   }
 
-  Future<List<Package>> getPackages() async {
+  Future<List<Package>> getPackages({bool forceRefresh = false}) async {
     // Remove unnecessary delay, load directly async
-    if (_ref.read(packagesProvider).isEmpty) {
-      final packages = await app.getPackages();
+    if (forceRefresh || _ref.read(packagesProvider).isEmpty) {
+      final packages = await app.getPackages(forceRefresh: forceRefresh);
       _ref.read(packagesProvider.notifier).value = packages;
     }
     return _ref.read(packagesProvider);
@@ -1202,30 +1206,30 @@ class AppController {
     );
 
     return Isolate.run<List<int>>(() async {
-      final archive = Archive();
+      // Use ZipFileEncoder like FLClash - more reliable than ZipEncoder + Archive
+      final tempDir = Directory.systemTemp;
+      final tempZipPath = join(tempDir.path, 'bettbox_backup_${DateTime.now().millisecondsSinceEpoch}.zip');
+      final encoder = ZipFileEncoder();
+      encoder.create(tempZipPath);
 
-      // Add Bettbox marker file
+      // Add marker file
       final markerData = json.encode({
         'app': 'Bettbox',
         'version': '1.0',
         'timestamp': DateTime.now().millisecondsSinceEpoch,
       });
       final markerBytes = utf8.encode(markerData);
-      final markerFile = ArchiveFile(
-        '.bettbox_marker',
-        markerBytes.length,
-        markerBytes,
-      );
-      archive.addFile(markerFile);
+      final tempMarkerFile = File(join(tempDir.path, 'bettbox_marker_${DateTime.now().millisecondsSinceEpoch}.tmp'));
+      await tempMarkerFile.writeAsBytes(markerBytes);
+      await encoder.addFile(tempMarkerFile, '.bettbox_marker');
+      await tempMarkerFile.delete();
 
       // Add config file
-      final configBytes = utf8.encode(json.encode(configJson));
-      final configFile = ArchiveFile(
-        'config.json',
-        configBytes.length,
-        configBytes,
-      );
-      archive.addFile(configFile);
+      final configStr = json.encode(configJson);
+      final tempConfigFile = File(join(tempDir.path, 'bettbox_config_${DateTime.now().millisecondsSinceEpoch}.tmp'));
+      await tempConfigFile.writeAsString(configStr);
+      await encoder.addFile(tempConfigFile, 'config.json');
+      await tempConfigFile.delete();
 
       // Add profiles dir (valid subscriptions only)
       final profilesDir = Directory(profilesPath);
@@ -1246,13 +1250,7 @@ class AppController {
                 file.path,
                 from: homeDirPath,
               ).replaceAll('\\', '/');
-              final bytes = await file.readAsBytes();
-              final archiveFile = ArchiveFile(
-                relativePath,
-                bytes.length,
-                bytes,
-              );
-              archive.addFile(archiveFile);
+              await encoder.addFile(file, relativePath);
             }
           }
         }
@@ -1273,22 +1271,20 @@ class AppController {
                   providerFile.path,
                   from: homeDirPath,
                 ).replaceAll('\\', '/');
-                final bytes = await providerFile.readAsBytes();
-                final archiveFile = ArchiveFile(
-                  relativePath,
-                  bytes.length,
-                  bytes,
-                );
-                archive.addFile(archiveFile);
+                await encoder.addFile(providerFile, relativePath);
               }
             }
           }
         }
       }
 
-      // Encode as ZIP (same as old version)
-      final zipEncoder = ZipEncoder();
-      return zipEncoder.encode(archive);
+      encoder.close();
+
+      // Read the zip file and return bytes
+      final zipFile = File(tempZipPath);
+      final bytes = await zipFile.readAsBytes();
+      await zipFile.delete();
+      return bytes;
     });
   }
 

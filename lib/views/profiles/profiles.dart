@@ -152,7 +152,11 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
               child: Grid(
                 mainAxisSpacing: 16,
                 crossAxisSpacing: 16,
-                crossAxisCount: profilesSelectorState.columns,
+                crossAxisCount: system.isAndroid
+                    ? 1
+                    : profilesSelectorState.profiles.length < profilesSelectorState.columns
+                        ? profilesSelectorState.profiles.length
+                        : profilesSelectorState.columns,
                 children: [
                   for (
                     int i = 0;
