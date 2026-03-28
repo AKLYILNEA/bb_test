@@ -98,13 +98,11 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             result.error("INVALID_ARGUMENT", "options data is null", null)
             return
         }
-        runCatching {
-            Gson().fromJson(data, VpnOptions::class.java)
-        }.onSuccess { options ->
-            GlobalState.getCurrentVPNPlugin()?.handleStart(options)
-            result.success(true)
-        }.onFailure {
-            result.error("PARSE_ERROR", it.message, null)
-        }
+        runCatching { Gson().fromJson(data, VpnOptions::class.java) }
+            .onSuccess { options ->
+                GlobalState.getCurrentVPNPlugin()?.handleStart(options)
+                result.success(true)
+            }
+            .onFailure { result.error("PARSE_ERROR", it.message, null) }
     }
 }

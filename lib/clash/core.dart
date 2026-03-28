@@ -36,26 +36,16 @@ class ClashCore {
   static Future<void> initGeo() async {
     final homePath = await appPath.homeDirPath;
     final homeDir = Directory(homePath);
-    final isExists = await homeDir.exists();
-    if (!isExists) {
+    if (!await homeDir.exists()) {
       await homeDir.create(recursive: true);
     }
-    const geoFileNameList = [
-      mmdbFileName,
-      geoIpFileName,
-      geoSiteFileName,
-      asnFileName,
-    ];
+    const geoFileNameList = [mmdbFileName, geoIpFileName, geoSiteFileName, asnFileName];
     try {
       for (final geoFileName in geoFileNameList) {
         final geoFile = File(join(homePath, geoFileName));
-        final isExists = await geoFile.exists();
-        if (isExists) {
-          continue;
-        }
+        if (await geoFile.exists()) continue;
         final data = await rootBundle.load('assets/data/$geoFileName');
-        List<int> bytes = data.buffer.asUint8List();
-        await geoFile.writeAsBytes(bytes, flush: true);
+        await geoFile.writeAsBytes(data.buffer.asUint8List(), flush: true);
       }
     } catch (e) {
       exit(0);
@@ -105,15 +95,15 @@ class ClashCore {
       final groupNames = [
         UsedProxy.GLOBAL.name,
         ...(proxies[UsedProxy.GLOBAL.name]['all'] as List).where((e) {
-          final proxy = proxies[e] ?? {};
-          return GroupTypeExtension.valueList.contains(proxy['type']);
+          final proxy = proxies[e] as Map<String, dynamic>?;
+          return GroupTypeExtension.valueList.contains(proxy?['type']);
         }),
       ];
       final groupsRaw = groupNames.map((groupName) {
-        final group = Map<String, dynamic>.from(proxies[groupName]);
+        final group = Map<String, dynamic>.from(proxies[groupName] as Map);
         group['all'] = ((group['all'] ?? []) as List)
             .map((name) => proxies[name])
-            .where((proxy) => proxy != null)
+            .whereType<Map<String, dynamic>>()
             .toList();
         return group;
       }).toList();

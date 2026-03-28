@@ -18,9 +18,7 @@ class AppSetting extends _$AppSetting with AutoDisposeNotifierMixin {
   }
 
   void updateState(AppSettingProps Function(AppSettingProps state) builder) {
-    final newState = builder(state);
-    // 确保 minimizeOnExit 始终为 true
-    state = newState.copyWith(minimizeOnExit: true);
+    state = builder(state).copyWith(minimizeOnExit: true);
   }
 }
 

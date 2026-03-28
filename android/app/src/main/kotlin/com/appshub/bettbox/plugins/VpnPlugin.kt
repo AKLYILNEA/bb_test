@@ -43,25 +43,25 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     private lateinit var flutterMethodChannel: MethodChannel
     private var bettBoxService: BaseServiceInterface? = null
     private var options: VpnOptions? = null
-    
-    private var isBind: Boolean = false
-    @Volatile
-    private var isBinding: Boolean = false 
 
-    private var job = kotlinx.coroutines.SupervisorJob()
+    private var isBind = false
+    @Volatile
+    private var isBinding = false
+
+    private var job = SupervisorJob()
     private var scope = CoroutineScope(Dispatchers.Default + job)
     private var lastStartForegroundParams: StartForegroundParams? = null
     private val uidPageNameMap = ConcurrentHashMap<Int, String>()
     private var suspendModule: SuspendModule? = null
-    
+
     private var quickResponseEnabled = false
     private var disconnectCount = 0
     private var disconnectWindowStart = 0L
-    private val disconnectWindowMs = 5000L 
+    private val disconnectWindowMs = 5000L
     private val maxDisconnectsInWindow = 2
     private var lastNetworkType: Int? = null
 
-    val networks: MutableSet<Network> = java.util.Collections.newSetFromMap(ConcurrentHashMap<Network, Boolean>())
+    val networks: MutableSet<Network> = Collections.newSetFromMap(ConcurrentHashMap())
 
     private val connectivity by lazy {
         BettboxApplication.getAppContext().getSystemService<ConnectivityManager>()
@@ -81,27 +81,23 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
         override fun onServiceDisconnected(arg: ComponentName) {
             isBind = false
-            isBinding = false 
+            isBinding = false
             bettBoxService = null
         }
     }
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         job.cancel()
-        job = kotlinx.coroutines.SupervisorJob()
+        job = SupervisorJob()
         scope = CoroutineScope(Dispatchers.Default + job)
-        
-        scope.launch {
-            registerNetworkCallback()
-        }
+
+        scope.launch { registerNetworkCallback() }
         flutterMethodChannel = MethodChannel(flutterPluginBinding.binaryMessenger, "vpn")
         flutterMethodChannel.setMethodCallHandler(this)
-        
+
         if (GlobalState.currentRunState == RunState.START && bettBoxService == null) {
             android.util.Log.d("VpnPlugin", "VPN is running but service connection lost, rebinding...")
-            if (options != null) {
-                bindService()
-            }
+            options?.let { bindService() }
         }
     }
 
@@ -526,12 +522,9 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             bettBoxService?.stop()
 
             if (force) {
-                try {
-                    val appContext = BettboxApplication.getAppContext()
-                    appContext.stopService(android.content.Intent(appContext, BettboxVpnService::class.java))
-                } catch (e: Exception) {
-                    android.util.Log.e("VpnPlugin", "Force stop service failed: ${e.message}")
-                }
+                BettboxApplication.getAppContext().stopService(
+                    Intent(BettboxApplication.getAppContext(), BettboxVpnService::class.java)
+                )
             }
 
             scope.launch {
@@ -606,7 +599,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }
 
     private fun bindService() {
-        if (isBinding) return 
+        if (isBinding) return
         isBinding = true
 
         try {
@@ -614,17 +607,17 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 BettboxApplication.getAppContext().unbindService(connection)
                 isBind = false
             }
-            val intent = when (options?.enable == true) {
-                true -> Intent(BettboxApplication.getAppContext(), BettboxVpnService::class.java)
-                false -> Intent(BettboxApplication.getAppContext(), BettboxService::class.java)
-            }
+            val intent = Intent(
+                BettboxApplication.getAppContext(),
+                if (options?.enable == true) BettboxVpnService::class.java else BettboxService::class.java
+            )
             val res = BettboxApplication.getAppContext().bindService(intent, connection, Context.BIND_AUTO_CREATE)
             if (!res) {
                 isBinding = false
                 android.util.Log.e("VpnPlugin", "bindService returned false (rejected by system)")
             }
         } catch (e: Exception) {
-            isBinding = false 
+            isBinding = false
             android.util.Log.e("VpnPlugin", "bindService error: ${e.message}")
         }
     }

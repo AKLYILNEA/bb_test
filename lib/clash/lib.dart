@@ -106,9 +106,7 @@ class ClashLib extends ClashHandlerInterface with AndroidClashInterface {
   @override
   Future<AndroidVpnOptions?> getAndroidVpnOptions() async {
     final res = await invoke<String>(method: ActionMethod.getAndroidVpnOptions);
-    if (res.isEmpty) {
-      return null;
-    }
+    if (res.isEmpty) return null;
     return AndroidVpnOptions.fromJson(json.decode(res));
   }
 
@@ -120,9 +118,7 @@ class ClashLib extends ClashHandlerInterface with AndroidClashInterface {
   @override
   Future<DateTime?> getRunTime() async {
     final runTimeString = await invoke<String>(method: ActionMethod.getRunTime);
-    if (runTimeString.isEmpty) {
-      return null;
-    }
+    if (runTimeString.isEmpty) return null;
     return DateTime.fromMillisecondsSinceEpoch(int.parse(runTimeString));
   }
 
@@ -199,9 +195,7 @@ class ClashLibHandler {
     final trafficRaw = clashFFI.getTraffic();
     final trafficString = trafficRaw.cast<Utf8>().toDartString();
     clashFFI.freeCString(trafficRaw);
-    if (trafficString.isEmpty) {
-      return Traffic();
-    }
+    if (trafficString.isEmpty) return Traffic();
     return Traffic.fromMap(json.decode(trafficString));
   }
 
@@ -209,9 +203,7 @@ class ClashLibHandler {
     final trafficRaw = clashFFI.getTotalTraffic();
     final trafficString = trafficRaw.cast<Utf8>().toDartString();
     clashFFI.freeCString(trafficRaw);
-    if (trafficString.isEmpty) {
-      return Traffic();
-    }
+    if (trafficString.isEmpty) return Traffic();
     return Traffic.fromMap(json.decode(trafficString));
   }
 
@@ -239,13 +231,10 @@ class ClashLibHandler {
     final pathChar = path.toNativeUtf8().cast<Char>();
     final configRaw = clashFFI.getConfig(pathChar);
     final configString = configRaw.cast<Utf8>().toDartString();
-    if (configString.isEmpty) {
-      return {};
-    }
-    final config = json.decode(configString);
     malloc.free(pathChar);
     clashFFI.freeCString(configRaw);
-    return config;
+    if (configString.isEmpty) return {};
+    return json.decode(configString);
   }
 
   Future<String> quickStart(

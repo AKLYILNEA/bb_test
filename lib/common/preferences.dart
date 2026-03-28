@@ -10,8 +10,7 @@ class Preferences {
   static Preferences? _instance;
   Completer<SharedPreferences?> sharedPreferencesCompleter = Completer();
 
-  Future<bool> get isInit async =>
-      await sharedPreferencesCompleter.future != null;
+  Future<bool> get isInit async => await sharedPreferencesCompleter.future != null;
 
   Preferences._internal() {
     SharedPreferences.getInstance()

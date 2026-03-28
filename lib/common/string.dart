@@ -72,9 +72,6 @@ extension StringExtension on String {
 
 extension StringExtensionSafe on String? {
   String getSafeValue(String defaultValue) {
-    if (this == null || this!.isEmpty) {
-      return defaultValue;
-    }
-    return this!;
+    return this?.isEmpty != false ? defaultValue : this!;
   }
 }

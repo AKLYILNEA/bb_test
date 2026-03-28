@@ -25,18 +25,13 @@ class Vpn {
         case 'closeConnections':
           clashCore.closeConnections();
         case 'getStartForegroundParams':
-          if (handleGetStartForegroundParams != null) {
-            return await handleGetStartForegroundParams!();
-          }
-          return '';
+          return handleGetStartForegroundParams?.call() ?? '';
         case 'status':
           return clashLibHandler?.getRunTime() != null;
         default:
           for (final VpnListener listener in _listeners) {
-            switch (call.method) {
-              case 'dnsChanged':
-                final dns = call.arguments as String;
-                listener.onDnsChanged(dns);
+            if (call.method == 'dnsChanged') {
+              listener.onDnsChanged(call.arguments as String);
             }
           }
       }

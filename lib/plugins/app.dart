@@ -15,9 +15,7 @@ class App {
     methodChannel.setMethodCallHandler((call) async {
       switch (call.method) {
         case 'exit':
-          if (onExit != null) {
-            await onExit!();
-          }
+          await onExit?.call();
         case 'getText':
           try {
             return Intl.message(call.arguments as String);

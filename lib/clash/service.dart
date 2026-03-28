@@ -61,18 +61,14 @@ class ClashService extends ClashHandlerInterface {
 
   @override
   reStart() async {
-    if (isStarting == true) {
-      return;
-    }
+    if (isStarting) return;
     isStarting = true;
     socketCompleter = Completer();
-    if (process != null) {
-      await shutdown();
-    }
+    process?.kill();
+    process = null;
+
     final serverSocket = await serverCompleter.future;
-    final arg = system.isWindows
-        ? '${serverSocket.port}'
-        : serverSocket.address.address;
+    final arg = system.isWindows ? '${serverSocket.port}' : serverSocket.address.address;
 
     if (system.isWindows) {
       // 强制使用 Helper 服务模式：先确保 Helper 服务已注册并启动

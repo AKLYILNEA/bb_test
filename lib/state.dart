@@ -119,7 +119,7 @@ class GlobalState {
   String get ua => config.patchClashConfig.globalUa ?? packageInfo.ua;
 
   Future<void> startUpdateTasks([UpdateTasks? tasks]) async {
-    if (timer != null && timer!.isActive == true) return;
+    if (timer?.isActive == true) return;
     if (tasks != null) {
       this.tasks = tasks;
     }
@@ -137,7 +137,7 @@ class GlobalState {
   }
 
   void stopUpdateTasks() {
-    if (timer == null || timer?.isActive == false) return;
+    if (timer?.isActive != true) return;
     timer?.cancel();
     timer = null;
   }
@@ -278,13 +278,9 @@ class GlobalState {
     );
   }
 
-  void showNotifier(String text,
-      {VoidCallback? onAction, String? actionLabel}) {
-    if (text.isEmpty) {
-      return;
-    }
-    navigatorKey.currentContext
-        ?.showNotifier(text, onAction: onAction, actionLabel: actionLabel);
+  void showNotifier(String text, {VoidCallback? onAction, String? actionLabel}) {
+    if (text.isEmpty) return;
+    navigatorKey.currentContext?.showNotifier(text, onAction: onAction, actionLabel: actionLabel);
   }
 
   Future<void> openUrl(String url, {bool needConfirm = false}) async {

@@ -37,9 +37,10 @@ suspend fun Drawable.getBase64(maxSizePx: Int = 128): String = withContext(Dispa
     val targetWidth = (intrinsicWidth * scale).toInt().coerceAtLeast(1)
     val targetHeight = (intrinsicHeight * scale).toInt().coerceAtLeast(1)
     val bitmap = toBitmap(targetWidth, targetHeight, Bitmap.Config.ARGB_8888)
-    val byteArrayOutputStream = ByteArrayOutputStream()
-    bitmap.compress(Bitmap.CompressFormat.PNG, 80, byteArrayOutputStream)
-    Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP)
+    ByteArrayOutputStream().use { byteArrayOutputStream ->
+        bitmap.compress(Bitmap.CompressFormat.PNG, 80, byteArrayOutputStream)
+        Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP)
+    }
 }
 
 fun Metadata.getProtocol(): Int? = when {

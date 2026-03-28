@@ -315,9 +315,8 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
 
     private fun isPngBytes(bytes: ByteArray): Boolean {
         if (bytes.size < PNG_MAGIC_SIZE) return false
-        return bytes[0].toInt() == 0x89 && bytes[1].toInt() == 0x50 && bytes[2].toInt() == 0x4E &&
-            bytes[3].toInt() == 0x47 && bytes[4].toInt() == 0x0D && bytes[5].toInt() == 0x0A &&
-            bytes[6].toInt() == 0x1A && bytes[7].toInt() == 0x0A
+        val magic = byteArrayOf(0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A)
+        return bytes.take(PNG_MAGIC_SIZE).toByteArray().contentEquals(magic)
     }
 
     private suspend fun getPackageIconBytes(packageName: String, forceRefresh: Boolean = false): ByteArray? =
@@ -355,9 +354,7 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
         }
 
     private suspend fun getPackages(forceRefresh: Boolean = false): List<Package> = withContext(Dispatchers.IO) {
-        if (forceRefresh) {
-            packages.clear()
-        }
+        if (forceRefresh) packages.clear()
         if (packages.isNotEmpty()) return@withContext packages
         val pm = BettboxApplication.getAppContext().packageManager ?: return@withContext emptyList()
         val selfPackageName = BettboxApplication.getAppContext().packageName
@@ -371,7 +368,7 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
             val internet = runCatching {
                 pm.checkPermission(Manifest.permission.INTERNET, packageName) == PackageManager.PERMISSION_GRANTED
             }.getOrDefault(false)
-            val lastUpdateTime = runCatching { appInfo.sourceDir?.let { File(it).lastModified() } ?: 0L }.getOrDefault(0L)
+            val lastUpdateTime = appInfo.sourceDir?.let { File(it).lastModified() } ?: 0L
 
             Package(packageName, label, system, internet, lastUpdateTime)
         })

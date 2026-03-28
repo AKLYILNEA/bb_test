@@ -176,14 +176,11 @@ class AppController {
     final currentLastModified = await _ref
         .read(currentProfileProvider)
         ?.profileLastModified;
-
-    // Skip if unchanged
     if (currentLastModified != null &&
         lastProfileModified != null &&
         currentLastModified <= lastProfileModified!) {
       return false;
     }
-
     return true;
   }
 

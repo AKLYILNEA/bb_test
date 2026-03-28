@@ -33,10 +33,8 @@ class LinkManager {
   }
 
   void destroy() {
-    if (subscription != null) {
-      subscription?.cancel();
-      subscription = null;
-    }
+    subscription?.cancel();
+    subscription = null;
   }
 
   factory LinkManager() {

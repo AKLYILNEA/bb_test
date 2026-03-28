@@ -30,16 +30,12 @@ class Tile {
       switch (call.method) {
         case 'start':
           listener.onStart();
-          break;
         case 'stop':
           listener.onStop();
-          break;
         case 'detached':
           listener.onDetached();
-          break;
         case 'reconnectIpc':
           listener.onReconnectIpc();
-          break;
       }
     }
   }

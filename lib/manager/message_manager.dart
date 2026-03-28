@@ -52,21 +52,14 @@ class MessageManagerState extends State<MessageManager> {
   }
 
   Future<void> _showMessage() async {
-    if (_pushing == true) {
-      return;
-    }
+    if (_pushing) return;
     _pushing = true;
     while (_bufferMessages.isNotEmpty) {
       final commonMessage = _bufferMessages.removeAt(0);
-      _messagesNotifier.value = List.from(_messagesNotifier.value)
-        ..add(commonMessage);
-      await Future.delayed(Duration(seconds: 1));
-      Future.delayed(commonMessage.duration, () {
-        _handleRemove(commonMessage);
-      });
-      if (_bufferMessages.isEmpty) {
-        _pushing = false;
-      }
+      _messagesNotifier.value = List.from(_messagesNotifier.value)..add(commonMessage);
+      await Future.delayed(const Duration(seconds: 1));
+      Future.delayed(commonMessage.duration, () => _handleRemove(commonMessage));
+      if (_bufferMessages.isEmpty) _pushing = false;
     }
   }
 

@@ -9,24 +9,18 @@ class ClashMessage {
 
   ClashMessage._() {
     controller.stream.listen((message) {
-      if (message.isEmpty) {
-        return;
-      }
+      if (message.isEmpty) return;
       final m = AppMessage.fromJson(message);
       for (final AppMessageListener listener in _listeners) {
         switch (m.type) {
           case AppMessageType.log:
             listener.onLog(Log.fromJson(m.data));
-            break;
           case AppMessageType.delay:
             listener.onDelay(Delay.fromJson(m.data));
-            break;
           case AppMessageType.request:
             listener.onRequest(TrackerInfo.fromJson(m.data));
-            break;
           case AppMessageType.loaded:
             listener.onLoaded(m.data);
-            break;
         }
       }
     });

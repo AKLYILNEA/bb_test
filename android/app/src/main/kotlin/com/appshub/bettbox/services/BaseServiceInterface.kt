@@ -90,23 +90,19 @@ fun Service.ensureNotificationChannel() {
 @SuppressLint("ForegroundServiceType")
 fun Service.startForeground(notification: Notification) {
     ensureNotificationChannel()
-    try {
-        when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
-                val type = if (this is android.net.VpnService) {
-                    android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC or 1024
-                } else {
-                    android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
-                }
-                startForeground(GlobalState.NOTIFICATION_ID, notification, type)
-            }
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
-                startForeground(GlobalState.NOTIFICATION_ID, notification, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
-            }
-            else -> startForeground(GlobalState.NOTIFICATION_ID, notification)
+    val foregroundType = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC or 1024
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+        else -> 0
+    }
+    runCatching {
+        if (foregroundType != 0) {
+            startForeground(GlobalState.NOTIFICATION_ID, notification, foregroundType)
+        } else {
+            startForeground(GlobalState.NOTIFICATION_ID, notification)
         }
-    } catch (e: Exception) {
-        android.util.Log.e("BaseServiceInterface", "startForeground failed: ${e.message}")
-        runCatching { startForeground(GlobalState.NOTIFICATION_ID, notification) }
+    }.onFailure {
+        android.util.Log.e("BaseServiceInterface", "startForeground failed: ${it.message}")
+        startForeground(GlobalState.NOTIFICATION_ID, notification)
     }
 }
