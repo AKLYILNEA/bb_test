@@ -255,12 +255,12 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
     }
 
     private fun updateExcludeFromRecents(value: Boolean?) {
-        val am = getSystemService(BettboxApplication.getAppContext(), ActivityManager::class.java)
-        val task = am?.appTasks?.firstOrNull {
+        val am = BettboxApplication.getAppContext().getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
+        val task = am?.appTasks?.firstOrNull { task ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                it.taskInfo.taskId == activityRef?.get()?.taskId
+                task.taskInfo.taskId == activityRef?.get()?.taskId
             } else {
-                it.taskInfo.id == activityRef?.get()?.taskId
+                task.taskInfo.id == activityRef?.get()?.taskId
             }
         }
 
