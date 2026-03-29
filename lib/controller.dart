@@ -590,12 +590,8 @@ class AppController {
   }
 
   Future<void> handleExit() async {
-    Future.delayed(commonDuration, () {
-      system.exit();
-    });
     try {
       stopWakelockAutoRecovery();
-
       await savePreferences();
       await macOS?.updateDns(true);
       await proxy?.stopProxy();
