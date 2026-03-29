@@ -58,10 +58,12 @@ class ApplicationState extends ConsumerState<Application>
         globalState.appController = AppController(currentContext, ref);
       }
       await globalState.appController.init();
-      globalState.appController.initLink();
-      if (system.isAndroid) {
-        app.initShortcuts();
-      }
+      unawaited(Future(() async {
+        globalState.appController.initLink();
+        if (system.isAndroid) {
+          app.initShortcuts();
+        }
+      }));
     });
   }
 

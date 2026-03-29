@@ -71,37 +71,40 @@ class ClashService extends ClashHandlerInterface {
     final arg = system.isWindows ? '${serverSocket.port}' : serverSocket.address.address;
 
     if (system.isWindows) {
-      // 强制使用 Helper 服务模式：先确保 Helper 服务已注册并启动
       final serviceOk = await windows?.registerService() ?? false;
       if (serviceOk) {
         final isSuccess = await request.startCoreByHelper(arg);
         if (isSuccess) {
+          await _waitForCoreReady();
           isStarting = false;
           return;
         }
-      } else {
-        // 注册服务失败（例如用户拒绝 UAC），提示但仍尝试直接启动核心（无服务模式，可能影响 TUN）
-        globalState.showNotifier('服务启动失败，尝试直接启动核心');
       }
     }
 
-    // 非 Windows 平台，或 Helper 启动失败时的回退方案：直接启动核心进程
-    // 设置 SAFE_PATHS 环境变量，将应用数据目录添加到安全路径列表
     final homeDirPath = await appPath.homeDirPath;
     final environment = Map<String, String>.from(Platform.environment);
     environment['SAFE_PATHS'] = homeDirPath;
 
-    process = await Process.start(appPath.corePath, [
-      arg,
-    ], environment: environment);
+    process = await Process.start(appPath.corePath, [arg], environment: environment);
     process?.stdout.listen((_) {});
     process?.stderr.listen((e) {
       final error = utf8.decode(e);
-      if (error.isNotEmpty) {
-        commonPrint.log(error);
-      }
+      if (error.isNotEmpty) commonPrint.log(error);
     });
+    await _waitForCoreReady();
     isStarting = false;
+  }
+
+  Future<void> _waitForCoreReady() async {
+    const maxAttempts = 10;
+    const interval = Duration(milliseconds: 500);
+
+    for (var attempt = 1; attempt <= maxAttempts; attempt++) {
+      if (socketCompleter.isCompleted) return;
+      await Future.delayed(interval);
+    }
+    commonPrint.log('Core ready timeout after ${maxAttempts * interval.inMilliseconds}ms');
   }
 
   @override

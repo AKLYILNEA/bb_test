@@ -281,35 +281,42 @@ class Request {
   }
 
   Future<bool> startCoreByHelper(String arg) async {
-    try {
-      final homeDirPath = await appPath.homeDirPath;
-      final body = json.encode({
-        'path': appPath.corePath,
-        'arg': arg,
-        'home_dir': homeDirPath,
-      });
+    final homeDirPath = await appPath.homeDirPath;
+    final body = json.encode({
+      'path': appPath.corePath,
+      'arg': arg,
+      'home_dir': homeDirPath,
+    });
+    final authHeaders = HelperAuthManager.generateAuthHeaders(body);
 
-      final authHeaders = HelperAuthManager.generateAuthHeaders(body);
+    const maxAttempts = 10;
+    const interval = Duration(milliseconds: 500);
 
-      final response = await _dio
-          .post(
-            'http://$localhost:$helperPort/start',
-            data: body,
-            options: Options(
-              responseType: ResponseType.plain,
-              headers: authHeaders,
-            ),
-          )
-          .timeout(const Duration(milliseconds: 2000));
-      if (response.statusCode != HttpStatus.ok) {
-        return false;
+    for (var attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        final response = await _dio
+            .post(
+              'http://$localhost:$helperPort/start',
+              data: body,
+              options: Options(
+                responseType: ResponseType.plain,
+                headers: authHeaders,
+              ),
+            )
+            .timeout(const Duration(milliseconds: 2000));
+        if (response.statusCode == HttpStatus.ok) {
+          final data = response.data as String;
+          if (data.isEmpty) return true;
+        }
+      } catch (e) {
+        if (attempt == maxAttempts) {
+          commonPrint.log('Failed to start core by helper after $maxAttempts attempts: $e');
+          return false;
+        }
       }
-      final data = response.data as String;
-      return data.isEmpty;
-    } catch (e) {
-      commonPrint.log('Failed to start core by helper: $e');
-      return false;
+      await Future.delayed(interval);
     }
+    return false;
   }
 
   Future<bool> stopCoreByHelper() async {

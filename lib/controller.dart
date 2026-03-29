@@ -823,11 +823,7 @@ class AppController {
     if (needRecovery) {
       commonPrint.log('Abnormal exit detected');
       try {
-        if (system.isDesktop) {
-          await restartCore();
-        } else {
           await applyProfile(silence: true);
-        }
       } catch (e) {
         commonPrint.log('Recovery failed: $e');
       }
