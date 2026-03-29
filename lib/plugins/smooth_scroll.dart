@@ -25,32 +25,21 @@ class DesktopSmoothScroll extends StatefulWidget {
 
 class _DesktopSmoothScrollState extends State<DesktopSmoothScroll> with SingleTickerProviderStateMixin {
   double _futurePosition = 0;
-  late final AnimationController _anim;
 
-  @override
-  void initState() {
-    super.initState();
-    _anim = AnimationController.unbounded(vsync: this)..addListener(_onTick);
-  }
+  late final _anim = AnimationController.unbounded(vsync: this)..addListener(_onTick);
 
   void _onTick() {
-    if (!widget.controller.hasClients) {
-      return;
-    }
-    
+    if (!widget.controller.hasClients) return;
+
     final pos = widget.controller.position;
     final val = _anim.value.clamp(pos.minScrollExtent, pos.maxScrollExtent);
 
     widget.controller.jumpTo(val);
-    if (val == pos.minScrollExtent || val == pos.maxScrollExtent) {
-      _anim.stop();
-    }
+    if (val == pos.minScrollExtent || val == pos.maxScrollExtent) _anim.stop();
   }
 
   void _handleSignal(PointerSignalEvent e) {
-    if (!system.isDesktop || e is! PointerScrollEvent || e.kind == PointerDeviceKind.trackpad || !widget.controller.hasClients) {
-      return;
-    }
+    if (e is! PointerScrollEvent || e.kind == PointerDeviceKind.trackpad || !widget.controller.hasClients) return;
 
     final pos = widget.controller.position;
     final delta = (e.scrollDelta.dy * widget.scrollSpeed).clamp(-_kMaxDelta, _kMaxDelta);
@@ -63,9 +52,7 @@ class _DesktopSmoothScrollState extends State<DesktopSmoothScroll> with SingleTi
     _futurePosition = _anim.isAnimating ? _futurePosition + delta * 0.8 : pos.pixels + delta * 0.9;
     _futurePosition = _futurePosition.clamp(pos.minScrollExtent, pos.maxScrollExtent);
 
-    if ((_futurePosition - pos.pixels).abs() < 0.5) {
-      return;
-    }
+    if ((_futurePosition - pos.pixels).abs() < 0.5) return;
 
     _anim.value = pos.pixels;
     _anim.animateWith(SpringSimulation(_kSpring, pos.pixels, _futurePosition, _anim.isAnimating ? _anim.velocity : 0.0));
@@ -79,14 +66,11 @@ class _DesktopSmoothScrollState extends State<DesktopSmoothScroll> with SingleTi
 
   @override
   Widget build(BuildContext context) {
-    if (!system.isDesktop) {
-      return widget.child;
-    }
+    if (!system.isDesktop) return widget.child;
+
     return NotificationListener<UserScrollNotification>(
-      onNotification: (notification) {
-        if (_anim.isAnimating && notification.direction != ScrollDirection.idle) {
-          _anim.stop();
-        }
+      onNotification: (n) {
+        if (_anim.isAnimating && n.direction != ScrollDirection.idle) _anim.stop();
         return false;
       },
       child: Listener(

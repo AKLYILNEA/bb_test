@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:collection/collection.dart';
 import 'package:bett_box/common/common.dart';
@@ -33,14 +34,45 @@ class CommonScrollBar extends StatelessWidget {
       child: child,
     );
 
-    if (controller != null) {
+    if (controller != null && system.isDesktop) {
       result = DesktopSmoothScroll(
         controller: controller!,
-        child: result,
+        child: _NoScrollPhysicsWrapper(child: result),
       );
     }
     return result;
   }
+}
+
+class _NoScrollPhysicsWrapper extends StatelessWidget {
+  final Widget child;
+
+  const _NoScrollPhysicsWrapper({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return ScrollConfiguration(
+      behavior: _DesktopScrollBehavior(),
+      child: child,
+    );
+  }
+}
+
+class _DesktopScrollBehavior extends ScrollBehavior {
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) {
+    return const NeverScrollableScrollPhysics();
+  }
+
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.stylus,
+        PointerDeviceKind.invertedStylus,
+        PointerDeviceKind.trackpad,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.unknown,
+      };
 }
 
 class ScrollToEndBox<T> extends StatefulWidget {
@@ -64,28 +96,23 @@ class ScrollToEndBox<T> extends StatefulWidget {
 }
 
 class _ScrollToEndBoxState<T> extends State<ScrollToEndBox<T>> {
-  final equals = ListEquality<T>();
-  bool _isFastToEnd = false;
+  final _equals = ListEquality<T>();
+  var _isFastToEnd = false;
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  Future<bool> _handleTryToEnd() {
-    final completer = Completer<bool>();
+  Future<void> _handleTryToEnd() async {
+    final completer = Completer<void>();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (mounted &&
-          widget.controller.hasClients &&
-          widget.controller.position.pixels !=
-              widget.controller.position.maxScrollExtent) {
-        await widget.controller.animateTo(
-          duration: kThemeAnimationDuration,
-          widget.controller.position.maxScrollExtent,
-          curve: Curves.easeOut,
-        );
+      if (mounted && widget.controller.hasClients) {
+        final pos = widget.controller.position;
+        if (pos.pixels != pos.maxScrollExtent) {
+          await widget.controller.animateTo(
+            pos.maxScrollExtent,
+            duration: kThemeAnimationDuration,
+            curve: Curves.easeOut,
+          );
+        }
       }
-      completer.complete(true);
+      completer.complete();
     });
     return completer.future;
   }
@@ -93,37 +120,26 @@ class _ScrollToEndBoxState<T> extends State<ScrollToEndBox<T>> {
   @override
   void didUpdateWidget(ScrollToEndBox<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.enable == true && oldWidget.enable != true) {
-      _handleFastToEnd();
+    if (widget.enable && !oldWidget.enable) {
+      _isFastToEnd = true;
+      _handleTryToEnd().then((_) => _isFastToEnd = false);
       return;
     }
-    if (widget.enable &&
-        !equals.equals(oldWidget.dataSource, widget.dataSource)) {
+    if (widget.enable && !_equals.equals(oldWidget.dataSource, widget.dataSource)) {
       _handleTryToEnd();
     }
   }
 
-  Future<void> _handleFastToEnd() async {
-    _isFastToEnd = true;
-    await _handleTryToEnd();
-    _isFastToEnd = false;
-  }
-
   @override
-  Widget build(BuildContext context) {
-    return NotificationListener<UserScrollNotification>(
-      onNotification: (details) {
-        if (_isFastToEnd) {
-          return false;
-        }
-        if (widget.onCancelToEnd != null) {
-          widget.onCancelToEnd!();
-        }
-        return false;
-      },
-      child: widget.child,
-    );
-  }
+  Widget build(BuildContext context) => NotificationListener<UserScrollNotification>(
+    onNotification: (n) {
+      if (!_isFastToEnd && widget.onCancelToEnd != null) {
+        widget.onCancelToEnd!();
+      }
+      return false;
+    },
+    child: widget.child,
+  );
 }
 
 class CacheItemExtentListView extends StatefulWidget {
@@ -151,44 +167,37 @@ class CacheItemExtentListView extends StatefulWidget {
   });
 
   @override
-  State<CacheItemExtentListView> createState() =>
-      CacheItemExtentListViewState();
+  State<CacheItemExtentListView> createState() => _CacheItemExtentListViewState();
 }
 
-class CacheItemExtentListViewState extends State<CacheItemExtentListView> {
+class _CacheItemExtentListViewState extends State<CacheItemExtentListView> {
   @override
   void initState() {
     super.initState();
-    _updateCacheHeightMap();
+    _updateCache();
   }
 
-  void _updateCacheHeightMap() {
-    globalState.computeHeightMapCache[widget.tag]?.updateMaxLength(
-      widget.itemCount,
-    );
-    globalState.computeHeightMapCache[widget.tag] ??= FixedMap(
-      widget.itemCount,
-    );
+  void _updateCache() {
+    globalState.computeHeightMapCache[widget.tag]?.updateMaxLength(widget.itemCount);
+    globalState.computeHeightMapCache[widget.tag] ??= FixedMap(widget.itemCount);
   }
 
   @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      itemBuilder: widget.itemBuilder,
-      itemCount: widget.itemCount,
-      physics: widget.physics,
-      reverse: widget.reverse,
-      shrinkWrap: widget.shrinkWrap,
-      controller: widget.controller,
-      itemExtentBuilder: (index, _) {
-        _updateCacheHeightMap();
-        return globalState.computeHeightMapCache[widget.tag]?.updateCacheValue(
-          widget.keyBuilder(index),
-          () => widget.itemExtentBuilder(index),
-        );
-      },
-    );
-  }
+  Widget build(BuildContext context) => ListView.builder(
+    itemBuilder: widget.itemBuilder,
+    itemCount: widget.itemCount,
+    physics: widget.physics,
+    reverse: widget.reverse,
+    shrinkWrap: widget.shrinkWrap,
+    controller: widget.controller,
+    itemExtentBuilder: (index, _) {
+      _updateCache();
+      return globalState.computeHeightMapCache[widget.tag]?.updateCacheValue(
+        widget.keyBuilder(index),
+        () => widget.itemExtentBuilder(index),
+      );
+    },
+  );
 }
 
 class CacheItemExtentSliverReorderableList extends StatefulWidget {
@@ -213,43 +222,34 @@ class CacheItemExtentSliverReorderableList extends StatefulWidget {
 
   @override
   State<CacheItemExtentSliverReorderableList> createState() =>
-      CacheItemExtentSliverReorderableListState();
+      _CacheItemExtentSliverReorderableListState();
 }
 
-class CacheItemExtentSliverReorderableListState
+class _CacheItemExtentSliverReorderableListState
     extends State<CacheItemExtentSliverReorderableList> {
   @override
   void initState() {
     super.initState();
-    globalState.computeHeightMapCache[widget.tag]?.updateMaxLength(
-      widget.itemCount,
-    );
-    globalState.computeHeightMapCache[widget.tag] ??= FixedMap(
-      widget.itemCount,
-    );
+    _updateCache();
+  }
+
+  void _updateCache() {
+    globalState.computeHeightMapCache[widget.tag]?.updateMaxLength(widget.itemCount);
+    globalState.computeHeightMapCache[widget.tag] ??= FixedMap(widget.itemCount);
   }
 
   @override
   Widget build(BuildContext context) {
-    globalState.computeHeightMapCache[widget.tag]?.updateMaxLength(
-      widget.itemCount,
-    );
+    _updateCache();
     return SliverReorderableList(
       itemBuilder: widget.itemBuilder,
       itemCount: widget.itemCount,
-      itemExtentBuilder: (index, _) {
-        return globalState.computeHeightMapCache[widget.tag]?.updateCacheValue(
-          widget.keyBuilder(index),
-          () => widget.itemExtentBuilder(index),
-        );
-      },
+      itemExtentBuilder: (index, _) => globalState.computeHeightMapCache[widget.tag]?.updateCacheValue(
+        widget.keyBuilder(index),
+        () => widget.itemExtentBuilder(index),
+      ),
       onReorder: widget.onReorder,
       proxyDecorator: widget.proxyDecorator,
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 }

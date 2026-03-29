@@ -95,7 +95,8 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
         if (isStopped) return
         isStopped = true
 
-        runCatching { Core.stopTun() }.onFailure { Log.e(TAG, "Failed to stop TUN: ${it.message}") }
+        runCatching { Core.stopTun() }
+            .onFailure { Log.e(TAG, "Failed to stop TUN: ${it.message}") }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             runCatching { stopForeground(STOP_FOREGROUND_REMOVE) }
                 .onFailure { Log.e(TAG, "Failed to stop foreground: ${it.message}") }

@@ -4,6 +4,7 @@ import 'package:bett_box/common/common.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:xml/xml.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
 import 'package:path/path.dart' as path;
@@ -96,10 +97,36 @@ class _CommonTargetIconState extends State<CommonTargetIcon> {
   Future<bool> _validateSvg(File file) async {
     try {
       final content = await file.readAsString();
-      // Check for invalid font-weight values
-      if (content.contains('font-weight:none') || 
+      final trimmed = content.trim();
+
+      // Check if content starts with valid SVG/XML tags
+      if (!trimmed.startsWith('<svg') &&
+          !trimmed.startsWith('<?xml') &&
+          !trimmed.startsWith('<!DOCTYPE svg')) {
+        commonPrint.log('Invalid SVG: not starting with svg tag');
+        return false;
+      }
+
+      // Check for HTML error pages
+      if (trimmed.contains('<!DOCTYPE html>') ||
+          trimmed.contains('<html>') ||
+          trimmed.contains('<head>') ||
+          trimmed.contains('<body>')) {
+        commonPrint.log('Invalid SVG: HTML content detected');
+        return false;
+      }
+
+      // Validate XML structure
+      try {
+        XmlDocument.parse(content);
+      } catch (e) {
+        commonPrint.log('Invalid SVG: XML parse error - $e');
+        return false;
+      }
+
+      // Fix invalid font-weight values
+      if (content.contains('font-weight:none') ||
           content.contains('font-weight: none')) {
-        // Fix invalid font-weight
         final fixed = content
             .replaceAll('font-weight:none', 'font-weight:normal')
             .replaceAll('font-weight: none', 'font-weight: normal');
@@ -133,9 +160,21 @@ class _CommonTargetIconState extends State<CommonTargetIcon> {
     if (fileInfo != null && mounted && widget.src.isNotEmpty) {
       // Validate SVG files
       if (widget.src.isSvg) {
-        await _validateSvg(fileInfo.file);
+        final isValid = await _validateSvg(fileInfo.file);
+        if (!isValid) {
+          // Remove invalid cached file
+          await DefaultCacheManager().removeFile(widget.src);
+          if (mounted) {
+            setState(() {
+              _file = null;
+              _cachedSrc = null;
+              _cachedSize = null;
+            });
+          }
+          return;
+        }
       }
-      
+
       // Resize non-SVG images
       File? displayFile = fileInfo.file;
       if (!widget.src.isSvg) {
@@ -158,9 +197,21 @@ class _CommonTargetIconState extends State<CommonTargetIcon> {
       if (mounted && widget.src.isNotEmpty) {
         // Validate SVG files
         if (widget.src.isSvg) {
-          await _validateSvg(file);
+          final isValid = await _validateSvg(file);
+          if (!isValid) {
+            // Remove invalid downloaded file
+            await DefaultCacheManager().removeFile(widget.src);
+            if (mounted) {
+              setState(() {
+                _file = null;
+                _cachedSrc = null;
+                _cachedSize = null;
+              });
+            }
+            return;
+          }
         }
-        
+
         // Resize non-SVG images
         File? displayFile = file;
         if (!widget.src.isSvg) {
@@ -205,17 +256,38 @@ class _CommonTargetIconState extends State<CommonTargetIcon> {
     }
     if (_file != null) {
       if (widget.src.isSvg) {
-        try {
-          return SvgPicture.file(
-            _file!,
-            width: widget.size,
-            height: widget.size,
-            placeholderBuilder: (_) => _defaultIcon(),
-          );
-        } catch (e) {
-          commonPrint.log('Failed to load SVG: $e');
-          return _defaultIcon();
-        }
+        return FutureBuilder<bool>(
+          future: _validateSvg(_file!),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return _defaultIcon();
+            }
+            if (snapshot.hasError || snapshot.data == false) {
+              commonPrint.log('SVG validation failed in build: ${snapshot.error}');
+              // Remove invalid file and clear state
+              DefaultCacheManager().removeFile(widget.src);
+              _file = null;
+              _cachedSrc = null;
+              _cachedSize = null;
+              return _defaultIcon();
+            }
+            try {
+              return SvgPicture.file(
+                _file!,
+                width: widget.size,
+                height: widget.size,
+                placeholderBuilder: (_) => _defaultIcon(),
+              );
+            } catch (e) {
+              commonPrint.log('Failed to load SVG: $e');
+              DefaultCacheManager().removeFile(widget.src);
+              _file = null;
+              _cachedSrc = null;
+              _cachedSize = null;
+              return _defaultIcon();
+            }
+          },
+        );
       }
       return Image.file(
         _file!,

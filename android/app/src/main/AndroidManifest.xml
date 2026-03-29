@@ -141,7 +141,7 @@
         <service
             android:name=".services.BettboxVpnService"
             android:exported="false"
-            android:foregroundServiceType="dataSync|systemExempted"
+            android:foregroundServiceType="systemExempted"
             android:permission="android.permission.BIND_VPN_SERVICE">
             <intent-filter>
                 <action android:name="android.net.VpnService" />
@@ -152,7 +152,7 @@
         <service
             android:name=".services.BettboxService"
             android:exported="false"
-            android:foregroundServiceType="dataSync" />
+            android:foregroundServiceType="systemExempted" />
 
         <receiver
             android:name=".receivers.BootReceiver"

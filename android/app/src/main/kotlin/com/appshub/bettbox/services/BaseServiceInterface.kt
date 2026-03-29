@@ -90,14 +90,16 @@ fun Service.ensureNotificationChannel() {
 @SuppressLint("ForegroundServiceType")
 fun Service.startForeground(notification: Notification) {
     ensureNotificationChannel()
-    val foregroundType = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC or 1024
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
-        else -> 0
+
+    val type = if (Build.VERSION.SDK_INT >= 34) {
+        1024
+    } else {
+        0
     }
+
     runCatching {
-        if (foregroundType != 0) {
-            startForeground(GlobalState.NOTIFICATION_ID, notification, foregroundType)
+        if (type != 0) {
+            startForeground(GlobalState.NOTIFICATION_ID, notification, type)
         } else {
             startForeground(GlobalState.NOTIFICATION_ID, notification)
         }

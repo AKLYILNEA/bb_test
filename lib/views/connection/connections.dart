@@ -43,7 +43,9 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView> {
   }
 
   Future<void> _updateConnections() async {
+    if (!mounted) return;
     final connections = await clashCore.getConnections();
+    if (!mounted) return;
     ref.read(connectionsProvider.notifier).state = connections;
   }
 

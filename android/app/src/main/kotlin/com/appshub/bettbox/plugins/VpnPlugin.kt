@@ -174,26 +174,18 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         quickResponseEnabled = enabled
     }
 
-    fun getLocalIpAddresses(): List<String> {
-        val ipAddresses = mutableListOf<String>()
-        try {
-            for (network in networks) {
-                val linkProperties = connectivity?.getLinkProperties(network) ?: continue
-                val addresses = linkProperties.linkAddresses
-                for (linkAddress in addresses) {
-                    val address = linkAddress.address
-                    if (address != null && !address.isLoopbackAddress) {
-                        val hostAddress = address.hostAddress
-                        if (hostAddress != null && !hostAddress.contains(":")) {
-                            ipAddresses.add(hostAddress)
-                        }
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            android.util.Log.e("VpnPlugin", "getLocalIpAddresses error: ${e.message}")
+    fun getLocalIpAddresses(): List<String> = runCatching {
+        networks.flatMap { network ->
+            connectivity?.getLinkProperties(network)
+                ?.linkAddresses
+                ?.mapNotNull { it.address }
+                ?.filter { !it.isLoopbackAddress && it.hostAddress?.contains(":") == false }
+                ?.mapNotNull { it.hostAddress }
+                ?: emptyList()
         }
-        return ipAddresses
+    }.getOrElse {
+        android.util.Log.e("VpnPlugin", "getLocalIpAddresses error: ${it.message}")
+        emptyList()
     }
 
     fun handleStart(options: VpnOptions): Boolean {
@@ -251,20 +243,20 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }.build()
 
     private fun registerNetworkCallback() {
-        try {
+        runCatching {
             networks.clear()
             connectivity?.registerNetworkCallback(request, callback)
-        } catch (e: Exception) {
-            android.util.Log.e("VpnPlugin", "Failed to register network callback: ${e.message}")
+        }.onFailure {
+            android.util.Log.e("VpnPlugin", "Failed to register network callback: ${it.message}")
         }
     }
 
     private fun unRegisterNetworkCallback() {
-        try {
+        runCatching {
             connectivity?.unregisterNetworkCallback(callback)
-        } catch (e: Exception) {
-            android.util.Log.e("VpnPlugin", "Failed to unregister network callback: ${e.message}")
-        } finally {
+        }.onFailure {
+            android.util.Log.e("VpnPlugin", "Failed to unregister network callback: ${it.message}")
+        }.also {
             networks.clear()
             onUpdateNetwork()
         }
@@ -359,14 +351,14 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
     fun updateNotificationIcon() {
         scope.launch {
-            try {
+            runCatching {
                 lastStartForegroundParams?.let { params ->
                     (bettBoxService as? BettboxService)?.resetNotificationBuilder()
                     (bettBoxService as? BettboxVpnService)?.resetNotificationBuilder()
                     bettBoxService?.startForeground(params.title, params.content)
                 }
-            } catch (e: Exception) {
-                android.util.Log.e("VpnPlugin", "updateNotificationIcon error: ${e.message}")
+            }.onFailure {
+                android.util.Log.e("VpnPlugin", "updateNotificationIcon error: ${it.message}")
             }
         }
     }
@@ -491,13 +483,11 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         }
     }
 
-    private fun protect(fd: Int): Boolean {
-        return try {
-            (bettBoxService as? BettboxVpnService)?.protect(fd) == true
-        } catch (e: Exception) {
-            android.util.Log.e("VpnPlugin", "protect error: ${e.message}")
-            false
-        }
+    private fun protect(fd: Int): Boolean = runCatching {
+        (bettBoxService as? BettboxVpnService)?.protect(fd) == true
+    }.getOrElse {
+        android.util.Log.e("VpnPlugin", "protect error: ${it.message}")
+        false
     }
 
     private fun resolverProcess(
@@ -505,26 +495,22 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         source: InetSocketAddress,
         target: InetSocketAddress,
         uid: Int,
-    ): String {
-        return try {
-            val nextUid = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                connectivity?.getConnectionOwnerUid(protocol, source, target) ?: -1
-            } else {
-                uid
-            }
-            if (nextUid == -1) {
-                return ""
-            }
-            if (!uidPageNameMap.containsKey(nextUid)) {
-                uidPageNameMap[nextUid] =
-                    BettboxApplication.getAppContext().packageManager?.getPackagesForUid(nextUid)
-                        ?.firstOrNull() ?: ""
-            }
-            uidPageNameMap[nextUid] ?: ""
-        } catch (e: Exception) {
-            android.util.Log.e("VpnPlugin", "resolverProcess error: ${e.message}")
-            ""
+    ): String = runCatching {
+        val nextUid = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            connectivity?.getConnectionOwnerUid(protocol, source, target) ?: -1
+        } else {
+            uid
         }
+        if (nextUid == -1) {
+            return@runCatching ""
+        }
+        uidPageNameMap.getOrPut(nextUid) {
+            BettboxApplication.getAppContext().packageManager?.getPackagesForUid(nextUid)
+                ?.firstOrNull() ?: ""
+        }
+    }.getOrElse {
+        android.util.Log.e("VpnPlugin", "resolverProcess error: ${it.message}")
+        ""
     }
 
     fun handleStop(force: Boolean = false) {
@@ -538,10 +524,26 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             Core.stopTun()
             bettBoxService?.stop()
 
-            if (force) {
-                BettboxApplication.getAppContext().stopService(
-                    Intent(BettboxApplication.getAppContext(), BettboxVpnService::class.java)
-                )
+            runCatching {
+                if (isBind) {
+                    BettboxApplication.getAppContext().unbindService(connection)
+                    isBind = false
+                }
+            }.onFailure {
+                android.util.Log.e("VpnPlugin", "unbindService error: ${it.message}")
+            }
+
+            val context = BettboxApplication.getAppContext()
+            if (force || bettBoxService == null) {
+                context.stopService(Intent(context, BettboxVpnService::class.java))
+                context.stopService(Intent(context, BettboxService::class.java))
+            }
+
+            runCatching {
+                context.getSystemService<android.app.NotificationManager>()
+                    ?.cancel(GlobalState.NOTIFICATION_ID)
+            }.onFailure {
+                android.util.Log.e("VpnPlugin", "cancel notification error: ${it.message}")
             }
 
             scope.launch {

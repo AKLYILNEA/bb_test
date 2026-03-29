@@ -38,22 +38,20 @@ class App {
   }
 
   Future<List<Package>> getPackages({bool forceRefresh = false}) async {
-    final packagesRaw =
-        await methodChannel.invokeMethod<List<dynamic>>('getPackages', {
-          'forceRefresh': forceRefresh,
-        }) ??
-        const <dynamic>[];
+    final packagesRaw = await methodChannel.invokeListMethod<Map<dynamic, dynamic>>(
+      'getPackages',
+      {'forceRefresh': forceRefresh},
+    ) ?? const [];
     return packagesRaw
-        .map((e) => Package.fromJson(Map<String, Object?>.from(e as Map)))
+        .map((e) => Package.fromJson(Map<String, Object?>.from(e)))
         .toList();
   }
 
-  /// 检查是否有应用列表权限 (Android 11+)
   Future<bool> hasPackageListPermission() async {
     final result = await methodChannel.invokeMethod<bool>(
       'hasPackageListPermission',
     );
-    return result ?? true; // 默认返回 true (Android 10 及以下不需要此权限)
+    return result ?? true;
   }
 
   Future<bool> hasCameraPermission() async {
@@ -63,7 +61,6 @@ class App {
     return result ?? true;
   }
 
-  /// 请求应用列表权限 (打开系统设置页面)
   Future<void> requestPackageListPermission() async {
     await methodChannel.invokeMethod<void>('requestPackageListPermission');
   }
@@ -74,10 +71,8 @@ class App {
 
   Future<List<String>> getChinaPackageNames() async {
     final packageNamesRaw =
-        await methodChannel.invokeMethod<List<dynamic>>(
-          'getChinaPackageNames',
-        ) ??
-        const <dynamic>[];
+        await methodChannel.invokeListMethod<String>('getChinaPackageNames') ??
+        const [];
     return packageNamesRaw.map((e) => e.toString()).toList();
   }
 
@@ -86,9 +81,6 @@ class App {
         false;
   }
 
-  /// 获取应用图标（使用磁盘缓存，不使用内存缓存）
-  /// [packageName] 应用包名
-  /// [forceRefresh] 是否强制刷新（手动刷新时使用）
   Future<Uint8List?> getPackageIcon(
     String packageName, {
     bool forceRefresh = false,
@@ -100,8 +92,9 @@ class App {
   }
 
   Future<bool?> tip(String? message) async {
+    if (message == null || message.isEmpty) return false;
     return await methodChannel.invokeMethod<bool>('tip', {
-      'message': '$message',
+      'message': message,
     });
   }
 
@@ -118,8 +111,6 @@ class App {
     });
   }
 
-  /// 获取当前应用APK的最后更新时间（毫秒时间戳）
-  /// 用于检测APK是否被重新安装（包括升级、降级、覆盖安装等）
   Future<int> getSelfLastUpdateTime() async {
     final result = await methodChannel.invokeMethod<int>(
       'getSelfLastUpdateTime',
@@ -127,7 +118,6 @@ class App {
     return result ?? 0;
   }
 
-  /// 检查应用是否在电池优化白名单中
   Future<bool> isIgnoringBatteryOptimizations() async {
     final result = await methodChannel.invokeMethod<bool>(
       'isIgnoringBatteryOptimizations',
@@ -135,13 +125,10 @@ class App {
     return result ?? false;
   }
 
-  /// 请求将应用加入电池优化白名单
   Future<void> requestIgnoreBatteryOptimizations() async {
     await methodChannel.invokeMethod<void>('requestIgnoreBatteryOptimizations');
   }
 
-  /// 设置启动图标（浅色/深色）
-  /// [useLightIcon] true: 使用浅色图标, false: 使用深色图标
   Future<bool> setLauncherIcon(bool useLightIcon) async {
     final result = await methodChannel.invokeMethod<bool>('setLauncherIcon', {
       'useLightIcon': useLightIcon,
@@ -149,7 +136,6 @@ class App {
     return result ?? false;
   }
 
-  /// 检测是否为 Android TV
   Future<bool> isAndroidTV() async {
     final result = await methodChannel.invokeMethod<bool>('isAndroidTV');
     return result ?? false;
