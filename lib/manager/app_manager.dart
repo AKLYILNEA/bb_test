@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/manager/window_manager.dart';
+import 'package:bett_box/plugins/app.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:flutter/foundation.dart';
@@ -144,6 +145,10 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
       if (state == AppLifecycleState.resumed && globalState.isStart) {
         await globalState.startUpdateTasks();
       }
+    }
+    if (state == AppLifecycleState.resumed && system.isAndroid) {
+      final hidden = ref.read(appSettingProvider.select((s) => s.hidden));
+      app.updateExcludeFromRecents(hidden);
     }
     if (state == AppLifecycleState.inactive) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
