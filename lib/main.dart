@@ -113,6 +113,9 @@ Future<void> _service(List<String> flags) async {
       if (locale != null) {
         await AppLocalizations.load(locale);
       }
+      if (AppLocalizations.currentOrNull == null) {
+        await AppLocalizations.load(const Locale('zh', 'CN'));
+      }
     }
 
     // Check if smart-stopped from native side
