@@ -192,11 +192,32 @@ Future<Uint8List?> _getPackageIcon(String process) async {
   return icon;
 }
 
-class _ProcessIcon extends StatelessWidget {
+class _ProcessIcon extends StatefulWidget {
   final String process;
   final Function(String)? onClick;
 
   const _ProcessIcon({required this.process, this.onClick});
+
+  @override
+  State<_ProcessIcon> createState() => _ProcessIconState();
+}
+
+class _ProcessIconState extends State<_ProcessIcon> {
+  late Future<Uint8List?> _iconFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _iconFuture = _getPackageIcon(widget.process);
+  }
+
+  @override
+  void didUpdateWidget(_ProcessIcon oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.process != widget.process) {
+      _iconFuture = _getPackageIcon(widget.process);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -210,7 +231,7 @@ class _ProcessIcon extends StatelessWidget {
       );
     }
 
-    if (process.isEmpty) {
+    if (widget.process.isEmpty) {
       return Container(
         margin: const EdgeInsets.only(top: 4),
         width: 42,
@@ -222,14 +243,14 @@ class _ProcessIcon extends StatelessWidget {
 
     return RepaintBoundary(
       child: GestureDetector(
-        onTap: () => onClick?.call(process),
+        onTap: () => widget.onClick?.call(widget.process),
         child: Container(
           margin: const EdgeInsets.only(top: 4),
           width: 42,
           height: 42,
           alignment: Alignment.center,
           child: FutureBuilder<Uint8List?>(
-            future: _getPackageIcon(process),
+            future: _iconFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return buildPlaceholder();
