@@ -373,8 +373,72 @@ class ProfileItem extends StatelessWidget {
     BaseNavigator.push(context, overrideProfileView);
   }
 
-  @override
-  Widget build(BuildContext context) {
+  List<PopupMenuItemData> _buildMenuItems(BuildContext context) {
+    return [
+      PopupMenuItemData(
+        icon: Icons.edit_outlined,
+        label: appLocalizations.edit,
+        onPressed: () {
+          _handleShowEditExtendPage(context);
+        },
+      ),
+      if (profile.type == ProfileType.url) ...[
+        PopupMenuItemData(
+          icon: Icons.sync_alt_sharp,
+          label: appLocalizations.sync,
+          onPressed: () {
+            updateProfile();
+          },
+        ),
+      ],
+      PopupMenuItemData(
+        icon: Icons.extension_outlined,
+        label: appLocalizations.override,
+        onPressed: () {
+          _handlePushGenProfilePage(context, profile.id);
+        },
+      ),
+      PopupMenuItemData(
+        icon: Icons.file_copy_outlined,
+        label: appLocalizations.exportFile,
+        onPressed: () {
+          _handleExportFile(context);
+        },
+      ),
+      PopupMenuItemData(
+        icon: Icons.delete_outlined,
+        label: appLocalizations.delete,
+        onPressed: () {
+          _handleDeleteProfile(context);
+        },
+      ),
+    ];
+  }
+
+  void _showTVMenu(BuildContext context) {
+    final items = _buildMenuItems(context);
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final item in items)
+              ListTile(
+                leading: item.icon != null ? Icon(item.icon) : null,
+                title: Text(item.label),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  item.onPressed!();
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNormalLayout(BuildContext context) {
     final trailingWidget = SizedBox(
       height: 40,
       width: 40,
@@ -385,47 +449,7 @@ class ProfileItem extends StatelessWidget {
                 child: CircularProgressIndicator(),
               )
             : CommonPopupBox(
-                popup: CommonPopupMenu(
-                  items: [
-                    PopupMenuItemData(
-                      icon: Icons.edit_outlined,
-                      label: appLocalizations.edit,
-                      onPressed: () {
-                        _handleShowEditExtendPage(context);
-                      },
-                    ),
-                    if (profile.type == ProfileType.url) ...[
-                      PopupMenuItemData(
-                        icon: Icons.sync_alt_sharp,
-                        label: appLocalizations.sync,
-                        onPressed: () {
-                          updateProfile();
-                        },
-                      ),
-                    ],
-                    PopupMenuItemData(
-                      icon: Icons.extension_outlined,
-                      label: appLocalizations.override,
-                      onPressed: () {
-                        _handlePushGenProfilePage(context, profile.id);
-                      },
-                    ),
-                    PopupMenuItemData(
-                      icon: Icons.file_copy_outlined,
-                      label: appLocalizations.exportFile,
-                      onPressed: () {
-                        _handleExportFile(context);
-                      },
-                    ),
-                    PopupMenuItemData(
-                      icon: Icons.delete_outlined,
-                      label: appLocalizations.delete,
-                      onPressed: () {
-                        _handleDeleteProfile(context);
-                      },
-                    ),
-                  ],
-                ),
+                popup: CommonPopupMenu(items: _buildMenuItems(context)),
                 targetBuilder: (open) {
                   return IconButton(
                     onPressed: () {
@@ -437,54 +461,101 @@ class ProfileItem extends StatelessWidget {
               ),
       ),
     );
-    return CommonCard(
-      isSelected: profile.id == groupValue,
-      onPressed: () {
-        onChanged(profile.id);
-      },
-      onLongPress: () {
-        _handlePreviewRuntimeConfig(context);
-      },
-      child: Stack(
-        children: [
-          ListItem(
-            key: Key(profile.id),
-            horizontalTitleGap: 16,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            title: Container(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 52),
-                    child: Text(
+    return Stack(
+      children: [
+        ListItem(
+          key: Key(profile.id),
+          horizontalTitleGap: 16,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          title: Container(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 52),
+                  child: Text(
+                    profile.label ?? profile.id,
+                    style: context.textTheme.titleMedium,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ...switch (profile.type) {
+                      ProfileType.file => _buildFileProfileInfo(context),
+                      ProfileType.url => _buildUrlProfileInfo(context),
+                    },
+                  ],
+                ),
+              ],
+            ),
+          ),
+          tileTitleAlignment: ListTileTitleAlignment.titleHeight,
+        ),
+        Positioned(top: 6, right: 6, child: trailingWidget),
+      ],
+    );
+  }
+
+  Widget _buildTVLayout(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: InkWell(
+            onTap: () => onChanged(profile.id),
+            onLongPress: () => _showTVMenu(context),
+            child: ListItem(
+              key: Key(profile.id),
+              horizontalTitleGap: 16,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              title: Container(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
                       profile.label ?? profile.id,
                       style: context.textTheme.titleMedium,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ...switch (profile.type) {
-                        ProfileType.file => _buildFileProfileInfo(context),
-                        ProfileType.url => _buildUrlProfileInfo(context),
-                      },
-                    ],
-                  ),
-                ],
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ...switch (profile.type) {
+                          ProfileType.file => _buildFileProfileInfo(context),
+                          ProfileType.url => _buildUrlProfileInfo(context),
+                        },
+                      ],
+                    ),
+                  ],
+                ),
               ),
+              tileTitleAlignment: ListTileTitleAlignment.titleHeight,
             ),
-            tileTitleAlignment: ListTileTitleAlignment.titleHeight,
           ),
-          Positioned(top: 6, right: 6, child: trailingWidget),
-        ],
-      ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isTV = globalState.isAndroidTV;
+    return CommonCard(
+      isSelected: profile.id == groupValue,
+      onPressed: isTV ? null : () => onChanged(profile.id),
+      onLongPress: isTV ? null : () => _handlePreviewRuntimeConfig(context),
+      child: isTV ? _buildTVLayout(context) : _buildNormalLayout(context),
     );
   }
 }

@@ -24,13 +24,19 @@ class HomePage extends StatelessWidget {
             final isMobile = state.viewMode == ViewMode.mobile;
             final navigationItems = state.navigationItems;
             final currentIndex = state.currentIndex;
-            final bottomNavigationBar = GoogleBottomNavBar(
-              navigationItems: navigationItems,
-              selectedIndex: currentIndex,
-              onTabChange: (index) {
-                globalState.appController.toPage(navigationItems[index].label);
-              },
-            );
+            final bottomNavigationBar = globalState.isAndroidTV
+                ? _buildTVBottomNavBar(
+                    context,
+                    navigationItems: navigationItems,
+                    currentIndex: currentIndex,
+                  )
+                : GoogleBottomNavBar(
+                    navigationItems: navigationItems,
+                    selectedIndex: currentIndex,
+                    onTabChange: (index) {
+                      globalState.appController.toPage(navigationItems[index].label);
+                    },
+                  );
             if (isMobile) {
               return AnnotatedRegion<SystemUiOverlayStyle>(
                 value: globalState.appState.systemUiOverlayStyle.copyWith(
@@ -90,6 +96,42 @@ class HomePage extends StatelessWidget {
               );
             },
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTVBottomNavBar(
+    BuildContext context, {
+    required List<NavigationItem> navigationItems,
+    required int currentIndex,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: context.colorScheme.surfaceContainer,
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 20,
+            color: Colors.black.withValues(alpha: 0.15),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: BottomNavigationBar(
+          currentIndex: currentIndex,
+          onTap: (index) {
+            globalState.appController.toPage(navigationItems[index].label);
+          },
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: context.colorScheme.surfaceContainer,
+          selectedItemColor: context.colorScheme.onSecondaryContainer,
+          unselectedItemColor: context.colorScheme.onSurfaceVariant,
+          items: navigationItems.map((e) {
+            return BottomNavigationBarItem(
+              icon: e.icon,
+              label: e.label.name,
+            );
+          }).toList(),
         ),
       ),
     );

@@ -244,6 +244,17 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
                     overlayColor: const WidgetStatePropertyAll(
                       Colors.transparent,
                     ),
+                    indicatorColor: globalState.isAndroidTV
+                        ? (Theme.of(context).brightness == Brightness.light
+                            ? Colors.black
+                            : Colors.white)
+                        : context.colorScheme.primary,
+                    labelColor: globalState.isAndroidTV
+                        ? (Theme.of(context).brightness == Brightness.light
+                            ? Colors.black
+                            : Colors.white)
+                        : context.colorScheme.primary,
+                    unselectedLabelColor: context.colorScheme.onSurfaceVariant,
                     tabs: [
                       for (final group in groups)
                         Tab(child: EmojiText(group.name)),
