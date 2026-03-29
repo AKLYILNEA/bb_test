@@ -39,13 +39,10 @@ class BettboxTileService : TileService() {
 
     override fun onClick() {
         super.onClick()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            GlobalState.handleToggle()
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE && isLocked) {
+            unlockAndRun { GlobalState.handleToggle() }
         } else {
-            when {
-                isLocked -> unlockAndRun { GlobalState.handleToggle() }
-                else -> GlobalState.handleToggle()
-            }
+            GlobalState.handleToggle()
         }
     }
 

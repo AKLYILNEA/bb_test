@@ -6,11 +6,21 @@ import android.content.Intent
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.RelativeSizeSpan
 import androidx.core.app.NotificationCompat
 import com.appshub.bettbox.GlobalState
 import com.appshub.bettbox.models.VpnOptions
 
 class BettboxService : Service(), BaseServiceInterface {
+
+    private var cachedBuilder: NotificationCompat.Builder? = null
+    private val binder = LocalBinder()
+
+    inner class LocalBinder : Binder() {
+        fun getService() = this@BettboxService
+    }
 
     override suspend fun start(options: VpnOptions) = 0
 
@@ -21,18 +31,12 @@ class BettboxService : Service(), BaseServiceInterface {
         }
     }
 
-    private var cachedBuilder: NotificationCompat.Builder? = null
-
     fun resetNotificationBuilder() {
         cachedBuilder = null
     }
 
-    private suspend fun notificationBuilder(): NotificationCompat.Builder {
-        if (cachedBuilder == null) {
-            cachedBuilder = createBettboxNotificationBuilder().await()
-        }
-        return cachedBuilder!!
-    }
+    private suspend fun notificationBuilder() =
+        cachedBuilder ?: createBettboxNotificationBuilder().await().also { cachedBuilder = it }
 
     @SuppressLint("ForegroundServiceType")
     override suspend fun startForeground(title: String, content: String) {
@@ -43,17 +47,18 @@ class BettboxService : Service(), BaseServiceInterface {
         val notification = if (safeContent.isBlank()) {
             builder.setContentTitle(safeTitle).setContentText(null).build()
         } else {
-            val separator = " ︙ "
+            val separator = " ‹ "
             val combinedText = "$safeTitle$separator$safeContent"
-            val spannable = android.text.SpannableString(combinedText)
-            val startIndex = safeTitle.length + separator.length
-            if (startIndex < combinedText.length) {
-                spannable.setSpan(
-                    android.text.style.RelativeSizeSpan(0.80f),
-                    startIndex,
-                    combinedText.length,
-                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
+            val spannable = SpannableString(combinedText).apply {
+                val startIndex = safeTitle.length + separator.length
+                if (startIndex < combinedText.length) {
+                    setSpan(
+                        RelativeSizeSpan(0.80f),
+                        startIndex,
+                        combinedText.length,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                }
             }
             builder.setContentTitle(spannable).setContentText(null).build()
         }
@@ -63,12 +68,6 @@ class BettboxService : Service(), BaseServiceInterface {
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
         GlobalState.getCurrentVPNPlugin()?.requestGc()
-    }
-
-    private val binder = LocalBinder()
-
-    inner class LocalBinder : Binder() {
-        fun getService(): BettboxService = this@BettboxService
     }
 
     override fun onBind(intent: Intent): IBinder = binder

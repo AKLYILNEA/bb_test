@@ -9,7 +9,7 @@ import io.flutter.plugin.common.MethodChannel
 
 class TilePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
-    private lateinit var channel: MethodChannel
+    private var channel: MethodChannel? = null
     private val mainHandler = Handler(Looper.getMainLooper())
 
     companion object {
@@ -23,8 +23,10 @@ class TilePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-        safeInvokeMethod("detached")
-        channel.setMethodCallHandler(null)
+        runCatching { channel?.invokeMethod("detached", null) }
+            .onFailure { Log.e(TAG, "Failed to invoke detached: ${it.message}") }
+        channel?.setMethodCallHandler(null)
+        channel = null
     }
 
     fun handleStart() = safeInvokeMethod("start")
@@ -32,9 +34,15 @@ class TilePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     fun handleReconnectIpc() = safeInvokeMethod("reconnectIpc")
 
     private fun safeInvokeMethod(method: String) {
-        mainHandler.post {
-            runCatching { channel.invokeMethod(method, null) }
+        val ch = channel ?: return
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            runCatching { ch.invokeMethod(method, null) }
                 .onFailure { Log.e(TAG, "Failed to invoke $method: ${it.message}") }
+        } else {
+            mainHandler.post {
+                runCatching { ch.invokeMethod(method, null) }
+                    .onFailure { Log.e(TAG, "Failed to invoke $method: ${it.message}") }
+            }
         }
     }
 

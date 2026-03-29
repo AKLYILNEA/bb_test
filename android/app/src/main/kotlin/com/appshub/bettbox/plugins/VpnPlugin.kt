@@ -39,6 +39,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import java.net.InetSocketAddress
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.withLock
 
 data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
@@ -47,8 +48,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     private var options: VpnOptions? = null
 
     private var isBind = false
-    @Volatile
-    private var isBinding = false
+    private val isBinding = AtomicBoolean(false)
 
     private var job = SupervisorJob()
     private var scope = CoroutineScope(Dispatchers.Default + job as kotlin.coroutines.CoroutineContext)
@@ -72,7 +72,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             isBind = true
-            isBinding = false
+            isBinding.set(false)
             bettBoxService = when (service) {
                 is BettboxVpnService.LocalBinder -> service.getService()
                 is BettboxService.LocalBinder -> service.getService()
@@ -83,7 +83,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
         override fun onServiceDisconnected(arg: ComponentName) {
             isBind = false
-            isBinding = false
+            isBinding.set(false)
             bettBoxService = null
         }
     }
@@ -425,53 +425,68 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
                 if (!startAllowed || currentOptions == null) return@launch
 
-                var fd: Int? = 0
-                try {
-                    fd = bettBoxService?.start(currentOptions)
-                } catch (e: Exception) {
-                    android.util.Log.e("VpnPlugin", "First start attempt failed: ${e.message}")
-                }
-
-                if (fd == null || (currentOptions.enable && fd == 0)) {
-                    android.util.Log.w("VpnPlugin", "VPN establish failed, retrying...")
-                    delay(300)
-                    try {
-                        fd = bettBoxService?.start(currentOptions)
-                    } catch (e: Exception) {
-                        android.util.Log.e("VpnPlugin", "Retry start failed: ${e.message}")
-                    }
-                }
-
-                if (fd == null || (currentOptions.enable && fd == 0)) {
-                    android.util.Log.e("VpnPlugin", "VPN start failed after all attempts")
-                    GlobalState.runLock.withLock { GlobalState.updateRunState(RunState.STOP) }
-                    ServicePlugin.notifyVpnStartFailed()
-                    return@launch
-                }
-
-                GlobalState.runLock.withLock {
-                    if (GlobalState.currentRunState != RunState.START) {
-                        bettBoxService?.stop()
-                        return@withLock
-                    }
-
-                    com.appshub.bettbox.core.Core.startTun(
-                        fd = fd ?: 0,
-                        protect = this@VpnPlugin::protect,
-                        resolverProcess = this@VpnPlugin::resolverProcess,
-                    )
-                    
-                    scope.launch { startForeground() }
-                    
-                    if (currentOptions.dozeSuspend) {
-                        suspendModule?.uninstall()
-                        suspendModule = SuspendModule(BettboxApplication.getAppContext())
-                        suspendModule?.install()
-                    }
-                }
+                performStartCore(currentOptions, retry = true, notifyOnFailure = true)
             } catch (e: Exception) {
                 android.util.Log.e("VpnPlugin", "Fatal error in start flow: ${e.message}")
                 GlobalState.updateRunState(RunState.STOP)
+            }
+        }
+    }
+
+    /**
+     * Core start logic shared between handleStartService and handleSmartResume
+     */
+    private suspend fun performStartCore(
+        currentOptions: VpnOptions,
+        retry: Boolean,
+        notifyOnFailure: Boolean
+    ) {
+        var fd: Int? = 0
+        try {
+            fd = bettBoxService?.start(currentOptions)
+        } catch (e: Exception) {
+            android.util.Log.e("VpnPlugin", "First start attempt failed: ${e.message}")
+        }
+
+        if (fd == null || (currentOptions.enable && fd == 0)) {
+            if (retry) {
+                android.util.Log.w("VpnPlugin", "VPN establish failed, retrying...")
+                delay(300)
+                try {
+                    fd = bettBoxService?.start(currentOptions)
+                } catch (e: Exception) {
+                    android.util.Log.e("VpnPlugin", "Retry start failed: ${e.message}")
+                }
+            }
+        }
+
+        if (fd == null || (currentOptions.enable && fd == 0)) {
+            android.util.Log.e("VpnPlugin", "VPN start failed after all attempts")
+            GlobalState.runLock.withLock { GlobalState.updateRunState(RunState.STOP) }
+            if (notifyOnFailure) {
+                ServicePlugin.notifyVpnStartFailed()
+            }
+            return
+        }
+
+        GlobalState.runLock.withLock {
+            if (GlobalState.currentRunState != RunState.START) {
+                bettBoxService?.stop()
+                return@withLock
+            }
+
+            com.appshub.bettbox.core.Core.startTun(
+                fd = fd ?: 0,
+                protect = this@VpnPlugin::protect,
+                resolverProcess = this@VpnPlugin::resolverProcess,
+            )
+            
+            scope.launch { startForeground() }
+            
+            if (currentOptions.dozeSuspend) {
+                suspendModule?.uninstall()
+                suspendModule = SuspendModule(BettboxApplication.getAppContext())
+                suspendModule?.install()
             }
         }
     }
@@ -560,49 +575,25 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 if (GlobalState.currentRunState == RunState.START) return@withLock false
                 GlobalState.isSmartStopped = false
                 this@VpnPlugin.options = options
-                
+
                 if (bettBoxService == null) {
                     bindService()
                     return@withLock false
                 }
-                
+
                 GlobalState.updateRunState(RunState.START)
                 lastStartForegroundParams = null
                 true
             }
             if (!startAllowed) return@launch
-            
-            var fd: Int? = 0
-            try {
-                fd = bettBoxService?.start(options)
-            } catch (e: Exception) {
-                android.util.Log.e("VpnPlugin", "Smart resume start failed with exception: ${e.message}")
-            }
-            
-            GlobalState.runLock.withLock {
-                if (GlobalState.currentRunState != RunState.START) {
-                    bettBoxService?.stop()
-                    return@withLock
-                }
-                Core.startTun(
-                    fd = fd ?: 0,
-                    protect = this@VpnPlugin::protect,
-                    resolverProcess = this@VpnPlugin::resolverProcess,
-                )
-                scope.launch { startForeground() }
-                if (options.dozeSuspend == true) {
-                    suspendModule?.uninstall()
-                    suspendModule = SuspendModule(BettboxApplication.getAppContext())
-                    suspendModule?.install()
-                }
-            }
+
+            performStartCore(options, retry = false, notifyOnFailure = false)
         }
         return true
     }
 
     private fun bindService() {
-        if (isBinding) return
-        isBinding = true
+        if (!isBinding.compareAndSet(false, true)) return
 
         try {
             if (isBind) {
@@ -615,11 +606,11 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             )
             val res = BettboxApplication.getAppContext().bindService(intent, connection, Context.BIND_AUTO_CREATE)
             if (!res) {
-                isBinding = false
+                isBinding.set(false)
                 android.util.Log.e("VpnPlugin", "bindService returned false (rejected by system)")
             }
         } catch (e: Exception) {
-            isBinding = false
+            isBinding.set(false)
             android.util.Log.e("VpnPlugin", "bindService error: ${e.message}")
         }
     }

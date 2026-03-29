@@ -124,6 +124,7 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
     }
 
     private var isBlockNotification = false
+    private var isActivityAttached = false
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -246,13 +247,12 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
             "${context.packageName}.fileProvider",
             file
         )
-        val intent = Intent(Intent.ACTION_VIEW).setDataAndType(uri, "text/plain")
-        val flags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION
-        context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
-            .forEach {
-                context.grantUriPermission(it.activityInfo.packageName, uri, flags)
-            }
-        runCatching { activityRef?.get()?.startActivity(intent) }
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, "text/plain")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        runCatching { context.startActivity(intent) }
     }
 
     private fun updateExcludeFromRecents(value: Boolean?) {
@@ -443,8 +443,11 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         activityRef = WeakReference(binding.activity)
-        binding.addActivityResultListener(::onActivityResult)
-        binding.addRequestPermissionsResultListener(::onRequestPermissionsResultListener)
+        if (!isActivityAttached) {
+            isActivityAttached = true
+            binding.addActivityResultListener(::onActivityResult)
+            binding.addRequestPermissionsResultListener(::onRequestPermissionsResultListener)
+        }
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
@@ -457,9 +460,11 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
         channel.invokeMethod("exit", null)
         activityRef = null
         cachedTaskId = null
+        isActivityAttached = false
     }
 
     private fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+        if (!isActivityAttached) return false
         if (requestCode == VPN_PERMISSION_REQUEST_CODE && resultCode == FlutterActivity.RESULT_OK) {
             GlobalState.initServiceEngine()
             vpnCallBack?.invoke()
@@ -468,6 +473,7 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
     }
 
     private fun onRequestPermissionsResultListener(requestCode: Int, permissions: Array<String>, grantResults: IntArray): Boolean {
+        if (!isActivityAttached) return false
         if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) isBlockNotification = true
         return true
     }

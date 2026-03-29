@@ -20,25 +20,26 @@ class SuspendModule(private val context: Context) {
 
     private val powerManager: PowerManager? by lazy { context.getSystemService<PowerManager>() }
 
-    private fun isScreenOn(): Boolean = powerManager?.isInteractive ?: true
+    private val isScreenOn: Boolean get() = powerManager?.isInteractive ?: true
 
     private val isDeviceIdleMode: Boolean
         get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && powerManager?.isDeviceIdleMode == true
 
-    private fun updateSuspendState() {
-        val screenOn = isScreenOn()
-        val deviceIdle = isDeviceIdleMode
+    private val shouldSuspend: Boolean get() = !isScreenOn && isDeviceIdleMode
 
-        Log.d(TAG, "updateSuspendState - screenOn: $screenOn, deviceIdle: $deviceIdle, isSuspended: $isSuspended")
+    private fun updateSuspendState() {
+        val shouldSuspendNow = shouldSuspend
+
+        Log.d(TAG, "updateSuspendState - shouldSuspend: $shouldSuspendNow, isSuspended: $isSuspended")
 
         when {
-            !screenOn && deviceIdle && !isSuspended -> {
+            shouldSuspendNow && !isSuspended -> {
                 Log.i(TAG, "Entering Doze - Suspending core")
                 Core.suspended(true)
                 isSuspended = true
             }
-            (screenOn || !deviceIdle) && isSuspended -> {
-                Log.i(TAG, "Exiting Doze (screenOn: $screenOn, deviceIdle: $deviceIdle) - Resuming core")
+            !shouldSuspendNow && isSuspended -> {
+                Log.i(TAG, "Exiting Doze - Resuming core")
                 Core.suspended(false)
                 isSuspended = false
             }
@@ -47,12 +48,9 @@ class SuspendModule(private val context: Context) {
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            when (intent?.action) {
-                Intent.ACTION_SCREEN_ON, Intent.ACTION_SCREEN_OFF,
-                PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED -> {
-                    Log.d(TAG, "Received ${intent.action}")
-                    updateSuspendState()
-                }
+            intent?.action?.let {
+                Log.d(TAG, "Received $it")
+                updateSuspendState()
             }
         }
     }

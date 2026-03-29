@@ -10,19 +10,21 @@ import com.google.gson.Gson
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
+import java.util.concurrent.CopyOnWriteArrayList
 
 class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
     private lateinit var channel: MethodChannel
 
     companion object {
-        private val activeChannels = mutableListOf<MethodChannel>()
+        private val activeChannels = CopyOnWriteArrayList<MethodChannel>()
         private val mainHandler = Handler(Looper.getMainLooper())
+        private val gson = Gson()
         private const val TAG = "ServicePlugin"
 
         private fun notify(method: String) {
             mainHandler.post {
-                activeChannels.toList().forEach { ch ->
+                activeChannels.forEach { ch ->
                     runCatching { ch.invokeMethod(method, null) }
                         .onFailure { Log.e(TAG, "$method notify error: ${it.message}") }
                 }
@@ -38,12 +40,12 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         channel = MethodChannel(binding.binaryMessenger, "service").apply {
             setMethodCallHandler(this@ServicePlugin)
         }
-        synchronized(activeChannels) { activeChannels.add(channel) }
+        activeChannels.add(channel)
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
-        synchronized(activeChannels) { activeChannels.remove(channel) }
+        activeChannels.remove(channel)
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
@@ -54,13 +56,13 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 result.success(true)
             }
             "smartStop" -> {
-                GlobalState.getCurrentVPNPlugin()?.handleSmartStop()
+                VpnPlugin.handleSmartStop()
                 result.success(true)
             }
             "smartResume" -> {
                 val data = call.argument<String>("data")
-                val options = Gson().fromJson(data, VpnOptions::class.java)
-                GlobalState.getCurrentVPNPlugin()?.handleSmartResume(options)
+                val options = gson.fromJson(data, VpnOptions::class.java)
+                VpnPlugin.handleSmartResume(options)
                 result.success(true)
             }
             "setSmartStopped" -> {
@@ -68,7 +70,7 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 result.success(true)
             }
             "isSmartStopped" -> result.success(GlobalState.isSmartStopped)
-            "getLocalIpAddresses" -> result.success(GlobalState.getCurrentVPNPlugin()?.getLocalIpAddresses().orEmpty())
+            "getLocalIpAddresses" -> result.success(VpnPlugin.getLocalIpAddresses())
             "setQuickResponse" -> {
                 VpnPlugin.setQuickResponse(call.argument<Boolean>("enabled") ?: false)
                 result.success(true)
@@ -98,9 +100,9 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             result.error("INVALID_ARGUMENT", "options data is null", null)
             return
         }
-        runCatching { Gson().fromJson(data, VpnOptions::class.java) }
+        runCatching { gson.fromJson(data, VpnOptions::class.java) }
             .onSuccess { options ->
-                GlobalState.getCurrentVPNPlugin()?.handleStart(options)
+                VpnPlugin.handleStart(options)
                 result.success(true)
             }
             .onFailure { result.error("PARSE_ERROR", it.message, null) }

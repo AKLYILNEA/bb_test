@@ -56,13 +56,15 @@ fun VpnOptions.getIpv6RouteAddress(): List<CIDR> = routeAddress.filter { it.isIp
 fun String.isIpv4(): Boolean {
     val parts = split("/")
     require(parts.size == 2) { "Invalid CIDR format" }
-    return InetAddress.getByName(parts[0]).address.size == 4
+    val ip = parts[0]
+    return ip.contains('.') && !ip.contains(':')
 }
 
 fun String.isIpv6(): Boolean {
     val parts = split("/")
     require(parts.size == 2) { "Invalid CIDR format" }
-    return InetAddress.getByName(parts[0]).address.size == 16
+    val ip = parts[0]
+    return ip.contains(':') && !ip.contains('.')
 }
 
 fun String.toCIDR(): CIDR {
@@ -118,8 +120,7 @@ suspend fun <T> MethodChannel.awaitResult(method: String, arguments: Any? = null
     withContext(Dispatchers.Main) {
         suspendCoroutine { continuation ->
             invokeMethod(method, arguments, object : MethodChannel.Result {
-                @Suppress("UNCHECKED_CAST")
-                override fun success(result: Any?) = continuation.resume(result as T)
+                override fun success(result: Any?) = continuation.resume(result as? T)
                 override fun error(code: String, message: String?, details: Any?) = continuation.resume(null)
                 override fun notImplemented() = continuation.resume(null)
             })
@@ -127,9 +128,9 @@ suspend fun <T> MethodChannel.awaitResult(method: String, arguments: Any? = null
     }
 
 fun ReentrantLock.safeLock() {
-    if (!isLocked) lock()
+    if (!isHeldByCurrentThread) lock()
 }
 
 fun ReentrantLock.safeUnlock() {
-    if (isLocked) unlock()
+    if (isHeldByCurrentThread) unlock()
 }
