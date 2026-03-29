@@ -280,11 +280,16 @@ class _TestUrlDialog extends ConsumerWidget {
             return Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: () {
+                onTap: () async {
                   ref
                       .read(appSettingProvider.notifier)
                       .updateState((state) => state.copyWith(testUrl: url));
-                  Navigator.of(context, rootNavigator: true).pop();
+                  if (ref.read(overrideTestUrlProvider)) {
+                    await globalState.appController.updateClashConfigDebounce();
+                  }
+                  if (context.mounted) {
+                    Navigator.of(context, rootNavigator: true).pop();
+                  }
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
@@ -353,6 +358,9 @@ class _TestUrlDialog extends ConsumerWidget {
 
                 if (customUrl != null) {
                   notifier.updateState((state) => state.copyWith(testUrl: customUrl));
+                  if (ref.read(overrideTestUrlProvider)) {
+                    await globalState.appController.updateClashConfigDebounce();
+                  }
                 }
               },
               child: Container(
