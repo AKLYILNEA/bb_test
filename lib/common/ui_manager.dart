@@ -4,6 +4,7 @@ import 'dart:isolate';
 import 'package:archive/archive_io.dart';
 import 'package:flutter/services.dart';
 import 'package:bett_box/common/common.dart';
+import 'package:bett_box/state.dart';
 import 'package:path/path.dart';
 
 class UiManager {
@@ -21,7 +22,7 @@ class UiManager {
       final uiPath = await appPath.uiPath;
       final uiDir = Directory(uiPath);
       final versionFile = File(join(uiPath, '.ui_version'));
-      const currentVersion = '2.9.0';
+      final currentVersion = globalState.packageInfo.version;
 
       if (await uiDir.exists()) {
         if (await versionFile.exists()) {

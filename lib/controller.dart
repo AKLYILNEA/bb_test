@@ -35,6 +35,8 @@ class AppController {
   final WidgetRef _ref;
 
   Timer? _wakelockSyncTimer;
+  Completer<void>? _restartLock;
+  int _backgroundLoadVersion = 0;
 
   AppController(this.context, WidgetRef ref) : _ref = ref;
 
@@ -81,24 +83,32 @@ class AppController {
   }
 
   Future<void> restartCore() async {
-    commonPrint.log('restart core');
-    final wasRunning = _ref.read(runTimeProvider.notifier).isStart;
-    if (wasRunning) {
-      await globalState.handleStop();
+    if (_restartLock != null) {
+      return _restartLock!.future;
     }
-    await clashService?.reStart();
-    await _initCore();
-    if (wasRunning) {
-      await globalState.handleStart();
+
+    _restartLock = Completer<void>();
+    commonPrint.log('restart core');
+
+    try {
+      final wasRunning = _ref.read(runTimeProvider.notifier).isStart;
+      if (wasRunning) {
+        await globalState.handleStop();
+      }
+      await clashService?.reStart();
+      await _initCore();
+      if (wasRunning) {
+        await globalState.handleStart();
+      }
+    } finally {
+      _restartLock?.complete();
+      _restartLock = null;
     }
   }
 
   Future<void> updateStatus(bool isStart) async {
     if (isStart) {
-      // Quick start
       await _fastStart();
-
-      // Lazy load
     } else {
       await globalState.handleStop();
       clashCore.resetTraffic();
@@ -109,46 +119,37 @@ class AppController {
     }
   }
 
-  /// Fast start: only execute essential startup operations
   Future<void> _fastStart() async {
     final patchConfig = _ref.read(patchClashConfigProvider);
     final isDesktop = system.isDesktop;
 
-    // Desktop TUN optimization
     if (isDesktop && patchConfig.tun.enable) {
-      // Disable TUN
       await _quickSetupConfig(enableTun: false);
-
-      // Update UI
       await globalState.handleStart([updateRunTime, updateTraffic]);
 
-      // Delay TUN enabling
       Future.microtask(() async {
         final res = await _requestAdmin(true);
-        if (!res.isError) {
+        if (res.needRestart) {
+          await restartCore();
+        } else if (!res.isError) {
           await _updateClashConfig();
         }
-        // Lazy load
         _backgroundLoad();
       });
 
-      // Delayed IP check
       Future.delayed(const Duration(seconds: 1), () {
         addCheckIpNumDebounce();
       });
       return;
     }
 
-    // Check config status
     final needReapply = await _checkIfNeedReapply();
     if (needReapply) {
-      // Quick apply
       await _quickSetupConfig();
     }
 
     await globalState.handleStart([updateRunTime, updateTraffic]);
 
-    // Delayed IP check
     Future.delayed(const Duration(seconds: 1), () {
       addCheckIpNumDebounce();
     });
@@ -156,15 +157,22 @@ class AppController {
     _backgroundLoad();
   }
 
-  /// Async data load
   void _backgroundLoad() {
+    final version = ++_backgroundLoadVersion;
+
     Future.microtask(() async {
       try {
-        // Fetch data
-        await Future.wait([updateGroups(), updateProviders()]);
+        final groups = await clashCore.getProxiesGroups();
+        if (version != _backgroundLoadVersion) return;
 
-        // Delayed GC
+        final providers = await clashCore.getExternalProviders();
+        if (version != _backgroundLoadVersion) return;
+
+        _ref.read(groupsProvider.notifier).value = groups;
+        _ref.read(providersProvider.notifier).value = providers;
+
         await Future.delayed(const Duration(seconds: 2));
+        if (version != _backgroundLoadVersion) return;
         await clashCore.requestGc();
       } catch (e) {
         commonPrint.log('Background load error: $e');
@@ -184,7 +192,6 @@ class AppController {
     return true;
   }
 
-  /// Simple setup
   Future<void> _quickSetupConfig({bool? enableTun}) async {
     await safeRun(
       () async {
@@ -194,6 +201,10 @@ class AppController {
         final targetTun = enableTun ?? patchConfig.tun.enable;
 
         final res = await _requestAdmin(targetTun);
+        if (res.needRestart) {
+          await restartCore();
+          return;
+        }
         if (res.isError) {
           return;
         }
@@ -204,17 +215,15 @@ class AppController {
         );
         final message = await clashCore.setupConfig(params);
         if (message.isNotEmpty) {
-          // Rollback
           await _rollbackConfig();
           throw message;
         }
-        // Backup
         globalState.backupSuccessfulConfig(params);
         lastProfileModified = await _ref.read(
           currentProfileProvider.select((state) => state?.profileLastModified),
         );
       },
-      needLoading: false, // Fast startup
+      needLoading: false,
     );
   }
 
@@ -245,19 +254,13 @@ class AppController {
   }
 
   Future<bool> _shouldUpdateTraffic() async {
-    if (!_ref.read(isCurrentPageProvider(PageLabel.dashboard))) {
-      return false;
-    }
+    if (!_ref.read(isCurrentPageProvider(PageLabel.dashboard))) return false;
+
     final lifecycleState = WidgetsBinding.instance.lifecycleState;
-    if (lifecycleState != null && lifecycleState != AppLifecycleState.resumed) {
-      return false;
-    }
-    if (system.isDesktop) {
-      final visible = await window?.isVisible;
-      if (visible == false) {
-        return false;
-      }
-    }
+    if (lifecycleState != AppLifecycleState.resumed) return false;
+
+    if (system.isDesktop && await window?.isVisible == false) return false;
+
     return true;
   }
 
@@ -338,17 +341,15 @@ class AppController {
     final index = hotKeyActions.indexWhere(
       (item) => item.action == hotKeyAction.action,
     );
+
+    final newList = List.of(hotKeyActions);
     if (index == -1) {
-      _ref.read(hotKeyActionsProvider.notifier).value = List.from(hotKeyActions)
-        ..add(hotKeyAction);
+      newList.add(hotKeyAction);
     } else {
-      _ref.read(hotKeyActionsProvider.notifier).value = List.from(hotKeyActions)
-        ..[index] = hotKeyAction;
+      newList[index] = hotKeyAction;
     }
 
-    _ref.read(hotKeyActionsProvider.notifier).value = index == -1
-        ? (List.from(hotKeyActions)..add(hotKeyAction))
-        : (List.from(hotKeyActions)..[index] = hotKeyAction);
+    _ref.read(hotKeyActionsProvider.notifier).value = newList;
   }
 
   List<Group> getCurrentGroups() {
@@ -399,6 +400,10 @@ class AppController {
   Future<void> _updateClashConfig() async {
     final updateParams = _ref.read(updateParamsProvider);
     final res = await _requestAdmin(updateParams.tun.enable);
+    if (res.needRestart) {
+      await restartCore();
+      return;
+    }
     if (res.isError) {
       return;
     }
@@ -414,17 +419,14 @@ class AppController {
       return Result.success(false);
     }
     final realTunEnable = _ref.read(realTunEnableProvider);
-    // When user switches from off to on, check/install privilege service
     if (enableTun != realTunEnable && realTunEnable == false) {
       final code = await system.authorizeCore();
       switch (code) {
         case AuthorizeCode.success:
-          await restartCore();
-          return Result.error('');
+          return Result.success(true, needRestart: true);
         case AuthorizeCode.none:
           break;
         case AuthorizeCode.error:
-          // Admin hint
           if (system.isWindows) {
             globalState.showNotifier(appLocalizations.tunEnableRequireAdmin);
           }
@@ -446,6 +448,10 @@ class AppController {
     await _ref.read(currentProfileProvider)?.checkAndUpdate();
     final patchConfig = _ref.read(patchClashConfigProvider);
     final res = await _requestAdmin(patchConfig.tun.enable);
+    if (res.needRestart) {
+      await restartCore();
+      return;
+    }
     if (res.isError) {
       return;
     }
@@ -456,11 +462,9 @@ class AppController {
     );
     final message = await clashCore.setupConfig(params);
     if (message.isNotEmpty) {
-      // Rollback
       await _rollbackConfig();
       throw message;
     }
-    // Backup
     globalState.backupSuccessfulConfig(params);
     lastProfileModified = await _ref.read(
       currentProfileProvider.select((state) => state?.profileLastModified),
@@ -520,28 +524,20 @@ class AppController {
   Future<void> updateGroups() async {
     try {
       final newGroups = await retry(
-        task: () async {
-          return await clashCore.getProxiesGroups();
-        },
+        task: clashCore.getProxiesGroups,
         retryIf: (res) => res.isEmpty,
-        maxAttempts: 5, // Wait for core
+        maxAttempts: 5,
       );
-      // Refresh data
       _ref.read(groupsProvider.notifier).value = newGroups;
+      return;
     } catch (e) {
       final currentGroups = _ref.read(groupsProvider);
-      if (currentGroups.isEmpty) {
-        // Retry initial load
-        commonPrint.log(
-          'updateGroups initial load failed, scheduling retry: $e',
-        );
-        Future.delayed(const Duration(seconds: 2), () {
-          updateGroupsDebounce();
-        });
-      } else {
-        // Keep cache
+      if (currentGroups.isNotEmpty) {
         commonPrint.log('updateGroups error, keeping existing groups: $e');
+        return;
       }
+      commonPrint.log('updateGroups initial load failed, scheduling retry: $e');
+      Future.delayed(const Duration(seconds: 2), updateGroupsDebounce);
     }
   }
 
@@ -593,10 +589,12 @@ class AppController {
     try {
       stopWakelockAutoRecovery();
       await savePreferences();
-      await macOS?.updateDns(true);
-      await proxy?.stopProxy();
-      await clashCore.shutdown();
-      await clashService?.destroy();
+      await Future.wait([
+        if (macOS != null) macOS!.updateDns(true),
+        if (proxy != null) proxy!.stopProxy(),
+        clashCore.shutdown(),
+        if (clashService != null) clashService!.destroy(),
+      ].whereType<Future<void>>().toList());
     } finally {
       system.exit();
     }
@@ -1008,24 +1006,13 @@ class AppController {
     );
   }
 
+  int _delayValue(int? delay) => (delay == null || delay == -1) ? 1 << 30 : delay;
+
   List<Proxy> _sortOfDelay({required List<Proxy> proxies, String? testUrl}) {
     return List.of(proxies)..sort((a, b) {
-      final aDelay = _ref.read(
-        getDelayProvider(proxyName: a.name, testUrl: testUrl),
-      );
-      final bDelay = _ref.read(
-        getDelayProvider(proxyName: b.name, testUrl: testUrl),
-      );
-      if (aDelay == null && bDelay == null) {
-        return 0;
-      }
-      if (aDelay == null || aDelay == -1) {
-        return 1;
-      }
-      if (bDelay == null || bDelay == -1) {
-        return -1;
-      }
-      return aDelay.compareTo(bDelay);
+      final aDelay = _ref.read(getDelayProvider(proxyName: a.name, testUrl: testUrl));
+      final bDelay = _ref.read(getDelayProvider(proxyName: b.name, testUrl: testUrl));
+      return _delayValue(aDelay).compareTo(_delayValue(bDelay));
     });
   }
 
@@ -1073,12 +1060,12 @@ class AppController {
   }
 
   Future<List<Package>> getPackages({bool forceRefresh = false}) async {
-    // Remove unnecessary delay, load directly async
-    if (forceRefresh || _ref.read(packagesProvider).isEmpty) {
-      final packages = await app.getPackages(forceRefresh: forceRefresh);
-      _ref.read(packagesProvider.notifier).value = packages;
-    }
-    return _ref.read(packagesProvider);
+    final cached = _ref.read(packagesProvider);
+    if (!forceRefresh && cached.isNotEmpty) return cached;
+
+    final packages = await app.getPackages(forceRefresh: forceRefresh);
+    _ref.read(packagesProvider.notifier).value = packages;
+    return packages;
   }
 
   void updateStart() {

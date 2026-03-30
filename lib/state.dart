@@ -550,6 +550,18 @@ class GlobalState {
           }
         }
       }
+
+      for (final group in proxyGroups) {
+        if (group is! Map) continue;
+        final tolerance = group['tolerance'];
+        if (tolerance != null) {
+          if (tolerance is double) {
+            group['tolerance'] = tolerance.toInt();
+          } else if (tolerance is String) {
+            group['tolerance'] = int.tryParse(tolerance) ?? tolerance;
+          }
+        }
+      }
     }
 
     var rules = [];

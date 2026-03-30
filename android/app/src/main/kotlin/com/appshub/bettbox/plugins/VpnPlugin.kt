@@ -60,8 +60,9 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     private var disconnectCount = 0
     private var disconnectWindowStart = 0L
     private val disconnectWindowMs = 5000L
-    private val maxDisconnectsInWindow = 2
+    private val maxDisconnectsInWindow = 3
     private var lastNetworkType: Int? = null
+    private var lastDns = ""
 
     val networks: MutableSet<Network> = Collections.newSetFromMap(ConcurrentHashMap())
 
@@ -89,6 +90,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        unRegisterNetworkCallback()
         job.cancel()
         job = SupervisorJob()
         scope = CoroutineScope(Dispatchers.Default + job as kotlin.coroutines.CoroutineContext)
@@ -215,6 +217,8 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         val dns = networks.flatMap { network ->
             connectivity?.resolveDns(network) ?: emptyList()
         }.toSet().joinToString(",")
+        if (dns == lastDns) return
+        lastDns = dns
         scope.launch {
             withContext(Dispatchers.Main) {
                 flutterMethodChannel.invokeMethod("dnsChanged", dns)

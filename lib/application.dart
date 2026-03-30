@@ -52,19 +52,21 @@ class ApplicationState extends ConsumerState<Application>
     _autoUpdateGroupTask();
     _autoUpdateProfilesTask();
     globalState.appController = AppController(context, ref);
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      final currentContext = globalState.navigatorKey.currentContext;
-      if (currentContext != null) {
-        globalState.appController = AppController(currentContext, ref);
-      }
-      await globalState.appController.init();
-      unawaited(Future(() async {
-        globalState.appController.initLink();
-        if (system.isAndroid) {
-          app.initShortcuts();
-        }
-      }));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_initApp());
     });
+  }
+
+  Future<void> _initApp() async {
+    final currentContext = globalState.navigatorKey.currentContext;
+    if (currentContext != null && currentContext != context) {
+      globalState.appController = AppController(currentContext, ref);
+    }
+    await globalState.appController.init();
+    globalState.appController.initLink();
+    if (system.isAndroid) {
+      app.initShortcuts();
+    }
   }
 
   @override
@@ -85,19 +87,17 @@ class ApplicationState extends ConsumerState<Application>
   }
 
   void _autoUpdateGroupTask() {
-    _autoUpdateGroupTaskTimer = Timer(const Duration(milliseconds: 20000), () {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        globalState.appController.updateGroupsDebounce();
-        _autoUpdateGroupTask();
-      });
-    });
+    _autoUpdateGroupTaskTimer = Timer.periodic(
+      const Duration(seconds: 20),
+      (_) => globalState.appController.updateGroupsDebounce(),
+    );
   }
 
   void _autoUpdateProfilesTask() {
-    _autoUpdateProfilesTaskTimer = Timer(const Duration(minutes: 20), () async {
-      await globalState.appController.autoUpdateProfiles();
-      _autoUpdateProfilesTask();
-    });
+    _autoUpdateProfilesTaskTimer = Timer.periodic(
+      const Duration(minutes: 20),
+      (_) => unawaited(globalState.appController.autoUpdateProfiles()),
+    );
   }
 
   Widget _buildPlatformState(Widget child) {
@@ -204,14 +204,14 @@ class ApplicationState extends ConsumerState<Application>
   }
 
   @override
-  Future<void> dispose() async {
+  void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     linkManager.destroy();
     _autoUpdateGroupTaskTimer?.cancel();
     _autoUpdateProfilesTaskTimer?.cancel();
-    await clashCore.destroy();
-    await globalState.appController.savePreferences();
-    await globalState.appController.handleExit();
+    unawaited(clashCore.destroy());
+    unawaited(globalState.appController.savePreferences());
+    unawaited(globalState.appController.handleExit());
     super.dispose();
   }
 }

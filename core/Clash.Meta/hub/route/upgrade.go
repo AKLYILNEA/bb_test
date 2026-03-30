@@ -15,8 +15,11 @@ import (
 func upgradeRouter() http.Handler {
 	r := chi.NewRouter()
 	r.Post("/ui", updateUI)
-	if !embedMode { // disallow upgrade core/geo in embed mode
-		r.Post("/", upgradeCore)
+	r.Post("/", func(w http.ResponseWriter, r *http.Request) {
+		render.Status(r, http.StatusForbidden)
+		render.JSON(w, r, newError("Not supported"))
+	})
+	if !embedMode {
 		r.Post("/geo", updateGeoDatabases)
 	}
 	return r

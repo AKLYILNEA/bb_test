@@ -146,7 +146,6 @@ class Tray {
     menuItems.add(autoStartMenuItem);
     menuItems.add(copyEnvVarMenuItem);
 
-    // Wakelock 菜单项（仅桌面端）
     if (!system.isAndroid) {
       final wakelockMenuItem = MenuItem.checkbox(
         label: appLocalizations.wakelock,
@@ -175,19 +174,6 @@ class Tray {
         force: focus,
       );
     }
-  }
-
-  Future<void> updateTrayTitle([Traffic? traffic]) async {
-    // if (!system.isMacOS) {
-    //   return;
-    // }
-    // if (traffic == null) {
-    //   await trayManager.setTitle("");
-    // } else {
-    //   await trayManager.setTitle(
-    //     "${traffic.up.shortShow} ↑ \n${traffic.down.shortShow} ↓",
-    //   );
-    // }
   }
 
   Future<void> _copyEnv(int port) async {

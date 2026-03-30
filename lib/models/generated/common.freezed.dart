@@ -4461,7 +4461,7 @@ as int?,
 /// @nodoc
 mixin _$Result<T> {
 
- T? get data; ResultType get type; String get message;
+ T? get data; ResultType get type; String get message; bool get needRestart;
 /// Create a copy of Result
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -4472,16 +4472,16 @@ $ResultCopyWith<T, Result<T>> get copyWith => _$ResultCopyWithImpl<T, Result<T>>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Result<T>&&const DeepCollectionEquality().equals(other.data, data)&&(identical(other.type, type) || other.type == type)&&(identical(other.message, message) || other.message == message));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Result<T>&&const DeepCollectionEquality().equals(other.data, data)&&(identical(other.type, type) || other.type == type)&&(identical(other.message, message) || other.message == message)&&(identical(other.needRestart, needRestart) || other.needRestart == needRestart));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(data),type,message);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(data),type,message,needRestart);
 
 @override
 String toString() {
-  return 'Result<$T>(data: $data, type: $type, message: $message)';
+  return 'Result<$T>(data: $data, type: $type, message: $message, needRestart: $needRestart)';
 }
 
 
@@ -4492,7 +4492,7 @@ abstract mixin class $ResultCopyWith<T,$Res>  {
   factory $ResultCopyWith(Result<T> value, $Res Function(Result<T>) _then) = _$ResultCopyWithImpl;
 @useResult
 $Res call({
- T? data, ResultType type, String message
+ T? data, ResultType type, String message, bool needRestart
 });
 
 
@@ -4509,12 +4509,13 @@ class _$ResultCopyWithImpl<T,$Res>
 
 /// Create a copy of Result
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? data = freezed,Object? type = null,Object? message = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? data = freezed,Object? type = null,Object? message = null,Object? needRestart = null,}) {
   return _then(_self.copyWith(
 data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
 as T?,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as ResultType,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
-as String,
+as String,needRestart: null == needRestart ? _self.needRestart : needRestart // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -4599,10 +4600,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( T? data,  ResultType type,  String message)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( T? data,  ResultType type,  String message,  bool needRestart)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Result() when $default != null:
-return $default(_that.data,_that.type,_that.message);case _:
+return $default(_that.data,_that.type,_that.message,_that.needRestart);case _:
   return orElse();
 
 }
@@ -4620,10 +4621,10 @@ return $default(_that.data,_that.type,_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( T? data,  ResultType type,  String message)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( T? data,  ResultType type,  String message,  bool needRestart)  $default,) {final _that = this;
 switch (_that) {
 case _Result():
-return $default(_that.data,_that.type,_that.message);case _:
+return $default(_that.data,_that.type,_that.message,_that.needRestart);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -4640,10 +4641,10 @@ return $default(_that.data,_that.type,_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( T? data,  ResultType type,  String message)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( T? data,  ResultType type,  String message,  bool needRestart)?  $default,) {final _that = this;
 switch (_that) {
 case _Result() when $default != null:
-return $default(_that.data,_that.type,_that.message);case _:
+return $default(_that.data,_that.type,_that.message,_that.needRestart);case _:
   return null;
 
 }
@@ -4655,12 +4656,13 @@ return $default(_that.data,_that.type,_that.message);case _:
 
 
 class _Result<T> implements Result<T> {
-  const _Result({required this.data, required this.type, required this.message});
+  const _Result({required this.data, required this.type, required this.message, this.needRestart = false});
   
 
 @override final  T? data;
 @override final  ResultType type;
 @override final  String message;
+@override@JsonKey() final  bool needRestart;
 
 /// Create a copy of Result
 /// with the given fields replaced by the non-null parameter values.
@@ -4672,16 +4674,16 @@ _$ResultCopyWith<T, _Result<T>> get copyWith => __$ResultCopyWithImpl<T, _Result
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Result<T>&&const DeepCollectionEquality().equals(other.data, data)&&(identical(other.type, type) || other.type == type)&&(identical(other.message, message) || other.message == message));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Result<T>&&const DeepCollectionEquality().equals(other.data, data)&&(identical(other.type, type) || other.type == type)&&(identical(other.message, message) || other.message == message)&&(identical(other.needRestart, needRestart) || other.needRestart == needRestart));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(data),type,message);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(data),type,message,needRestart);
 
 @override
 String toString() {
-  return 'Result<$T>(data: $data, type: $type, message: $message)';
+  return 'Result<$T>(data: $data, type: $type, message: $message, needRestart: $needRestart)';
 }
 
 
@@ -4692,7 +4694,7 @@ abstract mixin class _$ResultCopyWith<T,$Res> implements $ResultCopyWith<T, $Res
   factory _$ResultCopyWith(_Result<T> value, $Res Function(_Result<T>) _then) = __$ResultCopyWithImpl;
 @override @useResult
 $Res call({
- T? data, ResultType type, String message
+ T? data, ResultType type, String message, bool needRestart
 });
 
 
@@ -4709,12 +4711,13 @@ class __$ResultCopyWithImpl<T,$Res>
 
 /// Create a copy of Result
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? data = freezed,Object? type = null,Object? message = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? data = freezed,Object? type = null,Object? message = null,Object? needRestart = null,}) {
   return _then(_Result<T>(
 data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
 as T?,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as ResultType,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
-as String,
+as String,needRestart: null == needRestart ? _self.needRestart : needRestart // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

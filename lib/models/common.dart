@@ -538,10 +538,11 @@ abstract class Result<T> with _$Result<T> {
     required T? data,
     required ResultType type,
     required String message,
+    @Default(false) bool needRestart,
   }) = _Result;
 
-  factory Result.success(T data) =>
-      Result(data: data, type: ResultType.success, message: '');
+  factory Result.success(T data, {bool needRestart = false}) =>
+      Result(data: data, type: ResultType.success, message: '', needRestart: needRestart);
 
   factory Result.error(String message) =>
       Result(data: null, type: ResultType.error, message: message);

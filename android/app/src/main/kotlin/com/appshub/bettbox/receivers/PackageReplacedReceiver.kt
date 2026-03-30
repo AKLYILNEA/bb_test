@@ -17,9 +17,9 @@ class PackageReplacedReceiver : BroadcastReceiver() {
         val pending = goAsync()
         runCatching {
             Log.d(TAG, "App updated, resetting states.")
-            android.net.VpnService.prepare(context)
             GlobalState.updateIsStopping(false)
             GlobalState.updateRunState(RunState.STOP)
+            android.net.VpnService.prepare(context)
             context.getSharedPreferences("vpn_state", Context.MODE_PRIVATE).edit().remove("stop_lock_ts").apply()
         }.onFailure { Log.e(TAG, "Reset failed", it) }
         pending.finish()
