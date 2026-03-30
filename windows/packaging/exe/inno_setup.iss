@@ -22,17 +22,58 @@ ArchitecturesInstallIn64BitMode={{ARCH}}
 var
   ShouldCleanUserData: Boolean;
 
-procedure KillProcesses;
+function IsProcessRunning(ProcessName: String): Boolean;
 var
-  Processes: TArrayOfString;
-  i: Integer;
   ResultCode: Integer;
 begin
-  Processes := ['Bettbox.exe', 'BettboxCore.exe', 'BettboxHelperService.exe', 'LiClash.exe', 'LiClashCore.exe', 'LiClashHelperService.exe'];
+  Exec('cmd.exe', '/c tasklist /fi "imagename eq ' + ProcessName + '" 2>nul | find /i "' + ProcessName + '" >nul', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Result := (ResultCode = 0);
+end;
 
-  for i := 0 to GetArrayLength(Processes)-1 do
+procedure KillProcesses;
+var
+  ResultCode: Integer;
+  WaitCount: Integer;
+  GracefulProcesses: TArrayOfString;
+  ForceProcesses: TArrayOfString;
+  i: Integer;
+  AllExited: Boolean;
+begin
+  GracefulProcesses := ['Bettbox.exe'];
+  ForceProcesses := ['BettboxCore.exe', 'BettboxHelperService.exe'];
+
+  for i := 0 to GetArrayLength(GracefulProcesses)-1 do
   begin
-    Exec('taskkill', '/f /im ' + Processes[i], '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    if IsProcessRunning(GracefulProcesses[i]) then
+      Exec('taskkill', '/im ' + GracefulProcesses[i], '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  end;
+
+  WaitCount := 0;
+  while WaitCount < 5 do
+  begin
+    AllExited := True;
+    for i := 0 to GetArrayLength(GracefulProcesses)-1 do
+    begin
+      if IsProcessRunning(GracefulProcesses[i]) then
+      begin
+        AllExited := False;
+        Break;
+      end;
+    end;
+    if AllExited then
+      Break;
+    Sleep(200);
+    WaitCount := WaitCount + 1;
+  end;
+
+  for i := 0 to GetArrayLength(GracefulProcesses)-1 do
+  begin
+    Exec('taskkill', '/f /im ' + GracefulProcesses[i], '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  end;
+
+  for i := 0 to GetArrayLength(ForceProcesses)-1 do
+  begin
+    Exec('taskkill', '/f /im ' + ForceProcesses[i], '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   end;
 end;
 

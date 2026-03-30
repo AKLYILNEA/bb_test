@@ -550,7 +550,10 @@ class GlobalState {
           }
         }
       }
+    }
 
+    if (rawConfig['proxy-groups'] is List) {
+      final proxyGroups = rawConfig['proxy-groups'] as List;
       for (final group in proxyGroups) {
         if (group is! Map) continue;
         final tolerance = group['tolerance'];

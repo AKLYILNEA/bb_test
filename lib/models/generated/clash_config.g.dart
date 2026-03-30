@@ -50,7 +50,6 @@ const _$GroupTypeEnumMap = {
   GroupType.URLTest: 'URLTest',
   GroupType.Fallback: 'Fallback',
   GroupType.LoadBalance: 'LoadBalance',
-  GroupType.Relay: 'Relay',
 };
 
 _RuleProvider _$RuleProviderFromJson(Map<String, dynamic> json) =>

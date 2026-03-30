@@ -40,8 +40,7 @@ enum GroupType {
   Selector,
   URLTest,
   Fallback,
-  LoadBalance,
-  Relay;
+  LoadBalance;
 
   static GroupType parseProfileType(String type) {
     return switch (type) {
@@ -49,7 +48,6 @@ enum GroupType {
       'select' => Selector,
       'fallback' => Fallback,
       'load-balance' => LoadBalance,
-      'relay' => Relay,
       String() => throw UnimplementedError(),
     };
   }
