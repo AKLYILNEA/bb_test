@@ -148,9 +148,10 @@ class TrackerInfoItem extends ConsumerWidget {
             onClick: onClickKeyword,
           )
         : null;
-    return ListItem(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      onTap: () {
+    return RepaintBoundary(
+      child: ListItem(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        onTap: () {
         showExtend(
           context,
           builder: (_, type) {
@@ -178,6 +179,7 @@ class TrackerInfoItem extends ConsumerWidget {
           const SizedBox(height: 8),
           subTitle,
         ],
+      ),
       ),
     );
   }
@@ -226,16 +228,16 @@ class _ProcessIconState extends State<_ProcessIcon> {
 
     Widget buildPlaceholder() {
       return const Icon(
-        Icons.apps,
-        size: 42,
+        Icons.web_asset,
+        size: 48,
       );
     }
 
     if (widget.process.isEmpty) {
       return Container(
         margin: const EdgeInsets.only(top: 4),
-        width: 42,
-        height: 42,
+        width: 48,
+        height: 48,
         alignment: Alignment.center,
         child: buildPlaceholder(),
       );

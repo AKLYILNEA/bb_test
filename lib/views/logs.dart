@@ -212,9 +212,10 @@ class LogItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListItem(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      onTap: () {
+    return RepaintBoundary(
+      child: ListItem(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        onTap: () {
         globalState.showCommonDialog(child: LogDetailDialog(log: log));
       },
       title: SizedBox(
@@ -249,6 +250,7 @@ class LogItem extends StatelessWidget {
             ],
           ),
         ],
+      ),
       ),
     );
   }

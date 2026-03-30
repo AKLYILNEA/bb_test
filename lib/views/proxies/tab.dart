@@ -371,6 +371,7 @@ class _ProxyGroupViewState extends ConsumerState<ProxyGroupView> {
         child: GridView.builder(
           key: _getPageStorageKey(),
           controller: _controller,
+          cacheExtent: 500,
           padding: const EdgeInsets.only(
             top: 16,
             left: 16,

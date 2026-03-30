@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:collection/collection.dart';
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
-import 'package:bett_box/plugins/smooth_scroll.dart';
 import 'package:bett_box/state.dart';
 import 'package:flutter/material.dart';
 
@@ -24,7 +22,7 @@ class CommonScrollBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget result = Scrollbar(
+    return Scrollbar(
       controller: controller,
       thumbVisibility: thumbVisibility,
       trackVisibility: trackVisibility,
@@ -33,58 +31,7 @@ class CommonScrollBar extends StatelessWidget {
       interactive: true,
       child: child,
     );
-
-    if (controller != null && system.isDesktop) {
-      result = DesktopSmoothScroll(
-        controller: controller!,
-        child: _NoScrollPhysicsWrapper(child: result),
-      );
-    }
-    return result;
   }
-}
-
-class _NoScrollPhysicsWrapper extends StatelessWidget {
-  final Widget child;
-
-  const _NoScrollPhysicsWrapper({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return ScrollConfiguration(
-      behavior: _DesktopScrollBehavior(),
-      child: child,
-    );
-  }
-}
-
-class _DesktopScrollBehavior extends ScrollBehavior {
-  @override
-  ScrollPhysics getScrollPhysics(BuildContext context) {
-    return const _NoPointerScrollPhysics();
-  }
-
-  @override
-  Set<PointerDeviceKind> get dragDevices => {
-        PointerDeviceKind.touch,
-        PointerDeviceKind.stylus,
-        PointerDeviceKind.invertedStylus,
-        PointerDeviceKind.trackpad,
-        PointerDeviceKind.mouse,
-        PointerDeviceKind.unknown,
-      };
-}
-
-class _NoPointerScrollPhysics extends ScrollPhysics {
-  const _NoPointerScrollPhysics({super.parent});
-
-  @override
-  _NoPointerScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return _NoPointerScrollPhysics(parent: buildParent(ancestor));
-  }
-
-  @override
-  bool shouldAcceptUserOffset(ScrollMetrics position) => false;
 }
 
 class ScrollToEndBox<T> extends StatefulWidget {

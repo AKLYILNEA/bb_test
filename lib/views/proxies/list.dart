@@ -66,6 +66,7 @@ class _ProxyGroupsList extends StatelessWidget {
       thumbVisibility: true,
       trackVisibility: true,
       child: CustomScrollView(
+        cacheExtent: 500,
         slivers: [
           SliverPadding(
             padding: const EdgeInsets.all(16),
@@ -112,9 +113,10 @@ class _GroupSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Column(
+    return RepaintBoundary(
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           _GroupHeader(
@@ -134,6 +136,7 @@ class _GroupSection extends StatelessWidget {
             ),
           ],
         ],
+        ),
       ),
     );
   }
@@ -323,41 +326,32 @@ class _ProxyGrid extends StatelessWidget {
       testUrl: group.testUrl,
     );
 
-    final chunks = sortedProxies.chunks(columns);
+    final itemHeight = getItemHeight(cardType);
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: chunks
-          .map<Widget>((proxies) {
-            final itemHeight = getItemHeight(cardType);
-            final children = proxies
-                .map<Widget>(
-                  (proxy) => Flexible(
-                    child: SizedBox(
-                      height: itemHeight,
-                      child: ProxyCard(
-                        key: ValueKey('${group.name}.${proxy.name}'),
-                        proxy: proxy,
-                        groupName: group.name,
-                        type: cardType,
-                        groupType: group.type,
-                        testUrl: group.testUrl,
-                      ),
-                    ),
-                  ),
-                )
-                .fill(
-                  columns,
-                  filler: (_) => const Flexible(child: SizedBox()),
-                )
-                .separated(const SizedBox(width: 8));
-
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(children: children.toList()),
-            );
-          })
-          .toList(),
+    return SizedBox(
+      height: ((sortedProxies.length / columns).ceil() * (itemHeight + 8)).toDouble(),
+      child: GridView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.zero,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: columns,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
+          mainAxisExtent: itemHeight,
+        ),
+        itemCount: sortedProxies.length,
+        itemBuilder: (context, index) {
+          final proxy = sortedProxies[index];
+          return ProxyCard(
+            key: ValueKey('${group.name}.${proxy.name}'),
+            proxy: proxy,
+            groupName: group.name,
+            type: cardType,
+            groupType: group.type,
+            testUrl: group.testUrl,
+          );
+        },
+      ),
     );
   }
 }

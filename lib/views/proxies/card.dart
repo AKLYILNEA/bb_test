@@ -157,8 +157,9 @@ class ProxyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final proxyNameText = _buildProxyNameText(context);
     final delayText = _buildDelayText(context);
-    return Stack(
-      children: [
+    return RepaintBoundary(
+      child: Stack(
+        children: [
         Consumer(
           builder: (_, ref, child) {
             final selectedProxyName = ref.watch(
@@ -226,6 +227,7 @@ class ProxyCard extends StatelessWidget {
             child: _ProxyComputedMark(groupName: groupName, proxy: proxy),
           ),
       ],
+      ),
     );
   }
 }
