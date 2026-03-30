@@ -38,15 +38,26 @@ class LogLevelItem extends ConsumerWidget {
   }
 }
 
-class UaItem extends ConsumerWidget {
+class UaItem extends ConsumerStatefulWidget {
   const UaItem({super.key});
 
   @override
-  Widget build(BuildContext context, ref) {
+  ConsumerState<UaItem> createState() => _UaItemState();
+}
+
+class _UaItemState extends ConsumerState<UaItem> {
+  String _lastCustomUa = '';
+
+  @override
+  Widget build(BuildContext context) {
     final globalUa = ref.watch(
       patchClashConfigProvider.select((state) => state.globalUa),
     );
     final isCustom = globalUa != null;
+
+    if (isCustom) {
+      _lastCustomUa = globalUa;
+    }
 
     return ListItem(
       leading: const Icon(Icons.computer_outlined),
@@ -67,7 +78,7 @@ class UaItem extends ConsumerWidget {
             final customUa = await globalState.showCommonDialog<String>(
               child: InputDialog(
                 title: appLocalizations.custom,
-                value: globalUa ?? '',
+                value: _lastCustomUa,
                 hintText: 'Clash.Meta',
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {

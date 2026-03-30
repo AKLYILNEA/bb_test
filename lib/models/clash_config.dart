@@ -118,6 +118,7 @@ abstract class ProxyGroup with _$ProxyGroup {
     @JsonKey(name: 'expected-status') dynamic expectedStatus,
     @JsonKey(fromJson: _parseBool) bool? hidden,
     String? icon,
+    @JsonKey(fromJson: _parseInt) int? tolerance,
   }) = _ProxyGroup;
 
   factory ProxyGroup.fromJson(Map<String, Object?> json) =>

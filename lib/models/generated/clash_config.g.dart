@@ -22,6 +22,7 @@ _ProxyGroup _$ProxyGroupFromJson(Map<String, dynamic> json) => _ProxyGroup(
   expectedStatus: json['expected-status'],
   hidden: _parseBool(json['hidden']),
   icon: json['icon'] as String?,
+  tolerance: _parseInt(json['tolerance']),
 );
 
 Map<String, dynamic> _$ProxyGroupToJson(_ProxyGroup instance) =>
@@ -41,6 +42,7 @@ Map<String, dynamic> _$ProxyGroupToJson(_ProxyGroup instance) =>
       'expected-status': instance.expectedStatus,
       'hidden': instance.hidden,
       'icon': instance.icon,
+      'tolerance': instance.tolerance,
     };
 
 const _$GroupTypeEnumMap = {

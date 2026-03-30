@@ -10,7 +10,6 @@ import (
 	N "github.com/metacubex/mihomo/common/net"
 	"github.com/metacubex/mihomo/common/singledo"
 	"github.com/metacubex/mihomo/common/utils"
-	"github.com/metacubex/mihomo/component/profile/cachefile"
 	C "github.com/metacubex/mihomo/constant"
 	P "github.com/metacubex/mihomo/constant/provider"
 )
@@ -26,13 +25,10 @@ func urlTestWithTolerance(tolerance uint16) urlTestOption {
 type URLTest struct {
 	*GroupBase
 	selected       string
-	selectedManual bool
 	testUrl        string
 	expectedStatus string
 	tolerance      uint16
 	disableUDP     bool
-	Hidden         bool
-	Icon           string
 	fastNode       C.Proxy
 	fastSingle     *singledo.Single[C.Proxy]
 }
@@ -52,26 +48,13 @@ func (u *URLTest) Set(name string) error {
 	if p == nil {
 		return errors.New("proxy not exist")
 	}
-	u.selected = name
-	u.selectedManual = true
-	u.fastSingle.Reset()
+	u.ForceSet(name)
 	return nil
 }
 
 func (u *URLTest) ForceSet(name string) {
 	u.selected = name
-	u.selectedManual = false
 	u.fastSingle.Reset()
-}
-
-func (u *URLTest) clearSelected() {
-	if u.selected == "" && !u.selectedManual {
-		return
-	}
-
-	u.selected = ""
-	u.selectedManual = false
-	cachefile.Cache().SetSelected(u.Name(), "")
 }
 
 // DialContext implements C.ProxyAdapter
@@ -118,9 +101,6 @@ func (u *URLTest) Unwrap(metadata *C.Metadata, touch bool) C.Proxy {
 func (u *URLTest) healthCheck() {
 	u.fastSingle.Reset()
 	u.GroupBase.healthCheck()
-	if u.selectedManual {
-		u.clearSelected()
-	}
 	u.fastSingle.Reset()
 }
 
@@ -141,9 +121,7 @@ func (u *URLTest) fast(touch bool) C.Proxy {
 
 		fast := proxies[0]
 		minDelay := fast.LastDelayForTestUrl(u.testUrl)
-		// Treat the first proxy as an existing fast node candidate too, otherwise
-		// tolerance is skipped when the current fast node happens to be proxies[0].
-		fastNotExist := u.fastNode == nil || fast.Name() != u.fastNode.Name()
+		fastNotExist := true
 
 		for _, proxy := range proxies[1:] {
 			if u.fastNode != nil && proxy.Name() == u.fastNode.Name() {
@@ -200,8 +178,8 @@ func (u *URLTest) MarshalJSON() ([]byte, error) {
 		"testUrl":        u.testUrl,
 		"expectedStatus": u.expectedStatus,
 		"fixed":          u.selected,
-		"hidden":         u.Hidden,
-		"icon":           u.Icon,
+		"hidden":         u.Hidden(),
+		"icon":           u.Icon(),
 	})
 }
 
@@ -235,6 +213,8 @@ func NewURLTest(option *GroupCommonOption, providers []P.ProxyProvider, options 
 		GroupBase: NewGroupBase(GroupBaseOption{
 			Name:           option.Name,
 			Type:           C.URLTest,
+			Hidden:         option.Hidden,
+			Icon:           option.Icon,
 			Filter:         option.Filter,
 			ExcludeFilter:  option.ExcludeFilter,
 			ExcludeType:    option.ExcludeType,
@@ -246,8 +226,6 @@ func NewURLTest(option *GroupCommonOption, providers []P.ProxyProvider, options 
 		disableUDP:     option.DisableUDP,
 		testUrl:        option.URL,
 		expectedStatus: option.ExpectedStatus,
-		Hidden:         option.Hidden,
-		Icon:           option.Icon,
 	}
 
 	for _, option := range options {
