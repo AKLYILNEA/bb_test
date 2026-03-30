@@ -71,10 +71,18 @@ class ApplicationState extends ConsumerState<Application>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed &&
-        system.isAndroid &&
-        globalState.config.appSetting.enableHighRefreshRate) {
-      _restoreHighRefreshRate();
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      _autoUpdateGroupTaskTimer?.cancel();
+      _autoUpdateGroupTaskTimer = null;
+    } else if (state == AppLifecycleState.resumed) {
+      if (_autoUpdateGroupTaskTimer == null) {
+        _autoUpdateGroupTask();
+      }
+      if (system.isAndroid &&
+          globalState.config.appSetting.enableHighRefreshRate) {
+        _restoreHighRefreshRate();
+      }
     }
   }
 

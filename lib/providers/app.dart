@@ -38,7 +38,7 @@ class Logs extends _$Logs with AutoDisposeNotifierMixin {
   }
 
   void clearLogs() {
-    state = FixedList(500);
+    state = FixedList(maxLength);
   }
 }
 
@@ -84,7 +84,7 @@ class Requests extends _$Requests with AutoDisposeNotifierMixin {
   }
 
   void clearRequests() {
-    state = FixedList(500);
+    state = FixedList(maxLength);
   }
 }
 

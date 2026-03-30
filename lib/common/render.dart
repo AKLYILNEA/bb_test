@@ -19,15 +19,19 @@ class Render {
   void active() {
     resume();
     if (!system.isLinux) {
-      pause();
+      pauseDelayed();
     }
   }
 
   void pause() {
+    throttler.cancel(FunctionTag.renderPause);
+    _pause();
+  }
+  void pauseDelayed({Duration duration = const Duration(seconds: 5)}) {
     throttler.call(
       FunctionTag.renderPause,
       _pause,
-      duration: Duration(seconds: 5),
+      duration: duration,
     );
   }
 

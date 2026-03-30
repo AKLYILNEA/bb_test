@@ -140,6 +140,8 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
       globalState.appController.savePreferences();
       render?.pause();
       globalState.stopUpdateTasks();
+      PaintingBinding.instance.imageCache.clear();
+      PaintingBinding.instance.imageCache.clearLiveImages();
     } else {
       render?.active();
       if (state == AppLifecycleState.resumed && globalState.isStart) {

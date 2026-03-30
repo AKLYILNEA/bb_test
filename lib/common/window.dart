@@ -99,6 +99,8 @@ class Window {
 
   Future<void> hide() async {
     render?.pause();
+    PaintingBinding.instance.imageCache.clear();
+    PaintingBinding.instance.imageCache.clearLiveImages();
     await windowManager.hide();
     await windowManager.setSkipTaskbar(true);
   }
