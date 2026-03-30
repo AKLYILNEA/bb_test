@@ -61,7 +61,8 @@ class _ProxyGroupsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scrollbar(
+    return CommonScrollBar(
+      controller: null,
       thumbVisibility: true,
       trackVisibility: true,
       child: CustomScrollView(

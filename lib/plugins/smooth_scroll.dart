@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:flutter/rendering.dart';
 
-const _kSpring = SpringDescription(mass: 1.0, stiffness: 150.0, damping: 24.5);
+const _kSpring = SpringDescription(mass: 1.0, stiffness: 180.0, damping: 20.0);
 const _kMaxDelta = 120.0;
 
 class DesktopSmoothScroll extends StatefulWidget {
@@ -34,28 +34,40 @@ class _DesktopSmoothScrollState extends State<DesktopSmoothScroll> with SingleTi
     final pos = widget.controller.position;
     final val = _anim.value.clamp(pos.minScrollExtent, pos.maxScrollExtent);
 
-    widget.controller.jumpTo(val);
-    if (val == pos.minScrollExtent || val == pos.maxScrollExtent) _anim.stop();
+    if ((val - pos.pixels).abs() > 0.01) {
+      pos.setPixels(val);
+      pos.didUpdateScrollPositionBy(val - pos.pixels);
+    }
+    
+    if ((val - pos.minScrollExtent).abs() < 0.01 || (val - pos.maxScrollExtent).abs() < 0.01) {
+      _anim.stop();
+    }
   }
 
   void _handleSignal(PointerSignalEvent e) {
     if (e is! PointerScrollEvent || e.kind == PointerDeviceKind.trackpad || !widget.controller.hasClients) return;
 
     final pos = widget.controller.position;
-    final delta = (e.scrollDelta.dy * widget.scrollSpeed).clamp(-_kMaxDelta, _kMaxDelta);
+    final delta = (-e.scrollDelta.dy * widget.scrollSpeed).clamp(-_kMaxDelta, _kMaxDelta);
 
-    if ((pos.pixels == pos.maxScrollExtent && delta > 0) ||
-        (pos.pixels == pos.minScrollExtent && delta < 0)) {
+    final atMaxExtent = (pos.pixels - pos.maxScrollExtent).abs() < 1.0;
+    final atMinExtent = (pos.pixels - pos.minScrollExtent).abs() < 1.0;
+    
+    if ((atMaxExtent && delta > 0) || (atMinExtent && delta < 0)) {
       return;
     }
 
-    _futurePosition = _anim.isAnimating ? _futurePosition + delta * 0.8 : pos.pixels + delta * 0.9;
-    _futurePosition = _futurePosition.clamp(pos.minScrollExtent, pos.maxScrollExtent);
+    final basePosition = _anim.isAnimating ? _futurePosition : pos.pixels;
+    _futurePosition = (basePosition + delta).clamp(pos.minScrollExtent, pos.maxScrollExtent);
 
     if ((_futurePosition - pos.pixels).abs() < 0.5) return;
 
+    final currentVelocity = _anim.isAnimating ? _anim.velocity : 0.0;
+    final clampedVelocity = currentVelocity.clamp(-2000.0, 2000.0);
+    
+    _anim.stop();
     _anim.value = pos.pixels;
-    _anim.animateWith(SpringSimulation(_kSpring, pos.pixels, _futurePosition, _anim.isAnimating ? _anim.velocity : 0.0));
+    _anim.animateWith(SpringSimulation(_kSpring, pos.pixels, _futurePosition, clampedVelocity));
   }
 
   @override

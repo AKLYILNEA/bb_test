@@ -10,6 +10,7 @@ import 'package:bett_box/widgets/list.dart';
 import 'package:bett_box/widgets/null_status.dart';
 import 'package:bett_box/widgets/popup.dart';
 import 'package:bett_box/widgets/scaffold.dart';
+import 'package:bett_box/widgets/scroll.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -58,10 +59,12 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
             label: appLocalizations.nullTip(appLocalizations.script),
           );
         }
-        return ListView.builder(
-          padding: kMaterialListPadding.copyWith(bottom: 16 + 64),
-          itemCount: scripts.length,
-          itemBuilder: (_, index) {
+        return CommonScrollBar(
+          controller: null,
+          child: ListView.builder(
+            padding: kMaterialListPadding.copyWith(bottom: 16 + 64),
+            itemCount: scripts.length,
+            itemBuilder: (_, index) {
             final script = scripts[index];
             return Container(
               padding: kTabLabelPadding,
@@ -119,7 +122,8 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
                 ),
               ),
             );
-          },
+            },
+          ),
         );
       },
     );

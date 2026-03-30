@@ -82,7 +82,7 @@ fun Service.ensureNotificationChannel() {
     val manager = getSystemService(NotificationManager::class.java)
     if (manager?.getNotificationChannel(GlobalState.NOTIFICATION_CHANNEL) == null) {
         manager?.createNotificationChannel(
-            NotificationChannel(GlobalState.NOTIFICATION_CHANNEL, "SERVICE_CHANNEL", NotificationManager.IMPORTANCE_LOW)
+            NotificationChannel(GlobalState.NOTIFICATION_CHANNEL, "Foreground Service", NotificationManager.IMPORTANCE_LOW)
         )
     }
 }

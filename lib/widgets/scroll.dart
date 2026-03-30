@@ -61,7 +61,7 @@ class _NoScrollPhysicsWrapper extends StatelessWidget {
 class _DesktopScrollBehavior extends ScrollBehavior {
   @override
   ScrollPhysics getScrollPhysics(BuildContext context) {
-    return const NeverScrollableScrollPhysics();
+    return const _NoPointerScrollPhysics();
   }
 
   @override
@@ -73,6 +73,18 @@ class _DesktopScrollBehavior extends ScrollBehavior {
         PointerDeviceKind.mouse,
         PointerDeviceKind.unknown,
       };
+}
+
+class _NoPointerScrollPhysics extends ScrollPhysics {
+  const _NoPointerScrollPhysics({super.parent});
+
+  @override
+  _NoPointerScrollPhysics applyTo(ScrollPhysics? ancestor) {
+    return _NoPointerScrollPhysics(parent: buildParent(ancestor));
+  }
+
+  @override
+  bool shouldAcceptUserOffset(ScrollMetrics position) => false;
 }
 
 class ScrollToEndBox<T> extends StatefulWidget {

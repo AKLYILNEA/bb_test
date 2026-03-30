@@ -264,7 +264,7 @@ class AppSidebarContainer extends ConsumerWidget {
                 child: Column(
                   children: [
                     if (system.isMacOS) const SizedBox(height: 22),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 16),
                     if (!system.isMacOS) ...[const AppIcon(), const SizedBox(height: 12)],
                     Expanded(
                       child: ScrollConfiguration(

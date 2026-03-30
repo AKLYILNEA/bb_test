@@ -90,9 +90,11 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView> {
             );
           }
 
-          return ListView.builder(
+          return CommonScrollBar(
             controller: _scrollController,
-            itemBuilder: (context, index) {
+            child: ListView.builder(
+              controller: _scrollController,
+              itemBuilder: (context, index) {
               if (index.isOdd) {
                 return const Divider(height: 0);
               }
@@ -127,7 +129,8 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView> {
               }
               return TrackerInfoItem.height;
             },
-            itemCount: connections.length * 2 - 1,
+              itemCount: connections.length * 2 - 1,
+            ),
           );
         },
       ),
