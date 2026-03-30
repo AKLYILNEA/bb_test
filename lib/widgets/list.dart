@@ -379,9 +379,7 @@ class ListItem<T> extends StatelessWidget {
                     validator: inputDelegate.validator,
                   ),
                 );
-                inputDelegate.onChanged!(
-                  value,
-                ); // We need to update InputDelegate to allow null
+                inputDelegate.onChanged!(value);
               }
             : null,
       );

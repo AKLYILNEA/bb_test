@@ -23,26 +23,10 @@ import 'models/models.dart';
 
 const String _sentryDsn = String.fromEnvironment('SENTRY_DSN');
 
-Future<void> main() async {
-  // Init base services
-  globalState.isService = false;
-  WidgetsFlutterBinding.ensureInitialized();
+ReceivePort? _serviceReceiverPort;
+ReceivePort? _messageReceiverPort;
 
-  // Set image cache size
-  PaintingBinding.instance.imageCache.maximumSizeBytes =
-      50 * 1024 * 1024; // 50MB
-
-  final version = await system.version;
-  await clashCore.preload();
-  await globalState.initApp(version);
-
-  // Init UI
-  try {
-    await uiManager.initializeUI();
-  } catch (e) {
-    commonPrint.log('Failed to initialize UI: $e');
-  }
-
+Future<void> _initSentryAndRun(Future<void> Function() runner) async {
   assert(
     _sentryDsn.isNotEmpty,
     'SENTRY_DSN is not set. Build with --dart-define=SENTRY_DSN=<your-dsn>',
@@ -50,6 +34,11 @@ Future<void> main() async {
 
   final enableAdvancedAnalytics =
       globalState.config.appSetting.enableCrashReport;
+
+  if (!enableAdvancedAnalytics) {
+    await runner();
+    return;
+  }
 
   await SentryFlutter.init((options) {
     options.dsn = _sentryDsn;
@@ -61,8 +50,49 @@ Future<void> main() async {
     options.enableAutoSessionTracking = true;
     options.attachStacktrace = true;
 
-    options.tracesSampleRate = enableAdvancedAnalytics ? 0.2 : 0;
-  }, appRunner: () => _runApp(version));
+    options.tracesSampleRate = 0.2;
+
+    options.beforeSend = (event, hint) {
+      if (system.isMacOS) {
+        final hasFontDeadlock = event.threads?.any((thread) =>
+          thread.stacktrace?.frames.any((frame) =>
+            frame.function?.contains('XTCopyPropertiesForFont') == true ||
+            frame.function?.contains('TGlobalFontRegistryImp') == true ||
+            frame.function?.contains('__NSXPCCONNECTION_IS_WAITING_FOR_A_SYNCHRONOUS_REPLY__') == true
+          ) ?? false
+        ) ?? false;
+
+        if (hasFontDeadlock) {
+          event.level = SentryLevel.warning;
+          event.tags = {
+            ...?event.tags,
+            'known_issue': 'macos_font_deadlock',
+            'system_issue': 'fontd_service',
+          };
+        }
+      }
+      return event;
+    };
+  }, appRunner: runner);
+}
+
+Future<void> main() async {
+  globalState.isService = false;
+  WidgetsFlutterBinding.ensureInitialized();
+
+  PaintingBinding.instance.imageCache.maximumSizeBytes = 50 * 1024 * 1024;
+
+  final version = await system.version;
+  await clashCore.preload();
+  await globalState.initApp(version);
+
+  try {
+    await uiManager.initializeUI();
+  } catch (e) {
+    commonPrint.log('Failed to initialize UI: $e');
+  }
+
+  await _initSentryAndRun(() => _runApp(version));
 }
 
 Future<void> _runApp(int version) async {
@@ -83,70 +113,72 @@ Future<void> _runApp(int version) async {
 Future<void> _service(List<String> flags) async {
   globalState.isService = true;
   WidgetsFlutterBinding.ensureInitialized();
-  final quickStart = flags.contains('quick');
-  final clashLibHandler = ClashLibHandler();
   await globalState.init();
 
-  tile?.addListener(
-    _TileListenerWithService(
-      onStart: () async {
-        await app.tip(appLocalizations.startVpn);
-        await globalState.handleStart();
-      },
-      onStop: () async {
-        await app.tip(appLocalizations.stopVpn);
-        clashLibHandler.stopListener();
-        await vpn?.stop();
-      },
-      onReconnectIpc: () {
-        commonPrint.log('Service: reconnectIpc requested, re-establishing IPC');
-        _handleMainIpc(clashLibHandler);
-      },
-    ),
-  );
+  await _initSentryAndRun(() async {
+    final quickStart = flags.contains('quick');
+    final bootStart = flags.contains('boot');
+    final clashLibHandler = ClashLibHandler();
 
-  vpn?.handleGetStartForegroundParams = () async {
-    if (AppLocalizations.currentOrNull == null) {
-      final locale = globalState.config.appSetting.locale?.isNotEmpty == true
-          ? utils.getLocaleForString(globalState.config.appSetting.locale!)
-          : WidgetsBinding.instance.platformDispatcher.locale;
-      if (locale != null) {
-        await AppLocalizations.load(locale);
-      }
+    tile?.addListener(
+      _TileListenerWithService(
+        onStart: () async {
+          await app.tip(appLocalizations.startVpn);
+          await globalState.handleStart();
+        },
+        onStop: () async {
+          await app.tip(appLocalizations.stopVpn);
+          clashLibHandler.stopListener();
+          await vpn?.stop();
+        },
+        onReconnectIpc: () {
+          commonPrint.log('Service: reconnectIpc requested, re-establishing IPC');
+          _handleMainIpc(clashLibHandler);
+        },
+      ),
+    );
+
+    vpn?.handleGetStartForegroundParams = () async {
       if (AppLocalizations.currentOrNull == null) {
-        await AppLocalizations.load(const Locale('zh', 'CN'));
+        final locale = globalState.config.appSetting.locale?.isNotEmpty == true
+            ? utils.getLocaleForString(globalState.config.appSetting.locale!)
+            : WidgetsBinding.instance.platformDispatcher.locale;
+        if (locale != null) {
+          await AppLocalizations.load(locale);
+        }
+        if (AppLocalizations.currentOrNull == null) {
+          await AppLocalizations.load(const Locale('zh', 'CN'));
+        }
       }
-    }
 
-    // Check if smart-stopped from native side
-    final isSmartStopped = await vpn?.isSmartStopped() ?? false;
+      final isSmartStopped = await vpn?.isSmartStopped() ?? false;
 
-    if (isSmartStopped) {
+      if (isSmartStopped) {
+        return json.encode({
+          'title': appLocalizations.coreSuspended,
+          'content': appLocalizations.smartAutoStopServiceRunning,
+        });
+      }
+
       return json.encode({
-        'title': appLocalizations.coreSuspended,
-        'content': appLocalizations.smartAutoStopServiceRunning,
+        'title': appLocalizations.coreConnected,
+        'content': appLocalizations.serviceRunning,
       });
+    };
+
+    vpn?.addListener(
+      _VpnListenerWithService(
+        onDnsChanged: (String dns) {
+          clashLibHandler.updateDns(dns);
+        },
+      ),
+    );
+    
+    if (!quickStart && !bootStart) {
+      _handleMainIpc(clashLibHandler);
+      return;
     }
 
-    return json.encode({
-      'title': appLocalizations.coreConnected,
-      'content': appLocalizations.serviceRunning,
-    });
-  };
-
-  vpn?.addListener(
-    _VpnListenerWithService(
-      onDnsChanged: (String dns) {
-        clashLibHandler.updateDns(dns);
-      },
-    ),
-  );
-  final bootStart = flags.contains('boot');
-  
-  if (!quickStart && !bootStart) {
-    _handleMainIpc(clashLibHandler);
-  } else {
-    // For boot start, only proceed if autoRun is enabled
     if (bootStart && !globalState.config.appSetting.autoRun) {
       commonPrint.log('Silent boot detected, but autoRun is disabled. Staying idle.');
       _handleMainIpc(clashLibHandler);
@@ -164,31 +196,38 @@ Future<void> _service(List<String> flags) async {
     
     final params = await globalState.getSetupParams(pathConfig: clashConfig);
     Future(() async {
-      final profileId = globalState.config.currentProfileId;
-      if (profileId == null) {
-        return;
-      }
-      final res = await clashLibHandler.quickStart(
-        InitParams(homeDir: homeDirPath, version: version),
-        params,
-        globalState.getCoreState(),
-      );
-      debugPrint(res);
-      if (res.isNotEmpty) {
+      try {
+        final profileId = globalState.config.currentProfileId;
+        if (profileId == null) {
+          return;
+        }
+        final res = await clashLibHandler.quickStart(
+          InitParams(homeDir: homeDirPath, version: version),
+          params,
+          globalState.getCoreState(),
+        );
+        debugPrint(res);
+        if (res.isNotEmpty) {
+          commonPrint.log('QuickStart failed with error: $res');
+          await vpn?.stop();
+          return;
+        }
+        await vpn?.start(clashLibHandler.getAndroidVpnOptions());
+        
+        if (globalState.config.appSetting.openLogs) {
+          await clashLibHandler.invokeAction('{"id": "quickStartLog", "method": "startLog"}');
+        } else {
+          await clashLibHandler.invokeAction('{"id": "quickStopLog", "method": "stopLog"}');
+        }
+        
+        clashLibHandler.startListener();
+      } catch (e, stackTrace) {
+        commonPrint.log('Fatal error during service background start: $e');
+        Sentry.captureException(e, stackTrace: stackTrace);
         await vpn?.stop();
-        return;
       }
-      await vpn?.start(clashLibHandler.getAndroidVpnOptions());
-      
-      if (globalState.config.appSetting.openLogs) {
-        await clashLibHandler.invokeAction('{"id": "quickStartLog", "method": "startLog"}');
-      } else {
-        await clashLibHandler.invokeAction('{"id": "quickStopLog", "method": "stopLog"}');
-      }
-      
-      clashLibHandler.startListener();
     });
-  }
+  });
 }
 
 void _handleMainIpc(ClashLibHandler clashLibHandler) {
@@ -196,21 +235,23 @@ void _handleMainIpc(ClashLibHandler clashLibHandler) {
   if (sendPort == null) {
     return;
   }
-  final serviceReceiverPort = ReceivePort();
-  serviceReceiverPort.listen((message) async {
+
+  _serviceReceiverPort?.close();
+  _messageReceiverPort?.close();
+
+  _serviceReceiverPort = ReceivePort();
+  _serviceReceiverPort!.listen((message) async {
     final res = await clashLibHandler.invokeAction(message);
     sendPort.send(res);
   });
-  sendPort.send(serviceReceiverPort.sendPort);
-  final messageReceiverPort = ReceivePort();
-  clashLibHandler.attachMessagePort(messageReceiverPort.sendPort.nativePort);
-  messageReceiverPort.listen((message) {
+  sendPort.send(_serviceReceiverPort!.sendPort);
+
+  _messageReceiverPort = ReceivePort();
+  clashLibHandler.attachMessagePort(_messageReceiverPort!.sendPort.nativePort);
+  _messageReceiverPort!.listen((message) {
     sendPort.send(message);
   });
-  // Restart the listener goroutine now that the message port is bound.
-  // In quick start, startListener() was called before attachMessagePort,
-  // so the goroutine had no port and exited. Re-calling it here ensures
-  // log/traffic messages actually flow to the UI Engine.
+
   clashLibHandler.startListener();
 }
 
@@ -229,19 +270,13 @@ class _TileListenerWithService with TileListener {
        _onReconnectIpc = onReconnectIpc;
 
   @override
-  void onStart() {
-    _onStart();
-  }
+  void onStart() => _onStart();
 
   @override
-  void onStop() {
-    _onStop();
-  }
+  void onStop() => _onStop();
 
   @override
-  void onReconnectIpc() {
-    _onReconnectIpc();
-  }
+  void onReconnectIpc() => _onReconnectIpc();
 }
 
 @immutable

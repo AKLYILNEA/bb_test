@@ -30,9 +30,6 @@ typedef UpdateTasks = List<FutureOr Function()>;
 class GlobalState {
   static GlobalState? _instance;
   Map<CacheTag, FixedMap<String, double>> computeHeightMapCache = {};
-
-  // Map<CacheTag, double> computeScrollPositionCache = {};
-  // final Map<String, double> scrollPositionCache = {};
   bool isService = false;
   Timer? timer;
   Timer? groupsUpdateTimer;
@@ -52,10 +49,8 @@ class GlobalState {
   AppController? _appController;
   bool? _isAndroidTV;
 
-  // Config rollback: backup last successful config params
   SetupParams? _lastSuccessfulSetupParams;
 
-  // GlobalKey<CommonScaffoldState> homeScaffoldKey = GlobalKey();
   bool isInit = false;
 
   bool get isStart => startTime != null && startTime!.isBeforeNow;
@@ -131,7 +126,11 @@ class GlobalState {
 
   Future<void> executorUpdateTask() async {
     for (final task in tasks) {
-      await task();
+      try {
+        await task();
+      } catch (e) {
+        commonPrint.log('Background task failed: $e');
+      }
     }
     timer = null;
   }
@@ -148,12 +147,10 @@ class GlobalState {
     await service?.startVpn();
     final prefs = await preferences.sharedPreferencesCompleter.future;
     await prefs?.setBool('is_vpn_running', true);
-    // Desktop: record TUN running state (detect resource conflicts after update)
     if (system.isDesktop) {
       final tunEnabled = config.patchClashConfig.tun.enable;
       await prefs?.setBool('is_tun_running', tunEnabled);
     }
-    // Android: sync quick response state (disable if smartAutoStop is on to prevent conflicts)
     if (system.isAndroid) {
       final conflictFreeQuickResponse =
           config.vpnProps.quickResponse && !config.vpnProps.smartAutoStop;
@@ -167,11 +164,9 @@ class GlobalState {
   }
 
   void updateWakelockState(bool enabled) {
-    // Update synced wakelock state
     if (_appController != null) {
       final container = _appController!.context;
       if (container.mounted) {
-        // Get ProviderContainer using ProviderScope.containerOf
         final providerContainer = flutter_riverpod.ProviderScope.containerOf(
           container,
           listen: false,
@@ -190,7 +185,6 @@ class GlobalState {
     await service?.stopVpn();
     final prefs = await preferences.sharedPreferencesCompleter.future;
     await prefs?.setBool('is_vpn_running', false);
-    // Desktop: clear TUN running state
     if (system.isDesktop) {
       await prefs?.setBool('is_tun_running', false);
     }
@@ -241,27 +235,6 @@ class GlobalState {
       ),
     );
   }
-
-  // Future<Map<String, dynamic>> getProfileMap(String id) async {
-  //   final profilePath = await appPath.getProfilePath(id);
-  //   final res = await Isolate.run<Result<dynamic>>(() async {
-  //     try {
-  //       final file = File(profilePath);
-  //       if (!await file.exists()) {
-  //         return Result.error("");
-  //       }
-  //       final value = await file.readAsString();
-  //       return Result.success(utils.convertYamlNode(loadYaml(value)));
-  //     } catch (e) {
-  //       return Result.error(e.toString());
-  //     }
-  //   });
-  //   if (res.isSuccess) {
-  //     return res.data as Map<String, dynamic>;
-  //   } else {
-  //     throw res.message;
-  //   }
-  // }
 
   Future<T?> showCommonDialog<T>({
     required Widget child,
@@ -326,7 +299,6 @@ class GlobalState {
     return params;
   }
 
-  /// Backup successful config for rollback
   void backupSuccessfulConfig(SetupParams params) {
     if (_lastSuccessfulSetupParams == params) {
       return;
@@ -335,7 +307,6 @@ class GlobalState {
     commonPrint.log('Current config protected');
   }
 
-  /// Get last successful config for rollback
   SetupParams? getLastSuccessfulConfig() {
     return _lastSuccessfulSetupParams;
   }
@@ -358,7 +329,6 @@ class GlobalState {
       ),
     );
     rawConfig['external-controller'] = realPatchConfig.externalController.value;
-    // Auto-set secret when external controller is enabled
     if (realPatchConfig.externalController == ExternalControllerStatus.open) {
       final secret = realPatchConfig.secret;
       if (secret != null && secret.isNotEmpty) {
@@ -450,8 +420,6 @@ class GlobalState {
       rawConfig['hosts'][host.key] = host.value.splitByMultipleSeparators;
     }
 
-    // Force add Windows NCSI (Network Connectivity Status Indicator) hosts
-    // Ensure Windows network connectivity detection works properly
     rawConfig['hosts']['dns.msftncsi.com'] = [
       '131.107.255.255',
       'fd3e:4f5a:5b81::1',
@@ -477,7 +445,6 @@ class GlobalState {
       }
     }
     
-    // Android: protect port 53 (requires root), auto-change to 1053
     if (system.isAndroid && rawConfig['dns']['listen'] != null) {
       final listen = rawConfig['dns']['listen'] as String;
       if (listen.endsWith(':53')) {
@@ -501,12 +468,9 @@ class GlobalState {
       final sniffer = realPatchConfig.sniffer;
       rawConfig['sniffer'] = sniffer.toJson();
     }
-    // Tunnel append logic: append GUI tunnels to config file tunnels
     final guiTunnels = realPatchConfig.tunnels;
     if (guiTunnels.isNotEmpty) {
-      // Get existing tunnels from config file
       final existingTunnels = rawConfig['tunnels'] as List? ?? [];
-      // Append GUI tunnels to existing tunnels
       final allTunnels = [
         ...existingTunnels,
         ...guiTunnels.map((t) => t.toClashJson()),
@@ -522,7 +486,6 @@ class GlobalState {
       rawConfig['experimental'] = experimental.toJson();
     }
 
-    // Apply node filter to all proxy groups
     final nodeExcludeFilter = globalState.config.nodeExcludeFilter;
     final healthCheckTimeout = globalState.config.healthCheckTimeout;
     if ((nodeExcludeFilter.isNotEmpty || healthCheckTimeout != 5000) &&
@@ -590,7 +553,6 @@ class GlobalState {
     }
 
     var rules = [];
-    // Support both field names: rules (plural) and rule (singular)
     if (rawConfig['rules'] != null) {
       rules = rawConfig['rules'];
       rawConfig.remove('rules');
@@ -608,8 +570,6 @@ class GlobalState {
       }
     }
 
-    // Ensure private network direct rules, ensure priority matching
-    // Desktop only, Android bypassed via VPN routing
     if (system.isDesktop &&
         config.networkProps.routeMode == RouteMode.bypassPrivate) {
       final privateNetworkRules = [
@@ -624,7 +584,6 @@ class GlobalState {
       rules = [...privateNetworkRules, ...rules];
     }
 
-    // FCM optimization: add mtalk.google.com direct rule
     if (config.vpnProps.fcmOptimization) {
       final fcmRules = ['DOMAIN,mtalk.google.com,DIRECT'];
       rules = [...fcmRules, ...rules];
@@ -648,26 +607,26 @@ class GlobalState {
     Map<String, dynamic> config,
   ) async {
     final currentScript = globalState.config.scriptProps.currentScript;
-    if (currentScript == null) {
-      return config;
-    }
-    if (config['proxy-providers'] == null) {
-      config['proxy-providers'] = {};
-    }
+    if (currentScript == null) return config;
+
+    config['proxy-providers'] ??= {};
     final configJs = json.encode(config);
     final runtime = getJavascriptRuntime();
-    final res = await runtime.evaluateAsync('''
-      ${currentScript.content}
-      main($configJs)
-    ''');
-    if (res.isError) {
-      throw res.stringResult;
+
+    try {
+      final res = await runtime.evaluateAsync('''
+        ${currentScript.content}
+        main($configJs)
+      ''');
+      if (res.isError) throw res.stringResult;
+
+      return switch (res.rawResult) {
+        Pointer() => runtime.convertValue<Map<String, dynamic>>(res),
+        _ => Map<String, dynamic>.from(res.rawResult),
+      } ?? config;
+    } finally {
+      runtime.dispose();
     }
-    final value = switch (res.rawResult is Pointer) {
-      true => runtime.convertValue<Map<String, dynamic>>(res),
-      false => Map<String, dynamic>.from(res.rawResult),
-    };
-    return value ?? config;
   }
 }
 
@@ -740,11 +699,11 @@ final globalState = GlobalState();
 class DetectionState {
   static DetectionState? _instance;
   bool? _preIsStart;
-  int _requestId = 0; // Request ID to prevent old requests overwriting new ones
+  int _requestId = 0;
   CancelToken? _cancelToken;
-  bool _isIpMasked = false; // IP privacy protection state
-  IpInfo? _originalIpInfo; // Save original IP info
-  bool _isFirstLaunch = true; // First launch flag
+  bool _isIpMasked = false;
+  IpInfo? _originalIpInfo;
+  bool _isFirstLaunch = true;
 
   final state = ValueNotifier<NetworkDetectionState>(
     const NetworkDetectionState(
@@ -763,7 +722,6 @@ class DetectionState {
 
   bool get isIpMasked => _isIpMasked;
 
-  // Toggle IP privacy
   void toggleIpPrivacy() {
     _isIpMasked = !_isIpMasked;
     final currentIpInfo = state.value.ipInfo;
@@ -773,16 +731,13 @@ class DetectionState {
         state.value = state.value.copyWith(
           ipInfo: currentIpInfo.copyWith(ip: '*** *** *** ***'),
         );
-      } else {
-        if (_originalIpInfo != null) {
-          state.value = state.value.copyWith(ipInfo: _originalIpInfo);
-          _originalIpInfo = null;
-        }
+      } else if (_originalIpInfo != null) {
+        state.value = state.value.copyWith(ipInfo: _originalIpInfo);
+        _originalIpInfo = null;
       }
     }
   }
 
-  // Manual refresh IP
   void manualRefresh() {
     _isIpMasked = false;
     _originalIpInfo = null;
@@ -794,7 +749,6 @@ class DetectionState {
     startCheck();
   }
 
-  // Switch to domestic IP (use domestic API)
   Future<void> switchToDomesticIp() async {
     _isIpMasked = false;
     _originalIpInfo = null;
@@ -811,30 +765,24 @@ class DetectionState {
 
     final res = await request.checkIpDomestic(cancelToken: _cancelToken);
 
-    // Check if latest request
     if (requestId != _requestId) return;
 
     _handleResponse(res);
   }
 
   void startCheck() {
-    // Pre-check conditions
     final appState = globalState.appState;
     if (!appState.isInit) return;
     if (appState.pageLabel != PageLabel.dashboard) return;
 
-    // Reduce delay on first launch for faster response
     final delay = _isFirstLaunch
-        ? const Duration(milliseconds: 500) // First: 500ms
-        : const Duration(milliseconds: 1500); // Later: 1.5s
+        ? const Duration(milliseconds: 500)
+        : const Duration(milliseconds: 1500);
 
     debouncer.call(FunctionTag.checkIp, _checkIp, duration: delay);
   }
 
   void tryStartCheck() {
-    // Trigger check in these cases:
-    // 1. Never checked (_preIsStart == null)
-    // 2. Error state (error message but no IP)
     if (!state.value.isLoading &&
         state.value.ipInfo == null &&
         (_preIsStart == null || state.value.errorMessage != null)) {
@@ -843,15 +791,12 @@ class DetectionState {
   }
 
   void _cancelPreviousRequest() {
-    if (_cancelToken != null) {
-      _cancelToken!.cancel();
-      _cancelToken = null;
-    }
+    _cancelToken?.cancel();
+    _cancelToken = null;
   }
 
   void _handleResponse(Result<IpInfo?> res) {
     if (res.isError) {
-      // Request cancelled, no error shown
       if (res.message == 'cancelled') {
         state.value = state.value.copyWith(
           isLoading: false,
@@ -860,7 +805,6 @@ class DetectionState {
         );
         return;
       }
-      // Other errors
       state.value = state.value.copyWith(
         isLoading: false,
         ipInfo: null,
@@ -870,33 +814,21 @@ class DetectionState {
     }
 
     final ipInfo = res.data;
-    if (ipInfo != null) {
-      state.value = state.value.copyWith(
-        isLoading: false,
-        ipInfo: ipInfo,
-        errorMessage: null,
-      );
-    } else {
-      state.value = state.value.copyWith(
-        isLoading: false,
-        ipInfo: null,
-        errorMessage: appLocalizations.tryManualRefresh,
-      );
-    }
+    state.value = state.value.copyWith(
+      isLoading: false,
+      ipInfo: ipInfo,
+      errorMessage: ipInfo != null ? null : appLocalizations.tryManualRefresh,
+    );
   }
 
   Future<void> _checkIp() async {
     final appState = globalState.appState;
 
-    // Simplified pre-check: keep only core conditions
     if (!appState.isInit) return;
     if (appState.pageLabel != PageLabel.dashboard) return;
 
-    // Remove lifecycle and window visibility checks for stability
-
     final isStart = appState.runTime != null;
 
-    // Optimization: if VPN off and cached data exists, return
     if (!isStart && state.value.ipInfo != null && !state.value.isLoading) {
       return;
     }
@@ -916,7 +848,6 @@ class DetectionState {
 
     final timeout = const Duration(seconds: 5);
 
-    // When off, use domestic API by default
     final res = isStart
         ? await request.checkIp(cancelToken: _cancelToken, timeout: timeout)
         : await request.checkIpDomestic(
@@ -924,15 +855,12 @@ class DetectionState {
             timeout: timeout,
           );
 
-    // Check if latest request
     if (requestId != _requestId) return;
 
-    // First launch failure: retry after delay
     if (_isFirstLaunch && (res.isError || res.data == null)) {
       _isFirstLaunch = false;
       _handleResponse(res);
 
-      // Auto-retry after 3s
       Future.delayed(const Duration(seconds: 3), () {
         if (state.value.ipInfo == null && !state.value.isLoading) {
           startCheck();

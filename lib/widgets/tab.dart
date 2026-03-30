@@ -1097,11 +1097,6 @@ class _RenderSegmentedControl<T extends Object> extends RenderBox
       _kThumbRadius,
     );
 
-    // for (final BoxShadow shadow in thumbShadow) {
-    //   context.canvas
-    //       .drawRRect(thumbRRect.shift(shadow.offset), shadow.toPaint());
-    // }
-
     context.canvas.drawRRect(
       thumbRRect.inflate(0.5),
       Paint()..color = const Color(0x0A000000),

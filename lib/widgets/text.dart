@@ -81,7 +81,9 @@ class EmojiText extends StatelessWidget {
           text: match.group(0),
           style: effectiveStyle.merge(
             TextStyle(
-              fontFamily: system.isDesktop ? FontFamily.twEmoji.value : null,
+              fontFamily: system.isDesktop && !system.isMacOS 
+                  ? FontFamily.twEmoji.value 
+                  : null,
             ),
           ),
         ),
@@ -108,19 +110,3 @@ class EmojiText extends StatelessWidget {
     );
   }
 }
-
-// class HighlightText extends StatelessWidget {
-//   const HighlightText({super.key});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return RichText(
-//       textScaler: MediaQuery.of(context).textScaler,
-//       maxLines: maxLines,
-//       overflow: overflow ?? TextOverflow.clip,
-//       text: TextSpan(
-//         children: _buildTextSpans(text),
-//       ),
-//     );
-//   }
-// }
