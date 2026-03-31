@@ -265,7 +265,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "deleteTip": m1,
     "deleteTunnel": MessageLookupByLibrary.simpleMessage("Delete Forwarding"),
     "desc": MessageLookupByLibrary.simpleMessage(
-      "Bettbox client is built on the powerful and flexible Mihomo (Clash.Meta) core, built with Actions, open-source across platforms, clean and ad-free, beautiful and easy to use, energy-saving and worry-free, Forked from FlClash, Better Experience, Out of the box.",
+      "Bettbox is based on the powerful and flexible Mihomo (Clash.Meta) proxy kernel, dedicated to a superior user experience. Forked from FlClash: Better Experience, Out of the box",
     ),
     "destination": MessageLookupByLibrary.simpleMessage("Destination"),
     "destinationGeoIP": MessageLookupByLibrary.simpleMessage(

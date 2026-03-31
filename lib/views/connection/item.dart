@@ -226,21 +226,8 @@ class _ProcessIconState extends State<_ProcessIcon> {
     final devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
     final cacheSize = (42 * devicePixelRatio).ceil();
 
-    Widget buildPlaceholder() {
-      return const Icon(
-        Icons.web_asset,
-        size: 48,
-      );
-    }
-
     if (widget.process.isEmpty) {
-      return Container(
-        margin: const EdgeInsets.only(top: 4),
-        width: 48,
-        height: 48,
-        alignment: Alignment.center,
-        child: buildPlaceholder(),
-      );
+      return const SizedBox(width: 42, height: 42);
     }
 
     return RepaintBoundary(
@@ -251,14 +238,11 @@ class _ProcessIconState extends State<_ProcessIcon> {
           width: 42,
           height: 42,
           alignment: Alignment.center,
-          child: FutureBuilder<Uint8List?>(
-            future: _iconFuture,
+          child: FutureBuilder<Uint8List>(
+            future: _iconFuture.then((v) => v!),
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return buildPlaceholder();
-              }
-              if (!snapshot.hasData || snapshot.data == null) {
-                return buildPlaceholder();
+              if (!snapshot.hasData) {
+                return const SizedBox(width: 42, height: 42);
               }
               return Image(
                 image: ResizeImage(

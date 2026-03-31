@@ -1379,10 +1379,10 @@ class AppLocalizations {
     );
   }
 
-  /// `Bettbox client is built on the powerful and flexible Mihomo (Clash.Meta) core, built with Actions, open-source across platforms, clean and ad-free, beautiful and easy to use, energy-saving and worry-free, Forked from FlClash, Better Experience, Out of the box.`
+  /// `Bettbox is based on the powerful and flexible Mihomo (Clash.Meta) proxy kernel, dedicated to a superior user experience. Forked from FlClash: Better Experience, Out of the box`
   String get desc {
     return Intl.message(
-      'Bettbox client is built on the powerful and flexible Mihomo (Clash.Meta) core, built with Actions, open-source across platforms, clean and ad-free, beautiful and easy to use, energy-saving and worry-free, Forked from FlClash, Better Experience, Out of the box.',
+      'Bettbox is based on the powerful and flexible Mihomo (Clash.Meta) proxy kernel, dedicated to a superior user experience. Forked from FlClash: Better Experience, Out of the box',
       name: 'desc',
       desc: '',
       args: [],
@@ -4908,8 +4908,6 @@ class AppLocalizations {
       args: [],
     );
   }
-
-  static Null get currentOrNull => null;
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

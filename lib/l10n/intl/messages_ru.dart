@@ -267,7 +267,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Удалить перенаправление",
     ),
     "desc": MessageLookupByLibrary.simpleMessage(
-      "Клиент Bettbox построен на мощном и гибком ядре Mihomo (Clash.Meta), собран с помощью Actions, открыт для всех платформ, чистый и без рекламы, красивый и удобный, экономит энергию и не доставляет хлопот, основан на FlClash, обеспечивает лучший опыт, готов к работе сразу.",
+      "Bettbox основан на мощном и гибком прокси-ядре Mihomo (Clash.Meta) и стремится к созданию лучшего пользовательского опыта. Форк от FlClash: Улучшенный опыт, готов к работе «из коробки»",
     ),
     "destination": MessageLookupByLibrary.simpleMessage("Адрес назначения"),
     "destinationGeoIP": MessageLookupByLibrary.simpleMessage(

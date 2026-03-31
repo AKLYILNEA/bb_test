@@ -192,8 +192,10 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
                 val packageName = call.argument<String>("packageName")
                 val forceRefresh = call.argument<Boolean>("forceRefresh") ?: false
                 val icon = runCatching {
-                    packageName?.let { getPackageIconBytes(it, forceRefresh) } ?: getDefaultIconBytes()
-                }.getOrDefault(getDefaultIconBytes())
+                    packageName?.let { 
+                        getPackageIconBytes(it, forceRefresh) 
+                    } ?: getDefaultIconBytes()
+                }.getOrNull() ?: getDefaultIconBytes()
                 result.success(icon)
             }
             "tip" -> {

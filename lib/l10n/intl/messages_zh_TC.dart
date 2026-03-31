@@ -193,7 +193,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "deleteTip": m1,
     "deleteTunnel": MessageLookupByLibrary.simpleMessage("刪除轉發"),
     "desc": MessageLookupByLibrary.simpleMessage(
-      "Bettbox 用戶端基於強大靈活的 Mihomo(Clash.Meta) 內核，使用 Actions 建構，多平台開源，純淨無廣告，好看好用，省電省心，Forked form FlClash，Better Experience, Out of the box",
+      "Bettbox 基於強大靈活的 Mihomo (Clash.Meta) 代理內核，致力於提供更好的體驗，Forked from FlClash，Better Experience, Out of the box",
     ),
     "destination": MessageLookupByLibrary.simpleMessage("目標地址"),
     "destinationGeoIP": MessageLookupByLibrary.simpleMessage("目標地理定位"),

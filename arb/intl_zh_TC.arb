@@ -170,7 +170,7 @@
   "project": "專案",
   "core": "內核",
   "tabAnimation": "切換動畫",
-  "desc": "Bettbox 用戶端基於強大靈活的 Mihomo(Clash.Meta) 內核，使用 Actions 建構，多平台開源，純淨無廣告，好看好用，省電省心，Forked form FlClash，Better Experience, Out of the box",
+  "desc": "Bettbox 基於強大靈活的 Mihomo (Clash.Meta) 代理內核，致力於提供更好的體驗，Forked from FlClash，Better Experience, Out of the box",
   "startVpn": "正在啟動",
   "stopVpn": "正在停止",
   "discovery": "發現新版本",
