@@ -64,7 +64,7 @@ class _ConnectionsCountState extends State<ConnectionsCount> {
           showExtend(
             context,
             builder: (_, type) {
-              return const ConnectionsView();
+              return const ConnectionsView(respectCurrentPage: false);
             },
           );
         },

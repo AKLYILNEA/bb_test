@@ -17,7 +17,10 @@ import (
 
 func restartRouter() http.Handler {
 	r := chi.NewRouter()
-	r.Post("/", restart)
+	r.Post("/", func(w http.ResponseWriter, r *http.Request) {
+		render.Status(r, http.StatusForbidden)
+		render.JSON(w, r, newError("Not supported"))
+	})
 	return r
 }
 

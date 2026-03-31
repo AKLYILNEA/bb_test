@@ -25,6 +25,8 @@ class AppLocalizations {
     return _current!;
   }
 
+  static AppLocalizations? get currentOrNull => _current;
+
   static const AppLocalizationDelegate delegate = AppLocalizationDelegate();
 
   static Future<AppLocalizations> load(Locale locale) {

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:bett_box/common/common.dart';
+import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/l10n/l10n.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/providers/providers.dart';
@@ -9,6 +10,7 @@ import 'package:bett_box/views/about.dart';
 import 'package:bett_box/views/access.dart';
 import 'package:bett_box/views/application_setting.dart';
 import 'package:bett_box/views/config/config.dart';
+import 'package:bett_box/views/connection/connections.dart';
 import 'package:bett_box/views/hotkey.dart';
 import 'package:bett_box/views/other_setting.dart';
 import 'package:bett_box/widgets/widgets.dart';
@@ -29,6 +31,13 @@ class ToolsView extends ConsumerStatefulWidget {
 }
 
 class _ToolViewState extends ConsumerState<ToolsView> {
+  Widget _buildNavigationPage(NavigationItem navigationItem) {
+    if (navigationItem.label == PageLabel.connections) {
+      return const ConnectionsView(respectCurrentPage: false);
+    }
+    return navigationItem.builder(context);
+  }
+
   Widget _buildNavigationMenuItem(NavigationItem navigationItem) {
     return ListItem.open(
       leading: navigationItem.icon,
@@ -38,7 +47,7 @@ class _ToolViewState extends ConsumerState<ToolsView> {
           : null,
       delegate: OpenDelegate(
         title: Intl.message(navigationItem.label.name),
-        widget: navigationItem.builder(context),
+        widget: _buildNavigationPage(navigationItem),
         wrap: false,
       ),
     );

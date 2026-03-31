@@ -14,7 +14,12 @@ import 'package:window_manager/window_manager.dart';
 import 'item.dart';
 
 class ConnectionsView extends ConsumerStatefulWidget {
-  const ConnectionsView({super.key});
+  final bool respectCurrentPage;
+
+  const ConnectionsView({
+    super.key,
+    this.respectCurrentPage = true,
+  });
 
   @override
   ConsumerState<ConnectionsView> createState() => _ConnectionsViewState();
@@ -71,7 +76,8 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
     if (globalState.backgroundMode.value) {
       return false;
     }
-    if (ref.read(currentPageLabelProvider) != PageLabel.connections) {
+    if (widget.respectCurrentPage &&
+        ref.read(currentPageLabelProvider) != PageLabel.connections) {
       return false;
     }
     if (!_isForeground) {
