@@ -126,17 +126,15 @@ class _WindowContainerState extends ConsumerState<WindowManager>
   void onWindowMinimize() async {
     globalState.appController.savePreferencesDebounce();
     _renderToggleTimer?.cancel();
-    render?.pause();
-    globalState.stopUpdateTasks();
-    dashboardRefreshManager.stop();
-    PaintingBinding.instance.imageCache.clear();
-    PaintingBinding.instance.imageCache.clearLiveImages();
+    await globalState.handleBackground();
     super.onWindowMinimize();
   }
 
   @override
   void onWindowRestore() {
+    globalState.handleForeground();
     _scheduleRenderToggle(true);
+    unawaited(globalState.appController.syncWakelockIfNeeded());
     if (globalState.isStart) {
       globalState.startUpdateTasks([
         globalState.appController.updateRunTime,

@@ -136,15 +136,15 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.inactive) {
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.hidden) {
       globalState.appController.savePreferences();
-      render?.pause();
-      globalState.stopUpdateTasks();
-      PaintingBinding.instance.imageCache.clear();
-      PaintingBinding.instance.imageCache.clearLiveImages();
-    } else {
+      await globalState.handleBackground();
+    } else if (state == AppLifecycleState.resumed) {
+      globalState.handleForeground();
       render?.active();
-      if (state == AppLifecycleState.resumed && globalState.isStart) {
+      await globalState.appController.syncWakelockIfNeeded();
+      if (globalState.isStart) {
         await globalState.startUpdateTasks();
       }
     }

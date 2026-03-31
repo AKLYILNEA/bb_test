@@ -2,11 +2,14 @@ import 'dart:async';
 
 import 'package:bett_box/clash/clash.dart';
 import 'package:bett_box/common/common.dart';
+import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/providers/providers.dart';
+import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:window_manager/window_manager.dart';
 
 import 'item.dart';
 
@@ -17,36 +20,122 @@ class ConnectionsView extends ConsumerStatefulWidget {
   ConsumerState<ConnectionsView> createState() => _ConnectionsViewState();
 }
 
-class _ConnectionsViewState extends ConsumerState<ConnectionsView> {
+class _ConnectionsViewState extends ConsumerState<ConnectionsView>
+    with WidgetsBindingObserver, WindowListener {
   late final ScrollController _scrollController;
   Timer? _timer;
+  ProviderSubscription? _pageLabelSubscription;
+
+  bool get _isForeground {
+    final lifecycleState = WidgetsBinding.instance.lifecycleState;
+    return lifecycleState == null || lifecycleState == AppLifecycleState.resumed;
+  }
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
-    _startUpdateTimer();
+    WidgetsBinding.instance.addObserver(this);
+    globalState.backgroundMode.addListener(_handleBackgroundModeChanged);
+    if (system.isDesktop) {
+      windowManager.addListener(this);
+    }
+    _pageLabelSubscription = ref.listenManual(currentPageLabelProvider, (
+      prev,
+      next,
+    ) {
+      if (prev != next) {
+        unawaited(_syncUpdateTimer());
+      }
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_syncUpdateTimer());
+    });
   }
 
   @override
   void dispose() {
+    _pageLabelSubscription?.close();
+    globalState.backgroundMode.removeListener(_handleBackgroundModeChanged);
+    if (system.isDesktop) {
+      windowManager.removeListener(this);
+    }
+    WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
     _scrollController.dispose();
     super.dispose();
   }
 
-  void _startUpdateTimer() {
-    _updateConnections();
+  Future<bool> _shouldRunTimer() async {
+    if (!mounted) return false;
+    if (globalState.backgroundMode.value) {
+      return false;
+    }
+    if (ref.read(currentPageLabelProvider) != PageLabel.connections) {
+      return false;
+    }
+    if (!_isForeground) {
+      return false;
+    }
+    if (system.isDesktop && await window?.isVisible == false) {
+      return false;
+    }
+    return true;
+  }
+
+  Future<void> _syncUpdateTimer() async {
+    final shouldRun = await _shouldRunTimer();
+    if (!mounted) return;
+    if (!shouldRun) {
+      _timer?.cancel();
+      _timer = null;
+      return;
+    }
+    if (_timer != null) {
+      return;
+    }
+    await _updateConnections();
+    if (!mounted || !await _shouldRunTimer()) {
+      return;
+    }
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      _updateConnections();
+      unawaited(_updateConnections());
     });
   }
 
   Future<void> _updateConnections() async {
-    if (!mounted) return;
+    if (!mounted || !await _shouldRunTimer()) {
+      _timer?.cancel();
+      _timer = null;
+      return;
+    }
     final connections = await clashCore.getConnections();
-    if (!mounted) return;
+    if (!mounted || !await _shouldRunTimer()) {
+      _timer?.cancel();
+      _timer = null;
+      return;
+    }
     ref.read(connectionsProvider.notifier).state = connections;
+  }
+
+  void _handleBackgroundModeChanged() {
+    unawaited(_syncUpdateTimer());
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    unawaited(_syncUpdateTimer());
+  }
+
+  @override
+  void onWindowMinimize() {
+    unawaited(_syncUpdateTimer());
+  }
+
+  @override
+  void onWindowRestore() {
+    unawaited(_syncUpdateTimer());
   }
 
   Future<void> _handleBlockConnection(String id) async {

@@ -44,6 +44,13 @@ class AboutView extends StatelessWidget {
           },
         ),
         ListItem(
+          title: const Text('Github Releases'),
+          onTap: () {
+            globalState.openUrl('https://github.com/appshubcc/Bettbox');
+          },
+          trailing: const Icon(Icons.star),
+        ),
+        ListItem(
           title: const Text('Telegram Group'),
           onTap: () {
             globalState.openUrl('https://t.me/appshub_chat');
@@ -82,6 +89,9 @@ class AboutView extends StatelessWidget {
       Contributor(avatar: 'assets/images/avatars/dabaozi.jpg', name: '大包子'),
       Contributor(avatar: 'assets/images/avatars/xiaolou.jpg', name: '小楼'),
       Contributor(avatar: 'assets/images/avatars/www.jpg', name: 'Www'),
+      Contributor(avatar: 'assets/images/avatars/AIsouler.jpg', name: 'AIsouler'),
+      Contributor(avatar: 'assets/images/avatars/songchenwen.jpg', name: 'songchenwen'),
+      Contributor(avatar: 'assets/images/avatars/EriDeLee.jpg', name: 'EriDeLee'),
     ];
     return generateSection(
       separated: false,

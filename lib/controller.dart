@@ -26,8 +26,6 @@ import 'common/flclash_database_extractor.dart';
 import 'models/models.dart';
 import 'views/profiles/override_profile.dart';
 
-
-
 class AppController {
   int? lastProfileModified;
 
@@ -700,28 +698,12 @@ class AppController {
         final userEnabled = _ref.read(wakelockStateProvider);
 
         if (!userEnabled) {
+          stopWakelockAutoRecovery();
           return;
         }
 
-        final actualState = await WakelockPlus.enabled;
-
-        if (!actualState) {
-          commonPrint.log(
-            'WakeLock attempting auto-recovery',
-          );
-
-          await WakelockPlus.enable();
-
-          final recovered = await WakelockPlus.enabled;
-          if (recovered) {
-            commonPrint.log('WakeLock auto-recovery successful');
-          } else {
-            commonPrint.log('WakeLock auto-recovery failed');
-          }
-        }
-      } catch (e) {
-        commonPrint.log('WakeLock sync error: $e');
-      }
+        await syncWakelockIfNeeded();
+      } catch (_) {}
     });
   }
 
@@ -730,13 +712,26 @@ class AppController {
     _wakelockSyncTimer = null;
   }
 
+  Future<void> syncWakelockIfNeeded() async {
+    final userEnabled = _ref.read(wakelockStateProvider);
+    if (!userEnabled) {
+      stopWakelockAutoRecovery();
+      return;
+    }
+    final actualState = await WakelockPlus.enabled;
+    if (actualState) {
+      return;
+    }
+    await WakelockPlus.enable();
+  }
+
   Future<void> _initHighRefreshRateDefault() async {
     try {
       final androidVersion = await system.version;
       final currentSetting = _ref.read(appSettingProvider);
       
       final bool shouldEnableHighRefreshRate = androidVersion >= 31; // Android 12+
-      
+
       if (currentSetting.enableHighRefreshRate != shouldEnableHighRefreshRate) {
         _ref.read(appSettingProvider.notifier).updateState(
           (state) => state.copyWith(enableHighRefreshRate: shouldEnableHighRefreshRate),
@@ -776,7 +771,7 @@ class AppController {
       commonPrint.log('Failed to check wake lock status: $e');
     }
 
-    updateTray(true);
+    await updateTray(true);
 
     await _initCore();
     try {
@@ -803,6 +798,8 @@ class AppController {
         window?.hide();
       }
     }
+    await syncDesktopRuntimeState(preferCurrentState: true);
+    await updateTray(true);
 
     await _handlePreference();
     await _handlerDisclaimer();
@@ -812,8 +809,8 @@ class AppController {
   Future<void> _initStatus() async {
     if (system.isAndroid) {
       await globalState.updateStartTime();
-    } else if (globalState.isStart) {
-      await globalState.updateStartTime();
+    } else if (system.isDesktop) {
+      await syncDesktopRuntimeState();
     }
 
     final needRecovery = await _detectAbnormalExit();
@@ -842,6 +839,28 @@ class AppController {
       await applyProfile();
       addCheckIpNumDebounce();
     }
+  }
+
+  Future<void> syncDesktopRuntimeState({
+    bool preferCurrentState = false,
+  }) async {
+    if (!system.isDesktop) return;
+    if (!preferCurrentState || !globalState.isStart) {
+      await globalState.updateStartTime();
+    }
+
+    if (globalState.isStart) {
+      if (_ref.read(runTimeProvider) == null) {
+        _ref.read(runTimeProvider.notifier).value = 0;
+      }
+      await globalState.startUpdateTasks([updateRunTime, updateTraffic]);
+      return;
+    }
+
+    if (_ref.read(runTimeProvider) != null) {
+      _ref.read(runTimeProvider.notifier).value = null;
+    }
+    globalState.stopUpdateTasks();
   }
 
   Future<bool> _detectAbnormalExit() async {
@@ -1266,7 +1285,7 @@ class AppController {
 
   Future<void> updateTray([bool focus = false]) async {
     final trayState = await _ref.read(trayStateProvider.future);
-    tray.update(trayState: trayState);
+    await tray.update(trayState: trayState, focus: focus);
   }
 
   /// Restore data from bytes

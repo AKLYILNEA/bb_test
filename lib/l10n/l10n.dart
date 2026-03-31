@@ -25,8 +25,6 @@ class AppLocalizations {
     return _current!;
   }
 
-  static AppLocalizations? get currentOrNull => _current;
-
   static const AppLocalizationDelegate delegate = AppLocalizationDelegate();
 
   static Future<AppLocalizations> load(Locale locale) {
@@ -1381,10 +1379,10 @@ class AppLocalizations {
     );
   }
 
-  /// `A beautiful, easy-to-use, ad-free Mihomo-based proxy client.`
+  /// `Bettbox client is built on the powerful and flexible Mihomo (Clash.Meta) core, built with Actions, open-source across platforms, clean and ad-free, beautiful and easy to use, energy-saving and worry-free, Forked from FlClash, Better Experience, Out of the box.`
   String get desc {
     return Intl.message(
-      'A beautiful, easy-to-use, ad-free Mihomo-based proxy client.',
+      'Bettbox client is built on the powerful and flexible Mihomo (Clash.Meta) core, built with Actions, open-source across platforms, clean and ad-free, beautiful and easy to use, energy-saving and worry-free, Forked from FlClash, Better Experience, Out of the box.',
       name: 'desc',
       desc: '',
       args: [],
@@ -4910,6 +4908,8 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  static Null get currentOrNull => null;
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

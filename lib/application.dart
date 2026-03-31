@@ -49,12 +49,17 @@ class ApplicationState extends ConsumerState<Application>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _autoUpdateGroupTask();
-    _autoUpdateProfilesTask();
+    globalState.backgroundMode.addListener(_syncAutoUpdateTasks);
+    _syncAutoUpdateTasks();
     globalState.appController = AppController(context, ref);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       unawaited(_initApp());
     });
+  }
+
+  bool get _isForeground {
+    final lifecycleState = WidgetsBinding.instance.lifecycleState;
+    return lifecycleState == null || lifecycleState == AppLifecycleState.resumed;
   }
 
   Future<void> _initApp() async {
@@ -71,18 +76,29 @@ class ApplicationState extends ConsumerState<Application>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.inactive) {
-      _autoUpdateGroupTaskTimer?.cancel();
-      _autoUpdateGroupTaskTimer = null;
-    } else if (state == AppLifecycleState.resumed) {
-      if (_autoUpdateGroupTaskTimer == null) {
-        _autoUpdateGroupTask();
-      }
+    _syncAutoUpdateTasks();
+    if (state == AppLifecycleState.resumed) {
       if (system.isAndroid &&
           globalState.config.appSetting.enableHighRefreshRate) {
         _restoreHighRefreshRate();
       }
+    }
+  }
+
+  void _syncAutoUpdateTasks() {
+    final shouldRun = _isForeground && !globalState.backgroundMode.value;
+    if (!shouldRun) {
+      _autoUpdateGroupTaskTimer?.cancel();
+      _autoUpdateGroupTaskTimer = null;
+      _autoUpdateProfilesTaskTimer?.cancel();
+      _autoUpdateProfilesTaskTimer = null;
+      return;
+    }
+    if (_autoUpdateGroupTaskTimer == null) {
+      _autoUpdateGroupTask();
+    }
+    if (_autoUpdateProfilesTaskTimer == null) {
+      _autoUpdateProfilesTask();
     }
   }
 
@@ -213,6 +229,7 @@ class ApplicationState extends ConsumerState<Application>
 
   @override
   void dispose() {
+    globalState.backgroundMode.removeListener(_syncAutoUpdateTasks);
     WidgetsBinding.instance.removeObserver(this);
     linkManager.destroy();
     _autoUpdateGroupTaskTimer?.cancel();

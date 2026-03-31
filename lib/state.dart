@@ -46,8 +46,13 @@ class GlobalState {
   DateTime? startTime;
   UpdateTasks tasks = [];
   final navigatorKey = GlobalKey<NavigatorState>();
+  final backgroundMode = ValueNotifier<bool>(false);
   AppController? _appController;
   bool? _isAndroidTV;
+  int _taskLoopToken = 0;
+  bool _isExecutingTasks = false;
+  bool _needsTaskRestart = false;
+  DateTime? _lastBackgroundCleanupAt;
 
   SetupParams? _lastSuccessfulSetupParams;
 
@@ -114,13 +119,35 @@ class GlobalState {
   String get ua => config.patchClashConfig.globalUa ?? packageInfo.ua;
 
   Future<void> startUpdateTasks([UpdateTasks? tasks]) async {
-    if (timer?.isActive == true) return;
     if (tasks != null) {
       this.tasks = tasks;
     }
-    await executorUpdateTask();
-    timer = Timer(const Duration(seconds: 1), () async {
-      startUpdateTasks();
+    final token = ++_taskLoopToken;
+    timer?.cancel();
+    timer = null;
+    if (_isExecutingTasks) {
+      _needsTaskRestart = true;
+      return;
+    }
+    await _runUpdateLoop(token);
+  }
+
+  Future<void> _runUpdateLoop(int token) async {
+    if (token != _taskLoopToken) return;
+    _isExecutingTasks = true;
+    try {
+      await executorUpdateTask();
+    } finally {
+      _isExecutingTasks = false;
+    }
+    if (_needsTaskRestart) {
+      _needsTaskRestart = false;
+      await _runUpdateLoop(_taskLoopToken);
+      return;
+    }
+    if (token != _taskLoopToken) return;
+    timer = Timer(const Duration(seconds: 1), () {
+      unawaited(_runUpdateLoop(token));
     });
   }
 
@@ -136,9 +163,38 @@ class GlobalState {
   }
 
   void stopUpdateTasks() {
-    if (timer?.isActive != true) return;
+    _taskLoopToken++;
+    _needsTaskRestart = false;
     timer?.cancel();
     timer = null;
+  }
+
+  Future<void> handleBackground() async {
+    backgroundMode.value = true;
+    render?.pause();
+    stopUpdateTasks();
+    dashboardRefreshManager.stop();
+    await cleanupBackgroundResources();
+  }
+
+  void handleForeground() {
+    if (!backgroundMode.value) {
+      return;
+    }
+    backgroundMode.value = false;
+  }
+
+  Future<void> cleanupBackgroundResources() async {
+    final now = DateTime.now();
+    final lastCleanupAt = _lastBackgroundCleanupAt;
+    if (lastCleanupAt != null &&
+        now.difference(lastCleanupAt) < const Duration(minutes: 1)) {
+      return;
+    }
+    _lastBackgroundCleanupAt = now;
+    final imageCache = PaintingBinding.instance.imageCache;
+    imageCache.clearLiveImages();
+    WidgetsBinding.instance.handleMemoryPressure();
   }
 
   Future<void> handleStart([UpdateTasks? tasks]) async {
@@ -156,7 +212,7 @@ class GlobalState {
           config.vpnProps.quickResponse && !config.vpnProps.smartAutoStop;
       await service?.setQuickResponse(conflictFreeQuickResponse);
     }
-    startUpdateTasks(tasks);
+    await startUpdateTasks(tasks);
   }
 
   Future updateStartTime() async {
@@ -444,7 +500,7 @@ class GlobalState {
             entry.value.splitByMultipleSeparators;
       }
     }
-    
+
     if (system.isAndroid && rawConfig['dns']['listen'] != null) {
       final listen = rawConfig['dns']['listen'] as String;
       if (listen.endsWith(':53')) {
@@ -526,7 +582,7 @@ class GlobalState {
             if (item is! String || protectedNames.contains(item)) return true;
             return !filterRegex!.hasMatch(item);
           }).toList();
-          
+
           if (filtered.isEmpty && (group['use'] == null || (group['use'] is List && group['use'].isEmpty))) {
             filtered.add('DIRECT');
           }
@@ -851,7 +907,7 @@ class DetectionState {
 
     final isStateChanged = _preIsStart != isStart;
     _preIsStart = isStart;
-    
+
     _cancelPreviousRequest();
     _cancelToken = CancelToken();
     final requestId = ++_requestId;
