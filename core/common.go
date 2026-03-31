@@ -228,6 +228,9 @@ func updateConfig(params *UpdateParams) {
 		general.Tun.AutoRoute = *params.Tun.AutoRoute
 		general.Tun.Device = *params.Tun.Device
 		general.Tun.RouteAddress = *params.Tun.RouteAddress
+		if params.Tun.RouteExcludeAddress != nil {
+			general.Tun.RouteExcludeAddress = *params.Tun.RouteExcludeAddress
+		}
 		general.Tun.DNSHijack = *params.Tun.DNSHijack
 		general.Tun.Stack = *params.Tun.Stack
 		general.Tun.DisableICMPForwarding = *params.Tun.DisableICMPForwarding
@@ -239,6 +242,24 @@ func updateConfig(params *UpdateParams) {
 func setupConfig(params *SetupParams) error {
 	runLock.Lock()
 	defer runLock.Unlock()
+
+	if params.Config != nil && params.Config.ProxyGroup != nil {
+		for _, group := range params.Config.ProxyGroup {
+			if elm, ok := group["tolerance"]; ok {
+				switch v := elm.(type) {
+				case json.Number:
+					if i, err := v.Int64(); err == nil {
+						group["tolerance"] = int(i)
+					}
+				case float64:
+					group["tolerance"] = int(v)
+				case float32:
+					group["tolerance"] = int(v)
+				}
+			}
+		}
+	}
+
 	var err error
 	constant.DefaultTestURL = params.TestURL
 	currentConfig, err = config.ParseRawConfig(params.Config)

@@ -181,6 +181,11 @@ _Tun _$TunFromJson(Map<String, dynamic> json) => _Tun(
           ?.map((e) => e as String)
           .toList() ??
       const [],
+  routeExcludeAddress:
+      (json['route-exclude-address'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
   disableIcmpForwarding: json['disable-icmp-forwarding'] as bool? ?? true,
   mtu: (json['mtu'] as num?)?.toInt() ?? 4064,
 );
@@ -192,6 +197,7 @@ Map<String, dynamic> _$TunToJson(_Tun instance) => <String, dynamic>{
   'stack': _$TunStackEnumMap[instance.stack]!,
   'dns-hijack': instance.dnsHijack,
   'route-address': instance.routeAddress,
+  'route-exclude-address': instance.routeExcludeAddress,
   'disable-icmp-forwarding': instance.disableIcmpForwarding,
   'mtu': instance.mtu,
 };
