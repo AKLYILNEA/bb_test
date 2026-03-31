@@ -820,10 +820,12 @@ class AppController {
 
     if (needRecovery) {
       commonPrint.log('Abnormal exit detected');
-      try {
+      if (system.isAndroid) {
+        try {
           await applyProfile(silence: true);
-      } catch (e) {
-        commonPrint.log('Recovery failed: $e');
+        } catch (e) {
+          commonPrint.log('Recovery failed: $e');
+        }
       }
     }
     final shouldStart = globalState.isStart || _ref.read(appSettingProvider).autoRun;
@@ -847,13 +849,11 @@ class AppController {
 
     if (system.isAndroid) {
       final isVpnRunningFlag = prefs?.getBool('is_vpn_running') ?? false;
-      // Abnormal exit: flag says VPN was running, but app state shows not started
       return !globalState.isStart && isVpnRunningFlag;
     }
 
     if (system.isDesktop) {
       final wasTunRunning = prefs?.getBool('is_tun_running') ?? false;
-      // Abnormal exit: flag says TUN was running, but app state shows not started
       return !globalState.isStart && wasTunRunning;
     }
 

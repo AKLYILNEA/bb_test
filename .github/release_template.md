@@ -3,7 +3,7 @@
 # ⚡ Bettbox Release / 版本发布
 
 [![Latest Release](https://img.shields.io/github/v/release/appshubcc/Bettbox?style=for-the-badge&logo=github&color=238636&label=Release)](https://github.com/appshubcc/Bettbox/releases/latest) 
-[![Core](https://img.shields.io/badge/ALPHA-v.7fdc122-8A2BE2?style=for-the-badge&logo=go&logoColor=white)](https://github.com/MetaCubeX/mihomo/tree/Alpha) 
+[![Core](https://img.shields.io/badge/Mihomo-v.Alpha-8A2BE2?style=for-the-badge&logo=go&logoColor=white)](https://github.com/MetaCubeX/mihomo/tree/Alpha) 
 [![Downloads](https://img.shields.io/github/downloads/appshubcc/Bettbox/total?style=for-the-badge&logo=github&color=007ec6)](https://github.com/appshubcc/Bettbox/releases) 
 
 ---

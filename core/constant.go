@@ -47,6 +47,7 @@ type tunSchema struct {
 	AutoRoute             *bool              `yaml:"auto-route" json:"auto-route"`
 	RouteAddress          *[]netip.Prefix    `yaml:"route-address" json:"route-address,omitempty"`
 	RouteExcludeAddress   *[]netip.Prefix    `yaml:"route-exclude-address" json:"route-exclude-address,omitempty"`
+	StrictRoute           *bool              `yaml:"strict-route" json:"strict-route,omitempty"`
 	DisableICMPForwarding *bool              `yaml:"disable-icmp-forwarding" json:"disable-icmp-forwarding,omitempty"`
 }
 

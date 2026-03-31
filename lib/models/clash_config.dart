@@ -282,6 +282,7 @@ abstract class Tun with _$Tun {
     @JsonKey(name: 'route-exclude-address')
     @Default([])
     List<String> routeExcludeAddress,
+    @JsonKey(name: 'strict-route') @Default(false) bool strictRoute,
     @JsonKey(name: 'disable-icmp-forwarding')
     @Default(true)
     bool disableIcmpForwarding,
@@ -344,6 +345,7 @@ extension TunExt on Tun {
       if (routeMode == RouteMode.bypassPrivate) {
         return copyWith(
           autoRoute: true,
+          strictRoute: !system.isWindows,
           routeAddress: [],
           routeExcludeAddress: [
             '127.0.0.0/8',
@@ -357,11 +359,17 @@ extension TunExt on Tun {
           ],
         );
       }
-      return copyWith(autoRoute: true, routeAddress: [], routeExcludeAddress: []);
+      return copyWith(
+        autoRoute: true,
+        strictRoute: !system.isWindows,
+        routeAddress: [],
+        routeExcludeAddress: [],
+      );
     }
 
     return copyWith(
       autoRoute: mRouteAddress.isEmpty ? true : false,
+      strictRoute: true,
       routeAddress: mRouteAddress,
     );
   }
