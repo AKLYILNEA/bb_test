@@ -13,6 +13,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final _iconCache = <String, Uint8List?>{};
 final _iconCacheKeys = <String>[];
 const _maxIconCacheSize = 50;
+Uint8List? _defaultIconCache;
+Future<Uint8List?>? _defaultIconFuture;
 
 void _addToIconCache(String key, Uint8List? value) {
   if (_iconCache.containsKey(key)) {
@@ -186,12 +188,33 @@ class TrackerInfoItem extends ConsumerWidget {
 }
 
 Future<Uint8List?> _getPackageIcon(String process) async {
-  if (_iconCache.containsKey(process)) {
-    return _iconCache[process];
+  if (process.isEmpty) {
+    return _getDefaultPackageIcon();
+  }
+  final cachedIcon = _iconCache[process];
+  if (cachedIcon != null) {
+    return cachedIcon;
   }
   final icon = await app.getPackageIcon(process);
-  _addToIconCache(process, icon);
-  return icon;
+  if (icon != null) {
+    _addToIconCache(process, icon);
+    return icon;
+  }
+  return _getDefaultPackageIcon();
+}
+
+Future<Uint8List?> _getDefaultPackageIcon() {
+  final cachedIcon = _defaultIconCache;
+  if (cachedIcon != null) {
+    return Future.value(cachedIcon);
+  }
+  return _defaultIconFuture ??= app.getPackageIcon('').then((icon) {
+    if (icon != null) {
+      _defaultIconCache = icon;
+    }
+    _defaultIconFuture = null;
+    return icon;
+  });
 }
 
 class _ProcessIcon extends StatefulWidget {
@@ -226,27 +249,27 @@ class _ProcessIconState extends State<_ProcessIcon> {
     final devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
     final cacheSize = (42 * devicePixelRatio).ceil();
 
-    if (widget.process.isEmpty) {
-      return const SizedBox(width: 42, height: 42);
-    }
-
     return RepaintBoundary(
       child: GestureDetector(
-        onTap: () => widget.onClick?.call(widget.process),
+        onTap: () {
+          if (widget.process.isEmpty) return;
+          widget.onClick?.call(widget.process);
+        },
         child: Container(
           margin: const EdgeInsets.only(top: 4),
           width: 42,
           height: 42,
           alignment: Alignment.center,
-          child: FutureBuilder<Uint8List>(
-            future: _iconFuture.then((v) => v!),
+          child: FutureBuilder<Uint8List?>(
+            future: _iconFuture,
             builder: (context, snapshot) {
-              if (!snapshot.hasData) {
+              final iconBytes = snapshot.data;
+              if (iconBytes == null) {
                 return const SizedBox(width: 42, height: 42);
               }
               return Image(
                 image: ResizeImage(
-                  MemoryImage(snapshot.data!),
+                  MemoryImage(iconBytes),
                   width: cacheSize,
                   height: cacheSize,
                   allowUpscaling: false,
