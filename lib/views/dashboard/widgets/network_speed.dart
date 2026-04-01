@@ -1,11 +1,12 @@
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/providers/app.dart';
+import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class NetworkSpeed extends StatelessWidget {
+class NetworkSpeed extends ConsumerWidget {
   const NetworkSpeed({super.key});
 
   // Cache as const
@@ -36,7 +37,7 @@ class NetworkSpeed extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final color = context.colorScheme.onSurfaceVariant.opacity80;
     final primaryColor = Theme.of(context).colorScheme.primary;
     return SizedBox(
@@ -48,11 +49,10 @@ class NetworkSpeed extends StatelessWidget {
           iconData: Icons.speed_sharp,
         ),
         child: RepaintBoundary(
-          child: Consumer(
-            builder: (_, ref, _) {
-              final traffics = ref.watch(
-                trafficsProvider.select((state) => state.list),
-              );
+          child: ValueListenableBuilder<int>(
+            valueListenable: dashboardRefreshManager.tick1s,
+            builder: (_, _, _) {
+              final traffics = ref.read(trafficsProvider).list;
               final points = _getPoints(traffics);
               final speedText = _getLastTraffic(traffics).toSpeedText();
               return Stack(

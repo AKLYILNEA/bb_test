@@ -137,7 +137,6 @@ class _WindowContainerState extends ConsumerState<WindowManager>
     unawaited(globalState.appController.syncWakelockIfNeeded());
     if (globalState.isStart) {
       globalState.startUpdateTasks([
-        globalState.appController.updateRunTime,
         globalState.appController.updateTraffic,
       ]);
     }

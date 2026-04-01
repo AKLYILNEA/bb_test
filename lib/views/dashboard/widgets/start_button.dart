@@ -80,37 +80,42 @@ class _StartButtonState extends ConsumerState<StartButton> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(startButtonSelectorStateProvider);
-    final runTime = ref.watch(runTimeProvider);
-    final isStart = runTime != null;
     final canPress = state.isInit && state.hasProfile && !_isDisabled;
 
-    return SizedBox(
-      height: getWidgetHeight(1),
-      child: CommonCard(
-        info: Info(
-          label: isStart
-              ? appLocalizations.runTime
-              : appLocalizations.powerSwitch,
-          iconData: Icons.power_settings_new,
-        ),
-        onPressed: canPress ? _handleStart : null,
-        onLongPress: canPress ? _handleLongPress : null,
-        child: Container(
-          padding: baseInfoEdgeInsets.copyWith(top: 0),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              SizedBox(
-                height: globalState.measure.bodyMediumHeight + 2,
-                child: FadeThroughBox(
-                  child: _buildContent(context, ref, state, isStart, runTime),
-                ),
+    return ValueListenableBuilder<int>(
+      valueListenable: dashboardRefreshManager.tick1s,
+      builder: (_, _, _) {
+        final runTime = ref.read(runTimeProvider);
+        final isStart = runTime != null;
+        return SizedBox(
+          height: getWidgetHeight(1),
+          child: CommonCard(
+            info: Info(
+              label: isStart
+                  ? appLocalizations.runTime
+                  : appLocalizations.powerSwitch,
+              iconData: Icons.power_settings_new,
+            ),
+            onPressed: canPress ? _handleStart : null,
+            onLongPress: canPress ? _handleLongPress : null,
+            child: Container(
+              padding: baseInfoEdgeInsets.copyWith(top: 0),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SizedBox(
+                    height: globalState.measure.bodyMediumHeight + 2,
+                    child: FadeThroughBox(
+                      child: _buildContent(context, ref, state, isStart, runTime),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 

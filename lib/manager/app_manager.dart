@@ -25,13 +25,22 @@ class AppStateManager extends ConsumerStatefulWidget {
 
 class _AppStateManagerState extends ConsumerState<AppStateManager>
     with WidgetsBindingObserver {
-  bool _isDashboardActive = false;
+  bool _isRefreshActive = false;
   Timer? _dashboardRefreshDebounceTimer;
+  late final VoidCallback _dashboardTickListener;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _dashboardTickListener = () {
+      if (!globalState.isStart) {
+        return;
+      }
+      unawaited(globalState.appController.updateRunTime());
+      unawaited(globalState.appController.updateTraffic());
+    };
+    dashboardRefreshManager.tick1s.addListener(_dashboardTickListener);
     ref.listenManual(layoutChangeProvider, (prev, next) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (prev != next) {
@@ -47,11 +56,6 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
     ref.listenManual(configStateProvider, (prev, next) {
       if (prev != next) {
         globalState.appController.savePreferencesDebounce();
-      }
-    });
-    ref.listenManual(currentPageLabelProvider, (prev, next) {
-      if (prev != next) {
-        _updateDashboardRefreshState();
       }
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -81,13 +85,12 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
   @override
   void dispose() {
     _dashboardRefreshDebounceTimer?.cancel();
+    dashboardRefreshManager.tick1s.removeListener(_dashboardTickListener);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   Future<void> _updateDashboardRefreshState() async {
-    final isDashboard =
-        ref.read(currentPageLabelProvider) == PageLabel.dashboard;
     final lifecycleState = WidgetsBinding.instance.lifecycleState;
     final isForeground =
         lifecycleState == null || lifecycleState == AppLifecycleState.resumed;
@@ -98,19 +101,19 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
         isVisible = false;
       }
     }
-    final shouldRun = isDashboard && isForeground && isVisible;
+    final shouldRun = isForeground && isVisible;
 
     if (!shouldRun) {
       _dashboardRefreshDebounceTimer?.cancel();
       _dashboardRefreshDebounceTimer = null;
-      if (_isDashboardActive) {
+      if (_isRefreshActive) {
         dashboardRefreshManager.stop();
-        _isDashboardActive = false;
+        _isRefreshActive = false;
       }
       return;
     }
 
-    if (_isDashboardActive) {
+    if (_isRefreshActive) {
       return;
     }
 
@@ -119,9 +122,9 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
       const Duration(milliseconds: 1000),
       () {
         if (!mounted) return;
-        if (_isDashboardActive) return;
+        if (_isRefreshActive) return;
         dashboardRefreshManager.start();
-        _isDashboardActive = true;
+        _isRefreshActive = true;
         final hasDetection = ref
             .read(dashboardStateProvider)
             .dashboardWidgets
@@ -163,6 +166,7 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
   @override
   void didChangePlatformBrightness() {
     globalState.appController.updateBrightness();
+    globalState.appController.updateTray();
   }
 
   @override

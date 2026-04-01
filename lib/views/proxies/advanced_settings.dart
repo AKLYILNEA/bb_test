@@ -186,7 +186,9 @@ class _HealthCheckTimeoutItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final timeout = globalState.config.healthCheckTimeout;
+    final timeout = ref.watch(
+      configStateProvider.select((state) => state.healthCheckTimeout),
+    );
 
     return ListItem<int>.options(
       leading: const Icon(Icons.timer_outlined),

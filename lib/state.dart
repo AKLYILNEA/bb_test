@@ -52,7 +52,7 @@ class GlobalState {
   int _taskLoopToken = 0;
   bool _isExecutingTasks = false;
   bool _needsTaskRestart = false;
-  DateTime? _lastBackgroundCleanupAt;
+  Timer? _backgroundCleanupTimer;
 
   SetupParams? _lastSuccessfulSetupParams;
 
@@ -170,11 +170,13 @@ class GlobalState {
   }
 
   Future<void> handleBackground() async {
-    backgroundMode.value = true;
+    if (!backgroundMode.value) {
+      backgroundMode.value = true;
+      _scheduleBackgroundCleanup();
+    }
     render?.pause();
     stopUpdateTasks();
     dashboardRefreshManager.stop();
-    await cleanupBackgroundResources();
   }
 
   void handleForeground() {
@@ -182,19 +184,28 @@ class GlobalState {
       return;
     }
     backgroundMode.value = false;
+    _backgroundCleanupTimer?.cancel();
+    _backgroundCleanupTimer = null;
   }
 
-  Future<void> cleanupBackgroundResources() async {
-    final now = DateTime.now();
-    final lastCleanupAt = _lastBackgroundCleanupAt;
-    if (lastCleanupAt != null &&
-        now.difference(lastCleanupAt) < const Duration(minutes: 1)) {
-      return;
-    }
-    _lastBackgroundCleanupAt = now;
+  void _scheduleBackgroundCleanup() {
+    _backgroundCleanupTimer?.cancel();
+    _backgroundCleanupTimer = Timer(const Duration(minutes: 1), () {
+      _backgroundCleanupTimer = null;
+      if (!backgroundMode.value) {
+        return;
+      }
+      cleanupBackgroundResources();
+    });
+  }
+
+  void cleanupBackgroundResources() async {
     final imageCache = PaintingBinding.instance.imageCache;
     imageCache.clearLiveImages();
+    await Future.delayed(const Duration(milliseconds: 500));
     WidgetsBinding.instance.handleMemoryPressure();
+    await Future.delayed(const Duration(milliseconds: 500));
+    await clashCore.requestGc();
   }
 
   Future<void> handleStart([UpdateTasks? tasks]) async {
@@ -683,12 +694,22 @@ class GlobalState {
 
     config['proxy-providers'] ??= {};
     final configJs = json.encode(config);
+    final scriptJs = json.encode(currentScript.content);
     final runtime = getJavascriptRuntime();
 
     try {
       final res = await runtime.evaluateAsync('''
-        ${currentScript.content}
-        main($configJs)
+        (() => {
+          const __bettboxConfig = $configJs;
+          const __bettboxScript = $scriptJs;
+          const __bettboxMain = new Function(
+            __bettboxScript + '\\nreturn typeof main === "function" ? main : null;',
+          )();
+          if (typeof __bettboxMain !== 'function') {
+            throw new Error('Script must define main(config)');
+          }
+          return __bettboxMain(__bettboxConfig);
+        })()
       ''');
       if (res.isError) throw res.stringResult;
 
@@ -715,9 +736,6 @@ class DashboardRefreshManager {
   bool get isRunning => _isRunning;
 
   Future<bool> _isActive() async {
-    if (globalState.appState.pageLabel != PageLabel.dashboard) {
-      return false;
-    }
     final lifecycleState = WidgetsBinding.instance.lifecycleState;
     if (lifecycleState != null && lifecycleState != AppLifecycleState.resumed) {
       return false;

@@ -123,7 +123,7 @@ class AppController {
 
     if (isDesktop && patchConfig.tun.enable) {
       await _quickSetupConfig(enableTun: false);
-      await globalState.handleStart([updateRunTime, updateTraffic]);
+      await globalState.handleStart([updateTraffic]);
 
       Future.microtask(() async {
         final res = await _requestAdmin(true);
@@ -146,7 +146,7 @@ class AppController {
       await _quickSetupConfig();
     }
 
-    await globalState.handleStart([updateRunTime, updateTraffic]);
+    await globalState.handleStart([updateTraffic]);
 
     Future.delayed(const Duration(seconds: 1), () {
       addCheckIpNumDebounce();
@@ -243,17 +243,10 @@ class AppController {
       _ref.read(runTimeProvider.notifier).value = elapsed;
       return;
     }
-
-    if (!await _shouldUpdateTraffic()) {
-      return;
-    }
-
     _ref.read(runTimeProvider.notifier).value = elapsed;
   }
 
-  Future<bool> _shouldUpdateTraffic() async {
-    if (!_ref.read(isCurrentPageProvider(PageLabel.dashboard))) return false;
-
+  Future<bool> _shouldUpdateDashboardTick() async {
     final lifecycleState = WidgetsBinding.instance.lifecycleState;
     if (lifecycleState != AppLifecycleState.resumed) return false;
 
@@ -263,13 +256,13 @@ class AppController {
   }
 
   Future<void> updateTraffic() async {
-    if (!await _shouldUpdateTraffic()) {
+    _ref.read(totalTrafficProvider.notifier).value = await clashCore
+        .getTotalTraffic();
+    if (!await _shouldUpdateDashboardTick()) {
       return;
     }
     final traffic = await clashCore.getTraffic();
     _ref.read(trafficsProvider.notifier).addTraffic(traffic);
-    _ref.read(totalTrafficProvider.notifier).value = await clashCore
-        .getTotalTraffic();
   }
 
   Future<void> addProfile(Profile profile) async {
@@ -853,7 +846,7 @@ class AppController {
       if (_ref.read(runTimeProvider) == null) {
         _ref.read(runTimeProvider.notifier).value = 0;
       }
-      await globalState.startUpdateTasks([updateRunTime, updateTraffic]);
+      await globalState.startUpdateTasks([updateTraffic]);
       return;
     }
 
