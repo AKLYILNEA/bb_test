@@ -146,10 +146,8 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
     } else if (state == AppLifecycleState.resumed) {
       globalState.handleForeground();
       render?.active();
+      await globalState.resumeForegroundUpdates();
       await globalState.appController.syncWakelockIfNeeded();
-      if (globalState.isStart) {
-        await globalState.startUpdateTasks();
-      }
     }
     if (state == AppLifecycleState.resumed && system.isAndroid) {
       final hidden = ref.read(appSettingProvider.select((s) => s.hidden));

@@ -134,12 +134,8 @@ class _WindowContainerState extends ConsumerState<WindowManager>
   void onWindowRestore() {
     globalState.handleForeground();
     _scheduleRenderToggle(true);
+    unawaited(globalState.resumeForegroundUpdates());
     unawaited(globalState.appController.syncWakelockIfNeeded());
-    if (globalState.isStart) {
-      globalState.startUpdateTasks([
-        globalState.appController.updateTraffic,
-      ]);
-    }
     super.onWindowRestore();
   }
 

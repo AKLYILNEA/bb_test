@@ -188,9 +188,21 @@ class GlobalState {
     _backgroundCleanupTimer = null;
   }
 
+  Future<void> resumeForegroundUpdates() async {
+    dashboardRefreshManager.start();
+    if (!isStart) {
+      return;
+    }
+    await appController.updateRunTime();
+    await appController.updateTraffic();
+    await startUpdateTasks([
+      appController.updateTraffic,
+    ]);
+  }
+
   void _scheduleBackgroundCleanup() {
     _backgroundCleanupTimer?.cancel();
-    _backgroundCleanupTimer = Timer(const Duration(minutes: 1), () {
+    _backgroundCleanupTimer = Timer(const Duration(minutes: 3), () {
       _backgroundCleanupTimer = null;
       if (!backgroundMode.value) {
         return;

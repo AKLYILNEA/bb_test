@@ -489,10 +489,8 @@ class AppController {
   }
 
   void updateBrightness() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _ref.read(systemBrightnessProvider.notifier).value =
-          WidgetsBinding.instance.platformDispatcher.platformBrightness;
-    });
+    _ref.read(systemBrightnessProvider.notifier).value =
+        WidgetsBinding.instance.platformDispatcher.platformBrightness;
   }
 
   Future<void> autoUpdateProfiles() async {

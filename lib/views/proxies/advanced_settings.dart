@@ -186,9 +186,7 @@ class _HealthCheckTimeoutItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final timeout = ref.watch(
-      configStateProvider.select((state) => state.healthCheckTimeout),
-    );
+    final timeout = ref.watch(healthCheckTimeoutProvider);
 
     return ListItem<int>.options(
       leading: const Icon(Icons.timer_outlined),
@@ -201,9 +199,9 @@ class _HealthCheckTimeoutItem extends ConsumerWidget {
         textBuilder: _getDisplayText,
         onChanged: (value) {
           if (value != null) {
-            globalState.config = globalState.config.copyWith(
-              healthCheckTimeout: value,
-            );
+            ref
+                .read(healthCheckTimeoutProvider.notifier)
+                .updateState((_) => value);
             globalState.appController.applyProfileDebounce();
           }
         },

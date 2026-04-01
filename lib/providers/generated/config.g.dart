@@ -328,5 +328,22 @@ final nodeExcludeFilterProvider =
     );
 
 typedef _$NodeExcludeFilter = AutoDisposeNotifier<String>;
+String _$healthCheckTimeoutHash() =>
+    r'5d0b9e74e17b4304b5bc724b6823df870449d627';
+
+/// See also [HealthCheckTimeout].
+@ProviderFor(HealthCheckTimeout)
+final healthCheckTimeoutProvider =
+    AutoDisposeNotifierProvider<HealthCheckTimeout, int>.internal(
+      HealthCheckTimeout.new,
+      name: r'healthCheckTimeoutProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$healthCheckTimeoutHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$HealthCheckTimeout = AutoDisposeNotifier<int>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

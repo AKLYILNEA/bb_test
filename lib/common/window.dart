@@ -78,10 +78,11 @@ class Window {
   Future<void> show() async {
     globalState.handleForeground();
     render?.resume();
-    await globalState.appController.syncWakelockIfNeeded();
     await windowManager.show();
     await windowManager.focus();
     await windowManager.setSkipTaskbar(false);
+    await globalState.resumeForegroundUpdates();
+    await globalState.appController.syncWakelockIfNeeded();
   }
 
   Future<bool> get isVisible async {

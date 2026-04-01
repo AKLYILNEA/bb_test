@@ -398,3 +398,21 @@ class NodeExcludeFilter extends _$NodeExcludeFilter
   }
 }
 
+@riverpod
+class HealthCheckTimeout extends _$HealthCheckTimeout
+    with AutoDisposeNotifierMixin {
+  @override
+  int build() {
+    return globalState.config.healthCheckTimeout;
+  }
+
+  @override
+  onUpdate(value) {
+    globalState.config = globalState.config.copyWith(healthCheckTimeout: value);
+  }
+
+  void updateState(int Function(int state) builder) {
+    state = builder(state);
+  }
+}
+
