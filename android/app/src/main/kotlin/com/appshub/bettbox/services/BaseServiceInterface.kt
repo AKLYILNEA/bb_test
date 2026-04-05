@@ -92,7 +92,7 @@ fun Service.startForeground(notification: Notification) {
     ensureNotificationChannel()
 
     val type = if (Build.VERSION.SDK_INT >= 34) {
-        1024
+        android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
     } else {
         0
     }

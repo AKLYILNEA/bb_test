@@ -12,6 +12,7 @@ import 'package:bett_box/state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
+import 'package:intl/intl.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'application.dart';
@@ -19,6 +20,7 @@ import 'clash/core.dart';
 import 'clash/lib.dart';
 import 'common/common.dart';
 import 'l10n/l10n.dart';
+import 'l10n/intl/messages_all.dart' show initializeMessages;
 import 'models/models.dart';
 
 const String _sentryDsn = String.fromEnvironment('SENTRY_DSN');
@@ -54,13 +56,23 @@ Future<void> _initSentryAndRun(Future<void> Function() runner) async {
 
     options.beforeSend = (event, hint) {
       if (system.isMacOS) {
-        final hasFontDeadlock = event.threads?.any((thread) =>
-          thread.stacktrace?.frames.any((frame) =>
-            frame.function?.contains('XTCopyPropertiesForFont') == true ||
-            frame.function?.contains('TGlobalFontRegistryImp') == true ||
-            frame.function?.contains('__NSXPCCONNECTION_IS_WAITING_FOR_A_SYNCHRONOUS_REPLY__') == true
-          ) ?? false
-        ) ?? false;
+        final hasFontDeadlock =
+            event.threads?.any(
+              (thread) =>
+                  thread.stacktrace?.frames.any(
+                    (frame) =>
+                        frame.function?.contains('XTCopyPropertiesForFont') ==
+                            true ||
+                        frame.function?.contains('TGlobalFontRegistryImp') ==
+                            true ||
+                        frame.function?.contains(
+                              '__NSXPCCONNECTION_IS_WAITING_FOR_A_SYNCHRONOUS_REPLY__',
+                            ) ==
+                            true,
+                  ) ??
+                  false,
+            ) ??
+            false;
 
         if (hasFontDeadlock) {
           event.level = SentryLevel.warning;
@@ -132,22 +144,38 @@ Future<void> _service(List<String> flags) async {
           await vpn?.stop();
         },
         onReconnectIpc: () {
-          commonPrint.log('Service: reconnectIpc requested, re-establishing IPC');
+          commonPrint.log(
+            'Service: reconnectIpc requested, re-establishing IPC',
+          );
           _handleMainIpc(clashLibHandler);
         },
       ),
     );
 
     vpn?.handleGetStartForegroundParams = () async {
-      if (AppLocalizations.currentOrNull == null) {
-        final locale = globalState.config.appSetting.locale?.isNotEmpty == true
-            ? utils.getLocaleForString(globalState.config.appSetting.locale!)
-            : WidgetsBinding.instance.platformDispatcher.locale;
-        if (locale != null) {
-          await AppLocalizations.load(locale);
-        }
-        if (AppLocalizations.currentOrNull == null) {
-          await AppLocalizations.load(const Locale('zh', 'CN'));
+      final locale = globalState.config.appSetting.locale?.isNotEmpty == true
+          ? utils.getLocaleForString(globalState.config.appSetting.locale!)
+          : WidgetsBinding.instance.platformDispatcher.locale;
+      final normalizedLocale = locale == null
+          ? const Locale('zh', 'CN')
+          : (locale.languageCode.toLowerCase() == 'zh'
+                ? (((locale.countryCode?.toUpperCase() == 'TW') ||
+                          (locale.countryCode?.toUpperCase() == 'HK') ||
+                          (locale.countryCode?.toUpperCase() == 'MO') ||
+                          (locale.scriptCode?.toLowerCase() == 'hant'))
+                      ? const Locale('zh', 'TC')
+                      : const Locale('zh', 'CN'))
+                : locale);
+
+      await AppLocalizations.load(const Locale('zh', 'CN'));
+      if (normalizedLocale != const Locale('zh', 'CN')) {
+        final localeName = Intl.canonicalizedLocale(
+          (normalizedLocale.countryCode?.isEmpty ?? true)
+              ? normalizedLocale.languageCode
+              : normalizedLocale.toString(),
+        );
+        if (await initializeMessages(localeName)) {
+          await AppLocalizations.load(normalizedLocale);
         }
       }
 
@@ -173,7 +201,7 @@ Future<void> _service(List<String> flags) async {
         },
       ),
     );
-    
+
     if (!quickStart && !bootStart) {
       _handleMainIpc(clashLibHandler);
       return;
@@ -193,7 +221,7 @@ Future<void> _service(List<String> flags) async {
     final clashConfig = globalState.config.patchClashConfig.copyWith.tun(
       enable: false,
     );
-    
+
     final params = await globalState.getSetupParams(pathConfig: clashConfig);
     Future(() async {
       try {
@@ -213,13 +241,13 @@ Future<void> _service(List<String> flags) async {
           return;
         }
         await vpn?.start(clashLibHandler.getAndroidVpnOptions());
-        
+
         if (globalState.config.appSetting.openLogs) {
           await clashLibHandler.invokeAction('{"id": "quickStartLog", "method": "startLog"}');
         } else {
           await clashLibHandler.invokeAction('{"id": "quickStopLog", "method": "stopLog"}');
         }
-        
+
         clashLibHandler.startListener();
       } catch (e, stackTrace) {
         commonPrint.log('Fatal error during service background start: $e');
