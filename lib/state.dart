@@ -736,10 +736,9 @@ class GlobalState {
 }
 
 class DashboardRefreshManager {
-  Timer? _timer1s;
-  Timer? _timer2s;
-  Timer? _timer5s;
+  Timer? _timer;
   bool _isRunning = false;
+  int _counter = 0;
 
   final tick1s = ValueNotifier<int>(0);
   final tick2s = ValueNotifier<int>(0);
@@ -761,35 +760,32 @@ class DashboardRefreshManager {
     return true;
   }
 
-  Future<void> _tryTick(ValueNotifier<int> notifier) async {
+  Future<void> _tryTick() async {
     if (!await _isActive()) {
       return;
     }
-    notifier.value++;
+    _counter++;
+    tick1s.value++;
+    if (_counter % 2 == 0) {
+      tick2s.value++;
+    }
+    if (_counter % 5 == 0) {
+      tick5s.value++;
+    }
   }
 
   void start() {
     if (_isRunning) return;
     _isRunning = true;
-    _timer1s = Timer.periodic(const Duration(seconds: 1), (_) {
-      _tryTick(tick1s);
-    });
-    _timer2s = Timer.periodic(const Duration(seconds: 2), (_) {
-      _tryTick(tick2s);
-    });
-    _timer5s = Timer.periodic(const Duration(seconds: 5), (_) {
-      _tryTick(tick5s);
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      _tryTick();
     });
   }
 
   void stop() {
     if (!_isRunning) return;
-    _timer1s?.cancel();
-    _timer2s?.cancel();
-    _timer5s?.cancel();
-    _timer1s = null;
-    _timer2s = null;
-    _timer5s = null;
+    _timer?.cancel();
+    _timer = null;
     _isRunning = false;
   }
 }

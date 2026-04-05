@@ -38,7 +38,6 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
         return;
       }
       unawaited(globalState.appController.updateRunTime());
-      unawaited(globalState.appController.updateTraffic());
     };
     dashboardRefreshManager.tick1s.addListener(_dashboardTickListener);
     ref.listenManual(layoutChangeProvider, (prev, next) {
