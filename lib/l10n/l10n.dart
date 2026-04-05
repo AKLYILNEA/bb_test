@@ -25,8 +25,6 @@ class AppLocalizations {
     return _current!;
   }
 
-  static AppLocalizations? get currentOrNull => _current;
-
   static const AppLocalizationDelegate delegate = AppLocalizationDelegate();
 
   static Future<AppLocalizations> load(Locale locale) {
@@ -4634,6 +4632,26 @@ class AppLocalizations {
   /// `Import`
   String get import {
     return Intl.message('Import', name: 'import', desc: '', args: []);
+  }
+
+  /// `Import from Code`
+  String get importFromCode {
+    return Intl.message(
+      'Import from Code',
+      name: 'importFromCode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Import failed`
+  String get importFailed {
+    return Intl.message(
+      'Import failed',
+      name: 'importFailed',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Import from File`

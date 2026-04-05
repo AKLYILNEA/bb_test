@@ -5,6 +5,7 @@ import 'package:bett_box/pages/editor.dart';
 import 'package:bett_box/providers/config.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/card.dart';
+import 'package:bett_box/widgets/dialog.dart';
 import 'package:bett_box/widgets/input.dart';
 import 'package:bett_box/widgets/list.dart';
 import 'package:bett_box/widgets/null_status.dart';
@@ -206,27 +207,24 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
     return false;
   }
 
-  void _handleToEditor({Script? script}) {
+  void _handleToEditor({Script? script, String? initialContent, String? url}) {
     final title = script?.label ?? '';
-    final raw = script?.content ?? scriptTemplate;
-    String? importedUrl; // 记录本次 URL 导入的地址
+    final raw = script?.content ?? initialContent ?? scriptTemplate;
+    String? importedUrl = url ?? script?.url;
     BaseNavigator.push(
       context,
       EditorPage(
         titleEditable: true,
         title: title,
         supportRemoteDownload: true,
-        onUrlImport: (url) {
-          // URL 导入时技当前 url，保存时会一并存入 Script
-          importedUrl = url;
+        onUrlImport: (downloadedUrl) {
+          importedUrl = downloadedUrl;
         },
         onSave: (context, title, content) {
-          // 保存时把最新 importedUrl 写入；如果未重新导入则保持原有 url
-          final urlToSave = importedUrl ?? script?.url;
           final scriptToSave = script != null
-              ? script.copyWith(url: urlToSave)
+              ? script.copyWith(url: importedUrl)
               : null;
-          _handleEditorSave(context, title, content, script: scriptToSave, url: urlToSave);
+          _handleEditorSave(context, title, content, script: scriptToSave, url: importedUrl);
         },
         onPop: (context, title, content) {
           return _handleEditorPop(context, title, content, raw, script: script);
@@ -237,17 +235,116 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
     );
   }
 
+  Future<void> _handleImport() async {
+    final option = await globalState.showCommonDialog<ImportOption>(
+      child: const _ScriptImportOptionsDialog(),
+    );
+    if (option == null) {
+      return;
+    }
+
+    switch (option) {
+      case ImportOption.code:
+        _handleToEditor();
+      case ImportOption.url:
+        await _handleUrlImport();
+      case ImportOption.file:
+        await _handleFileImport();
+    }
+  }
+
+  Future<void> _handleUrlImport() async {
+    final url = await globalState.showCommonDialog<String>(
+      child: InputDialog(
+        title: appLocalizations.importUrl,
+        value: '',
+        labelText: appLocalizations.url,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return appLocalizations.emptyTip(appLocalizations.value);
+          }
+          if (!value.isUrl) {
+            return appLocalizations.urlTip(appLocalizations.value);
+          }
+          return null;
+        },
+      ),
+    );
+    if (url == null || url.isEmpty) {
+      return;
+    }
+
+    try {
+      final res = await request.getTextResponseForUrl(url);
+      if (mounted) {
+        _handleToEditor(initialContent: res.data, url: url);
+      }
+    } catch (e) {
+      globalState.showMessage(
+        message: TextSpan(text: '${appLocalizations.importFailed}: $e'),
+      );
+    }
+  }
+
+  Future<void> _handleFileImport() async {
+    final file = await picker.pickerFile();
+    if (file == null) {
+      return;
+    }
+    final content = String.fromCharCodes(file.bytes?.toList() ?? []);
+    if (mounted) {
+      _handleToEditor(initialContent: content);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _handleToEditor();
+          _handleImport();
         },
         child: Icon(Icons.add),
       ),
       body: _buildContent(),
       title: appLocalizations.script,
+    );
+  }
+}
+
+class _ScriptImportOptionsDialog extends StatelessWidget {
+  const _ScriptImportOptionsDialog();
+
+  @override
+  Widget build(BuildContext context) {
+    return CommonDialog(
+      title: appLocalizations.import,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+      child: Wrap(
+        children: [
+          ListItem(
+            onTap: () {
+              Navigator.of(context).pop(ImportOption.code);
+            },
+            leading: const Icon(Icons.code),
+            title: Text(appLocalizations.importFromCode),
+          ),
+          ListItem(
+            onTap: () {
+              Navigator.of(context).pop(ImportOption.url);
+            },
+            leading: const Icon(Icons.link),
+            title: Text(appLocalizations.importUrl),
+          ),
+          ListItem(
+            onTap: () {
+              Navigator.of(context).pop(ImportOption.file);
+            },
+            leading: const Icon(Icons.file_open),
+            title: Text(appLocalizations.importFile),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -578,6 +578,8 @@
   "portTip": "{label} должен быть от 1024 до 49151",
   "portConflictTip": "Введите разные порты",
   "import": "Импорт",
+  "importFromCode": "Импорт из кода",
+  "importFailed": "Ошибка импорта",
   "importFile": "Импорт из файла",
   "importUrl": "Импорт по URL",
   "autoSetSystemDns": "Автоматически настроить системный DNS",

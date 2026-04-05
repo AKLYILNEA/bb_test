@@ -208,7 +208,7 @@ _NetworkProps _$NetworkPropsFromJson(Map<String, dynamic> json) =>
           defaultBypassDomain,
       routeMode:
           $enumDecodeNullable(_$RouteModeEnumMap, json['routeMode']) ??
-          RouteMode.config,
+          RouteMode.bypassPrivate,
       autoSetSystemDns: json['autoSetSystemDns'] as bool? ?? true,
     );
 

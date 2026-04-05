@@ -577,6 +577,8 @@
   "portTip": "{label} 必須在 1024 到 49151 之間",
   "portConflictTip": "請輸入不同的連接埠",
   "import": "匯入",
+  "importFromCode": "透過程式碼匯入",
+  "importFailed": "匯入失敗",
   "importFile": "透過檔案匯入",
   "importUrl": "透過 URL 匯入",
   "autoSetSystemDns": "自動設定系統 DNS",

@@ -576,6 +576,8 @@
   "portTip": "{label} must be between 1024 and 49151",
   "portConflictTip": "Please enter a different port",
   "import": "Import",
+  "importFromCode": "Import from Code",
+  "importFailed": "Import failed",
   "importFile": "Import from File",
   "importUrl": "Import from URL",
   "autoSetSystemDns": "Auto Set System DNS",

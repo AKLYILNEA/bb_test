@@ -188,7 +188,7 @@ abstract class NetworkProps with _$NetworkProps {
   const factory NetworkProps({
     @Default(false) bool systemProxy,
     @Default(defaultBypassDomain) List<String> bypassDomain,
-    @Default(RouteMode.config) RouteMode routeMode,
+    @Default(RouteMode.bypassPrivate) RouteMode routeMode,
     @Default(true) bool autoSetSystemDns,
   }) = _NetworkProps;
 
