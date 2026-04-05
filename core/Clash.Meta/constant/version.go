@@ -2,7 +2,7 @@ package constant
 
 var (
 	Meta       = true
-	Version    = "1.19.22"
+	Version    = "Commit-7709554"
 	BuildTime  = "unknown time"
 	MihomoName = "mihomo"
 )
