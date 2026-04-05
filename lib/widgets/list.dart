@@ -54,7 +54,7 @@ class OpenDelegate extends Delegate {
     required this.widget,
     this.maxWidth,
     this.actions = const [],
-    this.blur = true,
+    this.blur = false,
     this.wrap = true,
     this.forceFull = true,
   });
@@ -73,7 +73,7 @@ class NextDelegate extends Delegate {
     required this.widget,
     this.maxWidth,
     this.actions = const [],
-    this.blur = true,
+    this.blur = false,
     this.wrap = true,
   });
 }

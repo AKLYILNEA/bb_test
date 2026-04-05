@@ -20,7 +20,7 @@ class SheetProps {
     this.maxHeight,
     this.useSafeArea = true,
     this.isScrollControlled = false,
-    this.blur = true,
+    this.blur = false,
   });
 }
 
@@ -34,7 +34,7 @@ class ExtendProps {
   const ExtendProps({
     this.maxWidth,
     this.useSafeArea = true,
-    this.blur = true,
+    this.blur = false,
     this.forceFull = false,
   });
 }
