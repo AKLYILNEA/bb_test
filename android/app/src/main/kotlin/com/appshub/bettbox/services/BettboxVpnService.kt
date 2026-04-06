@@ -11,7 +11,6 @@ import android.os.Parcel
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.appshub.bettbox.GlobalState
-import com.appshub.bettbox.core.Core
 import com.appshub.bettbox.extensions.getIpv4RouteAddress
 import com.appshub.bettbox.extensions.getIpv6RouteAddress
 import com.appshub.bettbox.extensions.toCIDR
@@ -99,8 +98,6 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
         isStopped = true
         hasStartedForeground = false
 
-        runCatching { Core.stopTun() }
-            .onFailure { Log.e(TAG, "Failed to stop TUN: ${it.message}") }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             runCatching { stopForeground(STOP_FOREGROUND_REMOVE) }
                 .onFailure { Log.e(TAG, "Failed to stop foreground: ${it.message}") }
@@ -108,6 +105,7 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
         stopSelf()
     }
 
+    @Volatile
     private var cachedBuilder: NotificationCompat.Builder? = null
 
     fun resetNotificationBuilder() {
@@ -180,7 +178,12 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
             }.getOrElse { Log.e(TAG, "onTransact failed: ${it.message}"); false }
     }
 
-    override fun onBind(intent: Intent?): IBinder = binder
+    override fun onBind(intent: Intent?): IBinder? {
+        if (intent?.action == VpnService.SERVICE_INTERFACE) {
+            return super.onBind(intent)
+        }
+        return binder
+    }
 
     override fun onUnbind(intent: Intent?): Boolean {
         super.onUnbind(intent)

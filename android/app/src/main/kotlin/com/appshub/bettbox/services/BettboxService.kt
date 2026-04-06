@@ -15,6 +15,7 @@ import com.appshub.bettbox.models.VpnOptions
 
 class BettboxService : Service(), BaseServiceInterface {
 
+    @Volatile
     private var cachedBuilder: NotificationCompat.Builder? = null
     private val binder = LocalBinder()
     @Volatile

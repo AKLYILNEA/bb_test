@@ -14,6 +14,7 @@ import io.flutter.plugins.GeneratedPluginRegistrant
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -29,6 +30,7 @@ enum class RunState {
 
 object GlobalState {
     val runLock = ReentrantLock()
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     const val NOTIFICATION_CHANNEL = "Bettbox"
     const val NOTIFICATION_ID = 1
@@ -78,7 +80,7 @@ object GlobalState {
 
     private fun startPendingTimeout() {
         pendingTimeoutJob?.cancel()
-        pendingTimeoutJob = CoroutineScope(Dispatchers.Main).launch {
+        pendingTimeoutJob = scope.launch {
             delay(PENDING_TIMEOUT_MS)
             if (currentRunState == RunState.PENDING) {
                 android.util.Log.w("GlobalState", "PENDING state timeout, resetting to STOP")
@@ -189,9 +191,8 @@ object GlobalState {
     }
 
     fun initServiceEngine(flags: List<String>? = null) {
-        if (serviceEngine != null) return
-        destroyServiceEngine()
         runLock.withLock {
+            if (serviceEngine != null) return
             serviceEngine = FlutterEngine(BettboxApplication.getAppContext()).apply {
                 plugins.add(VpnPlugin)
                 plugins.add(AppPlugin())

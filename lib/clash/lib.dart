@@ -43,23 +43,26 @@ class ClashLib extends ClashHandlerInterface with AndroidClashInterface {
         handleResult(ActionResult.fromJson(json.decode(message)));
       }
     });
-    // Check if Service Engine is already running (e.g. tile quick start).
-    // If so, don't destroy it — just reconnect IPC to preserve listener state.
     final alreadyRunning = await service?.isServiceEngineRunning() ?? false;
     if (alreadyRunning) {
       await service?.reconnectIpc();
     } else {
       await service?.destroy();
       await service?.init();
-      // New Service Engine runs _service() async; wait for IPC establishment
+    }
+    await _waitForIpc();
+  }
+
+  Future<void> _waitForIpc() async {
+    for (var attempt = 0; attempt < 3; attempt++) {
       final connected = await _canSendCompleter.future
           .timeout(const Duration(seconds: 2), onTimeout: () => false);
-      if (!connected) {
-        commonPrint.log('ClashLib: IPC not established');
-        _canSendCompleter = Completer();
-        await service?.reconnectIpc();
-      }
+      if (connected) return;
+      commonPrint.log('ClashLib: IPC attempt ${attempt + 1}/3 failed, retrying...');
+      _canSendCompleter = Completer();
+      await service?.reconnectIpc();
     }
+    commonPrint.log('ClashLib: IPC failed after 3 attempts');
   }
 
   void _registerMainPort(SendPort sendPort) {
@@ -93,7 +96,16 @@ class ClashLib extends ClashHandlerInterface with AndroidClashInterface {
   @override
   sendMessage(String message) async {
     await _canSendCompleter.future;
-    sendPort?.send(message);
+    try {
+      sendPort?.send(message);
+    } catch (e) {
+      commonPrint.log('ClashLib: sendMessage failed: $e, reconnecting IPC');
+      sendPort = null;
+      _canSendCompleter = Completer();
+      await service?.reconnectIpc();
+      await _waitForIpc();
+      sendPort?.send(message);
+    }
   }
 
   // @override

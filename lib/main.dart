@@ -251,6 +251,7 @@ Future<void> _service(List<String> flags) async {
 void _handleMainIpc(ClashLibHandler clashLibHandler) {
   final sendPort = IsolateNameServer.lookupPortByName(mainIsolate);
   if (sendPort == null) {
+    commonPrint.log('Service: mainIsolate sendPort not found, IPC unavailable');
     return;
   }
 
@@ -260,17 +261,31 @@ void _handleMainIpc(ClashLibHandler clashLibHandler) {
   _serviceReceiverPort = ReceivePort();
   _serviceReceiverPort!.listen((message) async {
     final res = await clashLibHandler.invokeAction(message);
-    sendPort.send(res);
+    _safeSend(sendPort, res);
   });
-  sendPort.send(_serviceReceiverPort!.sendPort);
+  _safeSend(sendPort, _serviceReceiverPort!.sendPort);
 
   _messageReceiverPort = ReceivePort();
   clashLibHandler.attachMessagePort(_messageReceiverPort!.sendPort.nativePort);
   _messageReceiverPort!.listen((message) {
-    sendPort.send(message);
+    _safeSend(sendPort, message);
   });
 
   clashLibHandler.startListener();
+}
+
+void _safeSend(SendPort sendPort, dynamic message) {
+  try {
+    sendPort.send(message);
+  } catch (e) {
+    commonPrint.log('Service: IPC send failed: $e');
+    final retryPort = IsolateNameServer.lookupPortByName(mainIsolate);
+    if (retryPort != null) {
+      try {
+        retryPort.send(message);
+      } catch (_) {}
+    }
+  }
 }
 
 @immutable
