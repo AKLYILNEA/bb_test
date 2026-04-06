@@ -137,14 +137,10 @@ class _ToolViewState extends ConsumerState<ToolsView> {
 class _LocaleItem extends ConsumerWidget {
   const _LocaleItem();
 
-  // Cache the options list to avoid recreating on every build
-  static final List<Locale?> _localeOptions = [
-    null,
-    ...AppLocalizations.delegate.supportedLocales,
-  ];
+  static final List<Locale> _localeOptions = 
+    AppLocalizations.delegate.supportedLocales;
 
-  String _getLocaleString(Locale? locale) {
-    if (locale == null) return appLocalizations.defaultText;
+  String _getLocaleString(Locale locale) {
     return Intl.message(locale.toString());
   }
 
@@ -153,20 +149,21 @@ class _LocaleItem extends ConsumerWidget {
     final locale = ref.watch(
       appSettingProvider.select((state) => state.locale),
     );
-    final subTitle = locale ?? appLocalizations.defaultText;
-    final currentLocale = utils.getLocaleForString(locale);
-    return ListItem<Locale?>.options(
+    final currentLocale = utils.getLocaleForString(locale) ?? 
+      utils.getSystemLocale();
+    return ListItem<Locale>.options(
       leading: const Icon(Icons.language_outlined),
       title: Text(appLocalizations.language),
-      subtitle: Text(Intl.message(subTitle)),
+      subtitle: Text(Intl.message(currentLocale.toString())),
       delegate: OptionsDelegate(
         title: appLocalizations.language,
         options: _localeOptions,
         onChanged: (Locale? locale) {
+          if (locale == null) return;
           ref
               .read(appSettingProvider.notifier)
               .updateState(
-                (state) => state.copyWith(locale: locale?.toString()),
+                (state) => state.copyWith(locale: locale.toString()),
               );
         },
         textBuilder: (locale) => _getLocaleString(locale),

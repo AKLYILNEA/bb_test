@@ -6,6 +6,7 @@ import 'dart:ui';
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:flutter/foundation.dart';
+import 'package:bett_box/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lpinyin/lpinyin.dart';
@@ -92,6 +93,28 @@ class Utils {
     return '${getDateStringLast2(inHours)}:${getDateStringLast2(inMinutes)}:${getDateStringLast2(inSeconds)}';
   }
 
+  Locale getSystemLocale() {
+    final platformLocale = WidgetsBinding.instance.platformDispatcher.locale;
+    final supportedLocales = AppLocalizations.delegate.supportedLocales;
+    
+    if (platformLocale.languageCode.toLowerCase() == 'zh') {
+      final isTraditional = 
+        (platformLocale.countryCode?.toUpperCase() == 'TW') ||
+        (platformLocale.countryCode?.toUpperCase() == 'HK') ||
+        (platformLocale.countryCode?.toUpperCase() == 'MO') ||
+        (platformLocale.scriptCode?.toLowerCase() == 'hant');
+      return isTraditional ? const Locale('zh', 'TC') : const Locale('zh', 'CN');
+    }
+    
+    for (final locale in supportedLocales) {
+      if (locale.languageCode == platformLocale.languageCode) {
+        return locale;
+      }
+    }
+    
+    return const Locale('zh', 'CN');
+  }
+
   Locale? getLocaleForString(String? localString) {
     if (localString == null) return null;
     var localSplit = localString.split('_');
@@ -147,16 +170,12 @@ class Utils {
     required Brightness brightness,
     bool isStart = false,
   }) {
-    // Linux 忽略此功能，使用默认图标
     if (system.isLinux) {
       return 'assets/images/icon.png';
     }
 
     final suffix = system.isWindows ? 'ico' : 'png';
 
-    // macOS 和 Windows 根据系统主题和启动状态切换图标
-    // 深色模式：未启动显示默认图标，启动后显示白色图标
-    // 亮色模式：未启动显示浅色图标，启动后显示黑色图标
     return switch (brightness) {
       Brightness.dark =>
         !isStart
@@ -337,51 +356,6 @@ class Utils {
     return SingleActivator(trigger, control: control, meta: !control);
   }
 
-  // dynamic convertYamlNode(dynamic node) {
-  //   if (node is YamlMap) {
-  //     final map = <String, dynamic>{};
-  //     YamlNode? mergeKeyNode;
-  //     for (final entry in node.nodes.entries) {
-  //       if (entry.key is YamlScalar &&
-  //           (entry.key as YamlScalar).value == '<<') {
-  //         mergeKeyNode = entry.value;
-  //         break;
-  //       }
-  //     }
-  //     if (mergeKeyNode != null) {
-  //       final mergeValue = mergeKeyNode.value;
-  //       if (mergeValue is YamlMap) {
-  //         map.addAll(convertYamlNode(mergeValue) as Map<String, dynamic>);
-  //       } else if (mergeValue is YamlList) {
-  //         for (final node in mergeValue.nodes) {
-  //           if (node.value is YamlMap) {
-  //             map.addAll(convertYamlNode(node.value) as Map<String, dynamic>);
-  //           }
-  //         }
-  //       }
-  //     }
-  //
-  //     node.nodes.forEach((key, value) {
-  //       String stringKey;
-  //       if (key is YamlScalar) {
-  //         stringKey = key.value.toString();
-  //       } else {
-  //         stringKey = key.toString();
-  //       }
-  //       map[stringKey] = convertYamlNode(value.value);
-  //     });
-  //     return map;
-  //   } else if (node is YamlList) {
-  //     final list = <dynamic>[];
-  //     for (final item in node.nodes) {
-  //       list.add(convertYamlNode(item.value));
-  //     }
-  //     return list;
-  //   } else if (node is YamlScalar) {
-  //     return node.value;
-  //   }
-  //   return node;
-  // }
 
   FutureOr<T> handleWatch<T>(Function function) async {
     if (kDebugMode) {
@@ -394,7 +368,6 @@ class Utils {
     return await function();
   }
 
-  /// Generate a random 8-digit secret
   String generateSecret() {
     final random = Random();
     // Generate an 8-digit number (10000000 to 99999999)

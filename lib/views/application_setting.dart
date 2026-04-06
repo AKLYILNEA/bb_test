@@ -3,7 +3,6 @@ import 'package:bett_box/providers/config.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 class CloseConnectionsItem extends ConsumerWidget {
   const CloseConnectionsItem({super.key});
@@ -295,10 +294,7 @@ class AutoCheckUpdateItem extends ConsumerWidget {
 class ApplicationSettingView extends StatelessWidget {
   const ApplicationSettingView({super.key});
 
-  String getLocaleString(Locale? locale) {
-    if (locale == null) return appLocalizations.defaultText;
-    return Intl.message(locale.toString());
-  }
+
 
   @override
   Widget build(BuildContext context) {

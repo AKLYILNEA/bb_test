@@ -105,10 +105,9 @@ class GlobalState {
     config =
         await preferences.getConfig() ?? Config(themeProps: defaultThemeProps);
     await globalState.migrateOldData(config);
-    await AppLocalizations.load(
-      utils.getLocaleForString(config.appSetting.locale) ??
-          WidgetsBinding.instance.platformDispatcher.locale,
-    );
+    final locale = utils.getLocaleForString(config.appSetting.locale) ?? 
+      utils.getSystemLocale();
+    await AppLocalizations.load(locale);
     if (system.isAndroid) {
       _isAndroidTV = await app.isAndroidTV();
     }
@@ -356,6 +355,17 @@ class GlobalState {
       config = config.copyWith(patchClashConfig: clashConfig);
       preferences.clearClashConfig();
       preferences.saveConfig(config);
+    }
+    
+    if (config.appSetting.locale == null) {
+      final systemLocale = utils.getSystemLocale();
+      config = config.copyWith(
+        appSetting: config.appSetting.copyWith(
+          locale: systemLocale.toString(),
+        ),
+      );
+      preferences.saveConfig(config);
+      this.config = config;
     }
   }
 

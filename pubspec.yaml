@@ -62,7 +62,7 @@ dependencies:
   flutter_cache_manager: ^3.4.1
   crypto: ^3.0.7
   flutter_acrylic: ^1.1.4
-  sentry_flutter: ^9.14.0
+  sentry_flutter: ^9.16.0
   google_nav_bar: ^5.0.7
   wakelock_plus: ^1.4.0
   flutter_spinkit: ^5.2.2

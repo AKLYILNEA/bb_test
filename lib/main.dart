@@ -153,29 +153,19 @@ Future<void> _service(List<String> flags) async {
     );
 
     vpn?.handleGetStartForegroundParams = () async {
-      final locale = globalState.config.appSetting.locale?.isNotEmpty == true
-          ? utils.getLocaleForString(globalState.config.appSetting.locale!)
-          : WidgetsBinding.instance.platformDispatcher.locale;
-      final normalizedLocale = locale == null
-          ? const Locale('zh', 'CN')
-          : (locale.languageCode.toLowerCase() == 'zh'
-                ? (((locale.countryCode?.toUpperCase() == 'TW') ||
-                          (locale.countryCode?.toUpperCase() == 'HK') ||
-                          (locale.countryCode?.toUpperCase() == 'MO') ||
-                          (locale.scriptCode?.toLowerCase() == 'hant'))
-                      ? const Locale('zh', 'TC')
-                      : const Locale('zh', 'CN'))
-                : locale);
+      final locale = utils.getLocaleForString(
+        globalState.config.appSetting.locale,
+      ) ?? utils.getSystemLocale();
 
       await AppLocalizations.load(const Locale('zh', 'CN'));
-      if (normalizedLocale != const Locale('zh', 'CN')) {
+      if (locale != const Locale('zh', 'CN')) {
         final localeName = Intl.canonicalizedLocale(
-          (normalizedLocale.countryCode?.isEmpty ?? true)
-              ? normalizedLocale.languageCode
-              : normalizedLocale.toString(),
+          (locale.countryCode?.isEmpty ?? true)
+              ? locale.languageCode
+              : locale.toString(),
         );
         if (await initializeMessages(localeName)) {
-          await AppLocalizations.load(normalizedLocale);
+          await AppLocalizations.load(locale);
         }
       }
 

@@ -43,10 +43,8 @@ class ThemeView extends ConsumerWidget {
     final locale = ref.watch(
       appSettingProvider.select((state) => state.locale),
     );
-    final shouldShowHarmonyFont = locale == null || 
-        locale.isEmpty || 
-        locale.startsWith('zh') || 
-        locale.startsWith('en');
+    final shouldShowHarmonyFont = locale?.startsWith('zh') == true || 
+        locale?.startsWith('en') == true;
     
     final items = [
       _ThemeModeItem(),
