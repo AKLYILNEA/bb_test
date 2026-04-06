@@ -317,8 +317,9 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             GlobalState.currentRunState == RunState.START || GlobalState.isSmartStopped
         }
         if (!shouldUpdate) return
+        
         val data = try {
-            withTimeoutOrNull(1200L) {
+            withTimeoutOrNull(2000L) {
                 flutterMethodChannel.awaitResult<String>("getStartForegroundParams")
             }
         } catch (e: Exception) {
@@ -338,7 +339,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 lastStartForegroundParams = startForegroundParams
                 true
             } else {
-                false
+                true 
             }
         }
         if (shouldNotify) {

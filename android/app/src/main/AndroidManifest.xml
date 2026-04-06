@@ -65,7 +65,6 @@
                 <data android:scheme="clashmeta" android:host="install-config" />
                 <data android:scheme="bettbox" android:host="install-config" />
             </intent-filter>
-            </intent-filter>
         </activity>
 
         <!-- Light icon alias -->

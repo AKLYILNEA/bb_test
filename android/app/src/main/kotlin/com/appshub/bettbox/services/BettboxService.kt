@@ -17,6 +17,8 @@ class BettboxService : Service(), BaseServiceInterface {
 
     private var cachedBuilder: NotificationCompat.Builder? = null
     private val binder = LocalBinder()
+    @Volatile
+    private var hasStartedForeground = false
 
     inner class LocalBinder : Binder() {
         fun getService() = this@BettboxService
@@ -25,6 +27,7 @@ class BettboxService : Service(), BaseServiceInterface {
     override suspend fun start(options: VpnOptions) = 0
 
     override fun stop() {
+        hasStartedForeground = false
         stopSelf()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             stopForeground(STOP_FOREGROUND_REMOVE)
@@ -44,14 +47,19 @@ class BettboxService : Service(), BaseServiceInterface {
         val safeTitle = title.ifBlank { "Bettbox" }
         val safeContent = content.trim()
         val builder = notificationBuilder()
+        
         val notification = if (safeContent.isBlank()) {
-            builder.setContentTitle(safeTitle).setContentText(null).build()
+            builder.setContentTitle(safeTitle)
+                .setContentText(null)
+                .setStyle(null)
+                .setTicker(safeTitle)
+                .build()
         } else {
             val separator = " ‹ "
             val combinedText = "$safeTitle$separator$safeContent"
             val spannable = SpannableString(combinedText).apply {
                 val startIndex = safeTitle.length + separator.length
-                if (startIndex < combinedText.length) {
+                if (startIndex in 1..combinedText.length) {
                     setSpan(
                         RelativeSizeSpan(0.80f),
                         startIndex,
@@ -60,9 +68,19 @@ class BettboxService : Service(), BaseServiceInterface {
                     )
                 }
             }
-            builder.setContentTitle(spannable).setContentText(null).build()
+            builder.setContentTitle(spannable)
+                .setContentText(null)
+                .setStyle(null)
+                .setTicker(combinedText)
+                .build()
         }
-        this.startForeground(notification)
+        
+        if (!hasStartedForeground) {
+            this.startForeground(notification)
+            hasStartedForeground = true
+        } else {
+            getSystemService(android.app.NotificationManager::class.java)?.notify(GlobalState.NOTIFICATION_ID, notification)
+        }
     }
 
     override fun onTrimMemory(level: Int) {
