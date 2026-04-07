@@ -25,7 +25,6 @@
 
     <application
         android:name=".BettboxApplication"
-        android:extractNativeLibs="true"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="Bettbox"

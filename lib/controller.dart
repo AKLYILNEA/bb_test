@@ -800,6 +800,9 @@ class AppController {
   Future<void> _initStatus() async {
     if (system.isAndroid) {
       await globalState.updateStartTime();
+      if (globalState.isStart && _ref.read(runTimeProvider) == null) {
+        _ref.read(runTimeProvider.notifier).value = 0;
+      }
     } else if (system.isDesktop) {
       await syncDesktopRuntimeState();
     }

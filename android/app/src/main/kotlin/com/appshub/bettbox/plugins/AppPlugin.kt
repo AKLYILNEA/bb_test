@@ -263,6 +263,7 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 task.taskInfo.taskId == activityRef?.get()?.taskId
             } else {
+                @Suppress("DEPRECATION")
                 task.taskInfo.id == activityRef?.get()?.taskId
             }
         }
