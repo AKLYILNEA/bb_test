@@ -2,6 +2,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(runner LANGUAGES CXX)
 
+set(SENTRY_BACKEND none CACHE STRING "Sentry backend" FORCE)
+
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
 set(BINARY_NAME "Bettbox")
@@ -10,9 +12,6 @@ set(BINARY_NAME "Bettbox")
 set(APPLICATION_ID "com.appshub.bettbox")
 
 add_definitions(-DFLUTTER_DISABLE_IMPELLER=1)
-
-# Disable Sentry native SDK on Linux to avoid chromium.googlesource.com access issues in CI
-set(SENTRY_BACKEND none CACHE STRING "Sentry backend" FORCE)
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
