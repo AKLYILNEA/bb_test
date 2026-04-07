@@ -263,6 +263,21 @@ func setupConfig(params *SetupParams) error {
 		}
 	}
 
+	if params.OverrideTestUrl && params.TestURL != "" {
+		if params.Config != nil && params.Config.ProxyProvider != nil {
+			for _, provider := range params.Config.ProxyProvider {
+				if healthCheck, ok := provider["health-check"].(map[string]any); ok {
+					healthCheck["url"] = params.TestURL
+				}
+			}
+		}
+		if params.Config != nil && params.Config.ProxyGroup != nil {
+			for _, group := range params.Config.ProxyGroup {
+				group["url"] = params.TestURL
+			}
+		}
+	}
+
 	var err error
 	constant.DefaultTestURL = params.TestURL
 	currentConfig, err = config.ParseRawConfig(params.Config)

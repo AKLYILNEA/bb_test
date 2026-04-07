@@ -29,6 +29,7 @@ abstract class SetupParams with _$SetupParams {
     @JsonKey(name: 'config') required Map<String, dynamic> config,
     @JsonKey(name: 'selected-map') required Map<String, String> selectedMap,
     @JsonKey(name: 'test-url') required String testUrl,
+    @JsonKey(name: 'override-test-url') @Default(true) bool overrideTestUrl,
   }) = _SetupParams;
 
   factory SetupParams.fromJson(Map<String, dynamic> json) =>

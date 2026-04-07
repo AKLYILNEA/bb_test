@@ -385,6 +385,7 @@ class GlobalState {
       config: clashConfig,
       selectedMap: config.currentProfile?.selectedMap ?? {},
       testUrl: config.appSetting.testUrl,
+      overrideTestUrl: config.overrideTestUrl,
     );
     return params;
   }

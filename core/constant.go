@@ -19,9 +19,10 @@ type InitParams struct {
 }
 
 type SetupParams struct {
-	Config      *config.RawConfig `json:"config"`
-	SelectedMap map[string]string `json:"selected-map"`
-	TestURL     string            `json:"test-url"`
+	Config          *config.RawConfig `json:"config"`
+	SelectedMap     map[string]string `json:"selected-map"`
+	TestURL         string            `json:"test-url"`
+	OverrideTestUrl bool              `json:"override-test-url"`
 }
 
 type UpdateParams struct {

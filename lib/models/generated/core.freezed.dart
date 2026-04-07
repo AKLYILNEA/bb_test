@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SetupParams {
 
-@JsonKey(name: 'config') Map<String, dynamic> get config;@JsonKey(name: 'selected-map') Map<String, String> get selectedMap;@JsonKey(name: 'test-url') String get testUrl;
+@JsonKey(name: 'config') Map<String, dynamic> get config;@JsonKey(name: 'selected-map') Map<String, String> get selectedMap;@JsonKey(name: 'test-url') String get testUrl;@JsonKey(name: 'override-test-url') bool get overrideTestUrl;
 /// Create a copy of SetupParams
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $SetupParamsCopyWith<SetupParams> get copyWith => _$SetupParamsCopyWithImpl<Setu
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SetupParams&&const DeepCollectionEquality().equals(other.config, config)&&const DeepCollectionEquality().equals(other.selectedMap, selectedMap)&&(identical(other.testUrl, testUrl) || other.testUrl == testUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SetupParams&&const DeepCollectionEquality().equals(other.config, config)&&const DeepCollectionEquality().equals(other.selectedMap, selectedMap)&&(identical(other.testUrl, testUrl) || other.testUrl == testUrl)&&(identical(other.overrideTestUrl, overrideTestUrl) || other.overrideTestUrl == overrideTestUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(config),const DeepCollectionEquality().hash(selectedMap),testUrl);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(config),const DeepCollectionEquality().hash(selectedMap),testUrl,overrideTestUrl);
 
 @override
 String toString() {
-  return 'SetupParams(config: $config, selectedMap: $selectedMap, testUrl: $testUrl)';
+  return 'SetupParams(config: $config, selectedMap: $selectedMap, testUrl: $testUrl, overrideTestUrl: $overrideTestUrl)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $SetupParamsCopyWith<$Res>  {
   factory $SetupParamsCopyWith(SetupParams value, $Res Function(SetupParams) _then) = _$SetupParamsCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'config') Map<String, dynamic> config,@JsonKey(name: 'selected-map') Map<String, String> selectedMap,@JsonKey(name: 'test-url') String testUrl
+@JsonKey(name: 'config') Map<String, dynamic> config,@JsonKey(name: 'selected-map') Map<String, String> selectedMap,@JsonKey(name: 'test-url') String testUrl,@JsonKey(name: 'override-test-url') bool overrideTestUrl
 });
 
 
@@ -65,12 +65,13 @@ class _$SetupParamsCopyWithImpl<$Res>
 
 /// Create a copy of SetupParams
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? config = null,Object? selectedMap = null,Object? testUrl = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? config = null,Object? selectedMap = null,Object? testUrl = null,Object? overrideTestUrl = null,}) {
   return _then(_self.copyWith(
 config: null == config ? _self.config : config // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>,selectedMap: null == selectedMap ? _self.selectedMap : selectedMap // ignore: cast_nullable_to_non_nullable
 as Map<String, String>,testUrl: null == testUrl ? _self.testUrl : testUrl // ignore: cast_nullable_to_non_nullable
-as String,
+as String,overrideTestUrl: null == overrideTestUrl ? _self.overrideTestUrl : overrideTestUrl // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -155,10 +156,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'config')  Map<String, dynamic> config, @JsonKey(name: 'selected-map')  Map<String, String> selectedMap, @JsonKey(name: 'test-url')  String testUrl)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'config')  Map<String, dynamic> config, @JsonKey(name: 'selected-map')  Map<String, String> selectedMap, @JsonKey(name: 'test-url')  String testUrl, @JsonKey(name: 'override-test-url')  bool overrideTestUrl)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SetupParams() when $default != null:
-return $default(_that.config,_that.selectedMap,_that.testUrl);case _:
+return $default(_that.config,_that.selectedMap,_that.testUrl,_that.overrideTestUrl);case _:
   return orElse();
 
 }
@@ -176,10 +177,10 @@ return $default(_that.config,_that.selectedMap,_that.testUrl);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'config')  Map<String, dynamic> config, @JsonKey(name: 'selected-map')  Map<String, String> selectedMap, @JsonKey(name: 'test-url')  String testUrl)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'config')  Map<String, dynamic> config, @JsonKey(name: 'selected-map')  Map<String, String> selectedMap, @JsonKey(name: 'test-url')  String testUrl, @JsonKey(name: 'override-test-url')  bool overrideTestUrl)  $default,) {final _that = this;
 switch (_that) {
 case _SetupParams():
-return $default(_that.config,_that.selectedMap,_that.testUrl);case _:
+return $default(_that.config,_that.selectedMap,_that.testUrl,_that.overrideTestUrl);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +197,10 @@ return $default(_that.config,_that.selectedMap,_that.testUrl);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'config')  Map<String, dynamic> config, @JsonKey(name: 'selected-map')  Map<String, String> selectedMap, @JsonKey(name: 'test-url')  String testUrl)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'config')  Map<String, dynamic> config, @JsonKey(name: 'selected-map')  Map<String, String> selectedMap, @JsonKey(name: 'test-url')  String testUrl, @JsonKey(name: 'override-test-url')  bool overrideTestUrl)?  $default,) {final _that = this;
 switch (_that) {
 case _SetupParams() when $default != null:
-return $default(_that.config,_that.selectedMap,_that.testUrl);case _:
+return $default(_that.config,_that.selectedMap,_that.testUrl,_that.overrideTestUrl);case _:
   return null;
 
 }
@@ -211,7 +212,7 @@ return $default(_that.config,_that.selectedMap,_that.testUrl);case _:
 @JsonSerializable()
 
 class _SetupParams implements SetupParams {
-  const _SetupParams({@JsonKey(name: 'config') required final  Map<String, dynamic> config, @JsonKey(name: 'selected-map') required final  Map<String, String> selectedMap, @JsonKey(name: 'test-url') required this.testUrl}): _config = config,_selectedMap = selectedMap;
+  const _SetupParams({@JsonKey(name: 'config') required final  Map<String, dynamic> config, @JsonKey(name: 'selected-map') required final  Map<String, String> selectedMap, @JsonKey(name: 'test-url') required this.testUrl, @JsonKey(name: 'override-test-url') this.overrideTestUrl = true}): _config = config,_selectedMap = selectedMap;
   factory _SetupParams.fromJson(Map<String, dynamic> json) => _$SetupParamsFromJson(json);
 
  final  Map<String, dynamic> _config;
@@ -229,6 +230,7 @@ class _SetupParams implements SetupParams {
 }
 
 @override@JsonKey(name: 'test-url') final  String testUrl;
+@override@JsonKey(name: 'override-test-url') final  bool overrideTestUrl;
 
 /// Create a copy of SetupParams
 /// with the given fields replaced by the non-null parameter values.
@@ -243,16 +245,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SetupParams&&const DeepCollectionEquality().equals(other._config, _config)&&const DeepCollectionEquality().equals(other._selectedMap, _selectedMap)&&(identical(other.testUrl, testUrl) || other.testUrl == testUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SetupParams&&const DeepCollectionEquality().equals(other._config, _config)&&const DeepCollectionEquality().equals(other._selectedMap, _selectedMap)&&(identical(other.testUrl, testUrl) || other.testUrl == testUrl)&&(identical(other.overrideTestUrl, overrideTestUrl) || other.overrideTestUrl == overrideTestUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_config),const DeepCollectionEquality().hash(_selectedMap),testUrl);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_config),const DeepCollectionEquality().hash(_selectedMap),testUrl,overrideTestUrl);
 
 @override
 String toString() {
-  return 'SetupParams(config: $config, selectedMap: $selectedMap, testUrl: $testUrl)';
+  return 'SetupParams(config: $config, selectedMap: $selectedMap, testUrl: $testUrl, overrideTestUrl: $overrideTestUrl)';
 }
 
 
@@ -263,7 +265,7 @@ abstract mixin class _$SetupParamsCopyWith<$Res> implements $SetupParamsCopyWith
   factory _$SetupParamsCopyWith(_SetupParams value, $Res Function(_SetupParams) _then) = __$SetupParamsCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'config') Map<String, dynamic> config,@JsonKey(name: 'selected-map') Map<String, String> selectedMap,@JsonKey(name: 'test-url') String testUrl
+@JsonKey(name: 'config') Map<String, dynamic> config,@JsonKey(name: 'selected-map') Map<String, String> selectedMap,@JsonKey(name: 'test-url') String testUrl,@JsonKey(name: 'override-test-url') bool overrideTestUrl
 });
 
 
@@ -280,12 +282,13 @@ class __$SetupParamsCopyWithImpl<$Res>
 
 /// Create a copy of SetupParams
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? config = null,Object? selectedMap = null,Object? testUrl = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? config = null,Object? selectedMap = null,Object? testUrl = null,Object? overrideTestUrl = null,}) {
   return _then(_SetupParams(
 config: null == config ? _self._config : config // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>,selectedMap: null == selectedMap ? _self._selectedMap : selectedMap // ignore: cast_nullable_to_non_nullable
 as Map<String, String>,testUrl: null == testUrl ? _self.testUrl : testUrl // ignore: cast_nullable_to_non_nullable
-as String,
+as String,overrideTestUrl: null == overrideTestUrl ? _self.overrideTestUrl : overrideTestUrl // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

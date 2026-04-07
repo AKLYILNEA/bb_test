@@ -10,6 +10,7 @@ _SetupParams _$SetupParamsFromJson(Map<String, dynamic> json) => _SetupParams(
   config: json['config'] as Map<String, dynamic>,
   selectedMap: Map<String, String>.from(json['selected-map'] as Map),
   testUrl: json['test-url'] as String,
+  overrideTestUrl: json['override-test-url'] as bool? ?? true,
 );
 
 Map<String, dynamic> _$SetupParamsToJson(_SetupParams instance) =>
@@ -17,6 +18,7 @@ Map<String, dynamic> _$SetupParamsToJson(_SetupParams instance) =>
       'config': instance.config,
       'selected-map': instance.selectedMap,
       'test-url': instance.testUrl,
+      'override-test-url': instance.overrideTestUrl,
     };
 
 _UpdateParams _$UpdateParamsFromJson(Map<String, dynamic> json) =>
