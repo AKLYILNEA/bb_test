@@ -157,7 +157,11 @@ jobs:
       - name: Patch release.md
         run: |
           version=$(echo "${{ github.ref_name }}" | sed 's/^v//')
-          sed "s|VERSION|$version|g" ./.github/release_template.md >> release.md
+          if [ "${{ env.IS_PRERELEASE }}" == "true" ]; then
+            sed "s|VERSION|$version|g" ./.github/release_template_pre.md >> release.md
+          else
+            sed "s|VERSION|$version|g" ./.github/release_template.md >> release.md
+          fi
 
       - name: Release
         if: ${{ env.SHOULD_RELEASE == 'true' }}
