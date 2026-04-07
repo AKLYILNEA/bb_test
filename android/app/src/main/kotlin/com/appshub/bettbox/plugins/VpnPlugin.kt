@@ -133,10 +133,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         val detachingChannel = MethodChannel(flutterPluginBinding.binaryMessenger, "vpn")
         detachingChannel.setMethodCallHandler(null)
 
-        val serviceMessenger = try {
-            GlobalState.serviceEngine?.dartExecutor?.binaryMessenger
-        } catch (_: Exception) { null }
-        if (serviceMessenger == flutterPluginBinding.binaryMessenger || serviceMessenger == null) {
+        if (serviceFlutterMethodChannel != null && !GlobalState.isServiceEngineRunning()) {
             serviceFlutterMethodChannel = null
         }
 

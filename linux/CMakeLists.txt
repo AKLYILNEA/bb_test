@@ -11,6 +11,9 @@ set(APPLICATION_ID "com.appshub.bettbox")
 
 add_definitions(-DFLUTTER_DISABLE_IMPELLER=1)
 
+# Disable Sentry native SDK on Linux to avoid chromium.googlesource.com access issues in CI
+set(SENTRY_BACKEND none CACHE STRING "Sentry backend" FORCE)
+
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
 cmake_policy(SET CMP0063 NEW)
