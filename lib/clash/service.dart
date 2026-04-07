@@ -63,6 +63,10 @@ class ClashService extends ClashHandlerInterface {
   reStart() async {
     if (isStarting) return;
     isStarting = true;
+    
+    await _destroySocket();
+    await Future.delayed(const Duration(milliseconds: 300));
+    
     socketCompleter = Completer();
     process?.kill();
     process = null;

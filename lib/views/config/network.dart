@@ -9,10 +9,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 Future<void> _handleNetworkConfigChange(WidgetRef ref) async {
-  // Check if VPN/TUN is running
-  final isRunning = ref.read(runTimeProvider) != null;
+  final bool isVpnOrTunEnabled;
+  if (system.isAndroid) {
+    isVpnOrTunEnabled = ref.read(vpnSettingProvider).enable;
+  } else {
+    isVpnOrTunEnabled = ref.read(patchClashConfigProvider).tun.enable;
+  }
+  
+  final isCoreRunning = ref.read(runTimeProvider) != null;
 
-  if (isRunning) {
+  if (isVpnOrTunEnabled && isCoreRunning) {
     final tipMessage = system.isAndroid 
         ? appLocalizations.vpnTip 
         : appLocalizations.restartTip;
@@ -25,7 +31,7 @@ Future<void> _handleNetworkConfigChange(WidgetRef ref) async {
       },
     );
   } else {
-    // VPN/TUN not running, just update config (takes effect on next start)
+    // VPN/TUN 未启用或核心未运行，只需更新配置（下次启动时生效）
     await globalState.appController.updateClashConfig();
   }
 }
