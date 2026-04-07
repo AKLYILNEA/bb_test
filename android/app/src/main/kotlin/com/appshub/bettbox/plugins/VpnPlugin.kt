@@ -44,6 +44,7 @@ import kotlin.concurrent.withLock
 
 data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     private lateinit var flutterMethodChannel: MethodChannel
+    private var serviceFlutterMethodChannel: MethodChannel? = null
     private var bettBoxService: BaseServiceInterface? = null
     private var options: VpnOptions? = null
 
@@ -71,6 +72,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }
 
     private var bindTimeoutJob: Job? = null
+    private val attachedMessengers = mutableSetOf<io.flutter.plugin.common.BinaryMessenger>()
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
@@ -100,13 +102,23 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         unRegisterNetworkCallback()
-        job.cancel()
-        job = SupervisorJob()
-        scope = CoroutineScope(Dispatchers.Default + job as kotlin.coroutines.CoroutineContext)
+
+        val isFirstAttach = attachedMessengers.isEmpty()
+        attachedMessengers.add(flutterPluginBinding.binaryMessenger)
+
+        if (job.isCancelled) {
+            job = SupervisorJob()
+            scope = CoroutineScope(Dispatchers.Default + job as kotlin.coroutines.CoroutineContext)
+        }
 
         scope.launch { registerNetworkCallback() }
-        flutterMethodChannel = MethodChannel(flutterPluginBinding.binaryMessenger, "vpn")
-        flutterMethodChannel.setMethodCallHandler(this)
+        val channel = MethodChannel(flutterPluginBinding.binaryMessenger, "vpn")
+        channel.setMethodCallHandler(this)
+        flutterMethodChannel = channel
+
+        if (isFirstAttach) {
+            serviceFlutterMethodChannel = channel
+        }
 
         if (GlobalState.currentRunState == RunState.START && bettBoxService == null) {
             android.util.Log.d("VpnPlugin", "VPN is running but service connection lost, rebinding...")
@@ -115,9 +127,22 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }
 
     override fun onDetachedFromEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        job.cancel()
+        attachedMessengers.remove(flutterPluginBinding.binaryMessenger)
         unRegisterNetworkCallback()
-        flutterMethodChannel.setMethodCallHandler(null)
+
+        val detachingChannel = MethodChannel(flutterPluginBinding.binaryMessenger, "vpn")
+        detachingChannel.setMethodCallHandler(null)
+
+        val serviceMessenger = try {
+            GlobalState.serviceEngine?.dartExecutor?.binaryMessenger
+        } catch (_: Exception) { null }
+        if (serviceMessenger == flutterPluginBinding.binaryMessenger || serviceMessenger == null) {
+            serviceFlutterMethodChannel = null
+        }
+
+        if (attachedMessengers.isEmpty()) {
+            job.cancel()
+        }
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
@@ -327,12 +352,13 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         }
         if (!shouldUpdate) return
         
+        val targetChannel = serviceFlutterMethodChannel ?: flutterMethodChannel
         val data = try {
             withTimeoutOrNull(2000L) {
-                flutterMethodChannel.awaitResult<String>("getStartForegroundParams")
+                targetChannel.awaitResult<String>("getStartForegroundParams")
             }
         } catch (e: Exception) {
-            android.util.Log.e("VpnPlugin", "getStartForegroundParams timeout: ${e.message}")
+            android.util.Log.e("VpnPlugin", "getStartForegroundParams failed: ${e.message}")
             null
         }
 
@@ -531,7 +557,6 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             if (!force && GlobalState.currentRunState == RunState.STOP) return
             GlobalState.updateIsStopping(true)
             GlobalState.updateRunState(RunState.STOP)
-            lastStartForegroundParams = null
             serviceRef = bettBoxService
             wasBound = isBind
             shouldForceStop = force || bettBoxService == null
