@@ -114,14 +114,14 @@ double getWidgetHeight(num lines) {
   return max(lines * 84 + (lines - 1) * 16, 0).ap;
 }
 
-const maxLength = 512;
+const maxLength = 256;
 
 final mainIsolate = 'BettboxMainIsolate';
 
 final serviceIsolate = 'BettboxServiceIsolate';
 
 const defaultPrimaryColors = [
-  0xFF000000,
+  0xFF191919,
   0xFF1976D2,
   defaultPrimaryColor,
   0xFFE91E63,
