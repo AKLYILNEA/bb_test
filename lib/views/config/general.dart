@@ -276,9 +276,9 @@ class _TestUrlDialog extends ConsumerWidget {
                 ),
                 Switch(
                   value: overrideTestUrl,
-                  onChanged: (bool value) {
-
+                  onChanged: (bool value) async {
                     ref.read(overrideTestUrlProvider.notifier).value = value;
+                    globalState.appController.applyProfileDebounce(silence: true);
                   },
                 ),
               ],
@@ -296,7 +296,7 @@ class _TestUrlDialog extends ConsumerWidget {
                       .read(appSettingProvider.notifier)
                       .updateState((state) => state.copyWith(testUrl: url));
                   if (ref.read(overrideTestUrlProvider)) {
-                    await globalState.appController.updateClashConfigDebounce();
+                    globalState.appController.applyProfileDebounce(silence: true);
                   }
                   if (context.mounted) {
                     Navigator.of(context, rootNavigator: true).pop();
@@ -370,7 +370,7 @@ class _TestUrlDialog extends ConsumerWidget {
                 if (customUrl != null) {
                   notifier.updateState((state) => state.copyWith(testUrl: customUrl));
                   if (ref.read(overrideTestUrlProvider)) {
-                    await globalState.appController.updateClashConfigDebounce();
+                    globalState.appController.applyProfileDebounce(silence: true);
                   }
                 }
               },
