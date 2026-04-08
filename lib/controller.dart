@@ -1114,6 +1114,7 @@ class AppController {
     if (mode == Mode.global) {
       updateCurrentGroupName(GroupName.GLOBAL.name);
     }
+    updateGroupsDebounce();
     addCheckIpNumDebounce();
   }
 
