@@ -33,9 +33,18 @@ Future<void> proxyDelayTest(Proxy proxy, [String? testUrl]) async {
   appController.setDelay(await clashCore.getDelay(url, state.proxyName));
 }
 
+bool _isNonTestableProxy(String proxyName) {
+  final name = proxyName.toUpperCase();
+  return name == 'REJECT' || name == 'REJECT-DROP' || name == 'PASS';
+}
+
 Future<void> delayTest(List<Proxy> proxies, [String? testUrl]) async {
   final appController = globalState.appController;
-  final proxyNames = proxies.map((proxy) => proxy.name).toSet().toList();
+  final proxyNames = proxies
+      .map((proxy) => proxy.name)
+      .where((name) => !_isNonTestableProxy(name))
+      .toSet()
+      .toList();
   final concurrencyLimit = globalState.config.proxiesStyle.concurrencyLimit;
 
   // Create lazy task

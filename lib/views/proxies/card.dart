@@ -27,7 +27,13 @@ class ProxyCard extends StatelessWidget {
 
   Measure get measure => globalState.measure;
 
+  bool get _isNonTestableProxy {
+    final name = proxy.name.toUpperCase();
+    return name == 'REJECT' || name == 'REJECT-DROP' || name == 'PASS';
+  }
+
   void _handleTestCurrentDelay() {
+    if (_isNonTestableProxy) return;
     proxyDelayTest(proxy, testUrl);
   }
 
@@ -42,6 +48,14 @@ class ProxyCard extends StatelessWidget {
           final delayAnimation = ref.watch(
             proxiesStyleSettingProvider.select((s) => s.delayAnimation),
           );
+
+          // REJECT, REJECT-DROP, PASS 节点不显示测试按钮
+          if (_isNonTestableProxy) {
+            return const SizedBox(
+              height: 0,
+              width: 0,
+            );
+          }
 
           if (delay == 0) {
             return SizedBox(
