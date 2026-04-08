@@ -185,6 +185,28 @@ class GlobalState {
     backgroundMode.value = false;
     _backgroundCleanupTimer?.cancel();
     _backgroundCleanupTimer = null;
+    _syncVpnState();
+  }
+
+  Future<void> _syncVpnState() async {
+    if (!system.isAndroid) return;
+    try {
+      final actuallyRunning = await service?.getStatus() ?? false;
+      final flutterState = appState.runTime != null;
+
+      if (actuallyRunning && !flutterState) {
+        await updateStartTime();
+        if (startTime != null) {
+          appState = appState.copyWith(runTime: 0);
+          await startUpdateTasks([appController.updateTraffic]);
+        }
+      } else if (!actuallyRunning && flutterState) {
+        appState = appState.copyWith(runTime: null);
+        startTime = null;
+      }
+    } catch (e) {
+      commonPrint.log('Sync VPN state error: $e');
+    }
   }
 
   Future<void> resumeForegroundUpdates() async {

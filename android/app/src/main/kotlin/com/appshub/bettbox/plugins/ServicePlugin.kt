@@ -34,6 +34,14 @@ class ServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         fun notifyNetworkChanged() = notify("networkChanged")
         fun notifyQuickResponse() = notify("quickResponse")
         fun notifyVpnStartFailed() = notify("vpnStartFailed")
+        fun notifyRunStateChanged(state: RunState) {
+            mainHandler.post {
+                activeChannels.forEach { ch ->
+                    runCatching { ch.invokeMethod("runStateChanged", state.name) }
+                        .onFailure { Log.e(TAG, "runStateChanged notify error: ${it.message}") }
+                }
+            }
+        }
     }
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {

@@ -96,6 +96,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 android.util.Log.w("VpnPlugin", "Service unexpectedly disconnected while running, syncing state")
                 GlobalState.updateRunState(RunState.STOP)
                 ServicePlugin.notifyVpnStartFailed()
+                ServicePlugin.notifyRunStateChanged(RunState.STOP)
             }
         }
     }

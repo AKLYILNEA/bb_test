@@ -22,6 +22,13 @@ class Service {
   factory Service() => _instance;
 
   Future<dynamic> _handleMethodCall(MethodCall call) async {
+    if (call.method == 'runStateChanged') {
+      final state = call.arguments as String?;
+      if (state == 'STOP') {
+        globalState.startTime = null;
+        globalState.appState = globalState.appState.copyWith(runTime: null);
+      }
+    }
     for (final callback in _nativeEventCallbacks) {
       await callback(call.method, call.arguments);
     }
