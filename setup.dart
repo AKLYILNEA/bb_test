@@ -220,6 +220,13 @@ class Build {
 
       final buildTags = getTags(item);
 
+      await exec(
+        ['go', 'mod', 'tidy'],
+        name: 'go mod tidy',
+        environment: env,
+        workingDirectory: _coreDir,
+      );
+
       final execLines = [
         'go',
         'build',
