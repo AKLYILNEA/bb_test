@@ -349,15 +349,23 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             GlobalState.currentRunState == RunState.START || GlobalState.isSmartStopped
         }
         if (!shouldUpdate) return
-        
-        val targetChannel = serviceFlutterMethodChannel ?: flutterMethodChannel
-        val data = try {
-            withTimeoutOrNull(2000L) {
+
+        val targetChannel = flutterMethodChannel
+        var data: String? = null
+
+        try {
+            data = withTimeoutOrNull(2000L) {
                 targetChannel.awaitResult<String>("getStartForegroundParams")
+            }
+
+            if (data == null && lastStartForegroundParams == null) {
+                delay(500)
+                data = withTimeoutOrNull(1000L) {
+                    targetChannel.awaitResult<String>("getStartForegroundParams")
+                }
             }
         } catch (e: Exception) {
             android.util.Log.e("VpnPlugin", "getStartForegroundParams failed: ${e.message}")
-            null
         }
 
         val startForegroundParams = try {
@@ -370,6 +378,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         GlobalState.runLock.withLock {
             lastStartForegroundParams = startForegroundParams
         }
+
         try {
             bettBoxService?.startForeground(
                 startForegroundParams.title,

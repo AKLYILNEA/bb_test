@@ -45,7 +45,7 @@
 > Detailed and well-structured issues will be prioritized(logs / reproduction steps)<br>
 > 书写认真、信息完整（包含必要的复现步骤和日志）的 issues 会被优先处理和对待
 
-- **Bug Report / 提交故障**: [Click Here / 点击这里](https://github.com/appshubcc/Bettbox/issues/new?template=bug_report.yml)
-- **Feature Request / 需求建议**: [Click Here / 点击这里](https://github.com/appshubcc/Bettbox/issues/new?template=feature_request.yml)
+**Bug Report / 提交故障**: [Click Here / 点击这里](https://github.com/appshubcc/Bettbox/issues/new?template=bug_report.yml)
+**Feature Request / 需求建议**: [Click Here / 点击这里](https://github.com/appshubcc/Bettbox/issues/new?template=feature_request.yml)
 
 <br>

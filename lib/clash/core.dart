@@ -92,47 +92,13 @@ class ClashCore {
     if (proxies.isEmpty) return [];
 
     return Isolate.run<List<Group>>(() {
-      final allGroupNames = proxies.entries
-          .where((entry) {
-            final proxy = entry.value as Map<String, dynamic>?;
-            return GroupTypeExtension.valueList.contains(proxy?['type']);
-          })
-          .map((entry) => entry.key as String)
-          .toList();
-
-      final hasGlobal = allGroupNames.contains(UsedProxy.GLOBAL.name);
-
-      List<String> groupNames;
-      if (hasGlobal) {
-        final sortedGroupNames = allGroupNames
-            .where((name) => name != UsedProxy.GLOBAL.name)
-            .toList()
-          ..sort();
-        final globalAll = [
-          ...sortedGroupNames,
-          ...proxies.entries
-              .where((entry) {
-                final proxy = entry.value as Map<String, dynamic>?;
-                return !GroupTypeExtension.valueList.contains(proxy?['type']);
-              })
-              .map((entry) => entry.key as String)
-              .toList()
-            ..sort(),
-        ];
-
-        final global = proxies[UsedProxy.GLOBAL.name] as Map<String, dynamic>?;
-        if (global != null) {
-          global['all'] = globalAll;
-        }
-
-        groupNames = [
-          UsedProxy.GLOBAL.name,
-          ...sortedGroupNames,
-        ];
-      } else {
-        groupNames = allGroupNames.toList();
-      }
-
+      final groupNames = [
+        UsedProxy.GLOBAL.name,
+        ...(proxies[UsedProxy.GLOBAL.name]['all'] as List).where((e) {
+          final proxy = proxies[e] as Map<String, dynamic>?;
+          return GroupTypeExtension.valueList.contains(proxy?['type']);
+        }),
+      ];
       final groupsRaw = groupNames.map((groupName) {
         final group = Map<String, dynamic>.from(proxies[groupName] as Map);
         group['all'] = ((group['all'] ?? []) as List)
