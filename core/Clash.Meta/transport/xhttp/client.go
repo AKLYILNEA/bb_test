@@ -24,19 +24,39 @@ type WrapTLSFunc func(ctx context.Context, conn net.Conn, isH2 bool) (net.Conn, 
 type TransportMaker func() http.RoundTripper
 
 type PacketUpWriter struct {
-	ctx       context.Context
-	cancel    context.CancelFunc
-	cfg       *Config
-	sessionID string
-	transport http.RoundTripper
-	writeMu   sync.Mutex
-	seq       uint64
+	ctx                context.Context
+	cancel             context.CancelFunc
+	cfg                *Config
+	scMaxEachPostBytes Range
+	sessionID          string
+	transport          http.RoundTripper
+	writeMu            sync.Mutex
+	seq                uint64
 }
 
 func (c *PacketUpWriter) Write(b []byte) (int, error) {
 	c.writeMu.Lock()
 	defer c.writeMu.Unlock()
+	scMaxEachPostBytes := c.scMaxEachPostBytes.Rand()
+	if len(b) < scMaxEachPostBytes {
+		return c.write(b)
+	}
+	var n int
+	for start := 0; start < len(b); start += scMaxEachPostBytes {
+		end := start + scMaxEachPostBytes
+		if end > len(b) {
+			end = len(b)
+		}
+		_n, err := c.write(b[start:end])
+		n += _n
+		if err != nil {
+			return n, err
+		}
+	}
+	return n, nil
+}
 
+func (c *PacketUpWriter) write(b []byte) (int, error) {
 	u := url.URL{
 		Scheme: "https",
 		Host:   c.cfg.Host,
@@ -76,7 +96,7 @@ func (c *PacketUpWriter) Close() error {
 	return nil
 }
 
-func NewTransport(dialRaw DialRawFunc, wrapTLS WrapTLSFunc) http.RoundTripper {
+func NewTransport(dialRaw DialRawFunc, wrapTLS WrapTLSFunc, alpn []string) http.RoundTripper {
 	return &http.Http2Transport{
 		DialTLSContext: func(ctx context.Context, network, addr string, _ *tls.Config) (net.Conn, error) {
 			raw, err := dialRaw(ctx)
@@ -98,6 +118,7 @@ type Client struct {
 	cancel                context.CancelFunc
 	mode                  string
 	cfg                   *Config
+	scMaxEachPostBytes    Range
 	makeTransport         TransportMaker
 	makeDownloadTransport TransportMaker
 	uploadManager         *ReuseManager
@@ -111,11 +132,16 @@ func NewClient(cfg *Config, makeTransport TransportMaker, makeDownloadTransport 
 	default:
 		return nil, fmt.Errorf("xhttp mode %s is not implemented yet", mode)
 	}
+	scMaxEachPostBytes, err := cfg.GetNormalizedScMaxEachPostBytes()
+	if err != nil {
+		return nil, err
+	}
 	ctx, cancel := context.WithCancel(context.Background())
 
 	client := &Client{
 		mode:                  mode,
 		cfg:                   cfg,
+		scMaxEachPostBytes:    scMaxEachPostBytes,
 		makeTransport:         makeTransport,
 		makeDownloadTransport: makeDownloadTransport,
 		ctx:                   ctx,
@@ -384,12 +410,13 @@ func (c *Client) DialPacketUp() (net.Conn, error) {
 
 	writerCtx, writerCancel := context.WithCancel(c.ctx)
 	writer := &PacketUpWriter{
-		ctx:       writerCtx,
-		cancel:    writerCancel,
-		cfg:       c.cfg,
-		sessionID: sessionID,
-		transport: uploadTransport,
-		seq:       0,
+		ctx:                writerCtx,
+		cancel:             writerCancel,
+		cfg:                c.cfg,
+		scMaxEachPostBytes: c.scMaxEachPostBytes,
+		sessionID:          sessionID,
+		transport:          uploadTransport,
+		seq:                0,
 	}
 	conn := &Conn{writer: writer}
 

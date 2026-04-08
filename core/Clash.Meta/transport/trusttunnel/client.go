@@ -9,9 +9,11 @@ import (
 	"net/netip"
 	"net/url"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/metacubex/mihomo/common/httputils"
+	"github.com/metacubex/mihomo/common/once"
 	C "github.com/metacubex/mihomo/constant"
 	"github.com/metacubex/mihomo/transport/vmess"
 
@@ -33,6 +35,9 @@ type ClientOptions struct {
 	QUICCongestionControl string
 	QUICCwnd              int
 	HealthCheck           bool
+	MaxConnections        int
+	MinStreams            int
+	MaxStreams            int
 }
 
 type Client struct {
@@ -45,6 +50,7 @@ type Client struct {
 	startOnce        sync.Once
 	healthCheck      bool
 	healthCheckTimer *time.Timer
+	count            atomic.Int64
 }
 
 func NewClient(ctx context.Context, options ClientOptions) (client *Client, err error) {
@@ -134,6 +140,10 @@ func (c *Client) roundTrip(request *http.Request, conn *httpConn) {
 		writer:  pipeWriter,
 		created: make(chan struct{}),
 	}
+	c.count.Add(1)
+	conn.closeFn = once.OnceFunc(func() {
+		c.count.Add(-1)
+	})
 	ctx, cancel := context.WithCancel(c.ctx) // requestCtx must alive during conn not closed
 	conn.cancelFn = cancel                   // cancel ctx when conn closed
 	go func() {
@@ -158,52 +168,37 @@ func (c *Client) roundTrip(request *http.Request, conn *httpConn) {
 	}()
 }
 
-func (c *Client) Dial(ctx context.Context, host string) (net.Conn, error) {
+func (c *Client) newConnectRequest(host, userAgent string) *http.Request {
 	request := &http.Request{
 		Method: http.MethodConnect,
 		URL: &url.URL{
 			Scheme: "https",
-			Host:   host,
+			Host:   c.server, // Use the proxy server authority so the pool keys reuse against the actual proxy endpoint.
 		},
 		Header: make(http.Header),
-		Host:   host,
+		Host:   host, // Send the actual CONNECT target as the Host header (:authority).
 	}
-	request.Header.Add("User-Agent", TCPUserAgent)
+	request.Header.Add("User-Agent", userAgent)
 	request.Header.Add("Proxy-Authorization", c.auth)
+	return request
+}
+
+func (c *Client) Dial(ctx context.Context, host string) (net.Conn, error) {
+	request := c.newConnectRequest(host, TCPUserAgent)
 	conn := &tcpConn{}
 	c.roundTrip(request, &conn.httpConn)
 	return conn, nil
 }
 
 func (c *Client) ListenPacket(ctx context.Context) (net.PacketConn, error) {
-	request := &http.Request{
-		Method: http.MethodConnect,
-		URL: &url.URL{
-			Scheme: "https",
-			Host:   UDPMagicAddress,
-		},
-		Header: make(http.Header),
-		Host:   UDPMagicAddress,
-	}
-	request.Header.Add("User-Agent", UDPUserAgent)
-	request.Header.Add("Proxy-Authorization", c.auth)
+	request := c.newConnectRequest(UDPMagicAddress, UDPUserAgent)
 	conn := &clientPacketConn{}
 	c.roundTrip(request, &conn.httpConn)
 	return conn, nil
 }
 
 func (c *Client) ListenICMP(ctx context.Context) (*IcmpConn, error) {
-	request := &http.Request{
-		Method: http.MethodConnect,
-		URL: &url.URL{
-			Scheme: "https",
-			Host:   ICMPMagicAddress,
-		},
-		Header: make(http.Header),
-		Host:   ICMPMagicAddress,
-	}
-	request.Header.Add("User-Agent", ICMPUserAgent)
-	request.Header.Add("Proxy-Authorization", c.auth)
+	request := c.newConnectRequest(ICMPMagicAddress, ICMPUserAgent)
 	conn := &IcmpConn{}
 	c.roundTrip(request, &conn.httpConn)
 	return conn, nil
@@ -224,17 +219,7 @@ func (c *Client) ResetConnections() {
 
 func (c *Client) HealthCheck(ctx context.Context) error {
 	defer c.resetHealthCheckTimer()
-	request := &http.Request{
-		Method: http.MethodConnect,
-		URL: &url.URL{
-			Scheme: "https",
-			Host:   HealthCheckMagicAddress,
-		},
-		Header: make(http.Header),
-		Host:   HealthCheckMagicAddress,
-	}
-	request.Header.Add("User-Agent", HealthCheckUserAgent)
-	request.Header.Add("Proxy-Authorization", c.auth)
+	request := c.newConnectRequest(HealthCheckMagicAddress, HealthCheckUserAgent)
 	response, err := c.roundTripper.RoundTrip(request.WithContext(ctx))
 	if err != nil {
 		return err
@@ -244,4 +229,110 @@ func (c *Client) HealthCheck(ctx context.Context) error {
 		return fmt.Errorf("unexpected status code: %d", response.StatusCode)
 	}
 	return nil
+}
+
+type PoolClient struct {
+	mutex          sync.Mutex
+	maxConnections int
+	minStreams     int
+	maxStreams     int
+	ctx            context.Context
+	options        ClientOptions
+	clients        []*Client
+}
+
+func NewPoolClient(ctx context.Context, options ClientOptions) (*PoolClient, error) {
+	maxConnections := options.MaxConnections
+	minStreams := options.MinStreams
+	maxStreams := options.MaxStreams
+	if maxConnections == 0 && minStreams == 0 && maxStreams == 0 {
+		maxConnections = 8
+		minStreams = 5
+	}
+	client, err := NewClient(ctx, options) // reserve one client and verify the configuration
+	if err != nil {
+		return nil, err
+	}
+	return &PoolClient{
+		maxConnections: maxConnections,
+		minStreams:     minStreams,
+		maxStreams:     maxStreams,
+		ctx:            ctx,
+		options:        options,
+		clients:        []*Client{client},
+	}, nil
+}
+
+func (c *PoolClient) Dial(ctx context.Context, host string) (net.Conn, error) {
+	transport, err := c.getClient()
+	if err != nil {
+		return nil, err
+	}
+	return transport.Dial(ctx, host)
+}
+
+func (c *PoolClient) ListenPacket(ctx context.Context) (net.PacketConn, error) {
+	transport, err := c.getClient()
+	if err != nil {
+		return nil, err
+	}
+	return transport.ListenPacket(ctx)
+}
+
+func (c *PoolClient) ListenICMP(ctx context.Context) (*IcmpConn, error) {
+	transport, err := c.getClient()
+	if err != nil {
+		return nil, err
+	}
+	return transport.ListenICMP(ctx)
+}
+
+func (c *PoolClient) Close() error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	var errs []error
+	for _, t := range c.clients {
+		if err := t.Close(); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	c.clients = nil
+	return errors.Join(errs...)
+}
+
+func (c *PoolClient) getClient() (*Client, error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	var transport *Client
+	for _, t := range c.clients {
+		if transport == nil || t.count.Load() < transport.count.Load() {
+			transport = t
+		}
+	}
+	if transport == nil {
+		return c.newTransportLocked()
+	}
+	numStreams := int(transport.count.Load())
+	if numStreams == 0 {
+		return transport, nil
+	}
+	if c.maxConnections > 0 {
+		if len(c.clients) >= c.maxConnections || numStreams < c.minStreams {
+			return transport, nil
+		}
+	} else {
+		if c.maxStreams > 0 && numStreams < c.maxStreams {
+			return transport, nil
+		}
+	}
+	return c.newTransportLocked()
+}
+
+func (c *PoolClient) newTransportLocked() (*Client, error) {
+	transport, err := NewClient(c.ctx, c.options)
+	if err != nil {
+		return nil, err
+	}
+	c.clients = append(c.clients, transport)
+	return transport, nil
 }
