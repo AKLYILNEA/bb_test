@@ -66,18 +66,8 @@ GroupsState currentGroupsState(Ref ref) {
 @riverpod
 NavigationItemsState navigationItemsState(Ref ref) {
   final openLogs = ref.watch(appSettingProvider).openLogs;
-  final hasProfiles = ref.watch(
-    profilesProvider.select((state) => state.isNotEmpty),
-  );
-  final hasProxies = ref.watch(
-    currentGroupsStateProvider.select((state) => state.value.isNotEmpty),
-  );
-  final isInit = ref.watch(initProvider);
   return NavigationItemsState(
-    value: navigation.getItems(
-      openLogs: openLogs,
-      hasProxies: !isInit ? hasProfiles : hasProxies,
-    ),
+    value: navigation.getItems(openLogs: openLogs, hasProxies: true),
   );
 }
 
@@ -432,12 +422,12 @@ bool isCurrentPage(
 String getRealTestUrl(Ref ref, [String? testUrl]) {
   final overrideTestUrl = ref.watch(overrideTestUrlProvider);
   final currentTestUrl = ref.watch(appSettingProvider).testUrl;
-  
+
   // If override is enabled or testUrl is null or empty, use client setting
   if (overrideTestUrl || testUrl == null || testUrl.isEmpty) {
     return currentTestUrl;
   }
-  
+
   // Otherwise use the provided testUrl from config file
   return testUrl;
 }

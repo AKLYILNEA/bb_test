@@ -161,15 +161,21 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
     final proxiesType = ref.watch(
       proxiesStyleSettingProvider.select((state) => state.type),
     );
+    final hasGroups = ref.watch(
+      groupsProvider.select((state) => state.isNotEmpty),
+    );
     ref.watch(appSettingProvider.select((state) => state.locale));
     return CommonScaffold(
       floatingActionButton: _buildFAB(),
       actions: _buildActions(),
       title: appLocalizations.proxies,
       searchState: AppBarSearchState(onSearch: _onSearch),
-      body: switch (proxiesType) {
-        ProxiesType.tab => ProxiesTabView(key: _proxiesTabKey),
-        ProxiesType.list => const ProxiesListView(),
+      body: switch (hasGroups) {
+        false => NullStatus(label: appLocalizations.noProxy),
+        true => switch (proxiesType) {
+          ProxiesType.tab => ProxiesTabView(key: _proxiesTabKey),
+          ProxiesType.list => const ProxiesListView(),
+        },
       },
     );
   }
