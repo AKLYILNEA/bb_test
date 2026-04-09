@@ -17,6 +17,8 @@ WizardStyle=modern
 PrivilegesRequired={{PRIVILEGES_REQUIRED}}
 ArchitecturesAllowed={{ARCH}}
 ArchitecturesInstallIn64BitMode={{ARCH}}
+CloseApplications=yes
+CloseApplicationsFilter={{EXECUTABLE_NAME}},BettboxCore.exe,BettboxHelperService.exe
 
 [Code]
 var
@@ -30,50 +32,34 @@ begin
   Result := (ResultCode = 0);
 end;
 
-procedure KillProcesses;
+procedure ForceKillProcesses;
 var
   ResultCode: Integer;
-  WaitCount: Integer;
-  GracefulProcesses: TArrayOfString;
-  ForceProcesses: TArrayOfString;
+  Processes: TArrayOfString;
   i: Integer;
-  AllExited: Boolean;
+  WaitCount: Integer;
 begin
-  GracefulProcesses := ['Bettbox.exe'];
-  ForceProcesses := ['BettboxCore.exe', 'BettboxHelperService.exe'];
-
-  for i := 0 to GetArrayLength(GracefulProcesses)-1 do
+  if IsProcessRunning('BettboxHelperService.exe') then
   begin
-    if IsProcessRunning(GracefulProcesses[i]) then
-      Exec('taskkill', '/im ' + GracefulProcesses[i], '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
-  end;
+    Exec('sc', 'stop BettboxHelperService', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
 
-  WaitCount := 0;
-  while WaitCount < 5 do
-  begin
-    AllExited := True;
-    for i := 0 to GetArrayLength(GracefulProcesses)-1 do
+    WaitCount := 0;
+    while (WaitCount < 5) and IsProcessRunning('BettboxHelperService.exe') do
     begin
-      if IsProcessRunning(GracefulProcesses[i]) then
-      begin
-        AllExited := False;
-        Break;
-      end;
+      Sleep(400);
+      WaitCount := WaitCount + 1;
     end;
-    if AllExited then
-      Break;
-    Sleep(200);
-    WaitCount := WaitCount + 1;
+
+    if IsProcessRunning('BettboxHelperService.exe') then
+      Exec('taskkill', '/f /im BettboxHelperService.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   end;
 
-  for i := 0 to GetArrayLength(GracefulProcesses)-1 do
-  begin
-    Exec('taskkill', '/f /im ' + GracefulProcesses[i], '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
-  end;
+  Processes := ['Bettbox.exe', 'BettboxCore.exe'];
 
-  for i := 0 to GetArrayLength(ForceProcesses)-1 do
+  for i := 0 to GetArrayLength(Processes)-1 do
   begin
-    Exec('taskkill', '/f /im ' + ForceProcesses[i], '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    if IsProcessRunning(Processes[i]) then
+      Exec('taskkill', '/f /im ' + Processes[i], '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   end;
 end;
 
@@ -87,10 +73,8 @@ begin
     '$ErrorActionPreference = ''SilentlyContinue'';' + #13#10 +
     'Write-Host "Cleaning old Wintun/Bettbox/LiClash network adapters...";' + #13#10 +
     '$adapters = Get-NetAdapter | Where-Object {' + #13#10 +
-    '  $_.InterfaceDescription -like "*Bettbox*" -or' + #13#10 +
-    '  $_.Name -like "*Bettbox*" -or' + #13#10 +
-    '  $_.InterfaceDescription -like "*LiClash*" -or' + #13#10 +
-    '  $_.Name -like "*LiClash*"' + #13#10 +
+    '$_.InterfaceDescription -like "*Bettbox*" -or' + #13#10 +
+    '  $_.Name -like "*Bettbox*"' + #13#10 +
     '};' + #13#10 +
     'if ($adapters) {' + #13#10 +
     '  foreach ($adapter in $adapters) {' + #13#10 +
@@ -153,7 +137,7 @@ var
   TaskNames: TArrayOfString;
   i: Integer;
 begin
-  TaskNames := ['Bettbox', 'LiClash'];
+  TaskNames := ['Bettbox'];
   
   for i := 0 to GetArrayLength(TaskNames)-1 do
   begin
@@ -166,11 +150,9 @@ var
   RegistryKeys: TArrayOfString;
   i: Integer;
 begin
-  SetArrayLength(RegistryKeys, 4);
+  SetArrayLength(RegistryKeys, 2);
   RegistryKeys[0] := 'Software\com.appshub.bettbox';
-  RegistryKeys[1] := 'Software\com.appshub.liclash';
-  RegistryKeys[2] := 'Software\com.appshub\Bettbox';
-  RegistryKeys[3] := 'Software\com.appshub\LiClash';
+  RegistryKeys[1] := 'Software\com.appshub\Bettbox';
   
   for i := 0 to GetArrayLength(RegistryKeys)-1 do
   begin
@@ -186,11 +168,9 @@ var
 begin
   AppDataPath := ExpandConstant('{userappdata}');
   
-  SetArrayLength(UserDataPaths, 4);
+  SetArrayLength(UserDataPaths, 2);
   UserDataPaths[0] := AppDataPath + '\com.appshub.bettbox';
-  UserDataPaths[1] := AppDataPath + '\com.appshub.liclash';
-  UserDataPaths[2] := AppDataPath + '\com.appshub\Bettbox';
-  UserDataPaths[3] := AppDataPath + '\com.appshub\LiClash';
+  UserDataPaths[1] := AppDataPath + '\com.appshub\Bettbox';
   
   for i := 0 to GetArrayLength(UserDataPaths)-1 do
   begin
@@ -208,8 +188,6 @@ end;
 
 function InitializeSetup(): Boolean;
 begin
-  KillProcesses;
-  CleanWintunDevices;
   Result := True;
 end;
 
@@ -232,6 +210,12 @@ end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
+  if CurStep = ssInstall then
+  begin
+    { Let Inno Setup try CloseApplications first; force-kill any leftovers before files are copied. }
+    ForceKillProcesses;
+  end;
+
   if CurStep = ssPostInstall then
   begin
     RegisterHelperService;
@@ -242,7 +226,7 @@ procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
   if CurUninstallStep = usUninstall then
   begin
-    KillProcesses;
+    ForceKillProcesses;
     CleanWintunDevices;
   end;
   
