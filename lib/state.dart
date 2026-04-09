@@ -434,6 +434,8 @@ class GlobalState {
     final profileId = profile.id;
     final configMap = await getProfileConfig(profileId);
     final rawConfig = await handleEvaluate(configMap);
+    final originalProxyGroups = rawConfig['proxy-groups'];
+
     final realPatchConfig = patchConfig.copyWith(
       tun: patchConfig.tun.getRealTun(
         config.networkProps.routeMode,
@@ -716,6 +718,10 @@ class GlobalState {
     if (config.vpnProps.fcmOptimization) {
       final fcmRules = ['DOMAIN,mtalk.google.com,DIRECT'];
       rules = [...fcmRules, ...rules];
+    }
+
+    if (rawConfig['proxy-groups'] == null && originalProxyGroups != null) {
+      rawConfig['proxy-groups'] = originalProxyGroups;
     }
 
     rawConfig['rule'] = rules;
