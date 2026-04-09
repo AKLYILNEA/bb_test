@@ -31,8 +31,7 @@ Future<void> _handleNetworkConfigChange(WidgetRef ref) async {
       },
     );
   } else {
-    // VPN/TUN 未启用或核心未运行，只需更新配置（下次启动时生效）
-    await globalState.appController.updateClashConfig();
+    globalState.appController.applyProfileDebounce(silence: true);
   }
 }
 
