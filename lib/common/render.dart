@@ -18,7 +18,7 @@ class Render {
 
   void active() {
     resume();
-    if (!system.isLinux) {
+    if (system.isWindows) {
       pauseDelayed();
     }
   }
@@ -28,6 +28,7 @@ class Render {
     _pause();
   }
   void pauseDelayed({Duration duration = const Duration(seconds: 5)}) {
+    if (!system.isWindows) return;
     throttler.call(
       FunctionTag.renderPause,
       _pause,
@@ -41,6 +42,7 @@ class Render {
   }
 
   void _pause() async {
+    if (!system.isWindows) return;
     if (_isPaused) return;
     _isPaused = true;
     _beginFrame = _dispatcher.onBeginFrame;
