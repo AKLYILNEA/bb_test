@@ -117,38 +117,6 @@ Future<void> _runApp(int version) async {
   }
   await android?.init();
   
-  vpn?.handleGetStartForegroundParams = () async {
-    final locale = utils.getLocaleForString(
-      globalState.config.appSetting.locale,
-    ) ?? utils.getSystemLocale();
-
-    await AppLocalizations.load(const Locale('zh', 'CN'));
-    if (locale != const Locale('zh', 'CN')) {
-      final localeName = Intl.canonicalizedLocale(
-        (locale.countryCode?.isEmpty ?? true)
-            ? locale.languageCode
-            : locale.toString(),
-      );
-      if (await initializeMessages(localeName)) {
-        await AppLocalizations.load(locale);
-      }
-    }
-
-    final isSmartStopped = await vpn?.isSmartStopped() ?? false;
-
-    if (isSmartStopped) {
-      return json.encode({
-        'title': appLocalizations.coreSuspended,
-        'content': appLocalizations.smartAutoStopServiceRunning,
-      });
-    }
-
-    return json.encode({
-      'title': appLocalizations.coreConnected,
-      'content': appLocalizations.serviceRunning,
-    });
-  };
-  
   await window?.init(version);
   HttpOverrides.global = BettboxHttpOverrides();
   runApp(ProviderScope(child: const Application()));

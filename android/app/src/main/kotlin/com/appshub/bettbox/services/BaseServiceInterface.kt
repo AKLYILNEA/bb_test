@@ -23,7 +23,7 @@ import android.content.Intent
 interface BaseServiceInterface {
     suspend fun start(options: VpnOptions): Int
     fun stop()
-    suspend fun startForeground(title: String, content: String)
+    suspend fun startForeground()
 }
 
 fun Service.createBettboxNotificationBuilder(): Deferred<NotificationCompat.Builder> =

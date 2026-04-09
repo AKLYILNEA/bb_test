@@ -1,8 +1,6 @@
 package com.appshub.bettbox
 
-import android.os.Looper
 import android.os.SystemClock
-import androidx.lifecycle.MutableLiveData
 import com.appshub.bettbox.plugins.AppPlugin
 import com.appshub.bettbox.plugins.ServicePlugin
 import com.appshub.bettbox.plugins.TilePlugin
@@ -17,6 +15,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.locks.ReentrantLock
@@ -46,7 +46,8 @@ object GlobalState {
     var currentRunState: RunState = RunState.STOP
         private set
 
-    val runState = MutableLiveData(RunState.STOP)
+    private val _runState = MutableStateFlow(RunState.STOP)
+    val runState = _runState.asStateFlow()
 
     private var pendingTimeoutJob: Job? = null
 
@@ -65,17 +66,7 @@ object GlobalState {
             pendingTimeoutJob = null
         }
         currentRunState = newState
-        runState.postValueSafe(newState)
-    }
-
-    private fun MutableLiveData<RunState>.postValueSafe(value: RunState) = try {
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            this.value = value
-        } else {
-            postValue(value)
-        }
-    } catch (_: Exception) {
-        postValue(value)
+        _runState.value = newState
     }
 
     private fun startPendingTimeout() {

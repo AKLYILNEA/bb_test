@@ -350,40 +350,8 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         }
         if (!shouldUpdate) return
 
-        val targetChannel = flutterMethodChannel
-        var data: String? = null
-
         try {
-            data = withTimeoutOrNull(2000L) {
-                targetChannel.awaitResult<String>("getStartForegroundParams")
-            }
-
-            if (data == null && lastStartForegroundParams == null) {
-                delay(500)
-                data = withTimeoutOrNull(1000L) {
-                    targetChannel.awaitResult<String>("getStartForegroundParams")
-                }
-            }
-        } catch (e: Exception) {
-            android.util.Log.e("VpnPlugin", "getStartForegroundParams failed: ${e.message}")
-        }
-
-        val startForegroundParams = try {
-            data?.let { Gson().fromJson(it, StartForegroundParams::class.java) }
-        } catch (e: Exception) {
-            android.util.Log.e("VpnPlugin", "Failed to parse StartForegroundParams: ${e.message}")
-            null
-        } ?: lastStartForegroundParams ?: StartForegroundParams(title = "", content = "")
-
-        GlobalState.runLock.withLock {
-            lastStartForegroundParams = startForegroundParams
-        }
-
-        try {
-            bettBoxService?.startForeground(
-                startForegroundParams.title,
-                startForegroundParams.content,
-            )
+            bettBoxService?.startForeground()
         } catch (e: Exception) {
             android.util.Log.e("VpnPlugin", "startForeground error: ${e.message}")
         }
@@ -392,11 +360,9 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     fun updateNotificationIcon() {
         scope.launch {
             runCatching {
-                lastStartForegroundParams?.let { params ->
-                    (bettBoxService as? BettboxService)?.resetNotificationBuilder()
-                    (bettBoxService as? BettboxVpnService)?.resetNotificationBuilder()
-                    bettBoxService?.startForeground(params.title, params.content)
-                }
+                (bettBoxService as? BettboxService)?.resetNotificationBuilder()
+                (bettBoxService as? BettboxVpnService)?.resetNotificationBuilder()
+                bettBoxService?.startForeground()
             }.onFailure {
                 android.util.Log.e("VpnPlugin", "updateNotificationIcon error: ${it.message}")
             }

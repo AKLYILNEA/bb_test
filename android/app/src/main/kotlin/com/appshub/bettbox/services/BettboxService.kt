@@ -11,6 +11,7 @@ import android.text.Spanned
 import android.text.style.RelativeSizeSpan
 import androidx.core.app.NotificationCompat
 import com.appshub.bettbox.GlobalState
+import com.appshub.bettbox.R
 import com.appshub.bettbox.models.VpnOptions
 
 class BettboxService : Service(), BaseServiceInterface {
@@ -43,39 +44,39 @@ class BettboxService : Service(), BaseServiceInterface {
         cachedBuilder ?: createBettboxNotificationBuilder().await().also { cachedBuilder = it }
 
     @SuppressLint("ForegroundServiceType")
-    override suspend fun startForeground(title: String, content: String) {
+    override suspend fun startForeground() {
         ensureNotificationChannel()
-        val safeTitle = title.ifBlank { "Bettbox" }
-        val safeContent = content.trim()
-        val builder = notificationBuilder()
-        
-        val notification = if (safeContent.isBlank()) {
-            builder.setContentTitle(safeTitle)
-                .setContentText(null)
-                .setStyle(null)
-                .setTicker(safeTitle)
-                .build()
+        val title: String
+        val content: String
+        if (GlobalState.isSmartStopped) {
+            title = getString(R.string.core_suspended)
+            content = getString(R.string.smart_auto_stop_service_running)
         } else {
-            val separator = " ‹ "
-            val combinedText = "$safeTitle$separator$safeContent"
-            val spannable = SpannableString(combinedText).apply {
-                val startIndex = safeTitle.length + separator.length
-                if (startIndex in 1..combinedText.length) {
-                    setSpan(
-                        RelativeSizeSpan(0.80f),
-                        startIndex,
-                        combinedText.length,
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                    )
-                }
-            }
-            builder.setContentTitle(spannable)
-                .setContentText(null)
-                .setStyle(null)
-                .setTicker(combinedText)
-                .build()
+            title = getString(R.string.core_connected)
+            content = getString(R.string.service_running)
         }
-        
+
+        val builder = notificationBuilder()
+
+        val separator = " ‹ "
+        val combinedText = "$title$separator$content"
+        val spannable = SpannableString(combinedText).apply {
+            val startIndex = title.length + separator.length
+            if (startIndex in 1..combinedText.length) {
+                setSpan(
+                    RelativeSizeSpan(0.80f),
+                    startIndex,
+                    combinedText.length,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+        }
+        val notification = builder.setContentTitle(spannable)
+            .setContentText(null)
+            .setStyle(null)
+            .setTicker(combinedText)
+            .build()
+
         if (!hasStartedForeground) {
             this.startForeground(notification)
             hasStartedForeground = true
