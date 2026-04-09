@@ -268,7 +268,7 @@ func setupConfig(params *SetupParams) error {
 		if params.Config.ProxyProvider != nil {
 			for _, provider := range params.Config.ProxyProvider {
 				if healthCheck, ok := provider["health-check"].(map[string]any); ok {
-					delete(healthCheck, "url")
+					healthCheck["url"] = params.TestURL
 				}
 			}
 		}
