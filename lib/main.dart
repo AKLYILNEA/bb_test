@@ -1,5 +1,3 @@
-import 'dart:async';
-import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 import 'dart:isolate';
@@ -12,15 +10,12 @@ import 'package:bett_box/state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
-import 'package:intl/intl.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'application.dart';
 import 'clash/core.dart';
 import 'clash/lib.dart';
 import 'common/common.dart';
-import 'l10n/l10n.dart';
-import 'l10n/intl/messages_all.dart' show initializeMessages;
 import 'models/models.dart';
 
 const String _sentryDsn = String.fromEnvironment('SENTRY_DSN');
@@ -127,6 +122,7 @@ Future<void> _service(List<String> flags) async {
   globalState.isService = true;
   WidgetsFlutterBinding.ensureInitialized();
   await globalState.init();
+  await clashCore.preload();
 
   await _initSentryAndRun(() async {
     final quickStart = flags.contains('quick');
@@ -152,38 +148,6 @@ Future<void> _service(List<String> flags) async {
         },
       ),
     );
-
-    vpn?.handleGetStartForegroundParams = () async {
-      final locale = utils.getLocaleForString(
-        globalState.config.appSetting.locale,
-      ) ?? utils.getSystemLocale();
-
-      await AppLocalizations.load(const Locale('zh', 'CN'));
-      if (locale != const Locale('zh', 'CN')) {
-        final localeName = Intl.canonicalizedLocale(
-          (locale.countryCode?.isEmpty ?? true)
-              ? locale.languageCode
-              : locale.toString(),
-        );
-        if (await initializeMessages(localeName)) {
-          await AppLocalizations.load(locale);
-        }
-      }
-
-      final isSmartStopped = await vpn?.isSmartStopped() ?? false;
-
-      if (isSmartStopped) {
-        return json.encode({
-          'title': appLocalizations.coreSuspended,
-          'content': appLocalizations.smartAutoStopServiceRunning,
-        });
-      }
-
-      return json.encode({
-        'title': appLocalizations.coreConnected,
-        'content': appLocalizations.serviceRunning,
-      });
-    };
 
     vpn?.addListener(
       _VpnListenerWithService(
