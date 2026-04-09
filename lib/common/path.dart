@@ -67,6 +67,11 @@ class AppPath {
     return join(directory.path, 'shared_preferences.json');
   }
 
+  Future<String> get helperAuthKeyPath async {
+    final directory = await dataDir.future;
+    return join(directory.path, 'helper_auth.key');
+  }
+
   Future<String> get profilesPath async {
     final directory = await dataDir.future;
     return join(directory.path, profilesDirectoryName);

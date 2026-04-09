@@ -200,7 +200,7 @@ class Windows {
   }
 
   Future<bool> registerService() async {
-    HelperAuthManager.generateAuthKey();
+    final createdNewKey = await HelperAuthManager.ensureAuthKey();
     final authKey = HelperAuthManager.getAuthKey();
 
     final quickCheck = await Process.run('sc', ['query', appHelperService]);
@@ -208,14 +208,18 @@ class Windows {
         quickCheck.stdout.toString().contains('RUNNING')) {
       final isReachable = await request.quickPingHelper();
       if (isReachable) {
-        if (authKey != null) await _restartServiceWithAuthKey(authKey);
+        if (createdNewKey && authKey != null) {
+          await _restartServiceWithAuthKey(authKey);
+        }
         return true;
       }
     }
 
     final status = await checkService();
     if (status == WindowsHelperServiceStatus.running) {
-      if (authKey != null) await _restartServiceWithAuthKey(authKey);
+      if (createdNewKey && authKey != null) {
+        await _restartServiceWithAuthKey(authKey);
+      }
       return true;
     }
 

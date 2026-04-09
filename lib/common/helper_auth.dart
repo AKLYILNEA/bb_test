@@ -1,40 +1,47 @@
 import 'dart:convert';
+import 'dart:ffi';
+import 'dart:io';
 import 'dart:math';
-import 'package:crypto/crypto.dart';
+import 'dart:typed_data';
 
-/// Windows Helper 服务认证管理器
-///
-/// 负责生成和管理 HMAC-SHA256 认证密钥，用于保护 Helper 服务的 API 调用
+import 'package:crypto/crypto.dart';
+import 'package:ffi/ffi.dart';
+import 'package:win32/win32.dart';
+
+import 'path.dart';
+
+const _cryptProtectUiForbidden = 0x1;
+
 class HelperAuthManager {
   static String? _authKey;
 
-  /// 生成随机认证密钥（应用启动时调用一次）
-  ///
-  /// 生成 32 字节的随机密钥，用于 HMAC-SHA256 签名
-  static void generateAuthKey() {
-    final random = Random.secure();
-    final bytes = List<int>.generate(32, (_) => random.nextInt(256));
-    _authKey = bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
-  }
-
-  /// 获取认证密钥（用于传递给 Helper 服务）
   static String? getAuthKey() => _authKey;
 
-  /// 生成请求签名
-  ///
-  /// 返回包含时间戳和签名的 HTTP 头
-  ///
-  /// [body] 请求体内容（用于签名）
+  static Future<bool> ensureAuthKey() async {
+    if (_authKey != null) {
+      return false;
+    }
+
+    final file = File(await appPath.helperAuthKeyPath);
+    final existingKey = await _readPersistedAuthKey(file);
+    if (existingKey != null) {
+      _authKey = existingKey;
+      return false;
+    }
+
+    _authKey = _generateRandomKey();
+    await _persistAuthKey(file, _authKey!);
+    return true;
+  }
+
   static Map<String, String> generateAuthHeaders(String body) {
     if (_authKey == null) {
-      // 如果没有密钥，返回空头（向后兼容）
       return {};
     }
 
     final timestamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     final message = '$timestamp:$body';
 
-    // 计算 HMAC-SHA256
     final keyBytes = _hexToBytes(_authKey!);
     final messageBytes = utf8.encode(message);
     final hmacSha256 = Hmac(sha256, keyBytes);
@@ -44,7 +51,55 @@ class HelperAuthManager {
     return {'X-Timestamp': timestamp.toString(), 'X-Signature': signature};
   }
 
-  /// 将十六进制字符串转换为字节数组
+  static Future<void> clearAuthKey() async {
+    _authKey = null;
+    final file = File(await appPath.helperAuthKeyPath);
+    if (await file.exists()) {
+      await file.delete();
+    }
+  }
+
+  static String _generateRandomKey() {
+    final random = Random.secure();
+    final bytes = List<int>.generate(32, (_) => random.nextInt(256));
+    return bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+  }
+
+  static Future<String?> _readPersistedAuthKey(File file) async {
+    if (!await file.exists()) {
+      return null;
+    }
+
+    try {
+      final encoded = await file.readAsString();
+      if (encoded.isEmpty) {
+        return null;
+      }
+      final encrypted = base64Decode(encoded);
+      final decrypted = Platform.isWindows
+          ? _unprotectForCurrentUser(Uint8List.fromList(encrypted))
+          : Uint8List.fromList(encrypted);
+      final key = utf8.decode(decrypted);
+      if (!_isValidHexKey(key)) {
+        return null;
+      }
+      return key;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<void> _persistAuthKey(File file, String key) async {
+    final raw = Uint8List.fromList(utf8.encode(key));
+    final encrypted = Platform.isWindows ? _protectForCurrentUser(raw) : raw;
+    await file.parent.create(recursive: true);
+    await file.writeAsString(base64Encode(encrypted), flush: true);
+  }
+
+  static bool _isValidHexKey(String value) {
+    return RegExp(r'^[0-9a-f]{64}$').hasMatch(value);
+  }
+
   static List<int> _hexToBytes(String hex) {
     final result = <int>[];
     for (var i = 0; i < hex.length; i += 2) {
@@ -53,8 +108,75 @@ class HelperAuthManager {
     return result;
   }
 
-  /// 清除认证密钥
-  static void clearAuthKey() {
-    _authKey = null;
+  static Uint8List _protectForCurrentUser(Uint8List input) {
+    final dataIn = calloc<CRYPT_INTEGER_BLOB>();
+    final dataOut = calloc<CRYPT_INTEGER_BLOB>();
+    final inputBuffer = calloc<Uint8>(input.length);
+
+    try {
+      inputBuffer.asTypedList(input.length).setAll(0, input);
+      dataIn.ref.cbData = input.length;
+      dataIn.ref.pbData = inputBuffer;
+
+      final result = CryptProtectData(
+        dataIn,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        _cryptProtectUiForbidden,
+        dataOut,
+      );
+      if (result == 0) {
+        throw WindowsException(HRESULT_FROM_WIN32(GetLastError()));
+      }
+
+      return Uint8List.fromList(
+        dataOut.ref.pbData.asTypedList(dataOut.ref.cbData),
+      );
+    } finally {
+      if (dataOut.ref.pbData != nullptr) {
+        LocalFree(dataOut.ref.pbData);
+      }
+      calloc.free(inputBuffer);
+      calloc.free(dataIn);
+      calloc.free(dataOut);
+    }
+  }
+
+  static Uint8List _unprotectForCurrentUser(Uint8List input) {
+    final dataIn = calloc<CRYPT_INTEGER_BLOB>();
+    final dataOut = calloc<CRYPT_INTEGER_BLOB>();
+    final inputBuffer = calloc<Uint8>(input.length);
+
+    try {
+      inputBuffer.asTypedList(input.length).setAll(0, input);
+      dataIn.ref.cbData = input.length;
+      dataIn.ref.pbData = inputBuffer;
+
+      final result = CryptUnprotectData(
+        dataIn,
+        nullptr,
+        nullptr,
+        nullptr,
+        nullptr,
+        _cryptProtectUiForbidden,
+        dataOut,
+      );
+      if (result == 0) {
+        throw WindowsException(HRESULT_FROM_WIN32(GetLastError()));
+      }
+
+      return Uint8List.fromList(
+        dataOut.ref.pbData.asTypedList(dataOut.ref.cbData),
+      );
+    } finally {
+      if (dataOut.ref.pbData != nullptr) {
+        LocalFree(dataOut.ref.pbData);
+      }
+      calloc.free(inputBuffer);
+      calloc.free(dataIn);
+      calloc.free(dataOut);
+    }
   }
 }
