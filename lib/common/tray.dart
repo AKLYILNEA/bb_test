@@ -29,7 +29,7 @@ class Tray {
             WidgetsBinding.instance.platformDispatcher.platformBrightness,
         isStart: isStart,
       ),
-      isTemplate: true,
+      isTemplate: system.isMacOS,
     );
     if (!Platform.isLinux) {
       await trayManager.setToolTip(appName);

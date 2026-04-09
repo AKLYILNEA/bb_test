@@ -170,6 +170,10 @@ class Utils {
     required Brightness brightness,
     bool isStart = false,
   }) {
+    if (system.isMacOS) {
+      return 'assets/images/icon_template.png';
+    }
+
     if (system.isLinux) {
       return 'assets/images/icon.png';
     }
