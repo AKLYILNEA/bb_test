@@ -189,10 +189,18 @@ class ApplicationState extends ConsumerState<Application>
                 GlobalWidgetsLocalizations.delegate,
               ],
               builder: (_, child) {
-                return AppEnvManager(
-                  child: _buildApp(
-                    AppSidebarContainer(child: _buildPlatformApp(child!)),
-                  ),
+                return ValueListenableBuilder<bool>(
+                  valueListenable: globalState.animationEnabled,
+                  builder: (_, enabled, _) {
+                    return TickerMode(
+                      enabled: enabled,
+                      child: AppEnvManager(
+                        child: _buildApp(
+                          AppSidebarContainer(child: _buildPlatformApp(child!)),
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
               scrollBehavior: BaseScrollBehavior(),

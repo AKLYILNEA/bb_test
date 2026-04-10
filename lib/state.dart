@@ -47,6 +47,7 @@ class GlobalState {
   UpdateTasks tasks = [];
   final navigatorKey = GlobalKey<NavigatorState>();
   final backgroundMode = ValueNotifier<bool>(false);
+  final animationEnabled = ValueNotifier<bool>(true);
   AppController? _appController;
   bool? _isAndroidTV;
   int _taskLoopToken = 0;
@@ -169,6 +170,9 @@ class GlobalState {
   }
 
   Future<void> handleBackground() async {
+    if (system.isDesktop) {
+      animationEnabled.value = false;
+    }
     if (!backgroundMode.value) {
       backgroundMode.value = true;
       _scheduleBackgroundCleanup();
@@ -179,6 +183,9 @@ class GlobalState {
   }
 
   void handleForeground() {
+    if (system.isDesktop) {
+      animationEnabled.value = true;
+    }
     if (!backgroundMode.value) {
       return;
     }

@@ -83,18 +83,6 @@ class _WindowContainerState extends ConsumerState<WindowManager>
   }
 
   @override
-  void onWindowFocus() {
-    super.onWindowFocus();
-    _scheduleRenderToggle(true);
-  }
-
-  @override
-  void onWindowBlur() {
-    super.onWindowBlur();
-    _scheduleRenderToggle(false);
-  }
-
-  @override
   Future<void> onShouldTerminate() async {
     await globalState.appController.handleExit();
     super.onShouldTerminate();
