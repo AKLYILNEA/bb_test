@@ -122,7 +122,6 @@ Future<void> _service(List<String> flags) async {
   globalState.isService = true;
   WidgetsFlutterBinding.ensureInitialized();
   await globalState.init();
-  await clashCore.preload();
 
   await _initSentryAndRun(() async {
     final quickStart = flags.contains('quick');
