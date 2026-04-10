@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:bett_box/clash/clash.dart';
@@ -14,7 +13,6 @@ abstract mixin class VpnListener {
 class Vpn {
   static final Vpn _instance = Vpn._internal();
   final MethodChannel methodChannel = const MethodChannel('vpn');
-  FutureOr<String> Function()? handleGetStartForegroundParams;
 
   Vpn._internal() {
     methodChannel.setMethodCallHandler((call) async {
@@ -23,8 +21,6 @@ class Vpn {
           clashCore.requestGc();
         case 'closeConnections':
           clashCore.closeConnections();
-        case 'getStartForegroundParams':
-          return handleGetStartForegroundParams?.call() ?? '';
         case 'status':
           return clashLibHandler?.getRunTime() != null;
         case 'dnsChanged':
