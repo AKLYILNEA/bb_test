@@ -1,4 +1,4 @@
-<h1 align="center"><img src="snapshots/icon.png" width="32" style="vertical-align: middle; display: inline-block;">&nbsp;<span style="vertical-align: 1px;">Bettbox</span></h1>
+<h1 align="center">⚡ Bettbox</h1>
 <p align="center">
   <strong>Another Better Mihomo Client</strong>
 </p>
