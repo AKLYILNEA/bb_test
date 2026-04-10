@@ -1,4 +1,4 @@
-<h1 align="center"><img src="snapshots/icon.png" width="32" style="vertical-align: middle; display: inline-block;">&nbsp;<span style="vertical-align: -3px;">Bettbox</span></h1>
+<h1 align="center">⚡ Bettbox</h1>
 <p align="center">
   <strong>Another Better Mihomo Client</strong>
 </p>
@@ -43,7 +43,7 @@ Bettbox意为: Better Experience, Out of the box，卓越体验，亦可开箱�
 请前往 [Releases](https://github.com/appshubcc/Bettbox/releases) 页面下载最新适合您平台和系统的安装包
 
 * **桌面端**: Windows (x64/arm64), macOS (Intel/Apple Silicon), Linux (x64/arm64)
-* **安卓端**: Android (ARMv8/x64/Universal) 
+* **安卓端**: Android (ARMv8/ x64/ Universal) 
 * **Android TV**: 已支持,可选ARMv7 32位
 * **Windows7**: 请配合 [[VxKex]](https://github.com/i486/VxKex/releases) 使用
 * **鸿蒙NEXT**: 请配合 [[卓易通]](https://harmonyos.cool/android-app) 使用
