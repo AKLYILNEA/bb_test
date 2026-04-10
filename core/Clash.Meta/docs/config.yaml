@@ -807,8 +807,7 @@ proxies: # socks5
     udp: true
     tls: true
     network: xhttp
-    alpn:
-      - h2
+    alpn: [h2] # 默认仅支持h2，如果开启h3模式需要设置alpn: [h3]，如果开启http1.1模式需要设置alpn: [http/1.1]
     # ech-opts: ...
     # reality-opts: ...
     # skip-cert-verify: false
@@ -828,11 +827,12 @@ proxies: # socks5
       # x-padding-bytes: "100-1000"
       # sc-max-each-post-bytes: 1000000
       # reuse-settings: # aka XMUX
-      #   max-connections: "16-32"
-      #   max-concurrency: "0"
+      #   max-concurrency: "16-32"
+      #   max-connections: "0"
       #   c-max-reuse-times: "0"
       #   h-max-request-times: "600-900"
       #   h-max-reusable-secs: "1800-3000"
+      #   h-keep-alive-period: 0
       # download-settings:
       #   ## xhttp part
       #   path: "/"
@@ -843,17 +843,17 @@ proxies: # socks5
       #   x-padding-bytes: "100-1000"
       #   sc-max-each-post-bytes: 1000000
       #   reuse-settings: # aka XMUX
-      #     max-connections: "16-32"
-      #     max-concurrency: "0"
+      #     max-concurrency: "16-32"
+      #     max-connections: "0"
       #     c-max-reuse-times: "0"
       #     h-max-request-times: "600-900"
       #     h-max-reusable-secs: "1800-3000"
+      #     h-keep-alive-period: 0
       #   ## proxy part
       #   server: server
       #   port: 443
       #   tls: true
-      #   alpn:
-      #     - h2
+      #   alpn: ...
       #   ech-opts: ...
       #   reality-opts: ...
       #   skip-cert-verify: false
@@ -1079,6 +1079,23 @@ proxies: # socks5
     # remote-dns-resolve: true # 强制 dns 远程解析，默认值为 false
     # dns: [ 1.1.1.1, 8.8.8.8 ] # 仅在 remote-dns-resolve 为 true 时生效
     # congestion-controller: bbr # 默认不开启
+
+  # masque-h2
+  - name: "masque-h2"
+    type: masque
+    server: 162.159.198.2
+    port: 443
+    private-key: MHcCAQEEILI1eOtnbEIh89Fj4yNDuFR6UjayCKI3NdLl3DhetimWoAoGCCqGSM49AwEHoUQDQgAEgyXrE8v+hHsHy3ewSb3WcRjYgCrM9T9hiE0Uv6k2DZ1+4kefrDT9v1Q/8wdRigTf6t6gGNUV8W+IUMdrfUt+9g==
+    public-key: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIaU7MToJm9NKp8YfGxR6r+/h4mcG7SxI8tsW8OR1A5tv/zCzVbCRRh2t87/kxnP6lAy0lkr7qYwu+ox+k3dr6w==
+    ip: 172.16.0.2
+    ipv6: 2606:4700:110:84c0:163a:4914:a0ad:3342
+    mtu: 1280
+    udp: true
+    network: h2
+    # 一个出站代理的标识。当值不为空时，将使用指定的 proxy 发出连接
+    # dialer-proxy: "ss1"
+    # remote-dns-resolve: true # 强制 dns 远程解析，默认值为 false
+    # dns: [ 1.1.1.1, 8.8.8.8 ] # 仅在 remote-dns-resolve 为 true 时生效
 
   # tuic
   - name: tuic
