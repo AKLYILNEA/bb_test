@@ -19,6 +19,7 @@ import 'package:flutter_js/flutter_js.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' as flutter_riverpod;
 import 'package:material_color_utilities/palettes/core_palette.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:synchronized/synchronized.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'common/common.dart';
@@ -54,6 +55,7 @@ class GlobalState {
   bool _isExecutingTasks = false;
   bool _needsTaskRestart = false;
   Timer? _backgroundCleanupTimer;
+  final Lock _scriptEvaluateLock = Lock();
 
   SetupParams? _lastSuccessfulSetupParams;
 
@@ -748,37 +750,39 @@ class GlobalState {
   Future<Map<String, dynamic>> handleEvaluate(
     Map<String, dynamic> config,
   ) async {
-    final currentScript = globalState.config.scriptProps.currentScript;
-    if (currentScript == null) return config;
+    return _scriptEvaluateLock.synchronized(() async {
+      final currentScript = globalState.config.scriptProps.currentScript;
+      if (currentScript == null) return config;
 
-    config['proxy-providers'] ??= {};
-    final configJs = json.encode(config);
-    final scriptJs = json.encode(currentScript.content);
-    final runtime = getJavascriptRuntime();
+      config['proxy-providers'] ??= {};
+      final configJs = json.encode(config);
+      final scriptJs = json.encode(currentScript.content);
+      final runtime = getJavascriptRuntime();
 
-    try {
-      final res = await runtime.evaluateAsync('''
-        (() => {
-          const __bettboxConfig = $configJs;
-          const __bettboxScript = $scriptJs;
-          const __bettboxMain = new Function(
-            __bettboxScript + '\\nreturn typeof main === "function" ? main : null;',
-          )();
-          if (typeof __bettboxMain !== 'function') {
-            throw new Error('Script must define main(config)');
-          }
-          return __bettboxMain(__bettboxConfig);
-        })()
-      ''');
-      if (res.isError) throw res.stringResult;
+      try {
+        final res = await runtime.evaluateAsync('''
+          (() => {
+            const __bettboxConfig = $configJs;
+            const __bettboxScript = $scriptJs;
+            const __bettboxMain = new Function(
+              __bettboxScript + '\\nreturn typeof main === "function" ? main : null;',
+            )();
+            if (typeof __bettboxMain !== 'function') {
+              throw new Error('Script must define main(config)');
+            }
+            return __bettboxMain(__bettboxConfig);
+          })()
+        ''');
+        if (res.isError) throw res.stringResult;
 
-      return switch (res.rawResult) {
-        Pointer() => runtime.convertValue<Map<String, dynamic>>(res),
-        _ => Map<String, dynamic>.from(res.rawResult),
-      } ?? config;
-    } finally {
-      runtime.dispose();
-    }
+        return switch (res.rawResult) {
+          Pointer() => runtime.convertValue<Map<String, dynamic>>(res),
+          _ => Map<String, dynamic>.from(res.rawResult),
+        } ?? config;
+      } finally {
+        runtime.dispose();
+      }
+    });
   }
 }
 
