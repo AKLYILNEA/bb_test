@@ -265,16 +265,9 @@ func setupConfig(params *SetupParams) error {
 
 	constant.DefaultTestURL = params.TestURL
 	if params.OverrideTestUrl && params.Config != nil {
-		if params.Config.ProxyProvider != nil {
-			for _, provider := range params.Config.ProxyProvider {
-				if healthCheck, ok := provider["health-check"].(map[string]any); ok {
-					delete(healthCheck, "url")
-				}
-			}
-		}
 		if params.Config.ProxyGroup != nil {
 			for _, group := range params.Config.ProxyGroup {
-				delete(group, "url")
+				group["url"] = params.TestURL
 			}
 		}
 	}
