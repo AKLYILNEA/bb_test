@@ -92,7 +92,7 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
         -1
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int) = START_NOT_STICKY
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int) = START_STICKY
 
     override fun stop() {
         if (isStopped) return

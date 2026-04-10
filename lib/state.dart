@@ -230,7 +230,7 @@ class GlobalState {
 
   void _scheduleBackgroundCleanup() {
     _backgroundCleanupTimer?.cancel();
-    _backgroundCleanupTimer = Timer(const Duration(minutes: 3), () {
+    _backgroundCleanupTimer = Timer(const Duration(minutes: 2), () {
       _backgroundCleanupTimer = null;
       if (!backgroundMode.value) {
         return;
@@ -242,9 +242,9 @@ class GlobalState {
   void cleanupBackgroundResources() async {
     final imageCache = PaintingBinding.instance.imageCache;
     imageCache.clearLiveImages();
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 1000));
     WidgetsBinding.instance.handleMemoryPressure();
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 1000));
     await clashCore.requestGc();
   }
 
