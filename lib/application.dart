@@ -84,7 +84,7 @@ class ApplicationState extends ConsumerState<Application>
         _restoreHighRefreshRate();
       }
     } else if (state == AppLifecycleState.detached) {
-      if (!globalState.isExiting) {
+      if (!system.isAndroid && !globalState.isExiting) {
         unawaited(globalState.appController.handleExit());
       }
     }
@@ -250,7 +250,7 @@ class ApplicationState extends ConsumerState<Application>
     linkManager.destroy();
     _autoUpdateGroupTaskTimer?.cancel();
     _autoUpdateProfilesTaskTimer?.cancel();
-    if (!globalState.isExiting) {
+    if (!system.isAndroid && !globalState.isExiting) {
       unawaited(globalState.appController.handleExit());
     }
     super.dispose();
