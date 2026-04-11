@@ -33,10 +33,10 @@ jobs:
             os: ubuntu-24.04
             arch: universal
           - platform: windows
-            os: windows-2025
+            os: windows-2022
             arch: amd64
           - platform: windows
-            os: windows-2025
+            os: windows-2022
             arch: arm64
           - platform: macos
             os: macos-15
@@ -59,7 +59,7 @@ jobs:
             arch: amd64
             compatible: true
           - platform: macos
-            os: macos-15
+            os: macos-15-intel
             arch: amd64
             compatible: true
 
@@ -101,7 +101,7 @@ jobs:
       - name: Setup Golang
         uses: actions/setup-go@v6
         with:
-          go-version: ${{ matrix.compatible == true && '1.20.x' || '1.24.x' }}
+          go-version: ${{ matrix.compatible == true && '1.20.x' || '1.25.x' }}
           cache-dependency-path: core/go.sum
 
       - name: Setup Flutter
@@ -121,6 +121,7 @@ jobs:
       - name: Build Bettbox
         env:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          GOEXPERIMENT: greenteagc
         run: |
           flutter pub get
           dart run build_runner build -d
