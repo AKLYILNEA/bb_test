@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
@@ -11,6 +12,11 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import 'common.dart';
 
 class Tray {
+  Timer? _debounceTimer;
+  TrayState? _pendingState;
+  bool _isUpdating = false;
+
+  static const _debounceDelay = Duration(milliseconds: 300);
   Future _updateSystemTray({
     required Brightness? brightness,
     required bool isStart,
@@ -19,7 +25,7 @@ class Tray {
     if (system.isAndroid) {
       return;
     }
-    if (Platform.isLinux || force) {
+    if (force) {
       await trayManager.destroy();
     }
     await trayManager.setIcon(
@@ -43,13 +49,38 @@ class Tray {
     if (system.isAndroid) {
       return;
     }
-    if (!Platform.isLinux) {
-      await _updateSystemTray(
-        brightness: trayState.brightness,
-        isStart: trayState.isStart,
-        force: focus,
-      );
+
+    _debounceTimer?.cancel();
+
+    if (_isUpdating) {
+      _pendingState = trayState;
+      return;
     }
+
+    if (focus) {
+      await _doUpdate(trayState: trayState, focus: focus);
+    } else {
+      _debounceTimer = Timer(_debounceDelay, () async {
+        await _doUpdate(trayState: trayState, focus: focus);
+      });
+    }
+  }
+
+  Future<void> _doUpdate({
+    required TrayState trayState,
+    bool focus = false,
+  }) async {
+    if (_isUpdating) return;
+    _isUpdating = true;
+
+    try {
+      if (!Platform.isLinux) {
+        await _updateSystemTray(
+          brightness: trayState.brightness,
+          isStart: trayState.isStart,
+          force: focus,
+        );
+      }
     List<MenuItem> menuItems = [];
     final showMenuItem = MenuItem(
       label: appLocalizations.show,
@@ -173,6 +204,15 @@ class Tray {
         isStart: trayState.isStart,
         force: focus,
       );
+    }
+    } finally {
+      _isUpdating = false;
+
+      if (_pendingState != null) {
+        final pending = _pendingState;
+        _pendingState = null;
+        await _doUpdate(trayState: pending!, focus: false);
+      }
     }
   }
 
