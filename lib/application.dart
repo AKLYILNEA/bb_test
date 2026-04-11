@@ -59,7 +59,8 @@ class ApplicationState extends ConsumerState<Application>
 
   bool get _isForeground {
     final lifecycleState = WidgetsBinding.instance.lifecycleState;
-    return lifecycleState == null || lifecycleState == AppLifecycleState.resumed;
+    return lifecycleState == null ||
+        lifecycleState == AppLifecycleState.resumed;
   }
 
   Future<void> _initApp() async {
@@ -81,6 +82,10 @@ class ApplicationState extends ConsumerState<Application>
       if (system.isAndroid &&
           globalState.config.appSetting.enableHighRefreshRate) {
         _restoreHighRefreshRate();
+      }
+    } else if (state == AppLifecycleState.detached) {
+      if (!globalState.isExiting) {
+        unawaited(globalState.appController.handleExit());
       }
     }
   }
@@ -177,8 +182,10 @@ class ApplicationState extends ConsumerState<Application>
               appSettingProvider.select((state) => state.locale),
             );
             final themeProps = ref.watch(themeSettingProvider);
-            final fontFamily = themeProps.useHarmonyFont ? 'HarmonyOS_Sans' : null;
-            
+            final fontFamily = themeProps.useHarmonyFont
+                ? 'HarmonyOS_Sans'
+                : null;
+
             return MaterialApp(
               debugShowCheckedModeBanner: false,
               navigatorKey: globalState.navigatorKey,
@@ -205,7 +212,8 @@ class ApplicationState extends ConsumerState<Application>
               },
               scrollBehavior: BaseScrollBehavior(),
               title: appName,
-              locale: utils.getLocaleForString(locale) ?? utils.getSystemLocale(),
+              locale:
+                  utils.getLocaleForString(locale) ?? utils.getSystemLocale(),
               supportedLocales: AppLocalizations.delegate.supportedLocales,
               themeMode: themeProps.themeMode,
               theme: ThemeData(
@@ -242,9 +250,9 @@ class ApplicationState extends ConsumerState<Application>
     linkManager.destroy();
     _autoUpdateGroupTaskTimer?.cancel();
     _autoUpdateProfilesTaskTimer?.cancel();
-    unawaited(clashCore.destroy());
-    unawaited(globalState.appController.savePreferences());
-    unawaited(globalState.appController.handleExit());
+    if (!globalState.isExiting) {
+      unawaited(globalState.appController.handleExit());
+    }
     super.dispose();
   }
 }

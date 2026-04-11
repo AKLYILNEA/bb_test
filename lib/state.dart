@@ -32,6 +32,7 @@ class GlobalState {
   static GlobalState? _instance;
   Map<CacheTag, FixedMap<String, double>> computeHeightMapCache = {};
   bool isService = false;
+  bool isExiting = false;
   Timer? timer;
   Timer? groupsUpdateTimer;
   late Config config;
@@ -78,6 +79,7 @@ class GlobalState {
   }
 
   Future<void> initApp(int version) async {
+    isExiting = false;
     coreSHA256 = const String.fromEnvironment('CORE_SHA256');
     isPre = const String.fromEnvironment('APP_ENV') != 'stable';
     appState = AppState(
@@ -108,8 +110,9 @@ class GlobalState {
     config =
         await preferences.getConfig() ?? Config(themeProps: defaultThemeProps);
     await globalState.migrateOldData(config);
-    final locale = utils.getLocaleForString(config.appSetting.locale) ?? 
-      utils.getSystemLocale();
+    final locale =
+        utils.getLocaleForString(config.appSetting.locale) ??
+        utils.getSystemLocale();
     await AppLocalizations.load(locale);
     if (system.isAndroid) {
       _isAndroidTV = await app.isAndroidTV();
@@ -225,9 +228,7 @@ class GlobalState {
     }
     await appController.updateRunTime();
     await appController.updateTraffic();
-    await startUpdateTasks([
-      appController.updateTraffic,
-    ]);
+    await startUpdateTasks([appController.updateTraffic]);
   }
 
   void _scheduleBackgroundCleanup() {
@@ -362,16 +363,26 @@ class GlobalState {
     return await showModal<T>(
       context: context,
       configuration: FadeScaleTransitionConfiguration(
-        barrierColor: isDark ? const Color(0xCC000000) : const Color(0x99000000),
+        barrierColor: isDark
+            ? const Color(0xCC000000)
+            : const Color(0x99000000),
         barrierDismissible: dismissible,
       ),
       builder: (_) => child,
     );
   }
 
-  void showNotifier(String text, {VoidCallback? onAction, String? actionLabel}) {
+  void showNotifier(
+    String text, {
+    VoidCallback? onAction,
+    String? actionLabel,
+  }) {
     if (text.isEmpty) return;
-    navigatorKey.currentContext?.showNotifier(text, onAction: onAction, actionLabel: actionLabel);
+    navigatorKey.currentContext?.showNotifier(
+      text,
+      onAction: onAction,
+      actionLabel: actionLabel,
+    );
   }
 
   Future<void> openUrl(String url, {bool needConfirm = false}) async {
@@ -395,13 +406,11 @@ class GlobalState {
       preferences.clearClashConfig();
       preferences.saveConfig(config);
     }
-    
+
     if (config.appSetting.locale == null) {
       final systemLocale = utils.getSystemLocale();
       config = config.copyWith(
-        appSetting: config.appSetting.copyWith(
-          locale: systemLocale.toString(),
-        ),
+        appSetting: config.appSetting.copyWith(locale: systemLocale.toString()),
       );
       preferences.saveConfig(config);
       this.config = config;
@@ -632,7 +641,11 @@ class GlobalState {
       final proxyGroups = rawConfig['proxy-groups'] as List;
 
       final Set<String> protectedNames = {
-        'DIRECT', 'REJECT', 'REJECT-DROP', 'COMPATIBLE', 'PASS',
+        'DIRECT',
+        'REJECT',
+        'REJECT-DROP',
+        'COMPATIBLE',
+        'PASS',
       };
       for (final g in proxyGroups) {
         if (g is Map && g['name'] is String) {
@@ -659,7 +672,9 @@ class GlobalState {
             return !filterRegex!.hasMatch(item);
           }).toList();
 
-          if (filtered.isEmpty && (group['use'] == null || (group['use'] is List && group['use'].isEmpty))) {
+          if (filtered.isEmpty &&
+              (group['use'] == null ||
+                  (group['use'] is List && group['use'].isEmpty))) {
             filtered.add('DIRECT');
           }
           group['proxies'] = filtered;
@@ -784,9 +799,10 @@ class GlobalState {
         if (res.isError) throw res.stringResult;
 
         return switch (res.rawResult) {
-          Pointer() => runtime.convertValue<Map<String, dynamic>>(res),
-          _ => Map<String, dynamic>.from(res.rawResult),
-        } ?? config;
+              Pointer() => runtime.convertValue<Map<String, dynamic>>(res),
+              _ => Map<String, dynamic>.from(res.rawResult),
+            } ??
+            config;
       } finally {
         runtime.dispose();
       }

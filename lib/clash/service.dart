@@ -15,6 +15,7 @@ class ClashService extends ClashHandlerInterface {
   Completer<Socket> socketCompleter = Completer();
 
   bool isStarting = false;
+  bool _isDestroying = false;
 
   Process? process;
 
@@ -51,7 +52,9 @@ class ClashService extends ClashHandlerInterface {
       },
       (error, stack) {
         commonPrint.log(error.toString());
-        if (error is SocketException) {
+        if (error is SocketException &&
+            !_isDestroying &&
+            !globalState.isExiting) {
           globalState.showNotifier(error.toString());
           // globalState.appController.restartCore();
         }
@@ -63,16 +66,19 @@ class ClashService extends ClashHandlerInterface {
   reStart() async {
     if (isStarting) return;
     isStarting = true;
-    
+    _isDestroying = false;
+
     await _destroySocket();
     await Future.delayed(const Duration(milliseconds: 300));
-    
+
     socketCompleter = Completer();
     process?.kill();
     process = null;
 
     final serverSocket = await serverCompleter.future;
-    final arg = system.isWindows ? '${serverSocket.port}' : serverSocket.address.address;
+    final arg = system.isWindows
+        ? '${serverSocket.port}'
+        : serverSocket.address.address;
 
     if (system.isWindows) {
       final serviceOk = await windows?.registerService() ?? false;
@@ -90,7 +96,9 @@ class ClashService extends ClashHandlerInterface {
     final environment = Map<String, String>.from(Platform.environment);
     environment['SAFE_PATHS'] = homeDirPath;
 
-    process = await Process.start(appPath.corePath, [arg], environment: environment);
+    process = await Process.start(appPath.corePath, [
+      arg,
+    ], environment: environment);
     process?.stdout.listen((_) {});
     process?.stderr.listen((e) {
       final error = utf8.decode(e);
@@ -108,11 +116,14 @@ class ClashService extends ClashHandlerInterface {
       if (socketCompleter.isCompleted) return;
       await Future.delayed(interval);
     }
-    commonPrint.log('Core ready timeout after ${maxAttempts * interval.inMilliseconds}ms');
+    commonPrint.log(
+      'Core ready timeout after ${maxAttempts * interval.inMilliseconds}ms',
+    );
   }
 
   @override
   destroy() async {
+    _isDestroying = true;
     final server = await serverCompleter.future;
     await server.close();
     await _deleteSocketFile();
@@ -121,8 +132,19 @@ class ClashService extends ClashHandlerInterface {
 
   @override
   sendMessage(String message) async {
+    if (_isDestroying || globalState.isExiting) {
+      return;
+    }
     final socket = await socketCompleter.future;
-    socket.writeln(message);
+    try {
+      socket.writeln(message);
+    } on SocketException catch (e) {
+      if (_isDestroying || globalState.isExiting) {
+        commonPrint.log('Ignore socket error during shutdown: $e');
+        return;
+      }
+      rethrow;
+    }
   }
 
   Future<void> _deleteSocketFile() async {
@@ -144,6 +166,7 @@ class ClashService extends ClashHandlerInterface {
 
   @override
   shutdown() async {
+    _isDestroying = true;
     if (system.isWindows) {
       await request.stopCoreByHelper();
     }

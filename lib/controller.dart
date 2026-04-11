@@ -34,6 +34,7 @@ class AppController {
 
   Timer? _wakelockSyncTimer;
   Completer<void>? _restartLock;
+  Completer<void>? _exitLock;
   int _backgroundLoadVersion = 0;
 
   AppController(this.context, WidgetRef ref) : _ref = ref;
@@ -191,38 +192,35 @@ class AppController {
   }
 
   Future<void> _quickSetupConfig({bool? enableTun}) async {
-    await safeRun(
-      () async {
-        await _ref.read(currentProfileProvider)?.checkAndUpdate();
-        final patchConfig = _ref.read(patchClashConfigProvider);
+    await safeRun(() async {
+      await _ref.read(currentProfileProvider)?.checkAndUpdate();
+      final patchConfig = _ref.read(patchClashConfigProvider);
 
-        final targetTun = enableTun ?? patchConfig.tun.enable;
+      final targetTun = enableTun ?? patchConfig.tun.enable;
 
-        final res = await _requestAdmin(targetTun);
-        if (res.needRestart) {
-          await restartCore();
-          return;
-        }
-        if (res.isError) {
-          return;
-        }
-        final realTunEnable = _ref.read(realTunEnableProvider);
-        final realPatchConfig = patchConfig.copyWith.tun(enable: realTunEnable);
-        final params = await globalState.getSetupParams(
-          pathConfig: realPatchConfig,
-        );
-        final message = await clashCore.setupConfig(params);
-        if (message.isNotEmpty) {
-          await _rollbackConfig();
-          throw message;
-        }
-        globalState.backupSuccessfulConfig(params);
-        lastProfileModified = await _ref.read(
-          currentProfileProvider.select((state) => state?.profileLastModified),
-        );
-      },
-      needLoading: false,
-    );
+      final res = await _requestAdmin(targetTun);
+      if (res.needRestart) {
+        await restartCore();
+        return;
+      }
+      if (res.isError) {
+        return;
+      }
+      final realTunEnable = _ref.read(realTunEnableProvider);
+      final realPatchConfig = patchConfig.copyWith.tun(enable: realTunEnable);
+      final params = await globalState.getSetupParams(
+        pathConfig: realPatchConfig,
+      );
+      final message = await clashCore.setupConfig(params);
+      if (message.isNotEmpty) {
+        await _rollbackConfig();
+        throw message;
+      }
+      globalState.backupSuccessfulConfig(params);
+      lastProfileModified = await _ref.read(
+        currentProfileProvider.select((state) => state?.profileLastModified),
+      );
+    }, needLoading: false);
   }
 
   Future<void> updateRunTime() async {
@@ -575,16 +573,34 @@ class AppController {
   }
 
   Future<void> handleExit() async {
+    if (_exitLock != null) {
+      return _exitLock!.future;
+    }
+
+    final exitLock = Completer<void>();
+    _exitLock = exitLock;
+    globalState.isExiting = true;
+
     try {
       stopWakelockAutoRecovery();
+      await globalState.handleBackground();
       await savePreferences();
-      await Future.wait([
-        if (macOS != null) macOS!.updateDns(true),
-        if (proxy != null) proxy!.stopProxy(),
-        clashCore.shutdown(),
-        if (clashService != null) clashService!.destroy(),
-      ].whereType<Future<void>>().toList());
+      if (macOS != null) {
+        await macOS!.updateDns(true);
+      }
+      if (proxy != null) {
+        await proxy!.stopProxy();
+      }
+      await clashCore.shutdown();
+      if (clashService != null) {
+        await clashService!.destroy();
+      }
+    } catch (e) {
+      commonPrint.log('handleExit error: $e');
     } finally {
+      if (!exitLock.isCompleted) {
+        exitLock.complete();
+      }
       system.exit();
     }
   }
@@ -720,13 +736,18 @@ class AppController {
     try {
       final androidVersion = await system.version;
       final currentSetting = _ref.read(appSettingProvider);
-      
-      final bool shouldEnableHighRefreshRate = androidVersion >= 31; // Android 12+
+
+      final bool shouldEnableHighRefreshRate =
+          androidVersion >= 31; // Android 12+
 
       if (currentSetting.enableHighRefreshRate != shouldEnableHighRefreshRate) {
-        _ref.read(appSettingProvider.notifier).updateState(
-          (state) => state.copyWith(enableHighRefreshRate: shouldEnableHighRefreshRate),
-        );
+        _ref
+            .read(appSettingProvider.notifier)
+            .updateState(
+              (state) => state.copyWith(
+                enableHighRefreshRate: shouldEnableHighRefreshRate,
+              ),
+            );
       }
     } catch (e) {
       commonPrint.log('Failed to initialize high refresh rate default: $e');
@@ -819,7 +840,8 @@ class AppController {
         }
       }
     }
-    final shouldStart = globalState.isStart || _ref.read(appSettingProvider).autoRun;
+    final shouldStart =
+        globalState.isStart || _ref.read(appSettingProvider).autoRun;
 
     if (shouldStart) {
       try {
@@ -1019,12 +1041,17 @@ class AppController {
     );
   }
 
-  int _delayValue(int? delay) => (delay == null || delay == -1) ? 1 << 30 : delay;
+  int _delayValue(int? delay) =>
+      (delay == null || delay == -1) ? 1 << 30 : delay;
 
   List<Proxy> _sortOfDelay({required List<Proxy> proxies, String? testUrl}) {
     return List.of(proxies)..sort((a, b) {
-      final aDelay = _ref.read(getDelayProvider(proxyName: a.name, testUrl: testUrl));
-      final bDelay = _ref.read(getDelayProvider(proxyName: b.name, testUrl: testUrl));
+      final aDelay = _ref.read(
+        getDelayProvider(proxyName: a.name, testUrl: testUrl),
+      );
+      final bDelay = _ref.read(
+        getDelayProvider(proxyName: b.name, testUrl: testUrl),
+      );
       return _delayValue(aDelay).compareTo(_delayValue(bDelay));
     });
   }
@@ -1198,7 +1225,10 @@ class AppController {
     return Isolate.run<List<int>>(() async {
       // Use ZipFileEncoder like FLClash - more reliable than ZipEncoder + Archive
       final tempDir = Directory.systemTemp;
-      final tempZipPath = join(tempDir.path, 'bettbox_backup_${DateTime.now().millisecondsSinceEpoch}.zip');
+      final tempZipPath = join(
+        tempDir.path,
+        'bettbox_backup_${DateTime.now().millisecondsSinceEpoch}.zip',
+      );
       final encoder = ZipFileEncoder();
       encoder.create(tempZipPath);
 
@@ -1209,14 +1239,24 @@ class AppController {
         'timestamp': DateTime.now().millisecondsSinceEpoch,
       });
       final markerBytes = utf8.encode(markerData);
-      final tempMarkerFile = File(join(tempDir.path, 'bettbox_marker_${DateTime.now().millisecondsSinceEpoch}.tmp'));
+      final tempMarkerFile = File(
+        join(
+          tempDir.path,
+          'bettbox_marker_${DateTime.now().millisecondsSinceEpoch}.tmp',
+        ),
+      );
       await tempMarkerFile.writeAsBytes(markerBytes);
       await encoder.addFile(tempMarkerFile, '.bettbox_marker');
       await tempMarkerFile.delete();
 
       // Add config file
       final configStr = json.encode(configJson);
-      final tempConfigFile = File(join(tempDir.path, 'bettbox_config_${DateTime.now().millisecondsSinceEpoch}.tmp'));
+      final tempConfigFile = File(
+        join(
+          tempDir.path,
+          'bettbox_config_${DateTime.now().millisecondsSinceEpoch}.tmp',
+        ),
+      );
       await tempConfigFile.writeAsString(configStr);
       await encoder.addFile(tempConfigFile, 'config.json');
       await tempConfigFile.delete();
@@ -1224,9 +1264,9 @@ class AppController {
       // Add profiles dir (valid subscriptions only)
       final profilesDir = Directory(profilesPath);
       if (await profilesDir.exists()) {
-        final files = await profilesDir.list(
-          recursive: false,
-        ).toList(); // First level only
+        final files = await profilesDir
+            .list(recursive: false)
+            .toList(); // First level only
 
         for (final file in files) {
           if (file is File) {
@@ -1253,7 +1293,9 @@ class AppController {
           );
 
           if (await providersDir.exists()) {
-            final providerFiles = await providersDir.list(recursive: true).toList();
+            final providerFiles = await providersDir
+                .list(recursive: true)
+                .toList();
 
             for (final providerFile in providerFiles) {
               if (providerFile is File) {

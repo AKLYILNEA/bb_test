@@ -24,7 +24,7 @@ final configStateProvider = AutoDisposeProvider<Config>.internal(
 // ignore: unused_element
 typedef ConfigStateRef = AutoDisposeProviderRef<Config>;
 String _$currentGroupsStateHash() =>
-    r'6222c006e1970e7435268d32903b9019cf1a4351';
+    r'bde3f468dc3a39b68c1d1f908c8a7f40896cb777';
 
 /// See also [currentGroupsState].
 @ProviderFor(currentGroupsState)
@@ -42,7 +42,7 @@ final currentGroupsStateProvider = AutoDisposeProvider<GroupsState>.internal(
 // ignore: unused_element
 typedef CurrentGroupsStateRef = AutoDisposeProviderRef<GroupsState>;
 String _$navigationItemsStateHash() =>
-    r'1fc37c14d129f9725b0e62fd53f6b25382f51102';
+    r'011892d5b7bdb324c51a1b29e448ee9dff8ae0ff';
 
 /// See also [navigationItemsState].
 @ProviderFor(navigationItemsState)
