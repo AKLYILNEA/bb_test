@@ -100,7 +100,9 @@ class ClashCore {
         }),
       ];
       final groupsRaw = groupNames.map((groupName) {
-        final group = Map<String, dynamic>.from(proxies[groupName] as Map);
+        final group = Map<String, dynamic>.from(
+          (proxies[groupName] as Map).cast<String, dynamic>(),
+        );
         group['all'] = ((group['all'] ?? []) as List)
             .map((name) => proxies[name])
             .whereType<Map<String, dynamic>>()
