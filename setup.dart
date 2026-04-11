@@ -200,7 +200,9 @@ class Build {
       corePaths.add(outPath);
 
       final Map<String, String> env = {};
-      env['GOEXPERIMENT'] = 'greenteagc';
+      if (!compatible) {
+        env['GOEXPERIMENT'] = 'greenteagc';
+      }
       env['GOOS'] = item.target.os;
       if (item.arch != null) {
         env['GOARCH'] = item.arch!.name;
