@@ -12,10 +12,10 @@ import 'package:bett_box/l10n/l10n.dart';
 import 'package:bett_box/plugins/app.dart';
 import 'package:bett_box/plugins/service.dart';
 import 'package:bett_box/providers/state.dart' as providers_state;
+
 import 'package:bett_box/widgets/dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_js/flutter_js.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' as flutter_riverpod;
 import 'package:material_color_utilities/palettes/core_palette.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -233,7 +233,7 @@ class GlobalState {
 
   void _scheduleBackgroundCleanup() {
     _backgroundCleanupTimer?.cancel();
-    _backgroundCleanupTimer = Timer(const Duration(minutes: 2), () {
+    _backgroundCleanupTimer = Timer(const Duration(minutes: 3), () {
       _backgroundCleanupTimer = null;
       if (!backgroundMode.value) {
         return;
@@ -245,9 +245,9 @@ class GlobalState {
   void cleanupBackgroundResources() async {
     final imageCache = PaintingBinding.instance.imageCache;
     imageCache.clearLiveImages();
-    await Future.delayed(const Duration(milliseconds: 1000));
+    await Future.delayed(const Duration(milliseconds: 500));
     WidgetsBinding.instance.handleMemoryPressure();
-    await Future.delayed(const Duration(milliseconds: 1000));
+    await Future.delayed(const Duration(milliseconds: 500));
     await clashCore.requestGc();
   }
 
@@ -780,9 +780,8 @@ class GlobalState {
       config['proxy-providers'] ??= {};
       final configJs = json.encode(config);
       final scriptJs = json.encode(currentScript.content);
-      final runtime = getJavascriptRuntime();
 
-      try {
+      return JavaScriptRuntimeManager.execute((runtime) async {
         final res = await runtime.evaluateAsync('''
           (() => {
             const __bettboxConfig = $configJs;
@@ -803,9 +802,7 @@ class GlobalState {
               _ => Map<String, dynamic>.from(res.rawResult),
             } ??
             config;
-      } finally {
-        runtime.dispose();
-      }
+      });
     });
   }
 }

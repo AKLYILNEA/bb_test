@@ -11,6 +11,7 @@ export 'future.dart';
 export 'http.dart';
 export 'icons.dart';
 export 'iterable.dart';
+export 'js_runtime_manager.dart';
 export 'keyboard.dart';
 export 'launch.dart';
 export 'link.dart';
