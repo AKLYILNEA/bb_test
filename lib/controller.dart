@@ -1385,6 +1385,10 @@ class AppController {
     Archive archive,
     RecoveryOption recoveryOption,
   ) async {
+    if (archive.files.isEmpty) {
+      throw 'Backup file is empty or corrupted';
+    }
+
     final homeDirPath = await appPath.homeDirPath;
 
     // Check for Bettbox marker
@@ -1426,8 +1430,12 @@ class AppController {
 
     // Parse config
     final configFile = configs[configIndex];
+    final configContent = configFile.content;
+    if (configContent.isEmpty) {
+      throw 'Config file is empty or corrupted';
+    }
     var tempConfig = Config.compatibleFromJson(
-      json.decode(utf8.decode(configFile.content)),
+      json.decode(utf8.decode(configContent)),
     );
 
     // Restore profile files to disk
@@ -1467,8 +1475,12 @@ class AppController {
 
     // Parse backup config
     final configFile = configs[configIndex];
+    final configContent = configFile.content;
+    if (configContent.isEmpty) {
+      throw 'Config file is empty or corrupted';
+    }
     final backupConfig = Config.compatibleFromJson(
-      json.decode(utf8.decode(configFile.content)),
+      json.decode(utf8.decode(configContent)),
     );
 
     // Restore profile files to disk
@@ -1488,7 +1500,7 @@ class AppController {
       (file) => file.name.endsWith('database.sqlite'),
     );
 
-    if (dbFile != null) {
+    if (dbFile != null && dbFile.content.isNotEmpty) {
       try {
         // Save database temporarily
         final tempDbPath = join(await appPath.tempPath, 'temp_flclash.db');
