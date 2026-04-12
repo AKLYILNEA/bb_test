@@ -153,7 +153,7 @@ jobs:
 
       - name: Generate release.md
         run: |
-          echo "- Fixes and improvements" > release.md
+          echo -e "- Fixes and improvements\n- 具体变更请参考最新Commits" > release.md
 
       - name: Patch release.md
         run: |
