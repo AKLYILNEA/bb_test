@@ -155,6 +155,8 @@ abstract class VpnProps with _$VpnProps {
     @Default('') String smartAutoStopNetworks,
     @Default(false) bool storeFix,
     @Default(false) bool networkFix,
+    @Default(false) bool disableQuic,
+    @Default(false) bool excludeChina,
     @Default(false) bool fcmOptimization,
     @Default(false) bool quickResponse,
     @Default(defaultAccessControl) AccessControl accessControl,

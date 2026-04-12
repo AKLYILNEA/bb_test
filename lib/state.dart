@@ -752,6 +752,14 @@ class GlobalState {
       rules = [...fcmRules, ...rules];
     }
 
+    if (config.vpnProps.disableQuic) {
+      final isRussian = config.appSetting.locale?.toLowerCase().startsWith('ru') ?? false;
+      final quicRules = config.vpnProps.excludeChina && !isRussian
+          ? ['AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((GEOSITE,geolocation-cn)))),REJECT']
+          : ['AND,((NETWORK,UDP),(DST-PORT,443)),REJECT'];
+      rules = [...quicRules, ...rules];
+    }
+
     if (rawConfig['proxy-groups'] == null && originalProxyGroups != null) {
       rawConfig['proxy-groups'] = originalProxyGroups;
     }

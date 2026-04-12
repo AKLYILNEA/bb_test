@@ -394,6 +394,46 @@ class AppLocalizations {
     );
   }
 
+  /// `Disable QUIC`
+  String get disableQuic {
+    return Intl.message(
+      'Disable QUIC',
+      name: 'disableQuic',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Disable QUIC to resolve specific network issues`
+  String get disableQuicDesc {
+    return Intl.message(
+      'Disable QUIC to resolve specific network issues',
+      name: 'disableQuicDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Exclude China`
+  String get excludeChina {
+    return Intl.message(
+      'Exclude China',
+      name: 'excludeChina',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Allow China QUIC traffic instead of blocking all`
+  String get excludeChinaDesc {
+    return Intl.message(
+      'Allow China QUIC traffic instead of blocking all',
+      name: 'excludeChinaDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `FCM Optimization`
   String get fcmOptimization {
     return Intl.message(

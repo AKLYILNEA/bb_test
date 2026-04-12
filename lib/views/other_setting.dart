@@ -4,6 +4,7 @@ import 'package:bett_box/plugins/app.dart';
 import 'package:bett_box/plugins/service.dart';
 import 'package:bett_box/providers/config.dart';
 import 'package:bett_box/providers/providers.dart';
+import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -386,6 +387,54 @@ class BatteryOptimizationItem extends ConsumerWidget {
   }
 }
 
+class DisableQuicItem extends ConsumerWidget {
+  const DisableQuicItem({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final disableQuic = ref.watch(
+      vpnSettingProvider.select((state) => state.disableQuic),
+    );
+    return ListItem.switchItem(
+      title: Text(appLocalizations.disableQuic),
+      subtitle: Text(appLocalizations.disableQuicDesc),
+      delegate: SwitchDelegate(
+        value: disableQuic,
+        onChanged: (bool value) async {
+          ref
+              .read(vpnSettingProvider.notifier)
+              .updateState((state) => state.copyWith(disableQuic: value));
+          globalState.appController.setupClashConfigDebounce();
+        },
+      ),
+    );
+  }
+}
+
+class ExcludeChinaItem extends ConsumerWidget {
+  const ExcludeChinaItem({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final excludeChina = ref.watch(
+      vpnSettingProvider.select((state) => state.excludeChina),
+    );
+    return ListItem.switchItem(
+      title: Text(appLocalizations.excludeChina),
+      subtitle: Text(appLocalizations.excludeChinaDesc),
+      delegate: SwitchDelegate(
+        value: excludeChina,
+        onChanged: (bool value) async {
+          ref
+              .read(vpnSettingProvider.notifier)
+              .updateState((state) => state.copyWith(excludeChina: value));
+          globalState.appController.setupClashConfigDebounce();
+        },
+      ),
+    );
+  }
+}
+
 class OtherSettingView extends ConsumerWidget {
   const OtherSettingView({super.key});
 
@@ -394,6 +443,11 @@ class OtherSettingView extends ConsumerWidget {
     final smartAutoStop = ref.watch(
       vpnSettingProvider.select((state) => state.smartAutoStop),
     );
+    final disableQuic = ref.watch(
+      vpnSettingProvider.select((state) => state.disableQuic),
+    );
+    final locale = ref.watch(appSettingProvider.select((state) => state.locale));
+    final isRussian = locale?.toLowerCase().startsWith('ru') ?? false;
 
     List<Widget> items = [
       const SmartAutoStopItem(),
@@ -402,6 +456,8 @@ class OtherSettingView extends ConsumerWidget {
       if (system.isAndroid) const QuickResponseItem(),
       const FcmOptimizationItem(),
       const StoreFixItem(),
+      const DisableQuicItem(),
+      if (disableQuic && !isRussian) const ExcludeChinaItem(),
       if (system.isWindows) const NetworkFixItem(),
       if (system.isAndroid) const BatteryOptimizationItem(),
     ];

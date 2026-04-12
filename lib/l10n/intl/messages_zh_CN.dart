@@ -208,6 +208,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "directNameserverFollowPolicy": MessageLookupByLibrary.simpleMessage(
       "直连DNS遵循规则",
     ),
+    "disableQuic": MessageLookupByLibrary.simpleMessage("禁用QUIC"),
+    "disableQuicDesc": MessageLookupByLibrary.simpleMessage("禁用QUIC以解决特定网络问题"),
     "disclaimer": MessageLookupByLibrary.simpleMessage("免责声明"),
     "disclaimerDesc": MessageLookupByLibrary.simpleMessage(
       "本软件为开源免费软件，仅供学习交流等非商业性质的个人测试使用，代理服务商的行为均与本软件无关，同意声明代表您已完全知晓并确认了这一点，如不同意，请选择退出！",
@@ -235,6 +237,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "enableOverride": MessageLookupByLibrary.simpleMessage("启用覆写"),
     "entries": MessageLookupByLibrary.simpleMessage("个条目"),
     "exclude": MessageLookupByLibrary.simpleMessage("后台隐藏"),
+    "excludeChina": MessageLookupByLibrary.simpleMessage("排除国内"),
+    "excludeChinaDesc": MessageLookupByLibrary.simpleMessage(
+      "放行中国QUIC流量而非全部禁用",
+    ),
     "excludeDesc": MessageLookupByLibrary.simpleMessage("从最近任务中隐藏应用"),
     "existsTip": m4,
     "exit": MessageLookupByLibrary.simpleMessage("退出"),

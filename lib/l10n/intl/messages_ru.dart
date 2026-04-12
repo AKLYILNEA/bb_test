@@ -298,6 +298,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "directNameserverFollowPolicy": MessageLookupByLibrary.simpleMessage(
       "Прямой DNS следует правилам",
     ),
+    "disableQuic": MessageLookupByLibrary.simpleMessage("Отключить QUIC"),
+    "disableQuicDesc": MessageLookupByLibrary.simpleMessage(
+      "Отключить QUIC для решения сетевых проблем",
+    ),
     "disclaimer": MessageLookupByLibrary.simpleMessage(
       "Отказ от ответственности",
     ),
@@ -337,6 +341,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "entries": MessageLookupByLibrary.simpleMessage("записей"),
     "exclude": MessageLookupByLibrary.simpleMessage("Скрыть из недавних"),
+    "excludeChina": MessageLookupByLibrary.simpleMessage("Исключить Китай"),
+    "excludeChinaDesc": MessageLookupByLibrary.simpleMessage(
+      "Разрешить QUIC-трафик Китая вместо полной блокировки",
+    ),
     "excludeDesc": MessageLookupByLibrary.simpleMessage(
       "Скрыть приложение из недавних задач",
     ),
