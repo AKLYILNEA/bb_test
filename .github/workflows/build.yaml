@@ -121,7 +121,6 @@ jobs:
       - name: Build Bettbox
         env:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-          GOEXPERIMENT: greenteagc
         run: |
           flutter pub get
           dart run build_runner build -d
