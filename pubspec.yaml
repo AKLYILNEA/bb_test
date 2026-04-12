@@ -1,7 +1,7 @@
 name: bett_box
 description: A multi-platform proxy client based on Mihomo, simple and easy to use, open-source and ad-free.
 publish_to: 'none'
-version: 1.16.6+2026041101
+version: 1.16.6+2026041205
 environment:
   sdk: '>=3.9.0 <4.0.0'
 
@@ -13,7 +13,7 @@ dependencies:
   intl: ^0.20.0
   path_provider: ^2.1.4
   path: ^1.9.0
-  shared_preferences: ^2.5.4
+  shared_preferences: ^2.5.5
   window_manager: ^0.5.1
   dynamic_color: ^1.8.1
   vclibs: ^0.1.3
@@ -29,8 +29,8 @@ dependencies:
   win32_registry: ^2.0.0
   tray_manager: ^0.5.2
   collection: ^1.18.0
-  animations: ^2.1.1
-  package_info_plus: ^9.0.0
+  animations: ^2.1.2
+  package_info_plus: ^9.0.1
   url_launcher: ^6.3.2
   freezed_annotation: ^3.1.0
   image_picker: ^1.2.1
@@ -45,11 +45,11 @@ dependencies:
   emoji_regex: ^0.0.5
   hotkey_manager: ^0.2.3
   uni_platform: ^0.1.3
-  device_info_plus: ^12.3.0
+  device_info_plus: ^12.4.0
   sqflite: ^2.3.0
   sqflite_common_ffi: ^2.3.7
   yaml: ^3.1.2
-  connectivity_plus: ^7.0.0
+  connectivity_plus: ^7.1.1
   screen_retriever: ^0.2.0
   defer_pointer: ^0.0.2
   flutter_riverpod: ^2.6.1
@@ -62,7 +62,7 @@ dependencies:
   flutter_cache_manager: ^3.4.1
   crypto: ^3.0.7
   flutter_acrylic: ^1.1.4
-  sentry_flutter: ^9.16.0
+  sentry_flutter: ^9.16.1
   google_nav_bar: ^5.0.7
   wakelock_plus: ^1.4.0
   flutter_spinkit: ^5.2.2
