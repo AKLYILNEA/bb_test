@@ -39,6 +39,28 @@ import (
 var InterfaceName = "Meta"
 var EnforceBindInterface = false
 
+var (
+	tunLogMu       sync.Mutex
+	tunLogLastTime time.Time
+	tunLogCount    int
+)
+
+func shouldLogTun() bool {
+	tunLogMu.Lock()
+	defer tunLogMu.Unlock()
+
+	now := time.Now()
+	if now.Sub(tunLogLastTime) >= time.Second {
+		tunLogLastTime = now
+		tunLogCount = 0
+	}
+	if tunLogCount >= 10 {
+		return false
+	}
+	tunLogCount++
+	return true
+}
+
 type Listener struct {
 	closed  bool
 	options LC.Tun
@@ -609,15 +631,21 @@ func (d *cDialerInterfaceFinder) FindInterfaceName(destination netip.Addr) strin
 	for _, dest := range []netip.Addr{destination, netip.IPv4Unspecified(), netip.IPv6Unspecified()} {
 		autoDetectInterfaceName := d.DefaultInterfaceName(dest)
 		if autoDetectInterfaceName == d.tunName {
-			log.Warnln("[TUN] Auto detect interface for %s get same name with tun", destination.String())
+			if shouldLogTun() {
+				log.Warnln("[TUN] Auto detect interface for %s get same name with tun", destination.String())
+			}
 		} else if autoDetectInterfaceName == "" || autoDetectInterfaceName == "<nil>" {
-			log.Warnln("[TUN] Auto detect interface for %s get empty name.", destination.String())
+			if shouldLogTun() {
+				log.Warnln("[TUN] Auto detect interface for %s get empty name.", destination.String())
+			}
 		} else {
 			log.Debugln("[TUN] Auto detect interface for %s --> %s", destination, autoDetectInterfaceName)
 			return autoDetectInterfaceName
 		}
 	}
-	log.Warnln("[TUN] Auto detect interface for %s failed, return '<invalid>' to avoid lookback", destination)
+	if shouldLogTun() {
+		log.Warnln("[TUN] Auto detect interface for %s failed, return '<invalid>' to avoid lookback", destination)
+	}
 	return "<invalid>"
 }
 
