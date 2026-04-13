@@ -502,6 +502,7 @@ class GlobalState {
     rawConfig['tun']['stack'] = realPatchConfig.tun.stack.name;
     rawConfig['tun']['route-address'] = realPatchConfig.tun.routeAddress;
     rawConfig['tun']['auto-route'] = realPatchConfig.tun.autoRoute;
+    rawConfig['tun']['auto-detect-interface'] = true;
     rawConfig['tun']['disable-icmp-forwarding'] =
         realPatchConfig.tun.disableIcmpForwarding;
     rawConfig['tun']['mtu'] = realPatchConfig.tun.mtu;
