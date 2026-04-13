@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/common.dart';
@@ -129,7 +131,11 @@ class _EditorPageState extends ConsumerState<EditorPage> {
       if (file == null) {
         return;
       }
-      final res = String.fromCharCodes(file.bytes?.toList() ?? []);
+      final bytes = file.bytes;
+      if (bytes == null) {
+        return;
+      }
+      final res = utf8.decode(bytes);
       _controller.text = res;
       return;
     }

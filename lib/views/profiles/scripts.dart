@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
@@ -291,7 +293,11 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
     if (file == null) {
       return;
     }
-    final content = String.fromCharCodes(file.bytes?.toList() ?? []);
+    final bytes = file.bytes;
+    if (bytes == null) {
+      return;
+    }
+    final content = utf8.decode(bytes);
     if (mounted) {
       _handleToEditor(initialContent: content);
     }
