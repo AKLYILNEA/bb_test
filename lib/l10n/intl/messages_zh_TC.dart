@@ -241,6 +241,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "必要時上傳應用崩潰日誌",
     ),
     "enableOverride": MessageLookupByLibrary.simpleMessage("啟用覆寫"),
+    "endpointIndependentNat": MessageLookupByLibrary.simpleMessage("NAT 增強"),
+    "endpointIndependentNatDesc": MessageLookupByLibrary.simpleMessage(
+      "啟用獨立於端點的 NAT",
+    ),
     "entries": MessageLookupByLibrary.simpleMessage("個項目"),
     "exclude": MessageLookupByLibrary.simpleMessage("背景隱藏"),
     "excludeChina": MessageLookupByLibrary.simpleMessage("排除國內"),
@@ -690,6 +694,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "storeFixDesc": MessageLookupByLibrary.simpleMessage(
       "修復 Google Play 商店下載異常",
     ),
+    "strictRoute": MessageLookupByLibrary.simpleMessage("嚴格路由"),
+    "strictRouteDesc": MessageLookupByLibrary.simpleMessage("使用 TUN 嚴格路由模式"),
     "style": MessageLookupByLibrary.simpleMessage("風格"),
     "subRule": MessageLookupByLibrary.simpleMessage("子規則"),
     "submit": MessageLookupByLibrary.simpleMessage("提交"),

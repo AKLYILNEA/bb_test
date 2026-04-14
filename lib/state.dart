@@ -501,8 +501,11 @@ class GlobalState {
     rawConfig['tun']['dns-hijack'] = realPatchConfig.tun.dnsHijack;
     rawConfig['tun']['stack'] = realPatchConfig.tun.stack.name;
     rawConfig['tun']['route-address'] = realPatchConfig.tun.routeAddress;
-    rawConfig['tun']['auto-route'] = realPatchConfig.tun.autoRoute;
+    rawConfig['tun']['auto-route'] = true;
     rawConfig['tun']['auto-detect-interface'] = true;
+    rawConfig['tun']['strict-route'] = realPatchConfig.tun.strictRoute;
+    rawConfig['tun']['endpoint-independent-nat'] =
+        realPatchConfig.tun.endpointIndependentNat;
     rawConfig['tun']['disable-icmp-forwarding'] =
         realPatchConfig.tun.disableIcmpForwarding;
     rawConfig['tun']['mtu'] = realPatchConfig.tun.mtu;

@@ -287,6 +287,9 @@ abstract class Tun with _$Tun {
     @Default(true)
     bool disableIcmpForwarding,
     @Default(4064) int mtu,
+    @JsonKey(name: 'endpoint-independent-nat')
+    @Default(false)
+    bool endpointIndependentNat,
   }) = _Tun;
 
   factory Tun.fromJson(Map<String, Object?> json) => _$TunFromJson(json);

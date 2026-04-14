@@ -3729,6 +3729,26 @@ class AppLocalizations {
     return Intl.message('Stack Mode', name: 'stackMode', desc: '', args: []);
   }
 
+  /// `Strict Route`
+  String get strictRoute {
+    return Intl.message(
+      'Strict Route',
+      name: 'strictRoute',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Use TUN strict routing mode`
+  String get strictRouteDesc {
+    return Intl.message(
+      'Use TUN strict routing mode',
+      name: 'strictRouteDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `ICMP Forwarding`
   String get icmpForwarding {
     return Intl.message(
@@ -3759,6 +3779,26 @@ class AppLocalizations {
     return Intl.message(
       'Redirect DNS queries to internal DNS module',
       name: 'dnsHijackDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `NAT Enhancement`
+  String get endpointIndependentNat {
+    return Intl.message(
+      'NAT Enhancement',
+      name: 'endpointIndependentNat',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enable endpoint-independent NAT`
+  String get endpointIndependentNatDesc {
+    return Intl.message(
+      'Enable endpoint-independent NAT',
+      name: 'endpointIndependentNatDesc',
       desc: '',
       args: [],
     );

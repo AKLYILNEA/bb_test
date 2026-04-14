@@ -213,6 +213,32 @@ class AutoSetSystemDnsItem extends ConsumerWidget {
   }
 }
 
+class StrictRouteItem extends ConsumerWidget {
+  const StrictRouteItem({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final strictRoute = ref.watch(
+      patchClashConfigProvider.select((state) => state.tun.strictRoute),
+    );
+
+    return ListItem.switchItem(
+      title: Text(appLocalizations.strictRoute),
+      subtitle: Text(appLocalizations.strictRouteDesc),
+      delegate: SwitchDelegate(
+        value: strictRoute,
+        onChanged: (value) async {
+          ref
+              .read(patchClashConfigProvider.notifier)
+              .updateState((state) => state.copyWith.tun(strictRoute: value));
+
+          await _handleNetworkConfigChange(ref);
+        },
+      ),
+    );
+  }
+}
+
 class IcmpForwardingItem extends ConsumerWidget {
   const IcmpForwardingItem({super.key});
 
@@ -270,6 +296,35 @@ class DnsHijackItem extends ConsumerWidget {
                 (state) => state.copyWith.tun(
                   dnsHijack: value ? ['any:53', 'tcp://any:53'] : [],
                 ),
+              );
+          await _handleNetworkConfigChange(ref);
+        },
+      ),
+    );
+  }
+}
+
+class EndpointIndependentNatItem extends ConsumerWidget {
+  const EndpointIndependentNatItem({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final endpointIndependentNat = ref.watch(
+      patchClashConfigProvider.select(
+        (state) => state.tun.endpointIndependentNat,
+      ),
+    );
+
+    return ListItem.switchItem(
+      title: Text(appLocalizations.endpointIndependentNat),
+      subtitle: Text(appLocalizations.endpointIndependentNatDesc),
+      delegate: SwitchDelegate(
+        value: endpointIndependentNat,
+        onChanged: (value) async {
+          ref
+              .read(patchClashConfigProvider.notifier)
+              .updateState(
+                (state) => state.copyWith.tun(endpointIndependentNat: value),
               );
           await _handleNetworkConfigChange(ref);
         },
@@ -596,8 +651,10 @@ final networkItems = [
     items: [
       if (system.isDesktop) const TUNItem(),
       if (system.isMacOS) const AutoSetSystemDnsItem(),
+      const StrictRouteItem(),
       const IcmpForwardingItem(),
       const DnsHijackItem(),
+      const EndpointIndependentNatItem(),
       const TunStackItem(),
       const MtuItem(),
       const RouteModeItem(),

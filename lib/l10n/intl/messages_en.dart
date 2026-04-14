@@ -337,6 +337,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "Upload crash logs when needed",
     ),
     "enableOverride": MessageLookupByLibrary.simpleMessage("Enable Override"),
+    "endpointIndependentNat": MessageLookupByLibrary.simpleMessage(
+      "NAT Enhancement",
+    ),
+    "endpointIndependentNatDesc": MessageLookupByLibrary.simpleMessage(
+      "Enable endpoint-independent NAT",
+    ),
     "entries": MessageLookupByLibrary.simpleMessage(" entries"),
     "exclude": MessageLookupByLibrary.simpleMessage("Hide from Recents"),
     "excludeChina": MessageLookupByLibrary.simpleMessage("Exclude China"),
@@ -973,6 +979,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "storeFix": MessageLookupByLibrary.simpleMessage("Store Fix"),
     "storeFixDesc": MessageLookupByLibrary.simpleMessage(
       "Fix Play Store download issues",
+    ),
+    "strictRoute": MessageLookupByLibrary.simpleMessage("Strict Route"),
+    "strictRouteDesc": MessageLookupByLibrary.simpleMessage(
+      "Use TUN strict routing mode",
     ),
     "style": MessageLookupByLibrary.simpleMessage("Style"),
     "subRule": MessageLookupByLibrary.simpleMessage("Sub Rule"),
