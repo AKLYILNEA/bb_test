@@ -782,6 +782,22 @@ class GlobalState {
     return configMap;
   }
 
+  String _escapeUnicodeRegex(String script) {
+    final regexPattern = RegExp(r'/(\\.|[^/\\])+/[gimuy]*');
+    
+    return script.replaceAllMapped(regexPattern, (match) {
+      final original = match.group(0)!;
+      final escaped = original.replaceAllMapped(
+        RegExp(r'[\u4e00-\u9fa5]'),
+        (charMatch) {
+          final code = charMatch.group(0)!.codeUnitAt(0);
+          return '\\u${code.toRadixString(16).padLeft(4, '0')}';
+        },
+      );
+      return escaped;
+    });
+  }
+
   Future<Map<String, dynamic>> handleEvaluate(
     Map<String, dynamic> config,
   ) async {
@@ -791,7 +807,10 @@ class GlobalState {
 
       config['proxy-providers'] ??= {};
       final configJs = json.encode(config);
-      final scriptJs = json.encode(currentScript.content);
+      final processedScript = system.isMacOS
+          ? _escapeUnicodeRegex(currentScript.content)
+          : currentScript.content;
+      final scriptJs = json.encode(processedScript);
 
       return JavaScriptRuntimeManager.execute((runtime) async {
         final res = await runtime.evaluateAsync('''
