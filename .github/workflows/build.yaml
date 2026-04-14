@@ -59,7 +59,7 @@ jobs:
             arch: amd64
             compatible: true
           - platform: macos
-            os: macos-15-intel
+            os: macos-15
             arch: amd64
             compatible: true
 
@@ -101,7 +101,7 @@ jobs:
       - name: Setup Golang
         uses: actions/setup-go@v6
         with:
-          go-version: ${{ matrix.compatible == true && '1.20.x' || '1.25.x' }}
+          go-version: ${{ matrix.compatible == true && '1.20.x' || '1.24.x' }}
           cache-dependency-path: core/go.sum
 
       - name: Setup Flutter
