@@ -36,7 +36,7 @@ jobs:
             os: windows-2022
             arch: amd64
           - platform: windows
-            os: windows-2022
+            os: windows-11-arm
             arch: arm64
           - platform: macos
             os: macos-15
@@ -76,6 +76,27 @@ jobs:
         with:
           targets: ${{ matrix.arch == 'arm64' && 'aarch64-pc-windows-msvc' || 'x86_64-pc-windows-msvc' }}
 
+      - name: Setup LLVM MinGW (Windows ARM64)
+        if: matrix.platform == 'windows' && matrix.arch == 'arm64'
+        shell: pwsh
+        run: |
+          $url = "https://github.com/mstorsjo/llvm-mingw/releases/download/20251202/llvm-mingw-20251202-ucrt-aarch64.zip"
+          $zip = "$env:RUNNER_TEMP\llvm.zip"
+          $extract = "$env:RUNNER_TEMP\extract"
+          $target = "C:\clangarm64"
+          curl -L $url -o $zip
+          rm -r -fo $extract,$target -ea Ignore
+          mkdir $extract | Out-Null
+          tar -xf $zip -C $extract
+          mv (Get-ChildItem $extract)[0].FullName $target
+          $b = "$target\bin"
+          "CC=$b\clang.exe"        >> $env:GITHUB_ENV
+          "CXX=$b\clang++.exe"     >> $env:GITHUB_ENV
+          "CLANGARM64_BIN=$b"       >> $env:GITHUB_ENV
+          "CGO_ENABLED=1"           >> $env:GITHUB_ENV
+          "CLANGARM64_ROOT=$target" >> $env:GITHUB_ENV
+          $b >> $env:GITHUB_PATH
+
       - name: Setup Keystore
         if: matrix.platform == 'android'
         run: |
@@ -107,10 +128,10 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ matrix.os == 'ubuntu-24.04-arm' && 'master' || 'stable' }}
+          channel: ${{ contains(matrix.os, 'arm') && 'master' || 'stable' }}
           cache: true
           cache-key: flutter-${{ matrix.platform }}-${{ matrix.arch }}-${{ hashFiles('**/pubspec.lock') }}
-          flutter-version: ${{ matrix.os == 'ubuntu-24.04-arm' && '' || '3.35.7' }}
+          flutter-version: ${{ contains(matrix.os, 'arm') && '1c6c6f4' || '3.35.7' }}
 
       - name: Clean Gradle
         if: matrix.platform == 'android'
@@ -153,7 +174,7 @@ jobs:
 
       - name: Generate release.md
         run: |
-          echo -e "- Fixes and improvements\n- 具体变更请参考最新Commits" > release.md
+          echo -e "- Fixes and improvements\n- 具体变更参考最新Commits" > release.md
 
       - name: Patch release.md
         run: |
@@ -166,7 +187,7 @@ jobs:
 
       - name: Release
         if: ${{ env.SHOULD_RELEASE == 'true' }}
-        uses: softprops/action-gh-release@v2.6.1
+        uses: softprops/action-gh-release@v3.0.0
         with:
           files: ./dist/*
           body_path: './release.md'
