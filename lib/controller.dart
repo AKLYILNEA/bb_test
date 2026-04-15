@@ -94,7 +94,7 @@ class AppController {
       if (wasRunning) {
         await globalState.handleStop();
       }
-      await clashService?.reStart();
+      await Future.delayed(const Duration(milliseconds: 500));
       await _initCore();
       if (wasRunning) {
         await globalState.handleStart();
