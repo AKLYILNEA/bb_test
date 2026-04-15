@@ -8,9 +8,9 @@ extension BuildContextExtension on BuildContext {
   }
 
   Future<void>? showNotifier(String text,
-      {VoidCallback? onAction, String? actionLabel}) {
+      {VoidCallback? onAction, String? actionLabel, bool showCountdown = false}) {
     return findAncestorStateOfType<MessageManagerState>()
-        ?.message(text, onAction: onAction, actionLabel: actionLabel);
+        ?.message(text, onAction: onAction, actionLabel: actionLabel, showCountdown: showCountdown);
   }
 
   void showSnackBar(String message, {SnackBarAction? action}) {

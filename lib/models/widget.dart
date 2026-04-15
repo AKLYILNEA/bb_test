@@ -16,6 +16,7 @@ abstract class CommonMessage with _$CommonMessage {
     @Default(Duration(seconds: 3)) Duration duration,
     VoidCallback? onAction,
     String? actionLabel,
+    @Default(false) bool showCountdown,
   }) = _CommonMessage;
 }
 

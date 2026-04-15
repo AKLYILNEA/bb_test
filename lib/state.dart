@@ -376,12 +376,14 @@ class GlobalState {
     String text, {
     VoidCallback? onAction,
     String? actionLabel,
+    bool showCountdown = false,
   }) {
     if (text.isEmpty) return;
     navigatorKey.currentContext?.showNotifier(
       text,
       onAction: onAction,
       actionLabel: actionLabel,
+      showCountdown: showCountdown,
     );
   }
 

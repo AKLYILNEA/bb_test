@@ -35,6 +35,7 @@ class MessageManagerState extends State<MessageManager> {
     String text, {
     VoidCallback? onAction,
     String? actionLabel,
+    bool showCountdown = false,
   }) async {
     if (_messagesNotifier.value.any((m) => m.text == text) ||
         _bufferMessages.any((m) => m.text == text)) {
@@ -46,6 +47,7 @@ class MessageManagerState extends State<MessageManager> {
       text: text,
       onAction: onAction,
       actionLabel: actionLabel,
+      showCountdown: showCountdown,
     );
     _bufferMessages.add(commonMessage);
     await _showMessage();
@@ -88,6 +90,7 @@ class MessageManagerState extends State<MessageManager> {
                   : LayoutBuilder(
                       key: Key(messages.last.id),
                       builder: (_, constraints) {
+                        final message = messages.last;
                         return Card(
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.all(
@@ -106,18 +109,21 @@ class MessageManagerState extends State<MessageManager> {
                               mainAxisSize: MainAxisSize.min,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
+                                if (message.showCountdown)
+                                  _CountdownWidget(
+                                    duration: message.duration,
+                                  ),
                                 Expanded(
                                   child: Text(
-                                    messages.last.text,
+                                    message.text,
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
-                                if (messages.last.actionLabel != null &&
-                                    messages.last.onAction != null) ...[
+                                if (message.actionLabel != null &&
+                                    message.onAction != null) ...[
                                   const SizedBox(width: 8),
                                   TextButton(
                                     onPressed: () {
-                                      final message = messages.last;
                                       _handleRemove(message);
                                       message.onAction?.call();
                                     },
@@ -133,7 +139,7 @@ class MessageManagerState extends State<MessageManager> {
                                       foregroundColor:
                                           context.colorScheme.primary,
                                     ),
-                                    child: Text(messages.last.actionLabel!),
+                                    child: Text(message.actionLabel!),
                                   ),
                                 ],
                               ],
@@ -146,6 +152,78 @@ class MessageManagerState extends State<MessageManager> {
           },
         ),
       ],
+    );
+  }
+}
+
+class _CountdownWidget extends StatefulWidget {
+  final Duration duration;
+
+  const _CountdownWidget({required this.duration});
+
+  @override
+  State<_CountdownWidget> createState() => _CountdownWidgetState();
+}
+
+class _CountdownWidgetState extends State<_CountdownWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late int _totalSeconds;
+
+  @override
+  void initState() {
+    super.initState();
+    _totalSeconds = widget.duration.inSeconds;
+    _controller = AnimationController(
+      vsync: this,
+      duration: widget.duration,
+    );
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final primaryColor = context.colorScheme.primary;
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: SizedBox(
+        width: 24,
+        height: 24,
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            final remaining = (_totalSeconds * (1 - _controller.value)).ceil();
+            final currentSecond = remaining > 0 ? remaining : 1;
+
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+                CircularProgressIndicator(
+                  value: 1 - _controller.value,
+                  strokeWidth: 2,
+                  backgroundColor: primaryColor.withAlpha(26),
+                  valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+                ),
+                Text(
+                  '$currentSecond',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: primaryColor,
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
     );
   }
 }

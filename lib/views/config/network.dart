@@ -19,12 +19,13 @@ Future<void> _handleNetworkConfigChange(WidgetRef ref) async {
   final isCoreRunning = ref.read(runTimeProvider) != null;
 
   if (isVpnOrTunEnabled && isCoreRunning) {
-    final tipMessage = system.isAndroid 
-        ? appLocalizations.vpnTip 
+    final tipMessage = system.isAndroid
+        ? appLocalizations.vpnTip
         : appLocalizations.restartTip;
     globalState.showNotifier(
       tipMessage,
       actionLabel: appLocalizations.restart,
+      showCountdown: true,
       onAction: () async {
         await globalState.appController.restartCore();
         globalState.showNotifier(appLocalizations.success);
