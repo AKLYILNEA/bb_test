@@ -348,7 +348,6 @@ extension TunExt on Tun {
       if (routeMode == RouteMode.bypassPrivate) {
         return copyWith(
           autoRoute: true,
-          strictRoute: !system.isWindows,
           routeAddress: [],
           routeExcludeAddress: [
             '127.0.0.0/8',
@@ -364,7 +363,6 @@ extension TunExt on Tun {
       }
       return copyWith(
         autoRoute: true,
-        strictRoute: !system.isWindows,
         routeAddress: [],
         routeExcludeAddress: [],
       );
