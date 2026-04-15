@@ -612,7 +612,7 @@
   "wakelock": "Wakelock",
   "wakelockDescription": "Keeps the screen on and app active in the background without requiring special CPU wakelock permissions.",
   "tunEnableRequireAdmin": "TUN requires admin privileges. Please run as Administrator.",
-  "restartTip": "Restart the app for changes to take effect",
+  "restartTip": "Restart TUN for changes to take effect",
   "restart": "Restart",
   "restartCoreTitle": "Restart Core",
   "restartCoreDesc": "Manually restart the core?",

@@ -4954,10 +4954,10 @@ class AppLocalizations {
     );
   }
 
-  /// `Restart the app for changes to take effect`
+  /// `Restart TUN for changes to take effect`
   String get restartTip {
     return Intl.message(
-      'Restart the app for changes to take effect',
+      'Restart TUN for changes to take effect',
       name: 'restartTip',
       desc: '',
       args: [],

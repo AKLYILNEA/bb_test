@@ -893,7 +893,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "restartCoreTitle": MessageLookupByLibrary.simpleMessage("Перезапуск ядра"),
     "restartTip": MessageLookupByLibrary.simpleMessage(
-      "Изменения вступят в силу после перезапуска приложения",
+      "Изменения вступят в силу после перезапуска TUN",
     ),
     "retry": MessageLookupByLibrary.simpleMessage("Повторить"),
     "rotatingCircle": MessageLookupByLibrary.simpleMessage("Вращающийся круг"),

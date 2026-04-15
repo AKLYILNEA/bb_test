@@ -877,7 +877,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "restartCoreTitle": MessageLookupByLibrary.simpleMessage("Restart Core"),
     "restartTip": MessageLookupByLibrary.simpleMessage(
-      "Restart the app for changes to take effect",
+      "Restart TUN for changes to take effect",
     ),
     "retry": MessageLookupByLibrary.simpleMessage("Retry"),
     "rotatingCircle": MessageLookupByLibrary.simpleMessage("Rotating Circle"),

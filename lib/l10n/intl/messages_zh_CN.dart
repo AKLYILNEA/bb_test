@@ -600,7 +600,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "restart": MessageLookupByLibrary.simpleMessage("重启"),
     "restartCoreDesc": MessageLookupByLibrary.simpleMessage("是否手动重启内核？"),
     "restartCoreTitle": MessageLookupByLibrary.simpleMessage("重启内核"),
-    "restartTip": MessageLookupByLibrary.simpleMessage("重启APP后改变生效"),
+    "restartTip": MessageLookupByLibrary.simpleMessage("重启TUN后改变生效"),
     "retry": MessageLookupByLibrary.simpleMessage("重试"),
     "rotatingCircle": MessageLookupByLibrary.simpleMessage("单圆自转"),
     "routeAddress": MessageLookupByLibrary.simpleMessage("路由地址"),
