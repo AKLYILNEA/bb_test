@@ -7,9 +7,9 @@ class JavaScriptRuntimeManager {
   static JavascriptRuntime? _instance;
   static final Lock _lock = Lock();
   static int _activeCount = 0;
-  static int _totalExecuteCount = 0;
   static bool _isDisposing = false;
-  static const int _cleanupThreshold = 1;
+  static Timer? _disposeTimer;
+  static const Duration _disposeDelay = Duration(seconds: 30);
 
   static Future<T> execute<T>(
     Future<T> Function(JavascriptRuntime runtime) task,
@@ -27,21 +27,9 @@ class JavaScriptRuntimeManager {
       while (_isDisposing) {
         await Future.delayed(const Duration(milliseconds: 10));
       }
-
-      if (_totalExecuteCount >= _cleanupThreshold &&
-          _activeCount == 0 &&
-          _instance != null) {
-        _isDisposing = true;
-        try {
-          _instance!.dispose();
-        } catch (_) {}
-        _instance = null;
-        _totalExecuteCount = 0;
-        _isDisposing = false;
-      }
-
+      _disposeTimer?.cancel();
+      _disposeTimer = null;
       _activeCount++;
-      _totalExecuteCount++;
       _instance ??= getJavascriptRuntime();
       return _instance!;
     });
@@ -50,29 +38,28 @@ class JavaScriptRuntimeManager {
   static Future<void> _release() async {
     await _lock.synchronized(() async {
       _activeCount--;
+      
+      // 当没有活跃任务时，启动防抖延迟销毁
       if (_activeCount <= 0 && _instance != null) {
-        _isDisposing = true;
-        try {
-          _instance!.dispose();
-        } catch (_) {}
-        _instance = null;
-        _activeCount = 0;
-        _isDisposing = false;
+        _disposeTimer?.cancel();
+        _disposeTimer = Timer(_disposeDelay, () {
+          dispose();
+        });
       }
     });
   }
 
   static Future<void> dispose() async {
     return _lock.synchronized(() async {
+      if (_activeCount > 0) return;
       if (_instance != null) {
+        _isDisposing = true;
         try {
           _instance!.dispose();
         } catch (_) {}
         _instance = null;
+        _isDisposing = false;
       }
-      _activeCount = 0;
-      _totalExecuteCount = 0;
-      _isDisposing = false;
     });
   }
 }
