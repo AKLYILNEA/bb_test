@@ -3914,46 +3914,21 @@ class AppLocalizations {
     return Intl.message('System', name: 'system', desc: '', args: []);
   }
 
-  /// `Route Mode`
-  String get routeMode {
-    return Intl.message('Route Mode', name: 'routeMode', desc: '', args: []);
-  }
-
-  /// `Bypass Private IPs`
-  String get routeMode_bypassPrivate {
+  /// `Bypass Private Network`
+  String get bypassPrivateRoute {
     return Intl.message(
-      'Bypass Private IPs',
-      name: 'routeMode_bypassPrivate',
+      'Bypass Private Network',
+      name: 'bypassPrivateRoute',
       desc: '',
       args: [],
     );
   }
 
-  /// `Use Config`
-  String get routeMode_config {
+  /// `Automatically bypass private network IP addresses`
+  String get bypassPrivateRouteDesc {
     return Intl.message(
-      'Use Config',
-      name: 'routeMode_config',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Route Address`
-  String get routeAddress {
-    return Intl.message(
-      'Route Address',
-      name: 'routeAddress',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Configure route listen address`
-  String get routeAddressDesc {
-    return Intl.message(
-      'Configure route listen address',
-      name: 'routeAddressDesc',
+      'Automatically bypass private network IP addresses',
+      name: 'bypassPrivateRouteDesc',
       desc: '',
       args: [],
     );

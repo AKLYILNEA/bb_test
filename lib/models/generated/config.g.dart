@@ -162,9 +162,7 @@ _VpnProps _$VpnPropsFromJson(Map<String, dynamic> json) => _VpnProps(
   systemProxy: json['systemProxy'] as bool? ?? false,
   ipv6: json['ipv6'] as bool? ?? false,
   allowBypass: json['allowBypass'] as bool? ?? false,
-  routeMode:
-      $enumDecodeNullable(_$RouteModeEnumMap, json['routeMode']) ??
-      RouteMode.config,
+  bypassPrivateRoute: json['bypassPrivateRoute'] as bool? ?? true,
   dozeSuspend: json['dozeSuspend'] as bool? ?? true,
   smartAutoStop: json['smartAutoStop'] as bool? ?? false,
   smartAutoStopNetworks: json['smartAutoStopNetworks'] as String? ?? '',
@@ -184,7 +182,7 @@ Map<String, dynamic> _$VpnPropsToJson(_VpnProps instance) => <String, dynamic>{
   'systemProxy': instance.systemProxy,
   'ipv6': instance.ipv6,
   'allowBypass': instance.allowBypass,
-  'routeMode': _$RouteModeEnumMap[instance.routeMode]!,
+  'bypassPrivateRoute': instance.bypassPrivateRoute,
   'dozeSuspend': instance.dozeSuspend,
   'smartAutoStop': instance.smartAutoStop,
   'smartAutoStopNetworks': instance.smartAutoStopNetworks,
@@ -197,11 +195,6 @@ Map<String, dynamic> _$VpnPropsToJson(_VpnProps instance) => <String, dynamic>{
   'accessControl': instance.accessControl,
 };
 
-const _$RouteModeEnumMap = {
-  RouteMode.bypassPrivate: 'bypassPrivate',
-  RouteMode.config: 'config',
-};
-
 _NetworkProps _$NetworkPropsFromJson(Map<String, dynamic> json) =>
     _NetworkProps(
       systemProxy: json['systemProxy'] as bool? ?? false,
@@ -210,9 +203,7 @@ _NetworkProps _$NetworkPropsFromJson(Map<String, dynamic> json) =>
               ?.map((e) => e as String)
               .toList() ??
           defaultBypassDomain,
-      routeMode:
-          $enumDecodeNullable(_$RouteModeEnumMap, json['routeMode']) ??
-          RouteMode.bypassPrivate,
+      bypassPrivateRoute: json['bypassPrivateRoute'] as bool? ?? true,
       autoSetSystemDns: json['autoSetSystemDns'] as bool? ?? true,
     );
 
@@ -220,7 +211,7 @@ Map<String, dynamic> _$NetworkPropsToJson(_NetworkProps instance) =>
     <String, dynamic>{
       'systemProxy': instance.systemProxy,
       'bypassDomain': instance.bypassDomain,
-      'routeMode': _$RouteModeEnumMap[instance.routeMode]!,
+      'bypassPrivateRoute': instance.bypassPrivateRoute,
       'autoSetSystemDns': instance.autoSetSystemDns,
     };
 

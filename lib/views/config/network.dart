@@ -6,7 +6,6 @@ import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 Future<void> _handleNetworkConfigChange(WidgetRef ref) async {
   final bool isVpnOrTunEnabled;
@@ -559,81 +558,31 @@ class BypassDomainItem extends StatelessWidget {
   }
 }
 
-class RouteModeItem extends ConsumerWidget {
-  const RouteModeItem({super.key});
+class BypassPrivateRouteItem extends ConsumerWidget {
+  const BypassPrivateRouteItem({super.key});
 
   @override
   Widget build(BuildContext context, ref) {
-    final routeMode = ref.watch(
-      networkSettingProvider.select((state) => state.routeMode),
+    final bypassPrivateRoute = ref.watch(
+      networkSettingProvider.select((state) => state.bypassPrivateRoute),
     );
-    return ListItem<RouteMode>.options(
-      title: Text(appLocalizations.routeMode),
-      subtitle: Text(Intl.message('routeMode_${routeMode.name}')),
-      delegate: OptionsDelegate<RouteMode>(
-        title: appLocalizations.routeMode,
-        options: RouteMode.values,
-        onChanged: (RouteMode? value) {
-          if (value == null) {
-            return;
-          }
+    return ListItem.switchItem(
+      title: Text(appLocalizations.bypassPrivateRoute),
+      subtitle: Text(appLocalizations.bypassPrivateRouteDesc),
+      delegate: SwitchDelegate(
+        value: bypassPrivateRoute,
+        onChanged: (value) async {
           ref
               .read(networkSettingProvider.notifier)
-              .updateState((state) => state.copyWith(routeMode: value));
+              .updateState((state) => state.copyWith(bypassPrivateRoute: value));
+          await _handleNetworkConfigChange(ref);
         },
-        textBuilder: (routeMode) => Intl.message('routeMode_${routeMode.name}'),
-        value: routeMode,
       ),
     );
   }
 }
 
-class RouteAddressItem extends ConsumerWidget {
-  const RouteAddressItem({super.key});
 
-  @override
-  Widget build(BuildContext context, ref) {
-    final bypassPrivate = ref.watch(
-      networkSettingProvider.select(
-        (state) => state.routeMode == RouteMode.bypassPrivate,
-      ),
-    );
-    if (bypassPrivate) {
-      return Container();
-    }
-    return ListItem.open(
-      title: Text(appLocalizations.routeAddress),
-      subtitle: Text(appLocalizations.routeAddressDesc),
-      delegate: OpenDelegate(
-        blur: false,
-        maxWidth: 360,
-        title: appLocalizations.routeAddress,
-        widget: Consumer(
-          builder: (_, ref, _) {
-            final routeAddress = ref.watch(
-              patchClashConfigProvider.select(
-                (state) => state.tun.routeAddress,
-              ),
-            );
-            return ListInputPage(
-              title: appLocalizations.routeAddress,
-              items: routeAddress,
-              titleBuilder: (item) => Text(item),
-              onChange: (items) {
-                ref
-                    .read(patchClashConfigProvider.notifier)
-                    .updateState(
-                      (state) =>
-                          state.copyWith.tun(routeAddress: List.from(items)),
-                    );
-              },
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
 
 final networkItems = [
   if (system.isAndroid) const VPNItem(),
@@ -658,8 +607,7 @@ final networkItems = [
       const EndpointIndependentNatItem(),
       const TunStackItem(),
       const MtuItem(),
-      const RouteModeItem(),
-      if (!system.isDesktop) const RouteAddressItem(),
+      const BypassPrivateRouteItem(),
     ],
   ),
 ];

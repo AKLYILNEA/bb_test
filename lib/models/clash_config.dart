@@ -1,7 +1,5 @@
 // ignore_for_file: invalid_annotation_target
 
-import 'dart:io';
-
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -25,7 +23,7 @@ const defaultMixedPort = 7890;
 const defaultKeepAliveInterval = 30;
 
 const defaultBypassPrivateRouteAddress = [
-  '172.19.0.0/30',
+  '198.51.100.0/30',
   '1.0.0.0/8',
   '2.0.0.0/7',
   '4.0.0.0/6',
@@ -308,44 +306,12 @@ abstract class Tun with _$Tun {
 
 extension TunExt on Tun {
   Tun getRealTun(
-    RouteMode routeMode, {
+    bool bypassPrivateRoute, {
     String? fakeIpRange,
     String? fakeIpRangeV6,
   }) {
-    bool isValidCidr(String? value) {
-      if (value == null) return false;
-      final trimmed = value.trim();
-      if (trimmed.isEmpty) return false;
-      final parts = trimmed.split('/');
-      if (parts.length != 2) return false;
-      final ip = InternetAddress.tryParse(parts[0]);
-      if (ip == null) return false;
-      final prefix = int.tryParse(parts[1]);
-      if (prefix == null) return false;
-      return ip.type == InternetAddressType.IPv4
-          ? prefix >= 0 && prefix <= 32
-          : prefix >= 0 && prefix <= 128;
-    }
-
-    List<String> buildBypassPrivateRouteAddress() {
-      final list = List<String>.from(defaultBypassPrivateRouteAddress);
-      final candidates = [fakeIpRange, fakeIpRangeV6];
-      for (final candidate in candidates) {
-        if (!isValidCidr(candidate)) continue;
-        final trimmed = candidate!.trim();
-        if (!list.contains(trimmed)) {
-          list.add(trimmed);
-        }
-      }
-      return list;
-    }
-
-    final mRouteAddress = routeMode == RouteMode.bypassPrivate
-        ? buildBypassPrivateRouteAddress()
-        : routeAddress;
-
     if (system.isDesktop) {
-      if (routeMode == RouteMode.bypassPrivate) {
+      if (bypassPrivateRoute) {
         return copyWith(
           autoRoute: true,
           routeAddress: [],
@@ -368,9 +334,16 @@ extension TunExt on Tun {
       );
     }
 
+    if (bypassPrivateRoute) {
+      return copyWith(
+        autoRoute: true,
+        routeAddress: List<String>.from(defaultBypassPrivateRouteAddress),
+      );
+    }
+
     return copyWith(
       autoRoute: true,
-      routeAddress: mRouteAddress,
+      routeAddress: [],
     );
   }
 }

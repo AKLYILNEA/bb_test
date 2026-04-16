@@ -163,6 +163,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "bypassDomainDesc": MessageLookupByLibrary.simpleMessage(
       "Работает только при включённом системном прокси",
     ),
+    "bypassPrivateRoute": MessageLookupByLibrary.simpleMessage(
+      "Обход частной сети",
+    ),
+    "bypassPrivateRouteDesc": MessageLookupByLibrary.simpleMessage(
+      "Автоматически обходить IP-адреса частной сети",
+    ),
     "cacheAlgorithm": MessageLookupByLibrary.simpleMessage("Алгоритм кэша"),
     "cacheCorrupt": MessageLookupByLibrary.simpleMessage(
       "Кэш повреждён. Очистить?",
@@ -897,17 +903,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "retry": MessageLookupByLibrary.simpleMessage("Повторить"),
     "rotatingCircle": MessageLookupByLibrary.simpleMessage("Вращающийся круг"),
-    "routeAddress": MessageLookupByLibrary.simpleMessage("Адрес маршрутизации"),
-    "routeAddressDesc": MessageLookupByLibrary.simpleMessage(
-      "Настроить адрес прослушивания маршрутизации",
-    ),
-    "routeMode": MessageLookupByLibrary.simpleMessage("Режим маршрутизации"),
-    "routeMode_bypassPrivate": MessageLookupByLibrary.simpleMessage(
-      "Обход частных адресов",
-    ),
-    "routeMode_config": MessageLookupByLibrary.simpleMessage(
-      "Использовать конфигурацию",
-    ),
     "ru": MessageLookupByLibrary.simpleMessage("Русский"),
     "rule": MessageLookupByLibrary.simpleMessage("Правила"),
     "ruleName": MessageLookupByLibrary.simpleMessage("Имя правила"),

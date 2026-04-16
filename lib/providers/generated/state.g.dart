@@ -80,7 +80,7 @@ final currentNavigationItemsStateProvider =
 // ignore: unused_element
 typedef CurrentNavigationItemsStateRef =
     AutoDisposeProviderRef<NavigationItemsState>;
-String _$coreStateHash() => r'a104c59a05ed8eae49e966b483bdb523b1d72d4f';
+String _$coreStateHash() => r'0fec30a6b2b78e720d08824a11e1cc945c1873bb';
 
 /// See also [coreState].
 @ProviderFor(coreState)
@@ -97,7 +97,7 @@ final coreStateProvider = AutoDisposeProvider<CoreState>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CoreStateRef = AutoDisposeProviderRef<CoreState>;
-String _$updateParamsHash() => r'c2237876e44da5474cda28eedf8bc0d69529dd3d';
+String _$updateParamsHash() => r'aef760656c0e937600e2b8e34d5286123d0ce121';
 
 /// See also [updateParams].
 @ProviderFor(updateParams)

@@ -5149,7 +5149,7 @@ as int,
 /// @nodoc
 mixin _$ClashConfigState {
 
- bool get overrideDns; ClashConfig get clashConfig; OverrideData get overrideData; RouteMode get routeMode;
+ bool get overrideDns; ClashConfig get clashConfig; OverrideData get overrideData; bool get bypassPrivateRoute;
 /// Create a copy of ClashConfigState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -5160,16 +5160,16 @@ $ClashConfigStateCopyWith<ClashConfigState> get copyWith => _$ClashConfigStateCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ClashConfigState&&(identical(other.overrideDns, overrideDns) || other.overrideDns == overrideDns)&&(identical(other.clashConfig, clashConfig) || other.clashConfig == clashConfig)&&(identical(other.overrideData, overrideData) || other.overrideData == overrideData)&&(identical(other.routeMode, routeMode) || other.routeMode == routeMode));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ClashConfigState&&(identical(other.overrideDns, overrideDns) || other.overrideDns == overrideDns)&&(identical(other.clashConfig, clashConfig) || other.clashConfig == clashConfig)&&(identical(other.overrideData, overrideData) || other.overrideData == overrideData)&&(identical(other.bypassPrivateRoute, bypassPrivateRoute) || other.bypassPrivateRoute == bypassPrivateRoute));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,overrideDns,clashConfig,overrideData,routeMode);
+int get hashCode => Object.hash(runtimeType,overrideDns,clashConfig,overrideData,bypassPrivateRoute);
 
 @override
 String toString() {
-  return 'ClashConfigState(overrideDns: $overrideDns, clashConfig: $clashConfig, overrideData: $overrideData, routeMode: $routeMode)';
+  return 'ClashConfigState(overrideDns: $overrideDns, clashConfig: $clashConfig, overrideData: $overrideData, bypassPrivateRoute: $bypassPrivateRoute)';
 }
 
 
@@ -5180,7 +5180,7 @@ abstract mixin class $ClashConfigStateCopyWith<$Res>  {
   factory $ClashConfigStateCopyWith(ClashConfigState value, $Res Function(ClashConfigState) _then) = _$ClashConfigStateCopyWithImpl;
 @useResult
 $Res call({
- bool overrideDns, ClashConfig clashConfig, OverrideData overrideData, RouteMode routeMode
+ bool overrideDns, ClashConfig clashConfig, OverrideData overrideData, bool bypassPrivateRoute
 });
 
 
@@ -5197,13 +5197,13 @@ class _$ClashConfigStateCopyWithImpl<$Res>
 
 /// Create a copy of ClashConfigState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? overrideDns = null,Object? clashConfig = null,Object? overrideData = null,Object? routeMode = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? overrideDns = null,Object? clashConfig = null,Object? overrideData = null,Object? bypassPrivateRoute = null,}) {
   return _then(_self.copyWith(
 overrideDns: null == overrideDns ? _self.overrideDns : overrideDns // ignore: cast_nullable_to_non_nullable
 as bool,clashConfig: null == clashConfig ? _self.clashConfig : clashConfig // ignore: cast_nullable_to_non_nullable
 as ClashConfig,overrideData: null == overrideData ? _self.overrideData : overrideData // ignore: cast_nullable_to_non_nullable
-as OverrideData,routeMode: null == routeMode ? _self.routeMode : routeMode // ignore: cast_nullable_to_non_nullable
-as RouteMode,
+as OverrideData,bypassPrivateRoute: null == bypassPrivateRoute ? _self.bypassPrivateRoute : bypassPrivateRoute // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 /// Create a copy of ClashConfigState
@@ -5306,10 +5306,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool overrideDns,  ClashConfig clashConfig,  OverrideData overrideData,  RouteMode routeMode)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool overrideDns,  ClashConfig clashConfig,  OverrideData overrideData,  bool bypassPrivateRoute)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ClashConfigState() when $default != null:
-return $default(_that.overrideDns,_that.clashConfig,_that.overrideData,_that.routeMode);case _:
+return $default(_that.overrideDns,_that.clashConfig,_that.overrideData,_that.bypassPrivateRoute);case _:
   return orElse();
 
 }
@@ -5327,10 +5327,10 @@ return $default(_that.overrideDns,_that.clashConfig,_that.overrideData,_that.rou
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool overrideDns,  ClashConfig clashConfig,  OverrideData overrideData,  RouteMode routeMode)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool overrideDns,  ClashConfig clashConfig,  OverrideData overrideData,  bool bypassPrivateRoute)  $default,) {final _that = this;
 switch (_that) {
 case _ClashConfigState():
-return $default(_that.overrideDns,_that.clashConfig,_that.overrideData,_that.routeMode);case _:
+return $default(_that.overrideDns,_that.clashConfig,_that.overrideData,_that.bypassPrivateRoute);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -5347,10 +5347,10 @@ return $default(_that.overrideDns,_that.clashConfig,_that.overrideData,_that.rou
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool overrideDns,  ClashConfig clashConfig,  OverrideData overrideData,  RouteMode routeMode)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool overrideDns,  ClashConfig clashConfig,  OverrideData overrideData,  bool bypassPrivateRoute)?  $default,) {final _that = this;
 switch (_that) {
 case _ClashConfigState() when $default != null:
-return $default(_that.overrideDns,_that.clashConfig,_that.overrideData,_that.routeMode);case _:
+return $default(_that.overrideDns,_that.clashConfig,_that.overrideData,_that.bypassPrivateRoute);case _:
   return null;
 
 }
@@ -5362,13 +5362,13 @@ return $default(_that.overrideDns,_that.clashConfig,_that.overrideData,_that.rou
 
 
 class _ClashConfigState implements ClashConfigState {
-  const _ClashConfigState({required this.overrideDns, required this.clashConfig, required this.overrideData, required this.routeMode});
+  const _ClashConfigState({required this.overrideDns, required this.clashConfig, required this.overrideData, required this.bypassPrivateRoute});
   
 
 @override final  bool overrideDns;
 @override final  ClashConfig clashConfig;
 @override final  OverrideData overrideData;
-@override final  RouteMode routeMode;
+@override final  bool bypassPrivateRoute;
 
 /// Create a copy of ClashConfigState
 /// with the given fields replaced by the non-null parameter values.
@@ -5380,16 +5380,16 @@ _$ClashConfigStateCopyWith<_ClashConfigState> get copyWith => __$ClashConfigStat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ClashConfigState&&(identical(other.overrideDns, overrideDns) || other.overrideDns == overrideDns)&&(identical(other.clashConfig, clashConfig) || other.clashConfig == clashConfig)&&(identical(other.overrideData, overrideData) || other.overrideData == overrideData)&&(identical(other.routeMode, routeMode) || other.routeMode == routeMode));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ClashConfigState&&(identical(other.overrideDns, overrideDns) || other.overrideDns == overrideDns)&&(identical(other.clashConfig, clashConfig) || other.clashConfig == clashConfig)&&(identical(other.overrideData, overrideData) || other.overrideData == overrideData)&&(identical(other.bypassPrivateRoute, bypassPrivateRoute) || other.bypassPrivateRoute == bypassPrivateRoute));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,overrideDns,clashConfig,overrideData,routeMode);
+int get hashCode => Object.hash(runtimeType,overrideDns,clashConfig,overrideData,bypassPrivateRoute);
 
 @override
 String toString() {
-  return 'ClashConfigState(overrideDns: $overrideDns, clashConfig: $clashConfig, overrideData: $overrideData, routeMode: $routeMode)';
+  return 'ClashConfigState(overrideDns: $overrideDns, clashConfig: $clashConfig, overrideData: $overrideData, bypassPrivateRoute: $bypassPrivateRoute)';
 }
 
 
@@ -5400,7 +5400,7 @@ abstract mixin class _$ClashConfigStateCopyWith<$Res> implements $ClashConfigSta
   factory _$ClashConfigStateCopyWith(_ClashConfigState value, $Res Function(_ClashConfigState) _then) = __$ClashConfigStateCopyWithImpl;
 @override @useResult
 $Res call({
- bool overrideDns, ClashConfig clashConfig, OverrideData overrideData, RouteMode routeMode
+ bool overrideDns, ClashConfig clashConfig, OverrideData overrideData, bool bypassPrivateRoute
 });
 
 
@@ -5417,13 +5417,13 @@ class __$ClashConfigStateCopyWithImpl<$Res>
 
 /// Create a copy of ClashConfigState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? overrideDns = null,Object? clashConfig = null,Object? overrideData = null,Object? routeMode = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? overrideDns = null,Object? clashConfig = null,Object? overrideData = null,Object? bypassPrivateRoute = null,}) {
   return _then(_ClashConfigState(
 overrideDns: null == overrideDns ? _self.overrideDns : overrideDns // ignore: cast_nullable_to_non_nullable
 as bool,clashConfig: null == clashConfig ? _self.clashConfig : clashConfig // ignore: cast_nullable_to_non_nullable
 as ClashConfig,overrideData: null == overrideData ? _self.overrideData : overrideData // ignore: cast_nullable_to_non_nullable
-as OverrideData,routeMode: null == routeMode ? _self.routeMode : routeMode // ignore: cast_nullable_to_non_nullable
-as RouteMode,
+as OverrideData,bypassPrivateRoute: null == bypassPrivateRoute ? _self.bypassPrivateRoute : bypassPrivateRoute // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

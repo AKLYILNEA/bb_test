@@ -89,13 +89,13 @@ NavigationItemsState currentNavigationItemsState(Ref ref) {
 @riverpod
 CoreState coreState(Ref ref) {
   final vpnProps = ref.watch(vpnSettingProvider);
-  final routeMode = ref.watch(
-    networkSettingProvider.select((state) => state.routeMode),
+  final bypassPrivateRoute = ref.watch(
+    networkSettingProvider.select((state) => state.bypassPrivateRoute),
   );
   final currentProfile = ref.watch(currentProfileProvider);
   final onlyStatisticsProxy = ref.watch(appSettingProvider).onlyStatisticsProxy;
   return CoreState(
-    vpnProps: vpnProps.copyWith(routeMode: routeMode),
+    vpnProps: vpnProps.copyWith(bypassPrivateRoute: bypassPrivateRoute),
     onlyStatisticsProxy: onlyStatisticsProxy,
     currentProfileName: currentProfile?.label ?? currentProfile?.id ?? '',
   );
@@ -103,14 +103,14 @@ CoreState coreState(Ref ref) {
 
 @riverpod
 UpdateParams updateParams(Ref ref) {
-  final routeMode = ref.watch(
-    networkSettingProvider.select((state) => state.routeMode),
+  final bypassPrivateRoute = ref.watch(
+    networkSettingProvider.select((state) => state.bypassPrivateRoute),
   );
   return ref.watch(
     patchClashConfigProvider.select(
       (state) => UpdateParams(
         tun: state.tun.getRealTun(
-          routeMode,
+          bypassPrivateRoute,
           fakeIpRange: state.dns.fakeIpRange,
           fakeIpRangeV6: state.dns.fakeIpRangeV6,
         ),

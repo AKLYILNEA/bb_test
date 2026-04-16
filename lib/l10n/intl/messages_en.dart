@@ -159,6 +159,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "bypassDomainDesc": MessageLookupByLibrary.simpleMessage(
       "Active only when System Proxy is on",
     ),
+    "bypassPrivateRoute": MessageLookupByLibrary.simpleMessage(
+      "Bypass Private Network",
+    ),
+    "bypassPrivateRouteDesc": MessageLookupByLibrary.simpleMessage(
+      "Automatically bypass private network IP addresses",
+    ),
     "cacheAlgorithm": MessageLookupByLibrary.simpleMessage("Cache Algorithm"),
     "cacheCorrupt": MessageLookupByLibrary.simpleMessage(
       "Cache corrupted. Clear it?",
@@ -881,15 +887,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "retry": MessageLookupByLibrary.simpleMessage("Retry"),
     "rotatingCircle": MessageLookupByLibrary.simpleMessage("Rotating Circle"),
-    "routeAddress": MessageLookupByLibrary.simpleMessage("Route Address"),
-    "routeAddressDesc": MessageLookupByLibrary.simpleMessage(
-      "Configure route listen address",
-    ),
-    "routeMode": MessageLookupByLibrary.simpleMessage("Route Mode"),
-    "routeMode_bypassPrivate": MessageLookupByLibrary.simpleMessage(
-      "Bypass Private IPs",
-    ),
-    "routeMode_config": MessageLookupByLibrary.simpleMessage("Use Config"),
     "ru": MessageLookupByLibrary.simpleMessage("Russian"),
     "rule": MessageLookupByLibrary.simpleMessage("Rule"),
     "ruleName": MessageLookupByLibrary.simpleMessage("Rule Name"),

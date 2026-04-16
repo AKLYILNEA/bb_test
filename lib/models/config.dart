@@ -149,7 +149,7 @@ abstract class VpnProps with _$VpnProps {
     @Default(false) bool systemProxy,
     @Default(false) bool ipv6,
     @Default(false) bool allowBypass,
-    @Default(RouteMode.config) RouteMode routeMode,
+    @Default(true) bool bypassPrivateRoute,
     @Default(true) bool dozeSuspend,
     @Default(false) bool smartAutoStop,
     @Default('') String smartAutoStopNetworks,
@@ -190,7 +190,7 @@ abstract class NetworkProps with _$NetworkProps {
   const factory NetworkProps({
     @Default(false) bool systemProxy,
     @Default(defaultBypassDomain) List<String> bypassDomain,
-    @Default(RouteMode.bypassPrivate) RouteMode routeMode,
+    @Default(true) bool bypassPrivateRoute,
     @Default(true) bool autoSetSystemDns,
   }) = _NetworkProps;
 
