@@ -107,6 +107,7 @@ class AllowBypassItem extends ConsumerWidget {
           ref
               .read(vpnSettingProvider.notifier)
               .updateState((state) => state.copyWith(allowBypass: value));
+          await _handleNetworkConfigChange(ref);
         },
       ),
     );
@@ -185,6 +186,7 @@ class Ipv6Item extends ConsumerWidget {
           ref
               .read(vpnSettingProvider.notifier)
               .updateState((state) => state.copyWith(ipv6: value));
+          await _handleNetworkConfigChange(ref);
         },
       ),
     );

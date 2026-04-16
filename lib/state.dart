@@ -503,6 +503,7 @@ class GlobalState {
     rawConfig['tun']['dns-hijack'] = realPatchConfig.tun.dnsHijack;
     rawConfig['tun']['stack'] = realPatchConfig.tun.stack.name;
     rawConfig['tun']['route-address'] = realPatchConfig.tun.routeAddress;
+    rawConfig['tun']['route-exclude-address'] = realPatchConfig.tun.routeExcludeAddress;
     rawConfig['tun']['auto-route'] = true;
     rawConfig['tun']['auto-detect-interface'] = true;
     rawConfig['tun']['strict-route'] = realPatchConfig.tun.strictRoute;
