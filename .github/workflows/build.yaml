@@ -180,10 +180,11 @@ jobs:
       - name: Patch release.md
         run: |
           version=$(echo "${{ github.ref_name }}" | sed 's/^v//')
+          base_version=$(echo "$version" | sed 's/-pre[0-9]*//')
           if [ "${{ env.IS_PRERELEASE }}" == "true" ]; then
-            sed "s|VERSION|$version|g" ./.github/release_template_pre.md >> release.md
+            sed -e "s|VERSION|$version|g" -e "s|BASE_VERSION|$base_version|g" ./.github/release_template_pre.md >> release.md
           else
-            sed "s|VERSION|$version|g" ./.github/release_template.md >> release.md
+            sed -e "s|VERSION|$version|g" -e "s|BASE_VERSION|$base_version|g" ./.github/release_template.md >> release.md
           fi
 
       - name: Release
