@@ -70,16 +70,17 @@ jobs:
           submodules: recursive
           fetch-depth: 1
 
-      - name: Setup Rust
+      - name: Setup Rust (Windows)
         if: matrix.platform == 'windows'
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.arch == 'arm64' && 'aarch64-pc-windows-msvc' || 'x86_64-pc-windows-msvc' }}
 
-      - name: Setup LLVM MinGW (Windows ARM64)
+      - name: Setup llvm-mingw (Windows arm64)
         if: matrix.platform == 'windows' && matrix.arch == 'arm64'
         shell: pwsh
         run: |
+          git config --global core.longpaths true
           $url = "https://github.com/mstorsjo/llvm-mingw/releases/download/20251202/llvm-mingw-20251202-ucrt-aarch64.zip"
           $zip = "$env:RUNNER_TEMP\llvm.zip"
           $extract = "$env:RUNNER_TEMP\extract"
@@ -97,7 +98,7 @@ jobs:
           "CLANGARM64_ROOT=$target" >> $env:GITHUB_ENV
           $b >> $env:GITHUB_PATH
 
-      - name: Setup Keystore
+      - name: Setup Keystore (Android)
         if: matrix.platform == 'android'
         run: |
           echo "${{ secrets.KEYSTORE }}" | base64 --decode > android/app/keystore.jks
@@ -113,7 +114,7 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - name: Install Dependencies
+      - name: Install Dependencies (linux)
         if: matrix.platform == 'linux'
         run: |
           sudo apt-get update
@@ -133,7 +134,7 @@ jobs:
           cache-key: flutter-${{ matrix.platform }}-${{ matrix.arch }}-${{ hashFiles('**/pubspec.lock') }}
           flutter-version: ${{ contains(matrix.os, 'arm') && '1c6c6f4' || '3.35.7' }}
 
-      - name: Clean Gradle
+      - name: Clean Gradle (Android)
         if: matrix.platform == 'android'
         run: |
           cd android
