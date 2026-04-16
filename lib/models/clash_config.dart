@@ -369,8 +369,7 @@ extension TunExt on Tun {
     }
 
     return copyWith(
-      autoRoute: mRouteAddress.isEmpty ? true : false,
-      strictRoute: false,
+      autoRoute: true,
       routeAddress: mRouteAddress,
     );
   }
