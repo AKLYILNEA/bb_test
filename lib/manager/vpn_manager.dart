@@ -55,6 +55,7 @@ class _VpnContainerState extends ConsumerState<VpnManager> {
             await globalState.appController.updateStatus(true);
           },
           actionLabel: appLocalizations.restart,
+          showCountdown: true,
         );
       }
     });

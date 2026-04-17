@@ -137,9 +137,11 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
 
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.inactive ||
-        state == AppLifecycleState.hidden) {
+    final isBackgroundState = state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden ||
+        (state == AppLifecycleState.inactive && !system.isDesktop);
+
+    if (isBackgroundState) {
       globalState.appController.savePreferences();
       await globalState.handleBackground();
     } else if (state == AppLifecycleState.resumed) {
@@ -363,10 +365,8 @@ class WindowLockButton extends ConsumerWidget {
           );
           final newLocked = !currentLocked;
 
-          // 先设置窗口
           await windowManager.setResizable(!newLocked);
 
-          // 再更新状态
           ref
               .read(windowSettingProvider.notifier)
               .updateState((state) => state.copyWith(isLocked: newLocked));

@@ -9,7 +9,7 @@ class JavaScriptRuntimeManager {
   static int _activeCount = 0;
   static bool _isDisposing = false;
   static Timer? _disposeTimer;
-  static const Duration _disposeDelay = Duration(seconds: 30);
+  static const Duration _disposeDelay = Duration(seconds: 10);
 
   static Future<T> execute<T>(
     Future<T> Function(JavascriptRuntime runtime) task,
@@ -38,8 +38,6 @@ class JavaScriptRuntimeManager {
   static Future<void> _release() async {
     await _lock.synchronized(() async {
       _activeCount--;
-      
-      // 当没有活跃任务时，启动防抖延迟销毁
       if (_activeCount <= 0 && _instance != null) {
         _disposeTimer?.cancel();
         _disposeTimer = Timer(_disposeDelay, () {

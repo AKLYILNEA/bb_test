@@ -94,7 +94,12 @@ class AppController {
       if (wasRunning) {
         await globalState.handleStop();
       }
-      await Future.delayed(const Duration(milliseconds: 500));
+      if (system.isDesktop) {
+        await clashCore.shutdown();
+        await clashService!.reStart();
+      } else {
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
       await _initCore();
       if (wasRunning) {
         await globalState.handleStart();
@@ -201,9 +206,7 @@ class AppController {
       final res = await _requestAdmin(targetTun);
       if (res.needRestart) {
         await restartCore();
-        return;
-      }
-      if (res.isError) {
+      } else if (res.isError) {
         return;
       }
       final realTunEnable = _ref.read(realTunEnableProvider);
@@ -391,9 +394,7 @@ class AppController {
     final res = await _requestAdmin(updateParams.tun.enable);
     if (res.needRestart) {
       await restartCore();
-      return;
-    }
-    if (res.isError) {
+    } else if (res.isError) {
       return;
     }
     final realTunEnable = _ref.read(realTunEnableProvider);
@@ -439,9 +440,7 @@ class AppController {
     final res = await _requestAdmin(patchConfig.tun.enable);
     if (res.needRestart) {
       await restartCore();
-      return;
-    }
-    if (res.isError) {
+    } else if (res.isError) {
       return;
     }
     final realTunEnable = _ref.read(realTunEnableProvider);
@@ -900,6 +899,10 @@ class AppController {
   }
 
   void toPage(PageLabel pageLabel) {
+    final context = globalState.navigatorKey.currentState?.context;
+    if (context != null && context.mounted) {
+      Navigator.of(context, rootNavigator: true).popUntil((route) => route.isFirst);
+    }
     _ref.read(currentPageLabelProvider.notifier).value = pageLabel;
   }
 

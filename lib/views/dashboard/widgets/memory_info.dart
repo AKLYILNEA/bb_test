@@ -30,11 +30,19 @@ class _MemoryInfoState extends State<MemoryInfo> {
 
     // Get immediately on first open, otherwise delay 1000ms
     if (_lastMemoryValue.value == 0) {
-      // First open, get immediately
-      _updateMemory();
+      _retryUpdateMemory();
     } else {
       // Has cached value, delay
       _initTimer = Timer(const Duration(milliseconds: 1000), _updateMemory);
+    }
+  }
+
+  Future<void> _retryUpdateMemory() async {
+    for (int i = 0; i < 5; i++) {
+      if (!mounted) return;
+      await _updateMemory();
+      if (_memoryValue.value > 0) break;
+      await Future.delayed(const Duration(milliseconds: 500));
     }
   }
 
