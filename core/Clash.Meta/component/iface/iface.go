@@ -144,8 +144,8 @@ func ResolveInterface(name string) (*Interface, error) {
 
 	iface, ok := ifaces[name]
 	if !ok {
-		if !ShouldLogIfaceError() {
-			return nil, nil
+		if ShouldLogIfaceError() {
+			return nil, ErrIfaceNotFound
 		}
 		return nil, ErrIfaceNotFound
 	}
@@ -165,8 +165,9 @@ func ResolveInterfaceByAddr(addr netip.Addr) (*Interface, error) {
 	}
 	iface, ok := cache.ifTable.Lookup(addr)
 	if !ok {
-		if !ShouldLogIfaceError() {
-			return nil, nil
+		// 始终返回错误，但只在需要时记录日志
+		if ShouldLogIfaceError() {
+			return nil, ErrIfaceNotFound
 		}
 		return nil, ErrIfaceNotFound
 	}

@@ -114,7 +114,7 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - name: Install Dependencies (linux)
+      - name: Install Dependencies (Linux)
         if: matrix.platform == 'linux'
         run: |
           sudo apt-get update

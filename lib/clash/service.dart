@@ -69,11 +69,20 @@ class ClashService extends ClashHandlerInterface {
     _isDestroying = false;
 
     await _destroySocket();
-    await Future.delayed(const Duration(milliseconds: 300));
+
+    process?.kill();
+    for (var i = 0; i < 5; i++) {
+      if (process == null) break;
+      try {
+        process!.exitCode;
+        break;
+      } on StateError {
+        await Future.delayed(const Duration(milliseconds: 100));
+      }
+    }
+    process = null;
 
     socketCompleter = Completer();
-    process?.kill();
-    process = null;
 
     final serverSocket = await serverCompleter.future;
     final arg = system.isWindows

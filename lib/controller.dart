@@ -94,11 +94,10 @@ class AppController {
       if (wasRunning) {
         await globalState.handleStop();
       }
-      if (system.isDesktop) {
-        await clashCore.shutdown();
-        await clashService!.reStart();
-      } else {
-        await Future.delayed(const Duration(milliseconds: 500));
+      for (var i = 0; i < 10; i++) {
+        await globalState.updateStartTime();
+        if (globalState.startTime == null) break;
+        await Future.delayed(const Duration(milliseconds: 100));
       }
       await _initCore();
       if (wasRunning) {

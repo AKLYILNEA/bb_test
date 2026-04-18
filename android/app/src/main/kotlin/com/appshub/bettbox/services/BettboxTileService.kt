@@ -41,6 +41,9 @@ class BettboxTileService : TileService() {
     }
 
     override fun onStopListening() {
+        if (GlobalState.currentRunState == RunState.PENDING) {
+            GlobalState.syncStatus()
+        }
         scope?.cancel()
         scope = null
         super.onStopListening()
