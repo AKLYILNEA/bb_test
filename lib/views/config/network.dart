@@ -31,7 +31,7 @@ Future<void> _handleNetworkConfigChange(WidgetRef ref) async {
       },
     );
   } else {
-    globalState.appController.applyProfileDebounce(silence: true);
+    globalState.appController.updateClashConfig();
   }
 }
 

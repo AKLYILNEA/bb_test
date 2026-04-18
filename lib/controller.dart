@@ -100,6 +100,9 @@ class AppController {
         await Future.delayed(const Duration(milliseconds: 100));
       }
       await _initCore();
+      if (system.isDesktop) {
+        await _quickSetupConfig();
+      }
       if (wasRunning) {
         await globalState.handleStart();
       }
