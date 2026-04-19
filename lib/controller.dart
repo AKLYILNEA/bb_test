@@ -37,6 +37,10 @@ class AppController {
   Completer<void>? _exitLock;
   int _backgroundLoadVersion = 0;
 
+  int _updateGroupsRetryCount = 0;
+  static const int _maxUpdateGroupsRetries = 3;
+  bool _isUpdatingGroups = false;
+
   AppController(this.context, WidgetRef ref) : _ref = ref;
 
   void setupClashConfigDebounce() {
@@ -507,13 +511,20 @@ class AppController {
   }
 
   Future<void> updateGroups() async {
+    if (_isUpdatingGroups) {
+      commonPrint.log('updateGroups already in progress, skipping');
+      return;
+    }
+    _isUpdatingGroups = true;
+
     try {
       final newGroups = await retry(
         task: clashCore.getProxiesGroups,
         retryIf: (res) => res.isEmpty,
-        maxAttempts: 5,
+        maxAttempts: 3,
       );
       _ref.read(groupsProvider.notifier).value = newGroups;
+      _updateGroupsRetryCount = 0;
       return;
     } catch (e) {
       final currentGroups = _ref.read(groupsProvider);
@@ -521,8 +532,20 @@ class AppController {
         commonPrint.log('updateGroups error, keeping existing groups: $e');
         return;
       }
-      commonPrint.log('updateGroups initial load failed, scheduling retry: $e');
-      Future.delayed(const Duration(seconds: 2), updateGroupsDebounce);
+
+      if (_updateGroupsRetryCount >= _maxUpdateGroupsRetries) {
+        commonPrint.log('updateGroups max retries ($_maxUpdateGroupsRetries) reached, giving up');
+        _updateGroupsRetryCount = 0;
+        return;
+      }
+      _updateGroupsRetryCount++;
+
+      commonPrint.log('updateGroups initial load failed ($_updateGroupsRetryCount/$_maxUpdateGroupsRetries), scheduling retry: $e');
+      Future.delayed(const Duration(seconds: 2), () {
+        updateGroups();
+      });
+    } finally {
+      _isUpdatingGroups = false;
     }
   }
 
