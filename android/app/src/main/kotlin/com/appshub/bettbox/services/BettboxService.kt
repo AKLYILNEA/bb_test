@@ -78,7 +78,7 @@ class BettboxService : Service(), BaseServiceInterface {
             .build()
 
         if (!hasStartedForeground) {
-            this.startForeground(notification)
+            this.startForeground(notification, useSpecialType = !GlobalState.isSmartStopped)
             hasStartedForeground = true
         } else {
             getSystemService(android.app.NotificationManager::class.java)?.notify(GlobalState.NOTIFICATION_ID, notification)

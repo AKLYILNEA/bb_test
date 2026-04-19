@@ -88,10 +88,10 @@ fun Service.ensureNotificationChannel() {
 }
 
 @SuppressLint("ForegroundServiceType")
-fun Service.startForeground(notification: Notification) {
+fun Service.startForeground(notification: Notification, useSpecialType: Boolean = true) {
     ensureNotificationChannel()
 
-    val type = if (Build.VERSION.SDK_INT >= 34) {
+    val type = if (Build.VERSION.SDK_INT >= 34 && useSpecialType && !GlobalState.isSmartStopped) {
         android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
     } else {
         0
