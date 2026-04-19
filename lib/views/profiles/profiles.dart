@@ -509,7 +509,6 @@ class ProfileItem extends StatelessWidget {
         Expanded(
           child: InkWell(
             onTap: () => onChanged(profile.id),
-            onLongPress: () => _showTVMenu(context),
             child: ListItem(
               key: Key(profile.id),
               horizontalTitleGap: 16,
@@ -543,6 +542,10 @@ class ProfileItem extends StatelessWidget {
               tileTitleAlignment: ListTileTitleAlignment.titleHeight,
             ),
           ),
+        ),
+        IconButton(
+          onPressed: () => _showTVMenu(context),
+          icon: const Icon(Icons.more_vert),
         ),
       ],
     );

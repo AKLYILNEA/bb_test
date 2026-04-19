@@ -10,8 +10,27 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 typedef OnSelected = void Function(int index);
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final Map<int, FocusNode> _navFocusNodes = {};
+
+  FocusNode _getNavFocusNode(int index) {
+    return _navFocusNodes.putIfAbsent(index, () => FocusNode());
+  }
+
+  @override
+  void dispose() {
+    for (final node in _navFocusNodes.values) {
+      node.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,24 +136,83 @@ class HomePage extends StatelessWidget {
         ],
       ),
       child: SafeArea(
-        child: BottomNavigationBar(
-          currentIndex: currentIndex,
-          onTap: (index) {
-            globalState.appController.toPage(navigationItems[index].label);
-          },
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: context.colorScheme.surfaceContainer,
-          selectedItemColor: context.colorScheme.onSecondaryContainer,
-          unselectedItemColor: context.colorScheme.onSurfaceVariant,
-          items: navigationItems.map((e) {
-            return BottomNavigationBarItem(
-              icon: e.icon,
-              label: e.label.name,
-            );
-          }).toList(),
+        child: FocusTraversalGroup(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: navigationItems.asMap().entries.map((entry) {
+              final index = entry.key;
+              final item = entry.value;
+              final isSelected = index == currentIndex;
+              return Focus(
+                focusNode: _getNavFocusNode(index),
+                skipTraversal: !isSelected,
+                child: InkWell(
+                  onTap: () {
+                    globalState.appController.toPage(item.label);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? context.colorScheme.secondaryContainer
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconTheme(
+                          data: IconThemeData(
+                            color: isSelected
+                                ? context.colorScheme.onSecondaryContainer
+                                : context.colorScheme.onSurfaceVariant,
+                            size: 24,
+                          ),
+                          child: item.icon,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          _getLocalizedLabel(item.label),
+                          style: TextStyle(
+                            color: isSelected
+                                ? context.colorScheme.onSecondaryContainer
+                                : context.colorScheme.onSurfaceVariant,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
         ),
       ),
     );
+  }
+
+  String _getLocalizedLabel(PageLabel label) {
+    switch (label) {
+      case PageLabel.dashboard:
+        return appLocalizations.dashboard;
+      case PageLabel.proxies:
+        return appLocalizations.proxies;
+      case PageLabel.profiles:
+        return appLocalizations.profiles;
+      case PageLabel.tools:
+        return appLocalizations.tools;
+      case PageLabel.logs:
+        return appLocalizations.logs;
+      case PageLabel.requests:
+        return appLocalizations.requests;
+      case PageLabel.resources:
+        return appLocalizations.resources;
+      case PageLabel.script:
+        return appLocalizations.script;
+      case PageLabel.connections:
+        return appLocalizations.connections;
+    }
   }
 }
 

@@ -94,11 +94,7 @@ class AppController {
       if (wasRunning) {
         await globalState.handleStop();
       }
-      for (var i = 0; i < 10; i++) {
-        await globalState.updateStartTime();
-        if (globalState.startTime == null) break;
-        await Future.delayed(const Duration(milliseconds: 100));
-      }
+      await Future.delayed(const Duration(milliseconds: 500));
       await _initCore();
       if (system.isDesktop) {
         await _quickSetupConfig();

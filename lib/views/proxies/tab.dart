@@ -241,23 +241,32 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
                     dividerColor: Colors.transparent,
                     isScrollable: true,
                     tabAlignment: TabAlignment.start,
-                    overlayColor: const WidgetStatePropertyAll(
-                      Colors.transparent,
-                    ),
+                    overlayColor: globalState.isAndroidTV
+                        ? null
+                        : const WidgetStatePropertyAll(Colors.transparent),
+                    indicator: globalState.isAndroidTV
+                        ? BoxDecoration(
+                            color: context.colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(8),
+                          )
+                        : null,
                     indicatorColor: globalState.isAndroidTV
-                        ? (Theme.of(context).brightness == Brightness.light
-                            ? Colors.black
-                            : Colors.white)
+                        ? Colors.transparent
                         : context.colorScheme.primary,
                     labelColor: globalState.isAndroidTV
-                        ? (Theme.of(context).brightness == Brightness.light
-                            ? Colors.black
-                            : Colors.white)
+                        ? context.colorScheme.onPrimaryContainer
                         : context.colorScheme.primary,
                     unselectedLabelColor: context.colorScheme.onSurfaceVariant,
                     tabs: [
                       for (final group in groups)
-                        Tab(child: EmojiText(group.name)),
+                        Tab(
+                          child: Padding(
+                            padding: globalState.isAndroidTV
+                                ? const EdgeInsets.symmetric(horizontal: 12, vertical: 6)
+                                : EdgeInsets.zero,
+                            child: EmojiText(group.name),
+                          ),
+                        ),
                     ],
                   ),
                   if (value) Positioned(right: 0, child: child!),
