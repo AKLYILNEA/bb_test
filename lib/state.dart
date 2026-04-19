@@ -749,7 +749,7 @@ class GlobalState {
     if (config.vpnProps.disableQuic) {
       final isRussian = config.appSetting.locale?.toLowerCase().startsWith('ru') ?? false;
       final quicRules = config.vpnProps.excludeChina && !isRussian
-          ? ['AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((GEOSITE,geolocation-cn),(GEOIP,CN,no-resolve)))),REJECT']
+          ? ['AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((GEOSITE,geolocation-cn),(GEOIP,CN,no-resolve)))))),REJECT']
           : ['AND,((NETWORK,UDP),(DST-PORT,443)),REJECT'];
       rules = [...quicRules, ...rules];
     }
