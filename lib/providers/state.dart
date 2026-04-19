@@ -147,11 +147,10 @@ ProxyState proxyState(Ref ref) {
   );
 }
 
-// 添加一个同步的 wakelock 状态 Provider
 final wakelockStateProvider = StateProvider<bool>((ref) => false);
 
 @riverpod
-Future<TrayState> trayState(Ref ref) async {
+TrayState trayState(Ref ref) {
   final isStart = ref.watch(runTimeProvider.select((state) => state != null));
   final networkProps = ref.watch(networkSettingProvider);
   final clashConfig = ref.watch(patchClashConfigProvider);
@@ -161,7 +160,6 @@ Future<TrayState> trayState(Ref ref) async {
 
   final selectedMap = ref.watch(selectedMapProvider);
 
-  // 使用同步的状态 Provider
   final wakelockEnabled = ref.watch(wakelockStateProvider);
 
   return TrayState(
