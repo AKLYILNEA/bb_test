@@ -25,6 +25,7 @@ import com.appshub.bettbox.services.BettboxService
 import com.appshub.bettbox.services.BettboxVpnService
 import com.google.gson.Gson
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.CoroutineScope
@@ -38,13 +39,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import java.net.InetSocketAddress
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.withLock
 
 data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
-    private lateinit var flutterMethodChannel: MethodChannel
-    private var serviceFlutterMethodChannel: MethodChannel? = null
     private var bettBoxService: BaseServiceInterface? = null
     private var options: VpnOptions? = null
 
@@ -72,7 +72,10 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }
 
     private var bindTimeoutJob: Job? = null
-    private val attachedMessengers = mutableSetOf<io.flutter.plugin.common.BinaryMessenger>()
+    private val attachedMessengers = mutableSetOf<BinaryMessenger>()
+    private val channelMap = ConcurrentHashMap<BinaryMessenger, MethodChannel>()
+    private val activeChannels = CopyOnWriteArrayList<MethodChannel>()
+    private val networkCallbackRegistered = AtomicBoolean(false)
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
@@ -102,8 +105,6 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        unRegisterNetworkCallback()
-
         val isFirstAttach = attachedMessengers.isEmpty()
         attachedMessengers.add(flutterPluginBinding.binaryMessenger)
 
@@ -112,13 +113,13 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             scope = CoroutineScope(Dispatchers.Default + job as kotlin.coroutines.CoroutineContext)
         }
 
-        scope.launch { registerNetworkCallback() }
         val channel = MethodChannel(flutterPluginBinding.binaryMessenger, "vpn")
         channel.setMethodCallHandler(this)
-        flutterMethodChannel = channel
+        channelMap[flutterPluginBinding.binaryMessenger] = channel
+        activeChannels.add(channel)
 
         if (isFirstAttach) {
-            serviceFlutterMethodChannel = channel
+            scope.launch { registerNetworkCallback() }
         }
 
         if (GlobalState.currentRunState == RunState.START && bettBoxService == null) {
@@ -129,16 +130,13 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
     override fun onDetachedFromEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         attachedMessengers.remove(flutterPluginBinding.binaryMessenger)
-        unRegisterNetworkCallback()
-
-        val detachingChannel = MethodChannel(flutterPluginBinding.binaryMessenger, "vpn")
-        detachingChannel.setMethodCallHandler(null)
-
-        if (serviceFlutterMethodChannel != null && !GlobalState.isServiceEngineRunning()) {
-            serviceFlutterMethodChannel = null
+        channelMap.remove(flutterPluginBinding.binaryMessenger)?.let { channel ->
+            channel.setMethodCallHandler(null)
+            activeChannels.remove(channel)
         }
 
         if (attachedMessengers.isEmpty()) {
+            unRegisterNetworkCallback()
             job.cancel()
         }
     }
@@ -242,7 +240,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }
 
     fun requestGc() {
-        flutterMethodChannel.invokeMethod("gc", null)
+        invokeDart("gc")
     }
 
     fun onUpdateNetwork() {
@@ -251,11 +249,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         }.toSet().joinToString(",")
         if (dns == lastDns) return
         lastDns = dns
-        scope.launch {
-            withContext(Dispatchers.Main) {
-                flutterMethodChannel.invokeMethod("dnsChanged", dns)
-            }
-        }
+        invokeDart("dnsChanged", dns)
     }
 
     private val callback = object : ConnectivityManager.NetworkCallback() {
@@ -279,15 +273,18 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     }.build()
 
     private fun registerNetworkCallback() {
+        if (!networkCallbackRegistered.compareAndSet(false, true)) return
         runCatching {
             networks.clear()
             connectivity?.registerNetworkCallback(request, callback)
         }.onFailure {
+            networkCallbackRegistered.set(false)
             android.util.Log.e("VpnPlugin", "Failed to register network callback: ${it.message}")
         }
     }
 
     private fun unRegisterNetworkCallback() {
+        if (!networkCallbackRegistered.compareAndSet(true, false)) return
         runCatching {
             connectivity?.unregisterNetworkCallback(callback)
         }.onFailure {
@@ -323,13 +320,23 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             if (disconnectCount < maxDisconnectsInWindow) {
                 disconnectCount++
                 android.util.Log.d("VpnPlugin", "Quick Response: Network changed, closing connections ($disconnectCount/$maxDisconnectsInWindow)")
-                scope.launch {
-                    withContext(Dispatchers.Main) {
-                        flutterMethodChannel.invokeMethod("closeConnections", null)
-                    }
-                }
+                invokeDart("closeConnections")
             } else {
                 android.util.Log.d("VpnPlugin", "Quick Response: Disconnect limit reached, ignoring")
+            }
+        }
+    }
+
+    private fun invokeDart(method: String, arguments: Any? = null) {
+        if (activeChannels.isEmpty()) return
+        scope.launch {
+            withContext(Dispatchers.Main) {
+                activeChannels.forEach { channel ->
+                    runCatching { channel.invokeMethod(method, arguments) }
+                        .onFailure {
+                            android.util.Log.w("VpnPlugin", "invokeDart($method) failed: ${it.message}")
+                        }
+                }
             }
         }
     }
