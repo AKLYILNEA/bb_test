@@ -96,11 +96,12 @@ class AppController {
       }
       await Future.delayed(const Duration(milliseconds: 500));
       await _initCore();
-      if (system.isDesktop) {
-        await _quickSetupConfig();
-      }
       if (wasRunning) {
-        await globalState.handleStart();
+        if (system.isDesktop) {
+          await _fastStart();
+        } else {
+          await globalState.handleStart();
+        }
       }
     } finally {
       _restartLock?.complete();
