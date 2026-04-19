@@ -35,7 +35,6 @@ type AndroidVpnRawOptions struct {
 	AccessControl *AccessControl `json:"accessControl"`
 	AllowBypass   bool           `json:"allowBypass"`
 	SystemProxy   bool           `json:"systemProxy"`
-	Ipv6          bool           `json:"ipv6"`
 	RouteMode     string         `json:"routeMode"`
 	DozeSuspend   bool           `json:"dozeSuspend"`
 }
@@ -52,13 +51,7 @@ var CurrentState = &State{
 	CurrentProfileName:  "",
 }
 
-func GetIpv6Address() string {
-	if CurrentState.VpnProps.Ipv6 {
-		return DefaultIpv6Address
-	} else {
-		return ""
-	}
-}
+
 
 func GetDnsServerAddress() string {
 	return DefaultDnsAddress

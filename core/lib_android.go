@@ -153,11 +153,15 @@ func removeTunHook() {
 func handleGetAndroidVpnOptions() string {
 	tunLock.Lock()
 	defer tunLock.Unlock()
+	ipv6Address := ""
+	if currentConfig.General.IPv6 {
+		ipv6Address = state.DefaultIpv6Address
+	}
 	options := state.AndroidVpnOptions{
 		Enable:                state.CurrentState.VpnProps.Enable,
 		Port:                  currentConfig.General.MixedPort,
 		Ipv4Address:           state.DefaultIpv4Address,
-		Ipv6Address:           state.GetIpv6Address(),
+		Ipv6Address:           ipv6Address,
 		AccessControl:         state.CurrentState.VpnProps.AccessControl,
 		SystemProxy:           state.CurrentState.VpnProps.SystemProxy,
 		AllowBypass:           state.CurrentState.VpnProps.AllowBypass,

@@ -171,28 +171,6 @@ class SystemProxyItem extends ConsumerWidget {
   }
 }
 
-class Ipv6Item extends ConsumerWidget {
-  const Ipv6Item({super.key});
-
-  @override
-  Widget build(BuildContext context, ref) {
-    final ipv6 = ref.watch(vpnSettingProvider.select((state) => state.ipv6));
-    return ListItem.switchItem(
-      title: const Text('IPv6'),
-      subtitle: Text(appLocalizations.ipv6InboundDesc),
-      delegate: SwitchDelegate(
-        value: ipv6,
-        onChanged: (bool value) async {
-          ref
-              .read(vpnSettingProvider.notifier)
-              .updateState((state) => state.copyWith(ipv6: value));
-          await _handleNetworkConfigChange(ref);
-        },
-      ),
-    );
-  }
-}
-
 class AutoSetSystemDnsItem extends ConsumerWidget {
   const AutoSetSystemDnsItem({super.key});
 
@@ -591,7 +569,7 @@ final networkItems = [
   if (system.isAndroid)
     ...generateSection(
       title: 'VPN',
-      items: [const AllowBypassItem(), const Ipv6Item()],
+      items: [const AllowBypassItem()],
     ),
   if (system.isDesktop)
     ...generateSection(

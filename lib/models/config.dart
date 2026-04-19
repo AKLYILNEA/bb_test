@@ -147,7 +147,6 @@ abstract class VpnProps with _$VpnProps {
   const factory VpnProps({
     @Default(true) bool enable,
     @Default(false) bool systemProxy,
-    @Default(false) bool ipv6,
     @Default(false) bool allowBypass,
     @Default(true) bool bypassPrivateRoute,
     @Default(true) bool dozeSuspend,

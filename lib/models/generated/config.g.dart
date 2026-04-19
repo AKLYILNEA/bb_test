@@ -160,7 +160,6 @@ Map<String, dynamic> _$WindowPropsToJson(_WindowProps instance) =>
 _VpnProps _$VpnPropsFromJson(Map<String, dynamic> json) => _VpnProps(
   enable: json['enable'] as bool? ?? true,
   systemProxy: json['systemProxy'] as bool? ?? false,
-  ipv6: json['ipv6'] as bool? ?? false,
   allowBypass: json['allowBypass'] as bool? ?? false,
   bypassPrivateRoute: json['bypassPrivateRoute'] as bool? ?? true,
   dozeSuspend: json['dozeSuspend'] as bool? ?? true,
@@ -180,7 +179,6 @@ _VpnProps _$VpnPropsFromJson(Map<String, dynamic> json) => _VpnProps(
 Map<String, dynamic> _$VpnPropsToJson(_VpnProps instance) => <String, dynamic>{
   'enable': instance.enable,
   'systemProxy': instance.systemProxy,
-  'ipv6': instance.ipv6,
   'allowBypass': instance.allowBypass,
   'bypassPrivateRoute': instance.bypassPrivateRoute,
   'dozeSuspend': instance.dozeSuspend,
