@@ -6,6 +6,8 @@ import (
 	"sync"
 )
 
+var ErrQueueTooLarge = errors.New("packet queue is too large")
+
 type Packet struct {
 	Seq     uint64
 	Payload []byte // UploadQueue will hold Payload, so never reuse it after UploadQueue.Push
@@ -13,20 +15,24 @@ type Packet struct {
 }
 
 type UploadQueue struct {
-	mu      sync.Mutex
-	cond    *sync.Cond
-	packets map[uint64][]byte
-	nextSeq uint64
-	buf     []byte
-	closed  bool
-	reader  io.ReadCloser
+	mu         sync.Mutex
+	condPushed sync.Cond
+	condPopped sync.Cond
+	packets    map[uint64][]byte
+	nextSeq    uint64
+	buf        []byte
+	closed     bool
+	maxPackets int
+	reader     io.ReadCloser
 }
 
-func NewUploadQueue() *UploadQueue {
+func NewUploadQueue(maxPackets int) *UploadQueue {
 	q := &UploadQueue{
-		packets: make(map[uint64][]byte),
+		packets:    make(map[uint64][]byte, maxPackets),
+		maxPackets: maxPackets,
 	}
-	q.cond = sync.NewCond(&q.mu)
+	q.condPushed = sync.Cond{L: &q.mu}
+	q.condPopped = sync.Cond{L: &q.mu}
 	return q
 }
 
@@ -44,12 +50,19 @@ func (q *UploadQueue) Push(p Packet) error {
 
 	if p.Reader != nil {
 		q.reader = p.Reader
-		q.cond.Broadcast()
+		q.condPushed.Broadcast()
 		return nil
 	}
 
+	for len(q.packets) > q.maxPackets {
+		q.condPopped.Wait() // wait for the reader to read the packets
+		if q.closed {
+			return io.ErrClosedPipe
+		}
+	}
+
 	q.packets[p.Seq] = p.Payload
-	q.cond.Broadcast()
+	q.condPushed.Broadcast()
 	return nil
 }
 
@@ -68,6 +81,7 @@ func (q *UploadQueue) Read(b []byte) (int, error) {
 			delete(q.packets, q.nextSeq)
 			q.nextSeq++
 			q.buf = payload
+			q.condPopped.Broadcast()
 			continue
 		}
 
@@ -81,7 +95,14 @@ func (q *UploadQueue) Read(b []byte) (int, error) {
 			return 0, io.EOF
 		}
 
-		q.cond.Wait()
+		if len(q.packets) > q.maxPackets {
+			q.mu.Unlock()
+			// the "reassembly buffer" is too large, and we want to constrain memory usage somehow.
+			// let's tear down the connection and hope the application retries.
+			return 0, ErrQueueTooLarge
+		}
+
+		q.condPushed.Wait()
 	}
 }
 
@@ -94,6 +115,7 @@ func (q *UploadQueue) Close() error {
 		err = q.reader.Close()
 	}
 	q.closed = true
-	q.cond.Broadcast()
+	q.condPushed.Broadcast()
+	q.condPopped.Broadcast()
 	return err
 }

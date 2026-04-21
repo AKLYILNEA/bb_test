@@ -34,6 +34,7 @@ type ClientOptions struct {
 	QUIC                  bool
 	QUICCongestionControl string
 	QUICCwnd              int
+	QUICBBRProfile        string
 	HealthCheck           bool
 	MaxConnections        int
 	MinStreams            int
@@ -67,7 +68,7 @@ func NewClient(ctx context.Context, options ClientOptions) (client *Client, err 
 		} else if !slices.Contains(options.TLSConfig.NextProtos, "h3") {
 			return nil, errors.New("require alpn h3")
 		}
-		err = client.quicRoundTripper(options.TLSConfig, options.QUICCongestionControl, options.QUICCwnd)
+		err = client.quicRoundTripper(options.TLSConfig, options.QUICCongestionControl, options.QUICCwnd, options.QUICBBRProfile)
 		if err != nil {
 			return nil, err
 		}
@@ -154,16 +155,16 @@ func (c *Client) roundTrip(request *http.Request, conn *httpConn) {
 		if err != nil {
 			_ = pipeWriter.CloseWithError(err)
 			_ = pipeReader.CloseWithError(err)
-			conn.setUp(nil, err)
+			conn.setup(nil, err)
 		} else if response.StatusCode != http.StatusOK {
 			_ = response.Body.Close()
 			err = fmt.Errorf("unexpected status code: %d", response.StatusCode)
 			_ = pipeWriter.CloseWithError(err)
 			_ = pipeReader.CloseWithError(err)
-			conn.setUp(nil, err)
+			conn.setup(nil, err)
 		} else {
 			c.resetHealthCheckTimer()
-			conn.setUp(response.Body, nil)
+			conn.setup(response.Body, nil)
 		}
 	}()
 }

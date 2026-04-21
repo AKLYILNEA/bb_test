@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto/subtle"
 	"encoding/json"
-	"errors"
 	"net"
 	"os"
 	"path/filepath"
@@ -133,6 +132,7 @@ func router(isDebug bool, secret string, dohServer string, cors Cors) *chi.Mux {
 		r.Mount("/providers/rules", ruleProviderRouter())
 		r.Mount("/cache", cacheRouter())
 		r.Mount("/dns", dnsRouter())
+		r.Mount("/storage", storageRouter())
 		if !embedMode { // disallow restart in embed mode
 			r.Mount("/restart", restartRouter())
 		}
@@ -177,7 +177,7 @@ func start(cfg *Config) {
 			Handler: router(cfg.IsDebug, cfg.Secret, cfg.DohServer, cfg.Cors),
 		}
 		httpServer = server
-		if err = server.Serve(l); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		if err = server.Serve(l); err != nil {
 			log.Errorln("External controller serve error: %s", err)
 		}
 	}
@@ -236,7 +236,7 @@ func startTLS(cfg *Config) {
 			Handler: router(cfg.IsDebug, cfg.Secret, cfg.DohServer, cfg.Cors),
 		}
 		tlsServer = server
-		if err = server.Serve(tls.NewListener(l, tlsConfig)); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		if err = server.Serve(tls.NewListener(l, tlsConfig)); err != nil {
 			log.Errorln("External controller tls serve error: %s", err)
 		}
 	}
@@ -282,7 +282,7 @@ func startUnix(cfg *Config) {
 			Handler: router(cfg.IsDebug, "", cfg.DohServer, cfg.Cors),
 		}
 		unixServer = server
-		if err = server.Serve(l); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		if err = server.Serve(l); err != nil {
 			log.Errorln("External controller unix serve error: %s", err)
 		}
 	}
@@ -313,7 +313,7 @@ func startPipe(cfg *Config) {
 			Handler: router(cfg.IsDebug, "", cfg.DohServer, cfg.Cors),
 		}
 		pipeServer = server
-		if err = server.Serve(l); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		if err = server.Serve(l); err != nil {
 			log.Errorln("External controller pipe serve error: %s", err)
 		}
 	}

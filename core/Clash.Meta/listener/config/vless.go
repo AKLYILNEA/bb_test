@@ -34,8 +34,23 @@ type XHTTPConfig struct {
 	Path                 string
 	Host                 string
 	Mode                 string
+	XPaddingBytes        string
+	XPaddingObfsMode     bool
+	XPaddingKey          string
+	XPaddingHeader       string
+	XPaddingPlacement    string
+	XPaddingMethod       string
+	UplinkHTTPMethod     string
+	SessionPlacement     string
+	SessionKey           string
+	SeqPlacement         string
+	SeqKey               string
+	UplinkDataPlacement  string
+	UplinkDataKey        string
+	UplinkChunkSize      string
 	NoSSEHeader          bool
 	ScStreamUpServerSecs string
+	ScMaxBufferedPosts   string
 	ScMaxEachPostBytes   string
 }
 
