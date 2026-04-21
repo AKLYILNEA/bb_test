@@ -18,7 +18,7 @@ class Render {
 
   void active() {
     resume();
-    if (system.isWindows) {
+    if (!system.isLinux) {
       pauseDelayed();
     }
   }
