@@ -945,7 +945,6 @@ class DetectionState {
   void startCheck() {
     final appState = globalState.appState;
     if (!appState.isInit) return;
-    if (appState.pageLabel != PageLabel.dashboard) return;
 
     final delay = _isFirstLaunch
         ? const Duration(milliseconds: 500)
