@@ -131,11 +131,11 @@ final proxyStateProvider = AutoDisposeProvider<ProxyState>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ProxyStateRef = AutoDisposeProviderRef<ProxyState>;
-String _$trayStateHash() => r'27b579ff8b1cac3c39f8d30b40a683f7e2f91dd4';
+String _$trayStateHash() => r'c132e2625c51db486c392c1f5c09bac8748509b0';
 
 /// See also [trayState].
 @ProviderFor(trayState)
-final trayStateProvider = AutoDisposeFutureProvider<TrayState>.internal(
+final trayStateProvider = AutoDisposeProvider<TrayState>.internal(
   trayState,
   name: r'trayStateProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -147,7 +147,7 @@ final trayStateProvider = AutoDisposeFutureProvider<TrayState>.internal(
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef TrayStateRef = AutoDisposeFutureProviderRef<TrayState>;
+typedef TrayStateRef = AutoDisposeProviderRef<TrayState>;
 String _$vpnStateHash() => r'128ddad03ce045ad1f8204e47aec3cb6cfa29f6e';
 
 /// See also [vpnState].

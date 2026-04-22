@@ -1146,6 +1146,7 @@ class AppController {
       _ref
           .read(profilesProvider.notifier)
           .setProfile(currentProfile.copyWith(selectedMap: selectedMap));
+      detectionState.startCheck();
     }
   }
 
@@ -1346,7 +1347,7 @@ class AppController {
   }
 
   Future<void> updateTray([bool focus = false]) async {
-    final trayState = await _ref.read(trayStateProvider.future);
+    final trayState = _ref.read(trayStateProvider);
     await tray.update(trayState: trayState, focus: focus);
   }
 
