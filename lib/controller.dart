@@ -132,7 +132,7 @@ class AppController {
 
     if (isDesktop && patchConfig.tun.enable) {
       await _quickSetupConfig(enableTun: false);
-      await globalState.handleStart([updateTraffic]);
+      await globalState.handleStart([updateRunTime, updateTraffic]);
 
       Future.microtask(() async {
         final res = await _requestAdmin(true);
@@ -155,7 +155,7 @@ class AppController {
       await _quickSetupConfig();
     }
 
-    await globalState.handleStart([updateTraffic]);
+    await globalState.handleStart([updateRunTime, updateTraffic]);
 
     Future.delayed(const Duration(seconds: 1), () {
       addCheckIpNumDebounce();
@@ -1146,7 +1146,7 @@ class AppController {
       _ref
           .read(profilesProvider.notifier)
           .setProfile(currentProfile.copyWith(selectedMap: selectedMap));
-      detectionState.startCheck();
+      detectionState.startCheck(immediate: true);
     }
   }
 

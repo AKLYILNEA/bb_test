@@ -59,6 +59,7 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _updateDashboardRefreshState();
+      detectionState.tryStartCheck();
     });
     if (window == null) {
       return;
@@ -124,13 +125,6 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
         if (_isRefreshActive) return;
         dashboardRefreshManager.start();
         _isRefreshActive = true;
-        final hasDetection = ref
-            .read(dashboardStateProvider)
-            .dashboardWidgets
-            .contains(DashboardWidget.networkDetection);
-        if (hasDetection) {
-          detectionState.tryStartCheck();
-        }
       },
     );
   }
@@ -149,6 +143,14 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
       render?.active();
       await globalState.resumeForegroundUpdates();
       await globalState.appController.syncWakelockIfNeeded();
+
+      final hasDetection = ref
+          .read(dashboardStateProvider)
+          .dashboardWidgets
+          .contains(DashboardWidget.networkDetection);
+      if (hasDetection) {
+        detectionState.startCheck(immediate: true);
+      }
     }
     if (state == AppLifecycleState.resumed && system.isAndroid) {
       final hidden = ref.read(appSettingProvider.select((s) => s.hidden));

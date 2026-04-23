@@ -942,13 +942,13 @@ class DetectionState {
     _handleResponse(res);
   }
 
-  void startCheck() {
+  void startCheck({bool immediate = false}) {
     final appState = globalState.appState;
     if (!appState.isInit) return;
 
-    final delay = _isFirstLaunch
-        ? const Duration(milliseconds: 500)
-        : const Duration(milliseconds: 1500);
+    final delay = immediate
+        ? Duration.zero
+        : const Duration(milliseconds: 1000);
 
     debouncer.call(FunctionTag.checkIp, _checkIp, duration: delay);
   }
