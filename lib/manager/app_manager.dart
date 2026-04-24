@@ -148,6 +148,13 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
           .read(dashboardStateProvider)
           .dashboardWidgets
           .contains(DashboardWidget.networkDetection);
+      final externalControllerEnabled = ref.read(patchClashConfigProvider
+              .select((s) => s.externalController)) !=
+          ExternalControllerStatus.close;
+
+      if (globalState.isStart && externalControllerEnabled) {
+        await globalState.appController.updateGroups();
+      }
       if (hasDetection) {
         detectionState.startCheck(immediate: true);
       }
