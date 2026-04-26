@@ -176,7 +176,18 @@ class GlobalState {
 
   Future<void> handleBackground() async {
     if (system.isDesktop) {
+      final isMinimized = await window?.isMinimized ?? false;
+      final isVisible = await window?.isVisible ?? true;
+      if (!isMinimized && isVisible) {
+        return;
+      }
       animationEnabled.value = false;
+      if (!backgroundMode.value) {
+        backgroundMode.value = true;
+        _scheduleBackgroundCleanup();
+      }
+      render?.pause();
+      return;
     }
     if (!backgroundMode.value) {
       backgroundMode.value = true;
