@@ -557,29 +557,6 @@ class AppController {
         maxAttempts: 3,
       );
       _ref.read(groupsProvider.notifier).value = newGroups;
-      
-      final currentProfile = _ref.read(currentProfileProvider);
-      if (currentProfile != null) {
-        final Map<String, String> newSelectedMap = Map.from(currentProfile.selectedMap);
-        bool hasChanged = false;
-        
-        for (final group in newGroups) {
-          if (group.now != null && group.now!.isNotEmpty) {
-            final currentSelected = newSelectedMap[group.name];
-            if (currentSelected != group.now) {
-              newSelectedMap[group.name] = group.now!;
-              hasChanged = true;
-            }
-          }
-        }
-        
-        if (hasChanged) {
-          _ref.read(profilesProvider.notifier).setProfile(
-            currentProfile.copyWith(selectedMap: newSelectedMap),
-          );
-        }
-      }
-      
       _updateGroupsRetryCount = 0;
       return;
     } catch (e) {
