@@ -514,6 +514,35 @@ class AppController {
     }
   }
 
+  Future<void> checkAndUpdateMissedProfiles() async {
+    final now = DateTime.now();
+    final profilesToUpdate = <Profile>[];
+    for (final profile in _ref.read(profilesProvider)) {
+      if (!profile.autoUpdate) continue;
+      if (profile.type == ProfileType.file) continue;
+      if (profile.isUpdating) continue;
+      final lastUpdate = profile.lastUpdateDate;
+      if (lastUpdate == null) continue;
+      final expectedNextUpdate = lastUpdate.add(profile.autoUpdateDuration);
+      final isOverdue = now.difference(expectedNextUpdate) > const Duration(minutes: 1);
+      if (isOverdue) {
+        profilesToUpdate.add(profile);
+      }
+    }
+    if (profilesToUpdate.isEmpty) return;
+    for (final profile in profilesToUpdate) {
+      try {
+        commonPrint.log('[MissedUpdate] Updating profile: ${profile.label ?? profile.id}');
+        await updateProfile(profile);
+      } catch (e) {
+        commonPrint.log('[MissedUpdate] Failed to update ${profile.id}: $e');
+      }
+      if (profilesToUpdate.length > 1) {
+        await Future.delayed(const Duration(seconds: 2));
+      }
+    }
+  }
+
   Future<void> updateGroups() async {
     if (_isUpdatingGroups) {
       commonPrint.log('updateGroups already in progress, skipping');
