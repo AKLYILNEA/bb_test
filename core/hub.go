@@ -247,6 +247,9 @@ func closeConnections() {
 		c.Close()
 		return true
 	})
+	for _, proxy := range tunnel.Proxies() {
+		proxy.Close()
+	}
 }
 
 func handleResetConnections() bool {
