@@ -86,6 +86,7 @@ class AppController {
     ) async {
       await changeProxy(groupName: groupName, proxyName: proxyName);
       await updateGroups();
+      addCheckIp();
     }, args: [groupName, proxyName]);
   }
 
