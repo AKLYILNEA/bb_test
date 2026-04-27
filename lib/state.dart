@@ -1007,7 +1007,6 @@ class DetectionState {
     final appState = globalState.appState;
 
     if (!appState.isInit) return;
-    if (appState.pageLabel != PageLabel.dashboard) return;
 
     final isStart = appState.runTime != null;
 
