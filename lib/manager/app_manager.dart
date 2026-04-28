@@ -101,13 +101,15 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
     final isForeground =
         lifecycleState == null || lifecycleState == AppLifecycleState.resumed;
     var isVisible = true;
+    var isMinimized = false;
     if (system.isDesktop) {
       final visible = await window?.isVisible;
       if (visible == false) {
         isVisible = false;
       }
+      isMinimized = await window?.isMinimized ?? false;
     }
-    final shouldRun = isForeground && isVisible;
+    final shouldRun = isForeground && isVisible && !isMinimized;
 
     if (!shouldRun) {
       _dashboardRefreshDebounceTimer?.cancel();

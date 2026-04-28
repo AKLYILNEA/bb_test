@@ -187,6 +187,7 @@ class GlobalState {
         _scheduleBackgroundCleanup();
       }
       render?.pause();
+      dashboardRefreshManager.stop();
       return;
     }
     if (!backgroundMode.value) {
@@ -1010,12 +1011,12 @@ class DetectionState {
 
     final isStart = appState.runTime != null;
 
-    if (!isStart && state.value.ipInfo != null && !state.value.isLoading) {
-      return;
-    }
-
     final isStateChanged = _preIsStart != isStart;
     _preIsStart = isStart;
+
+    if (!isStart && state.value.ipInfo != null && !state.value.isLoading && !isStateChanged) {
+      return;
+    }
 
     _cancelPreviousRequest();
     _cancelToken = CancelToken();
