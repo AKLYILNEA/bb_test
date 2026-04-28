@@ -43,6 +43,10 @@ class _ProvidersViewState extends ConsumerState<ProvidersView> {
     final titleMedium = context.textTheme.titleMedium;
     await Future.wait(updateProviders);
     globalState.appController.updateGroupsDebounce();
+    final hasRuleProvider = providers.any((p) => p.type == 'Rule');
+    if (hasRuleProvider) {
+      globalState.appController.applyProfileDebounce(silence: true);
+    }
     if (messages.isNotEmpty) {
       globalState.showMessage(
         title: appLocalizations.tip,
@@ -108,6 +112,9 @@ class ProviderItem extends StatelessWidget {
       await clashCore.getExternalProvider(provider.name),
     );
     globalState.appController.updateGroupsDebounce();
+    if (provider.type == 'Rule') {
+      globalState.appController.applyProfileDebounce(silence: true);
+    }
   }
 
   Future<void> _handleSideLoadProvider() async {
@@ -129,6 +136,9 @@ class ProviderItem extends StatelessWidget {
       if (message.isNotEmpty) throw message;
     });
     globalState.appController.updateGroupsDebounce();
+    if (provider.type == 'Rule') {
+      globalState.appController.applyProfileDebounce(silence: true);
+    }
   }
 
   String _buildProviderDesc() {
