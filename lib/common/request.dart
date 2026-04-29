@@ -289,8 +289,9 @@ class Request {
     });
     final authHeaders = HelperAuthManager.generateAuthHeaders(body);
 
-    const maxAttempts = 10;
+    const maxAttempts = 3;
     const interval = Duration(milliseconds: 500);
+    const requestTimeout = Duration(seconds: 8);
 
     for (var attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
@@ -303,7 +304,7 @@ class Request {
                 headers: authHeaders,
               ),
             )
-            .timeout(const Duration(milliseconds: 2000));
+            .timeout(requestTimeout);
         if (response.statusCode == HttpStatus.ok) {
           final data = response.data as String;
           if (data.isEmpty) return true;
