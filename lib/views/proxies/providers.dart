@@ -24,6 +24,14 @@ class ProvidersView extends ConsumerStatefulWidget {
 }
 
 class _ProvidersViewState extends ConsumerState<ProvidersView> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      globalState.appController.updateProviders();
+    });
+  }
+
   Future<void> _updateProviders() async {
     final providers = ref.read(providersProvider);
     final providersNotifier = ref.read(providersProvider.notifier);
