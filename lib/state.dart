@@ -187,6 +187,7 @@ class GlobalState {
         _scheduleBackgroundCleanup();
       }
       render?.pause();
+      stopUpdateTasks();
       dashboardRefreshManager.stop();
       return;
     }

@@ -258,7 +258,10 @@ class AppController {
     final lifecycleState = WidgetsBinding.instance.lifecycleState;
     if (lifecycleState != AppLifecycleState.resumed) return false;
 
-    if (system.isDesktop && await window?.isVisible == false) return false;
+    if (system.isDesktop) {
+      if (await window?.isVisible == false) return false;
+      if (await window?.isMinimized == true) return false;
+    }
 
     return true;
   }
