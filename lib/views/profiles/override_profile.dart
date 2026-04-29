@@ -28,11 +28,19 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
         final overrideData = ref.read(
           getProfileOverrideDataProvider(widget.profileId),
         );
+        final newOverrideData = overrideData?.rule.type == OverrideRuleType.override &&
+                overrideData?.rule.overrideRules.isEmpty == true
+            ? overrideData?.copyWith(
+                rule: overrideData.rule.copyWith(
+                  overrideRules: snippet.rule,
+                ),
+              )
+            : overrideData;
         ref
             .read(profileOverrideStateProvider.notifier)
             .updateState(
               (state) =>
-                  state.copyWith(snippet: snippet, overrideData: overrideData),
+                  state.copyWith(snippet: snippet, overrideData: newOverrideData),
             );
       });
     });
