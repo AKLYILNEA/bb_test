@@ -731,11 +731,15 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
                         )
                       : TextFormField(
                           controller: _contentController,
+                          enabled: _ruleAction != RuleAction.MATCH,
                           decoration: InputDecoration(
                             border: const OutlineInputBorder(),
                             labelText: appLocalizations.content,
                           ),
                           validator: (_) {
+                            if (_ruleAction == RuleAction.MATCH) {
+                              return null;
+                            }
                             if (_contentController.text.isEmpty) {
                               return appLocalizations.emptyTip(
                                 appLocalizations.content,

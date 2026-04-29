@@ -566,6 +566,12 @@ abstract class ParsedRule with _$ParsedRule {
 
 extension ParsedRuleExt on ParsedRule {
   String get value {
+    if (ruleAction == RuleAction.MATCH) {
+      return [
+        ruleAction.value,
+        ruleTarget,
+      ].join(',');
+    }
     return [
       ruleAction.value,
       ruleAction == RuleAction.RULE_SET ? ruleProvider : content,
