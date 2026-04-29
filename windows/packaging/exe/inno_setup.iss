@@ -120,6 +120,20 @@ begin
   Exec('sc', 'start ' + ServiceName, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
 end;
 
+procedure ReserveHelperPort;
+var
+  ResultCode: Integer;
+  DeleteResult: Integer;
+  AddResult: Integer;
+begin
+  DeleteResult := Exec('netsh', 'int ipv4 delete excludedportrange protocol=tcp startport=43210 numberofports=1', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  AddResult := Exec('netsh', 'int ipv4 add excludedportrange protocol=tcp startport=43210 numberofports=1', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  if (DeleteResult <> 0) or (AddResult <> 0) or (ResultCode <> 0) then
+  begin
+    Log('ReserveHelperPort failed: delete result=' + IntToStr(DeleteResult) + ', add result=' + IntToStr(AddResult) + ', resultCode=' + IntToStr(ResultCode));
+  end;
+end;
+
 procedure UnregisterHelperService;
 var
   ResultCode: Integer;
@@ -214,6 +228,7 @@ begin
   begin
     { Let Inno Setup try CloseApplications first; force-kill any leftovers before files are copied. }
     ForceKillProcesses;
+    ReserveHelperPort;
   end;
 
   if CurStep = ssPostInstall then

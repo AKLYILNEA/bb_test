@@ -556,7 +556,7 @@ class AppController {
     try {
       final currentGroups = _ref.read(groupsProvider);
       final isInitialDesktopLoad = system.isDesktop && currentGroups.isEmpty;
-      final maxAttempts = isInitialDesktopLoad ? 6 : 3;
+      final maxAttempts = isInitialDesktopLoad ? 6 : 4;
 
       final newGroups = await retry(
         task: clashCore.getProxiesGroups,
@@ -569,7 +569,7 @@ class AppController {
     } catch (e) {
       final currentGroups = _ref.read(groupsProvider);
       final isInitialDesktopLoad = system.isDesktop && currentGroups.isEmpty;
-      final maxRetryRounds = isInitialDesktopLoad ? 8 : 3;
+      final maxRetryRounds = isInitialDesktopLoad ? 8 : 4;
       final retryDelay = isInitialDesktopLoad
           ? const Duration(seconds: 1)
           : const Duration(seconds: 2);

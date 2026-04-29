@@ -289,9 +289,9 @@ class Request {
     });
     final authHeaders = HelperAuthManager.generateAuthHeaders(body);
 
-    const maxAttempts = 3;
+    const maxAttempts = 4;
     const interval = Duration(milliseconds: 500);
-    const requestTimeout = Duration(seconds: 8);
+    const requestTimeout = Duration(seconds: 5);
 
     for (var attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
