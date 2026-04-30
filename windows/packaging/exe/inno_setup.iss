@@ -19,6 +19,7 @@ ArchitecturesAllowed={{ARCH}}
 ArchitecturesInstallIn64BitMode={{ARCH}}
 CloseApplications=yes
 CloseApplicationsFilter={{EXECUTABLE_NAME}},BettboxCore.exe,BettboxHelperService.exe
+SetupLogging=yes
 
 [Code]
 var
@@ -123,15 +124,9 @@ end;
 procedure ReserveHelperPort;
 var
   ResultCode: Integer;
-  DeleteResult: Integer;
-  AddResult: Integer;
 begin
-  DeleteResult := Exec('netsh', 'int ipv4 delete excludedportrange protocol=tcp startport=43210 numberofports=1', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
-  AddResult := Exec('netsh', 'int ipv4 add excludedportrange protocol=tcp startport=43210 numberofports=1', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
-  if (DeleteResult <> 0) or (AddResult <> 0) or (ResultCode <> 0) then
-  begin
-    Log('ReserveHelperPort failed: delete result=' + IntToStr(DeleteResult) + ', add result=' + IntToStr(AddResult) + ', resultCode=' + IntToStr(ResultCode));
-  end;
+  Exec('netsh', 'int ipv4 add excludedportrange protocol=tcp startport=43210 numberofports=1', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  if ResultCode <> 0 then Log('ReserveHelperPort: netsh returned ' + IntToStr(ResultCode));
 end;
 
 procedure UnregisterHelperService;
