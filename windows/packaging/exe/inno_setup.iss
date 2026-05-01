@@ -121,14 +121,6 @@ begin
   Exec('sc', 'start ' + ServiceName, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
 end;
 
-procedure ReserveHelperPort;
-var
-  ResultCode: Integer;
-begin
-  Exec('netsh', 'int ipv4 add excludedportrange protocol=tcp startport=43210 numberofports=1', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
-  if ResultCode <> 0 then Log('ReserveHelperPort: netsh returned ' + IntToStr(ResultCode));
-end;
-
 procedure UnregisterHelperService;
 var
   ResultCode: Integer;
@@ -223,7 +215,6 @@ begin
   begin
     { Let Inno Setup try CloseApplications first; force-kill any leftovers before files are copied. }
     ForceKillProcesses;
-    ReserveHelperPort;
   end;
 
   if CurStep = ssPostInstall then
