@@ -25,10 +25,10 @@ pub fn main() -> Result<()> {
 }
 
 pub fn start_service() -> Result<()> {
-    service_dispatcher::start(SERVICE_NAME, serveice)
+    service_dispatcher::start(SERVICE_NAME, service_entry)
 }
 
-define_windows_service!(serveice, service_main);
+define_windows_service!(service_entry, service_main);
 
 pub fn service_main(_arguments: Vec<OsString>) {
     if let Ok(rt) = Runtime::new() {
