@@ -281,6 +281,12 @@ class Request {
   }
 
   Future<bool> startCoreByHelper(String arg) async {
+    final helperAlive = await quickPingHelper();
+    if (!helperAlive) {
+      commonPrint.log('Helper service is not reachable, skipping startCoreByHelper');
+      return false;
+    }
+
     final homeDirPath = await appPath.homeDirPath;
     final body = json.encode({
       'path': appPath.corePath,
