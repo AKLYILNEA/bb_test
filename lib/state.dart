@@ -526,6 +526,7 @@ class GlobalState {
         realPatchConfig.tun.disableIcmpForwarding;
     rawConfig['tun']['mtu'] = realPatchConfig.tun.mtu;
     rawConfig['geodata-loader'] = realPatchConfig.geodataLoader.name;
+    rawConfig['geodata-mode'] = false;
     if (rawConfig['sniffer']?['sniff'] != null) {
       for (final value in (rawConfig['sniffer']?['sniff'] as Map).values) {
         if (value['ports'] != null && value['ports'] is List) {
