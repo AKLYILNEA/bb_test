@@ -179,6 +179,7 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
     if (state == AppLifecycleState.resumed && system.isAndroid) {
       final hidden = ref.read(appSettingProvider.select((s) => s.hidden));
       app.updateExcludeFromRecents(hidden);
+      SystemChrome.setSystemUIOverlayStyle(globalState.appState.systemUiOverlayStyle);
     }
     if (state == AppLifecycleState.inactive) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
