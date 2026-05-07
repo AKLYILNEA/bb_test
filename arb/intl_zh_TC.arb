@@ -244,7 +244,7 @@
   "copy": "複製",
   "paste": "貼上",
   "testUrl": "測試連結",
-  "startTest": "一鍵測試",
+  "startTest": "延遲測試",
   "addProfile": "新增配置",
   "customUrl": "自訂 URL",
   "sync": "同步",

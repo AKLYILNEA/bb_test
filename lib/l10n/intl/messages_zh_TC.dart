@@ -683,7 +683,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "stackMode": MessageLookupByLibrary.simpleMessage("堆疊模式"),
     "standard": MessageLookupByLibrary.simpleMessage("標準"),
     "start": MessageLookupByLibrary.simpleMessage("啟動"),
-    "startTest": MessageLookupByLibrary.simpleMessage("一鍵測試"),
+    "startTest": MessageLookupByLibrary.simpleMessage("延遲測試"),
     "startVpn": MessageLookupByLibrary.simpleMessage("正在啟動"),
     "status": MessageLookupByLibrary.simpleMessage("狀態"),
     "statusDesc": MessageLookupByLibrary.simpleMessage("關閉後將使用系統 DNS"),
