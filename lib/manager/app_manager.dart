@@ -163,7 +163,7 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
       await globalState.handleBackground();
     } else if (state == AppLifecycleState.resumed) {
       globalState.handleForeground();
-      render?.active();
+      render?.resume();
       await globalState.resumeForegroundUpdates();
       await globalState.appController.syncWakelockIfNeeded();
       _scheduleMissedUpdateCheck();
@@ -197,15 +197,7 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
 
   @override
   Widget build(BuildContext context) {
-    return Listener(
-      onPointerDown: (_) {
-        render?.active();
-      },
-      onPointerHover: (_) {
-        render?.active();
-      },
-      child: widget.child,
-    );
+    return widget.child;
   }
 }
 

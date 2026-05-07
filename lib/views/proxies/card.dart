@@ -297,24 +297,14 @@ class _ProxyMetaTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
-    return Ink(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
-      decoration: ShapeDecoration(
-        color: colorScheme.surfaceContainerHighest.opacity50,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(6),
-          side: BorderSide(color: colorScheme.outlineVariant.opacity30),
-        ),
-      ),
-      child: Text(
-        text,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: context.textTheme.labelSmall?.copyWith(
-          height: 1,
-          color: colorScheme.onSurfaceVariant.opacity80,
-          fontWeight: FontWeight.w400,
-        ),
+    return Text(
+      text,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: context.textTheme.labelSmall?.copyWith(
+        height: 1,
+        color: colorScheme.onSurfaceVariant.opacity80,
+        fontWeight: FontWeight.w400,
       ),
     );
   }
