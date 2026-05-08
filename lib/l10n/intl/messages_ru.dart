@@ -523,7 +523,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "ipClickBehavior": MessageLookupByLibrary.simpleMessage(
       "Переключение отображения",
     ),
-    "ipPrivacyProtection": MessageLookupByLibrary.simpleMessage("Защита IP"),
+    "ipPrivacyProtection": MessageLookupByLibrary.simpleMessage("Скрыть IP"),
     "ipcidr": MessageLookupByLibrary.simpleMessage("IP/маска"),
     "ipv6Desc": MessageLookupByLibrary.simpleMessage("Включить поддержку IPv6"),
     "ipv6InboundDesc": MessageLookupByLibrary.simpleMessage(
@@ -563,9 +563,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Инструмент для разблокировки UWP loopback",
     ),
     "loose": MessageLookupByLibrary.simpleMessage("Свободный"),
-    "manualRefreshIp": MessageLookupByLibrary.simpleMessage(
-      "Обновить IP вручную",
-    ),
+    "manualRefreshIp": MessageLookupByLibrary.simpleMessage("Обновить IP"),
     "memoryInfo": MessageLookupByLibrary.simpleMessage("Информация о памяти"),
     "messageTest": MessageLookupByLibrary.simpleMessage("Тест сообщения"),
     "messageTestTip": MessageLookupByLibrary.simpleMessage(
@@ -1001,7 +999,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "success": MessageLookupByLibrary.simpleMessage("Успех"),
     "switchLabel": MessageLookupByLibrary.simpleMessage("Переключатель"),
     "switchToDomesticIp": MessageLookupByLibrary.simpleMessage(
-      "Переключить на локальный IP",
+      "Получить локальный IP",
     ),
     "sync": MessageLookupByLibrary.simpleMessage("Синхронизировать"),
     "syncAll": MessageLookupByLibrary.simpleMessage("Синхронизировать всё"),
