@@ -297,7 +297,7 @@ class _ProxyMetaTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
-    return Text(
+    return EmojiText(
       text,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
