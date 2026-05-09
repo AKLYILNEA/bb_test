@@ -85,7 +85,7 @@ func (c Chain) Last() string {
 	case 0:
 		return ""
 	default:
-		return c[0]
+		return c[len(c)-1]
 	}
 }
 
