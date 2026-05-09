@@ -110,35 +110,33 @@ class Tray {
       );
     }
     menuItems.add(MenuItem.separator());
-    if (system.isMacOS) {
-      for (final group in trayState.groups) {
-        List<MenuItem> subMenuItems = [];
-        for (final proxy in group.all) {
-          subMenuItems.add(
-            MenuItem.checkbox(
-              label: proxy.name,
-              checked: trayState.selectedMap[group.name] == proxy.name,
-              onClick: (_) {
-                final appController = globalState.appController;
-                appController.updateCurrentSelectedMap(group.name, proxy.name);
-                appController.changeProxy(
-                  groupName: group.name,
-                  proxyName: proxy.name,
-                );
-              },
-            ),
-          );
-        }
-        menuItems.add(
-          MenuItem.submenu(
-            label: group.name,
-            submenu: Menu(items: subMenuItems),
+    for (final group in trayState.groups) {
+      List<MenuItem> subMenuItems = [];
+      for (final proxy in group.all) {
+        subMenuItems.add(
+          MenuItem.checkbox(
+            label: proxy.name,
+            checked: trayState.selectedMap[group.name] == proxy.name,
+            onClick: (_) {
+              final appController = globalState.appController;
+              appController.updateCurrentSelectedMap(group.name, proxy.name);
+              appController.changeProxy(
+                groupName: group.name,
+                proxyName: proxy.name,
+              );
+            },
           ),
         );
       }
-      if (trayState.groups.isNotEmpty) {
-        menuItems.add(MenuItem.separator());
-      }
+      menuItems.add(
+        MenuItem.submenu(
+          label: group.name,
+          submenu: Menu(items: subMenuItems),
+        ),
+      );
+    }
+    if (trayState.groups.isNotEmpty) {
+      menuItems.add(MenuItem.separator());
     }
     if (trayState.isStart) {
       menuItems.add(
