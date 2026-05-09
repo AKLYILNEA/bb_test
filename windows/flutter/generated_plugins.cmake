@@ -12,7 +12,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   hotkey_manager_windows
   proxy
   screen_retriever_windows
-  sentry_flutter
   tray_manager
   url_launcher_windows
   vclibs
