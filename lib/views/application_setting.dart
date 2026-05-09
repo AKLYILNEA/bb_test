@@ -240,34 +240,6 @@ class HighRefreshRateItem extends ConsumerWidget {
   }
 }
 
-class EnableCrashReportItem extends ConsumerWidget {
-  const EnableCrashReportItem({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final enableCrashReport = ref.watch(
-      appSettingProvider.select((state) => state.enableCrashReport),
-    );
-    return ListItem.switchItem(
-      title: Text(appLocalizations.enableCrashReport),
-      subtitle: Text(appLocalizations.enableCrashReportDesc),
-      delegate: SwitchDelegate(
-        value: enableCrashReport,
-        onChanged: (bool value) async {
-          ref
-              .read(appSettingProvider.notifier)
-              .updateState((state) => state.copyWith(enableCrashReport: value));
-          
-          // Show restart hint
-          if (context.mounted) {
-            context.showSnackBar(appLocalizations.restartTip);
-          }
-        },
-      ),
-    );
-  }
-}
-
 class AutoCheckUpdateItem extends ConsumerWidget {
   const AutoCheckUpdateItem({super.key});
 
@@ -318,7 +290,6 @@ class ApplicationSettingView extends StatelessWidget {
           ],
           CloseConnectionsItem(),
           UsageItem(),
-          EnableCrashReportItem(),
           AutoCheckUpdateItem(),
         ];
         return ListView.separated(

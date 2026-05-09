@@ -23,7 +23,6 @@ _AppSettingProps _$AppSettingPropsFromJson(Map<String, dynamic> json) =>
       isAnimateToPage: json['isAnimateToPage'] as bool? ?? true,
       enableNavBarHapticFeedback:
           json['enableNavBarHapticFeedback'] as bool? ?? false,
-      enableCrashReport: json['enableCrashReport'] as bool? ?? false,
       autoCheckUpdate: json['autoCheckUpdate'] as bool? ?? true,
       showLabel: json['showLabel'] as bool? ?? false,
       disclaimerAccepted: json['disclaimerAccepted'] as bool? ?? false,
@@ -55,7 +54,6 @@ Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>
       'testUrl': instance.testUrl,
       'isAnimateToPage': instance.isAnimateToPage,
       'enableNavBarHapticFeedback': instance.enableNavBarHapticFeedback,
-      'enableCrashReport': instance.enableCrashReport,
       'autoCheckUpdate': instance.autoCheckUpdate,
       'showLabel': instance.showLabel,
       'disclaimerAccepted': instance.disclaimerAccepted,

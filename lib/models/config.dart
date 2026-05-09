@@ -79,7 +79,6 @@ abstract class AppSettingProps with _$AppSettingProps {
     @Default(defaultTestUrl) String testUrl,
     @Default(true) bool isAnimateToPage,
     @Default(false) bool enableNavBarHapticFeedback,
-    @Default(false) bool enableCrashReport,
     @Default(true) bool autoCheckUpdate,
     @Default(false) bool showLabel,
     @Default(false) bool disclaimerAccepted,
