@@ -34,7 +34,7 @@ class ProxiesListView extends ConsumerWidget {
   }
 }
 
-class _ProxyGroupsList extends StatelessWidget {
+class _ProxyGroupsList extends StatefulWidget {
   final List<Group> groups;
   final int columns;
   final ProxyCardType cardType;
@@ -49,8 +49,15 @@ class _ProxyGroupsList extends StatelessWidget {
     required this.currentUnfoldSet,
   });
 
+  @override
+  State<_ProxyGroupsList> createState() => _ProxyGroupsListState();
+}
+
+class _ProxyGroupsListState extends State<_ProxyGroupsList> {
+  final ScrollController _scrollController = ScrollController();
+
   void _handleToggle(String groupName) {
-    final tempUnfoldSet = Set<String>.from(currentUnfoldSet);
+    final tempUnfoldSet = Set<String>.from(widget.currentUnfoldSet);
     if (tempUnfoldSet.contains(groupName)) {
       tempUnfoldSet.remove(groupName);
     } else {
@@ -60,27 +67,34 @@ class _ProxyGroupsList extends StatelessWidget {
   }
 
   @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return CommonScrollBar(
-      controller: null,
+      controller: _scrollController,
       thumbVisibility: true,
       trackVisibility: true,
       child: CustomScrollView(
+        controller: _scrollController,
         cacheExtent: 500,
         slivers: [
           SliverPadding(
             padding: const EdgeInsets.all(16),
             sliver: SliverList.builder(
-              itemCount: groups.length,
+              itemCount: widget.groups.length,
               itemBuilder: (context, index) {
-                final group = groups[index];
-                final isExpand = currentUnfoldSet.contains(group.name);
+                final group = widget.groups[index];
+                final isExpand = widget.currentUnfoldSet.contains(group.name);
                 return _GroupSection(
                   key: ValueKey(group.name),
                   group: group,
-                  columns: columns,
-                  cardType: cardType,
-                  sortType: sortType,
+                  columns: widget.columns,
+                  cardType: widget.cardType,
+                  sortType: widget.sortType,
                   isExpand: isExpand,
                   onToggle: () => _handleToggle(group.name),
                 );
