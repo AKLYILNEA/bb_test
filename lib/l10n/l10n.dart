@@ -74,6 +74,26 @@ class AppLocalizations {
     return Intl.message('Dashboard', name: 'dashboard', desc: '', args: []);
   }
 
+  /// `Custom Dashboard Title`
+  String get customDashboardTitle {
+    return Intl.message(
+      'Custom Dashboard Title',
+      name: 'customDashboardTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Title is too long, maximum 20 characters supported`
+  String get titleTooLong {
+    return Intl.message(
+      'Title is too long, maximum 20 characters supported',
+      name: 'titleTooLong',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Proxies`
   String get proxies {
     return Intl.message('Proxies', name: 'proxies', desc: '', args: []);

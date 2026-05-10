@@ -247,6 +247,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "create": MessageLookupByLibrary.simpleMessage("Create"),
     "creationTime": MessageLookupByLibrary.simpleMessage("Creation Time"),
     "custom": MessageLookupByLibrary.simpleMessage("Custom"),
+    "customDashboardTitle": MessageLookupByLibrary.simpleMessage(
+      "Custom Dashboard Title",
+    ),
     "customUrl": MessageLookupByLibrary.simpleMessage("Custom URL"),
     "cut": MessageLookupByLibrary.simpleMessage("Cut"),
     "dark": MessageLookupByLibrary.simpleMessage("Dark"),
@@ -1025,6 +1028,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "tight": MessageLookupByLibrary.simpleMessage("Compact"),
     "time": MessageLookupByLibrary.simpleMessage("Time"),
     "tip": MessageLookupByLibrary.simpleMessage("Tip"),
+    "titleTooLong": MessageLookupByLibrary.simpleMessage(
+      "Title is too long, maximum 20 characters supported",
+    ),
     "tlsPortSniffer": MessageLookupByLibrary.simpleMessage("TLS Port Sniffing"),
     "toggle": MessageLookupByLibrary.simpleMessage("Toggle"),
     "tonalSpotScheme": MessageLookupByLibrary.simpleMessage("Tonal Spot"),

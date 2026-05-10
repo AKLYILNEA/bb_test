@@ -3,6 +3,8 @@
   "global": "Глобально",
   "direct": "Напрямую",
   "dashboard": "Главная",
+  "customDashboardTitle": "Пользовательский заголовок",
+  "titleTooLong": "Слишком длинный, максимум 20 символов",
   "proxies": "Прокси",
   "profile": "Профиль",
   "profiles": "Профили",

@@ -3,6 +3,8 @@
   "global": "Global",
   "direct": "Direct",
   "dashboard": "Dashboard",
+  "customDashboardTitle": "Custom Dashboard Title",
+  "titleTooLong": "Title is too long, maximum 20 characters supported",
   "proxies": "Proxies",
   "profile": "Profile",
   "profiles": "Profiles",

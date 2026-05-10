@@ -245,6 +245,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "create": MessageLookupByLibrary.simpleMessage("Создать"),
     "creationTime": MessageLookupByLibrary.simpleMessage("Время создания"),
     "custom": MessageLookupByLibrary.simpleMessage("Пользовательский"),
+    "customDashboardTitle": MessageLookupByLibrary.simpleMessage(
+      "Пользовательский заголовок",
+    ),
     "customUrl": MessageLookupByLibrary.simpleMessage("Пользовательский URL"),
     "cut": MessageLookupByLibrary.simpleMessage("Вырезать"),
     "dark": MessageLookupByLibrary.simpleMessage("Тёмная"),
@@ -1041,6 +1044,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "tight": MessageLookupByLibrary.simpleMessage("Компактный"),
     "time": MessageLookupByLibrary.simpleMessage("Время"),
     "tip": MessageLookupByLibrary.simpleMessage("Подсказка"),
+    "titleTooLong": MessageLookupByLibrary.simpleMessage(
+      "Слишком длинный, максимум 20 символов",
+    ),
     "tlsPortSniffer": MessageLookupByLibrary.simpleMessage(
       "TLS порты сниффера",
     ),
