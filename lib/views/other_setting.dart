@@ -355,6 +355,41 @@ class NetworkFixItem extends ConsumerWidget {
   }
 }
 
+class HighPriorityItem extends ConsumerWidget {
+  const HighPriorityItem({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final enableHighPriority = ref.watch(
+      appSettingProvider.select((state) => state.enableHighPriority),
+    );
+
+    return ListItem.switchItem(
+      title: Text(appLocalizations.highPriority),
+      subtitle: Text(appLocalizations.highPriorityDesc),
+      delegate: SwitchDelegate(
+        value: enableHighPriority,
+        onChanged: (bool value) async {
+          ref
+              .read(appSettingProvider.notifier)
+              .updateState((state) => state.copyWith(enableHighPriority: value));
+
+          if (system.isWindows) {
+            try {
+              await globalState.appController.setProcessPriority(value);
+            } catch (e) {
+              commonPrint.log('Set process priority error: $e');
+              if (context.mounted) {
+                context.showSnackBar('Failed to set process priority: $e');
+              }
+            }
+          }
+        },
+      ),
+    );
+  }
+}
+
 class BatteryOptimizationItem extends ConsumerWidget {
   const BatteryOptimizationItem({super.key});
 
@@ -458,6 +493,7 @@ class OtherSettingView extends ConsumerWidget {
       const StoreFixItem(),
       const DisableQuicItem(),
       if (disableQuic && !isRussian) const ExcludeChinaItem(),
+      if (system.isWindows) const HighPriorityItem(),
       if (system.isWindows) const NetworkFixItem(),
       if (system.isAndroid) const BatteryOptimizationItem(),
     ];

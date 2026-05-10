@@ -55,6 +55,8 @@
   "quickResponseDesc": "Disconnect on network change (WiFi/Mobile)",
   "networkFix": "Network Fix",
   "networkFixDesc": "Fix Windows network globe icon issue",
+  "highPriority": "High Priority",
+  "highPriorityDesc": "Increase priority of main process and core process",
   "batteryOptimization": "Battery Optimization",
   "batteryOptimizationDesc": "Request battery optimization whitelist",
   "alreadyInWhitelist": "Already in whitelist",

@@ -470,6 +470,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(
       "Таймаут проверки работоспособности узлов",
     ),
+    "highPriority": MessageLookupByLibrary.simpleMessage("Высокий приоритет"),
+    "highPriorityDesc": MessageLookupByLibrary.simpleMessage(
+      "Повысить приоритет основного и основного процессов",
+    ),
     "highRefreshRate": MessageLookupByLibrary.simpleMessage(
       "Высокая частота обновления",
     ),

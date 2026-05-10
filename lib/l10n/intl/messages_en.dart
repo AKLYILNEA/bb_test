@@ -462,6 +462,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(
       "Node health check timeout",
     ),
+    "highPriority": MessageLookupByLibrary.simpleMessage("High Priority"),
+    "highPriorityDesc": MessageLookupByLibrary.simpleMessage(
+      "Increase priority of main process and core process",
+    ),
     "highRefreshRate": MessageLookupByLibrary.simpleMessage(
       "High Refresh Rate",
     ),

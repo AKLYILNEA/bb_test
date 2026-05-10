@@ -489,6 +489,26 @@ class AppLocalizations {
     );
   }
 
+  /// `High Priority`
+  String get highPriority {
+    return Intl.message(
+      'High Priority',
+      name: 'highPriority',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Increase priority of main process and core process`
+  String get highPriorityDesc {
+    return Intl.message(
+      'Increase priority of main process and core process',
+      name: 'highPriorityDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Battery Optimization`
   String get batteryOptimization {
     return Intl.message(

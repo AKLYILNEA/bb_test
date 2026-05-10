@@ -106,7 +106,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "backupSuccess": MessageLookupByLibrary.simpleMessage("備份成功"),
     "basicConfig": MessageLookupByLibrary.simpleMessage("內核配置"),
     "basicConfigDesc": MessageLookupByLibrary.simpleMessage("全域修改內核配置"),
-    "batteryOptimization": MessageLookupByLibrary.simpleMessage("電池最佳化"),
+    "batteryOptimization": MessageLookupByLibrary.simpleMessage("電池優化"),
     "batteryOptimizationDesc": MessageLookupByLibrary.simpleMessage(
       "請求 Android 電池最佳化白名單權限",
     ),
@@ -333,6 +333,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "healthCheckTimeout": MessageLookupByLibrary.simpleMessage("超時時間"),
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(
       "節點健康檢查超時時間",
+    ),
+    "highPriority": MessageLookupByLibrary.simpleMessage("高優先級"),
+    "highPriorityDesc": MessageLookupByLibrary.simpleMessage(
+      "提升主程式和核心處理程序的優先級",
     ),
     "highRefreshRate": MessageLookupByLibrary.simpleMessage("高重新整理率"),
     "highRefreshRateDesc": MessageLookupByLibrary.simpleMessage(

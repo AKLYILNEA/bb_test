@@ -626,6 +626,18 @@ class AppController {
     _ref.read(backBlockProvider.notifier).value = false;
   }
 
+  Future<void> setProcessPriority(bool enable) async {
+    if (!system.isWindows) return;
+    
+    try {
+      await system.setProcessPriority('Bettbox.exe', enable);
+      await request.setProcessPriorityByHelper('BettboxCore.exe', enable);
+    } catch (e) {
+      commonPrint.log('Set process priority error: $e');
+      rethrow;
+    }
+  }
+
   Future<void> handleExit() async {
     if (_exitLock != null) {
       return _exitLock!.future;

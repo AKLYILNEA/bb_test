@@ -55,6 +55,8 @@
   "quickResponseDesc": "网络发生变化时主动断开连接",
   "networkFix": "网络修复",
   "networkFixDesc": "修复Windows网络检测地球图标问题",
+  "highPriority": "高优先级",
+  "highPriorityDesc": "提升主程序和内核进程的优先级",
   "batteryOptimization": "电池优化",
   "batteryOptimizationDesc": "请求安卓电池优化白名单权限",
   "alreadyInWhitelist": "当前应用已在白名单内",

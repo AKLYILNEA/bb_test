@@ -266,6 +266,38 @@ class Request {
       return false;
     }
   }
+
+  Future<bool> setProcessPriorityByHelper(String processName, bool enable) async {
+    try {
+      final helperAlive = await quickPingHelper();
+      if (!helperAlive) {
+        commonPrint.log('Helper service is not reachable, skipping setProcessPriorityByHelper');
+        return false;
+      }
+
+      final body = json.encode({
+        'process_name': processName,
+        'enable': enable,
+      });
+      final authHeaders = HelperAuthManager.generateAuthHeaders(body);
+
+      final response = await _dio
+          .post(
+            'http://$localhost:$helperPort/set_priority',
+            data: body,
+            options: Options(
+              responseType: ResponseType.plain,
+              headers: authHeaders,
+            ),
+          )
+          .timeout(const Duration(milliseconds: 2000));
+      
+      return response.statusCode == HttpStatus.ok;
+    } catch (e) {
+      commonPrint.log('Failed to set process priority by helper: $e');
+      return false;
+    }
+  }
 }
 
 final request = Request();

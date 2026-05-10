@@ -55,6 +55,8 @@
   "quickResponseDesc": "Активно отключать соединения при изменении сети",
   "networkFix": "Исправление сети",
   "networkFixDesc": "Исправляет значок сети Windows",
+  "highPriority": "Высокий приоритет",
+  "highPriorityDesc": "Повысить приоритет основного и основного процессов",
   "batteryOptimization": "Оптимизация батареи",
   "batteryOptimizationDesc": "Запросить добавление в белый список энергосбережения",
   "alreadyInWhitelist": "Уже в белом списке",
