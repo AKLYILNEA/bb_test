@@ -389,6 +389,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "local": MessageLookupByLibrary.simpleMessage("本機"),
     "localBackupDesc": MessageLookupByLibrary.simpleMessage("備份資料到本機"),
     "localRecoveryDesc": MessageLookupByLibrary.simpleMessage("透過檔案還原資料"),
+    "lockWindowSize": MessageLookupByLibrary.simpleMessage("鎖定目前視窗大小"),
     "log": MessageLookupByLibrary.simpleMessage("日誌"),
     "logLevel": MessageLookupByLibrary.simpleMessage("日誌等級"),
     "logcat": MessageLookupByLibrary.simpleMessage("日誌捕獲"),

@@ -547,6 +547,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "localRecoveryDesc": MessageLookupByLibrary.simpleMessage(
       "Restore data from file",
     ),
+    "lockWindowSize": MessageLookupByLibrary.simpleMessage(
+      "Lock current window size",
+    ),
     "log": MessageLookupByLibrary.simpleMessage("Log"),
     "logLevel": MessageLookupByLibrary.simpleMessage("Log Level"),
     "logcat": MessageLookupByLibrary.simpleMessage("Log Capture"),

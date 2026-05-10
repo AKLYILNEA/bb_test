@@ -76,6 +76,7 @@
   "tunDesc": "接管目前裝置全域流量",
   "minimizeOnExit": "退出最小化",
   "minimizeOnExitDesc": "修改系統預設退出事件",
+  "lockWindowSize": "鎖定目前視窗大小",
   "autoLaunch": "開機啟動",
   "autoLaunchDesc": "跟隨系統自動啟動",
   "smartDelayLaunch": "智慧延遲",

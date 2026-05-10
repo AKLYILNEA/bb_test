@@ -376,26 +376,29 @@ class WindowLockButton extends ConsumerWidget {
       windowSettingProvider.select((state) => state.isLocked),
     );
 
-    return IconButton(
-      onPressed: () async {
-        try {
-          final currentLocked = ref.read(
-            windowSettingProvider.select((state) => state.isLocked),
-          );
-          final newLocked = !currentLocked;
+    return Tooltip(
+      message: appLocalizations.lockWindowSize,
+      child: IconButton(
+        onPressed: () async {
+          try {
+            final currentLocked = ref.read(
+              windowSettingProvider.select((state) => state.isLocked),
+            );
+            final newLocked = !currentLocked;
 
-          await windowManager.setResizable(!newLocked);
+            await windowManager.setResizable(!newLocked);
 
-          ref
-              .read(windowSettingProvider.notifier)
-              .updateState((state) => state.copyWith(isLocked: newLocked));
-        } catch (e) {
-          commonPrint.log('Window Lock Failed: $e');
-        }
-      },
-      icon: Icon(
-        isLocked ? Icons.lock : Icons.lock_open,
-        color: context.colorScheme.onSurfaceVariant,
+            ref
+                .read(windowSettingProvider.notifier)
+                .updateState((state) => state.copyWith(isLocked: newLocked));
+          } catch (e) {
+            commonPrint.log('Window Lock Failed: $e');
+          }
+        },
+        icon: Icon(
+          isLocked ? Icons.lock : Icons.lock_open,
+          color: context.colorScheme.onSurfaceVariant,
+        ),
       ),
     );
   }
