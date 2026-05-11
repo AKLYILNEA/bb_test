@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/state.dart';
+import 'package:bett_box/views/proxies/common.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -17,6 +18,18 @@ class Tray {
   bool _isUpdating = false;
 
   static const _debounceDelay = Duration(milliseconds: 300);
+
+  Timer? _loadingTimer;
+  int _loadingFrame = 0;
+  final List<String> _loadingFrames = ['  .', ' ..', '...'];
+
+  bool _isTesting = false;
+  String? _testingGroupId;
+
+  void dispose() {
+    _debounceTimer?.cancel();
+    _loadingTimer?.cancel();
+  }
   Future _updateSystemTray({
     required Brightness? brightness,
     required bool isStart,
@@ -45,6 +58,7 @@ class Tray {
   Future<void> update({
     required TrayState trayState,
     bool focus = false,
+    bool silent = false,
   }) async {
     if (system.isAndroid) {
       return;
@@ -59,6 +73,10 @@ class Tray {
 
     if (focus) {
       await _doUpdate(trayState: trayState, focus: focus);
+    } else if (silent) {
+      _debounceTimer = Timer(const Duration(milliseconds: 50), () async {
+        await _doUpdate(trayState: trayState, focus: focus, silent: silent);
+      });
     } else {
       _debounceTimer = Timer(_debounceDelay, () async {
         await _doUpdate(trayState: trayState, focus: focus);
@@ -69,12 +87,13 @@ class Tray {
   Future<void> _doUpdate({
     required TrayState trayState,
     bool focus = false,
+    bool silent = false,
   }) async {
     if (_isUpdating) return;
     _isUpdating = true;
 
     try {
-      if (!Platform.isLinux) {
+      if (!silent && !Platform.isLinux) {
         await _updateSystemTray(
           brightness: trayState.brightness,
           isStart: trayState.isStart,
@@ -112,10 +131,28 @@ class Tray {
     menuItems.add(MenuItem.separator());
     for (final group in trayState.groups) {
       List<MenuItem> subMenuItems = [];
+
+      final isTestingThisGroup = _isTesting && _testingGroupId == group.name;
+
+      subMenuItems.add(
+        MenuItem(
+          label: isTestingThisGroup
+              ? '⚡ ${appLocalizations.startTest}...'
+              : '⚡ ${appLocalizations.startTest}',
+          disabled: _isTesting,
+          onClick: (_) => _testGroupDelay(group),
+        ),
+      );
+
+      subMenuItems.add(MenuItem.separator());
+
       for (final proxy in group.all) {
+        final delay = trayState.delays[proxy.name];
+        final label = _formatProxyLabel(proxy.name, delay);
+
         subMenuItems.add(
           MenuItem.checkbox(
-            label: proxy.name,
+            label: label,
             checked: trayState.selectedMap[group.name] == proxy.name,
             onClick: (_) {
               final appController = globalState.appController;
@@ -195,7 +232,7 @@ class Tray {
     );
     menuItems.add(exitMenuItem);
     final menu = Menu(items: menuItems);
-    await trayManager.setContextMenu(menu);
+    await trayManager.setContextMenu(menu, keepMenuOpen: silent);
     if (Platform.isLinux) {
       await _updateSystemTray(
         brightness: trayState.brightness,
@@ -238,6 +275,83 @@ class Tray {
       await globalState.appController.updateTray();
     } catch (e) {
       commonPrint.log('WakeLock toggle error: $e');
+    }
+  }
+
+  String _formatProxyLabel(String name, int? delay) {
+    final sep = system.isWindows ? '\t' : '  ';
+    if (delay == null) {
+      return name;
+    } else if (delay == 0) {
+      final frame = _loadingFrames[_loadingFrame];
+      return '$name$sep$frame';
+    } else if (delay < 0) {
+      return '$name$sep×';
+    } else {
+      return '$name$sep${delay}ms';
+    }
+  }
+
+  void _startLoadingAnimation() {
+    _loadingTimer?.cancel();
+    _loadingFrame = 0;
+    _loadingTimer = Timer.periodic(const Duration(milliseconds: 500), (_) async {
+      _loadingFrame = (_loadingFrame + 1) % _loadingFrames.length;
+      await globalState.appController.updateTray(false, true);
+    });
+  }
+
+  void _stopLoadingAnimation() {
+    _loadingTimer?.cancel();
+    _loadingTimer = null;
+    _loadingFrame = 0;
+  }
+
+  Future<void> _testGroupDelay(Group group) async {
+    if (_isTesting) return;
+
+    final appController = globalState.appController;
+    final testUrl = appController.getRealTestUrl('');
+
+    final testableProxies = group.all.where((p) {
+      final name = p.name.toUpperCase();
+      return name != 'REJECT' && name != 'REJECT-DROP' && name != 'PASS';
+    }).toList();
+
+    _isTesting = true;
+    _testingGroupId = group.name;
+
+    try {
+
+      for (final proxy in testableProxies) {
+        appController.setDelay(Delay(
+          url: testUrl,
+          name: proxy.name,
+          value: 0,
+        ));
+      }
+
+      _startLoadingAnimation();
+
+      await globalState.appController.updateTray(false, true);
+
+      await delayTest(testableProxies);
+    } catch (e) {
+      commonPrint.log('Delay test error: $e');
+      for (final proxy in testableProxies) {
+        appController.setDelay(Delay(
+          url: testUrl,
+          name: proxy.name,
+          value: -1,
+        ));
+      }
+    } finally {
+      _stopLoadingAnimation();
+
+      _isTesting = false;
+      _testingGroupId = null;
+
+      await globalState.appController.updateTray(false, true);
     }
   }
 }

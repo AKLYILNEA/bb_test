@@ -162,6 +162,17 @@ TrayState trayState(Ref ref) {
 
   final wakelockEnabled = ref.watch(wakelockStateProvider);
 
+  final delays = <String, int?>{};
+  final delayMap = ref.watch(delayDataSourceProvider);
+  final testUrl = ref.watch(getRealTestUrlProvider(''));
+  final urlDelayMap = delayMap[testUrl] ?? {};
+
+  for (final group in groups) {
+    for (final proxy in group.all) {
+      delays[proxy.name] = urlDelayMap[proxy.name];
+    }
+  }
+
   return TrayState(
     mode: clashConfig.mode,
     port: clashConfig.mixedPort,
@@ -174,6 +185,7 @@ TrayState trayState(Ref ref) {
     groups: groups,
     selectedMap: selectedMap,
     wakelockEnabled: wakelockEnabled,
+    delays: delays,
   );
 }
 

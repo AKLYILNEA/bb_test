@@ -1390,9 +1390,9 @@ class AppController {
     });
   }
 
-  Future<void> updateTray([bool focus = false]) async {
+  Future<void> updateTray([bool focus = false, bool silent = false]) async {
     final trayState = _ref.read(trayStateProvider);
-    await tray.update(trayState: trayState, focus: focus);
+    await tray.update(trayState: trayState, focus: focus, silent: silent);
   }
 
   Future<void> _processRecoveryArchive(
