@@ -40,7 +40,7 @@ Future<void> main() async {
 }
 
 Future<void> _runApp(int version) async {
-  if (system.isAndroid && globalState.config.appSetting.enableHighRefreshRate) {
+  if (system.isAndroid) {
     try {
       await FlutterDisplayMode.setHighRefreshRate();
     } catch (e) {

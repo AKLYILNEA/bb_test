@@ -213,33 +213,6 @@ class NavBarHapticFeedbackItem extends ConsumerWidget {
   }
 }
 
-class HighRefreshRateItem extends ConsumerWidget {
-  const HighRefreshRateItem({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final enableHighRefreshRate = ref.watch(
-      appSettingProvider.select((state) => state.enableHighRefreshRate),
-    );
-    return ListItem.switchItem(
-      title: Text(appLocalizations.highRefreshRate),
-      subtitle: Text(appLocalizations.highRefreshRateDesc),
-      delegate: SwitchDelegate(
-        value: enableHighRefreshRate,
-        onChanged: (value) {
-          ref.read(appSettingProvider.notifier).updateState(
-            (state) => state.copyWith(enableHighRefreshRate: value),
-          );
-
-          if (context.mounted) {
-            context.showSnackBar(appLocalizations.restartTip);
-          }
-        },
-      ),
-    );
-  }
-}
-
 class AutoCheckUpdateItem extends ConsumerWidget {
   const AutoCheckUpdateItem({super.key});
 
@@ -286,7 +259,6 @@ class ApplicationSettingView extends StatelessWidget {
           AnimateTabItem(),
           if (system.isAndroid) ...[
             NavBarHapticFeedbackItem(),
-            HighRefreshRateItem(),
           ],
           CloseConnectionsItem(),
           UsageItem(),
