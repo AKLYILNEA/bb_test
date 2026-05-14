@@ -6,6 +6,9 @@
 
 #include <shellapi.h>
 #include <strsafe.h>
+#include <uxtheme.h>
+#include <vsstyle.h>
+#include <vssym32.h>
 
 #include <flutter/method_channel.h>
 #include <flutter/plugin_registrar_windows.h>
@@ -18,6 +21,57 @@
 #include <sstream>
 
 #define WM_MYMESSAGE (WM_USER + 1)
+
+// Windows 11 Dark Mode APIs
+using SetPreferredAppModeFunc = int (WINAPI*)(int mode);
+using AllowDarkModeForWindowFunc = BOOL (WINAPI*)(HWND hwnd, BOOL allow);
+using FlushMenuThemesFunc = void (WINAPI*)();
+
+enum PreferredAppMode {
+  DefaultAppMode = 0,
+  AllowDarkAppMode = 1,
+  ForceDarkAppMode = 2,
+  ForceLightAppMode = 3,
+};
+
+static SetPreferredAppModeFunc g_setPreferredAppMode = nullptr;
+static AllowDarkModeForWindowFunc g_allowDarkModeForWindow = nullptr;
+static FlushMenuThemesFunc g_flushMenuThemes = nullptr;
+static bool g_darkModeApisInitialized = false;
+
+static void InitializeDarkModeApis() {
+  if (g_darkModeApisInitialized) return;
+  
+  HMODULE hUxtheme = LoadLibrary(L"uxtheme.dll");
+  if (hUxtheme) {
+    g_setPreferredAppMode = (SetPreferredAppModeFunc)GetProcAddress(hUxtheme, MAKEINTRESOURCEA(135));
+    g_allowDarkModeForWindow = (AllowDarkModeForWindowFunc)GetProcAddress(hUxtheme, MAKEINTRESOURCEA(133));
+    g_flushMenuThemes = (FlushMenuThemesFunc)GetProcAddress(hUxtheme, MAKEINTRESOURCEA(136));
+  }
+  g_darkModeApisInitialized = true;
+}
+
+static bool g_darkModeLastIsDark = false;
+
+static void ApplyDarkModeToMenu(HWND hwnd, bool isDark) {
+  InitializeDarkModeApis();
+
+  if (isDark == g_darkModeLastIsDark && g_darkModeApisInitialized) return;
+  g_darkModeLastIsDark = isDark;
+
+  if (g_setPreferredAppMode) {
+    g_setPreferredAppMode(isDark ? AllowDarkAppMode : DefaultAppMode);
+  }
+
+  if (g_allowDarkModeForWindow && hwnd) {
+    g_allowDarkModeForWindow(hwnd, isDark ? TRUE : FALSE);
+  }
+
+  if (g_flushMenuThemes) {
+    g_flushMenuThemes();
+  }
+}
+
 
 namespace {
 
@@ -366,6 +420,10 @@ void TrayManagerPlugin::SetContextMenu(
 
   auto* keep_menu_open = std::get_if<bool>(ValueOrNull(args, "keepMenuOpen"));
   bool should_keep_open = keep_menu_open != nullptr && *keep_menu_open && is_menu_open_;
+
+  auto* brightness = std::get_if<std::string>(ValueOrNull(args, "brightness"));
+  bool is_dark = brightness != nullptr && *brightness == "dark";
+  ApplyDarkModeToMenu(GetMainWindow(), is_dark);
 
   if (should_keep_open) {
     _UpdateMenuLabels(hMenu, std::get<flutter::EncodableMap>(

@@ -190,12 +190,16 @@ class TrayManager {
 
   /// Sets the context menu for this icon.
   ///
-  /// [keepMenuOpen] 如果为 true，且菜单当前是打开的，则在更新菜单后重新打开菜单（仅 Windows）
-  Future<void> setContextMenu(Menu menu, {bool keepMenuOpen = false}) async {
+  Future<void> setContextMenu(
+    Menu menu, {
+    bool keepMenuOpen = false,
+    Brightness? brightness,
+  }) async {
     _menu = menu;
     final Map<String, dynamic> arguments = {
       'menu': menu.toJson(),
       'keepMenuOpen': keepMenuOpen && _isMenuOpen,
+      'brightness': brightness?.name,
     };
     await _channel.invokeMethod('setContextMenu', arguments);
   }

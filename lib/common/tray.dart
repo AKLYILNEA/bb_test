@@ -234,7 +234,11 @@ class Tray {
     );
     menuItems.add(exitMenuItem);
     final menu = Menu(items: menuItems);
-    await trayManager.setContextMenu(menu, keepMenuOpen: silent);
+    await trayManager.setContextMenu(
+      menu,
+      keepMenuOpen: silent,
+      brightness: trayState.brightness,
+    );
     if (Platform.isLinux) {
       await _updateSystemTray(
         brightness: trayState.brightness,
