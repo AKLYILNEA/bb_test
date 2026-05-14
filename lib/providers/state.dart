@@ -157,6 +157,7 @@ TrayState trayState(Ref ref) {
   final appSetting = ref.watch(appSettingProvider);
   final groups = ref.watch(currentGroupsStateProvider).value;
   final brightness = ref.watch(systemBrightnessProvider);
+  final vpnProps = ref.watch(vpnSettingProvider);
 
   final selectedMap = ref.watch(selectedMapProvider);
 
@@ -186,6 +187,7 @@ TrayState trayState(Ref ref) {
     selectedMap: selectedMap,
     wakelockEnabled: wakelockEnabled,
     delays: delays,
+    trayEnhancement: vpnProps.trayEnhancement,
   );
 }
 

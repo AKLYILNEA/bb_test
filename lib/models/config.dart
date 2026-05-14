@@ -156,6 +156,7 @@ abstract class VpnProps with _$VpnProps {
     @Default(false) bool networkFix,
     @Default(false) bool disableQuic,
     @Default(false) bool excludeChina,
+    @Default(true) bool trayEnhancement,
     @Default(false) bool fcmOptimization,
     @Default(false) bool quickResponse,
     @Default(defaultAccessControl) AccessControl accessControl,

@@ -129,51 +129,53 @@ class Tray {
       );
     }
     menuItems.add(MenuItem.separator());
-    for (final group in trayState.groups) {
-      List<MenuItem> subMenuItems = [];
+    if (trayState.trayEnhancement) {
+      for (final group in trayState.groups) {
+        List<MenuItem> subMenuItems = [];
 
-      final isTestingThisGroup = _isTesting && _testingGroupId == group.name;
-
-      subMenuItems.add(
-        MenuItem(
-          label: isTestingThisGroup
-              ? '⚡ ${appLocalizations.startTest}...'
-              : '⚡ ${appLocalizations.startTest}',
-          disabled: _isTesting,
-          onClick: (_) => _testGroupDelay(group),
-        ),
-      );
-
-      subMenuItems.add(MenuItem.separator());
-
-      for (final proxy in group.all) {
-        final delay = trayState.delays[proxy.name];
-        final label = _formatProxyLabel(proxy.name, delay);
+        final isTestingThisGroup = _isTesting && _testingGroupId == group.name;
 
         subMenuItems.add(
-          MenuItem.checkbox(
-            label: label,
-            checked: trayState.selectedMap[group.name] == proxy.name,
-            onClick: (_) {
-              final appController = globalState.appController;
-              appController.updateCurrentSelectedMap(group.name, proxy.name);
-              appController.changeProxy(
-                groupName: group.name,
-                proxyName: proxy.name,
-              );
-            },
+          MenuItem(
+            label: isTestingThisGroup
+                ? '⚡ ${appLocalizations.startTest}...'
+                : '⚡ ${appLocalizations.startTest}',
+            disabled: _isTesting,
+            onClick: (_) => _testGroupDelay(group),
+          ),
+        );
+
+        subMenuItems.add(MenuItem.separator());
+
+        for (final proxy in group.all) {
+          final delay = trayState.delays[proxy.name];
+          final label = _formatProxyLabel(proxy.name, delay);
+
+          subMenuItems.add(
+            MenuItem.checkbox(
+              label: label,
+              checked: trayState.selectedMap[group.name] == proxy.name,
+              onClick: (_) {
+                final appController = globalState.appController;
+                appController.updateCurrentSelectedMap(group.name, proxy.name);
+                appController.changeProxy(
+                  groupName: group.name,
+                  proxyName: proxy.name,
+                );
+              },
+            ),
+          );
+        }
+        menuItems.add(
+          MenuItem.submenu(
+            label: group.name,
+            submenu: Menu(items: subMenuItems),
           ),
         );
       }
-      menuItems.add(
-        MenuItem.submenu(
-          label: group.name,
-          submenu: Menu(items: subMenuItems),
-        ),
-      );
-    }
-    if (trayState.groups.isNotEmpty) {
-      menuItems.add(MenuItem.separator());
+      if (trayState.groups.isNotEmpty) {
+        menuItems.add(MenuItem.separator());
+      }
     }
     if (trayState.isStart) {
       menuItems.add(

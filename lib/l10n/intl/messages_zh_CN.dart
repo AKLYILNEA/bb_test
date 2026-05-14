@@ -718,6 +718,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "tools": MessageLookupByLibrary.simpleMessage("更多"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("Tproxy端口"),
     "trafficUsage": MessageLookupByLibrary.simpleMessage("流量统计"),
+    "trayEnhancement": MessageLookupByLibrary.simpleMessage("托盘增强"),
+    "trayEnhancementDesc": MessageLookupByLibrary.simpleMessage(
+      "在托盘区右键菜单中控制代理组",
+    ),
     "tryManualRefresh": MessageLookupByLibrary.simpleMessage("请尝试手动刷新"),
     "tun": MessageLookupByLibrary.simpleMessage("虚拟网卡"),
     "tunDesc": MessageLookupByLibrary.simpleMessage("接管当前设备全局流量"),

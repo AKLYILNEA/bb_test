@@ -21,6 +21,7 @@ TrayManagerPlugin* plugin_instance;
 
 AppIndicator* indicator = nullptr;
 GtkWidget* menu = nullptr;
+bool is_menu_open_ = false;
 
 struct _TrayManagerPlugin {
   GObject parent_instance;
@@ -47,6 +48,22 @@ void _on_activate(GtkMenuItem* item, gpointer user_data) {
   fl_method_channel_invoke_method(plugin_instance->channel,
                                   "onTrayMenuItemClick", result_data, nullptr,
                                   nullptr, nullptr);
+}
+
+static void _on_menu_mapped(GtkWidget* widget, gpointer user_data) {
+  if (!is_menu_open_) {
+    is_menu_open_ = true;
+    fl_method_channel_invoke_method(plugin_instance->channel, "onMenuOpen",
+                                    nullptr, nullptr, nullptr, nullptr);
+  }
+}
+
+static void _on_menu_unmapped(GtkWidget* widget, gpointer user_data) {
+  if (is_menu_open_) {
+    is_menu_open_ = false;
+    fl_method_channel_invoke_method(plugin_instance->channel, "onMenuClose",
+                                    nullptr, nullptr, nullptr, nullptr);
+  }
 }
 
 static void _update_menu_labels(GtkWidget* menu_widget, FlValue* args) {
@@ -195,10 +212,20 @@ static FlMethodResponse* set_context_menu(TrayManagerPlugin* self,
   bool keep_menu_open =
       keep_open_value != nullptr && fl_value_get_bool(keep_open_value);
 
-  if (keep_menu_open && menu != nullptr) {
+  if (keep_menu_open && menu != nullptr && is_menu_open_) {
     _update_menu_labels(menu, fl_value_lookup_string(args, "menu"));
   } else {
+    if (menu != nullptr) {
+      g_signal_handlers_disconnect_by_func(
+          menu, (gpointer)_on_menu_mapped, nullptr);
+      g_signal_handlers_disconnect_by_func(
+          menu, (gpointer)_on_menu_unmapped, nullptr);
+    }
     menu = _create_menu(fl_value_lookup_string(args, "menu"));
+    g_signal_connect(G_OBJECT(menu), "map",
+                     G_CALLBACK(_on_menu_mapped), nullptr);
+    g_signal_connect(G_OBJECT(menu), "unmap",
+                     G_CALLBACK(_on_menu_unmapped), nullptr);
     app_indicator_set_menu(indicator, GTK_MENU(menu));
     gtk_widget_show_all(menu);
   }
@@ -206,6 +233,7 @@ static FlMethodResponse* set_context_menu(TrayManagerPlugin* self,
   return FL_METHOD_RESPONSE(
       fl_method_success_response_new(fl_value_new_bool(true)));
 }
+
 
 // Called when a method call is received from Flutter.
 static void tray_manager_plugin_handle_method_call(TrayManagerPlugin* self,

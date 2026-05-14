@@ -49,6 +49,8 @@
   "storeFixDesc": "Исправляет проблемы загрузки Google Play",
   "disableQuic": "Отключить QUIC",
   "disableQuicDesc": "Отключить QUIC для решения сетевых проблем",
+  "trayEnhancement": "Улучшение трея",
+  "trayEnhancementDesc": "Управление группами прокси в контекстном меню трея",
   "excludeChina": "Исключить Китай",
   "excludeChinaDesc": "Разрешить QUIC-трафик Китая вместо полной блокировки",
   "fcmOptimization": "Оптимизация FCM",

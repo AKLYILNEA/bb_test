@@ -1038,6 +1038,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "tools": MessageLookupByLibrary.simpleMessage("Tools"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("Tproxy Port"),
     "trafficUsage": MessageLookupByLibrary.simpleMessage("Traffic Usage"),
+    "trayEnhancement": MessageLookupByLibrary.simpleMessage("Tray Enhancement"),
+    "trayEnhancementDesc": MessageLookupByLibrary.simpleMessage(
+      "Control proxy groups in the system tray context menu",
+    ),
     "tryManualRefresh": MessageLookupByLibrary.simpleMessage(
       "Please try manual refresh",
     ),

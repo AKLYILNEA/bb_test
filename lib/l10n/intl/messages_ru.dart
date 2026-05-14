@@ -1056,6 +1056,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "tools": MessageLookupByLibrary.simpleMessage("Настройки"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("Порт Tproxy"),
     "trafficUsage": MessageLookupByLibrary.simpleMessage("Трафик"),
+    "trayEnhancement": MessageLookupByLibrary.simpleMessage("Улучшение трея"),
+    "trayEnhancementDesc": MessageLookupByLibrary.simpleMessage(
+      "Управление группами прокси в контекстном меню трея",
+    ),
     "tryManualRefresh": MessageLookupByLibrary.simpleMessage(
       "Попробуйте обновить вручную",
     ),

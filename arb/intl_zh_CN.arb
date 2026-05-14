@@ -49,6 +49,8 @@
   "storeFixDesc": "修复Google Play商店下载异常",
   "disableQuic": "禁用QUIC",
   "disableQuicDesc": "禁用QUIC以解决特定网络问题",
+  "trayEnhancement": "托盘增强",
+  "trayEnhancementDesc": "在托盘区右键菜单中控制代理组",
   "excludeChina": "排除国内",
   "excludeChinaDesc": "放行中国QUIC流量而非全部禁用",
   "fcmOptimization": "FCM优化",
