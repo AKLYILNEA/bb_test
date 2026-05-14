@@ -145,7 +145,6 @@ _WindowProps _$WindowPropsFromJson(Map<String, dynamic> json) => _WindowProps(
   height: (json['height'] as num?)?.toDouble() ?? 600,
   top: (json['top'] as num?)?.toDouble(),
   left: (json['left'] as num?)?.toDouble(),
-  isLocked: json['isLocked'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$WindowPropsToJson(_WindowProps instance) =>
@@ -154,7 +153,6 @@ Map<String, dynamic> _$WindowPropsToJson(_WindowProps instance) =>
       'height': instance.height,
       'top': instance.top,
       'left': instance.left,
-      'isLocked': instance.isLocked,
     };
 
 _VpnProps _$VpnPropsFromJson(Map<String, dynamic> json) => _VpnProps(

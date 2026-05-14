@@ -80,7 +80,6 @@
   "tunDesc": "Перехват всего трафика устройства",
   "minimizeOnExit": "Сворачивать при выходе",
   "minimizeOnExitDesc": "Изменить поведение при выходе",
-  "lockWindowSize": "Заблокировать размер окна",
   "autoLaunch": "Автозапуск",
   "autoLaunchDesc": "Запуск при старте системы",
   "smartDelayLaunch": "Умная задержка",

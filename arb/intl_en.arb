@@ -80,7 +80,6 @@
   "tunDesc": "Take over global device traffic",
   "minimizeOnExit": "Minimize on Exit",
   "minimizeOnExitDesc": "Override default exit behavior",
-  "lockWindowSize": "Lock current window size",
   "autoLaunch": "Auto Launch",
   "autoLaunchDesc": "Launch on system startup",
   "smartDelayLaunch": "Smart Delay",

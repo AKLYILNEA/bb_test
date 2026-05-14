@@ -135,7 +135,6 @@ abstract class WindowProps with _$WindowProps {
     @Default(600) double height,
     double? top,
     double? left,
-    @Default(false) bool isLocked,
   }) = _WindowProps;
 
   factory WindowProps.fromJson(Map<String, Object?>? json) =>

@@ -699,16 +699,6 @@ class AppLocalizations {
     );
   }
 
-  /// `Lock current window size`
-  String get lockWindowSize {
-    return Intl.message(
-      'Lock current window size',
-      name: 'lockWindowSize',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Auto Launch`
   String get autoLaunch {
     return Intl.message('Auto Launch', name: 'autoLaunch', desc: '', args: []);

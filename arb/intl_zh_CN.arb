@@ -80,7 +80,6 @@
   "tunDesc": "接管当前设备全局流量",
   "minimizeOnExit": "退出最小化",
   "minimizeOnExitDesc": "修改系统默认退出事件",
-  "lockWindowSize": "锁定当前窗口大小",
   "autoLaunch": "开机启动",
   "autoLaunchDesc": "跟随系统自启动",
   "smartDelayLaunch": "智能延迟",

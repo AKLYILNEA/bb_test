@@ -558,9 +558,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "localRecoveryDesc": MessageLookupByLibrary.simpleMessage(
       "Восстановление из файла",
     ),
-    "lockWindowSize": MessageLookupByLibrary.simpleMessage(
-      "Заблокировать размер окна",
-    ),
     "log": MessageLookupByLibrary.simpleMessage("Лог"),
     "logLevel": MessageLookupByLibrary.simpleMessage("Уровень логов"),
     "logcat": MessageLookupByLibrary.simpleMessage("Сбор логов"),
