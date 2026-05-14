@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.net.ConnectivityManager
+import android.net.LinkProperties
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
@@ -16,6 +17,7 @@ import com.appshub.bettbox.GlobalState
 import com.appshub.bettbox.RunState
 import com.appshub.bettbox.core.Core
 import com.appshub.bettbox.extensions.awaitResult
+import com.appshub.bettbox.extensions.asSocketAddressText
 import com.appshub.bettbox.extensions.resolveDns
 import com.appshub.bettbox.models.StartForegroundParams
 import com.appshub.bettbox.models.VpnOptions
@@ -247,14 +249,14 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         val dns = when {
             networks.isNotEmpty() -> {
                 networks.flatMap { network ->
-                    connectivity?.resolveDns(network) ?: emptyList()
+                    networkDnsMap[network] ?: emptyList()
                 }.toSet()
             }
             else -> {
                 val cm = connectivity
                 val activeNetwork = cm?.activeNetwork
-                if (activeNetwork != null && cm != null) {
-                    cm.resolveDns(activeNetwork).toSet()
+                if (activeNetwork != null) {
+                    networkDnsMap[activeNetwork] ?: cm.resolveDns(activeNetwork).toSet()
                 } else {
                     emptySet()
                 }
@@ -270,24 +272,40 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         invokeDart("dnsChanged", dns)
     }
     private fun getAllNetworksDns(): String {
-        return runCatching {
+        val result = runCatching {
             connectivity?.allNetworks?.flatMap { network ->
                 connectivity?.resolveDns(network) ?: emptyList()
             }?.filter { it.isNotBlank() }?.toSet()?.joinToString(",") ?: ""
         }.getOrElse { "" }
+
+        return if (result.isBlank()) {
+            android.util.Log.w("VpnPlugin", "getAllNetworksDns: all methods failed, using fallback DNS")
+            "114.114.114.114,119.29.29.29"
+        } else {
+            result
+        }
     }
+
+    private val networkDnsMap = ConcurrentHashMap<Network, List<String>>()
 
     private val callback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
             networks.add(network)
-            onUpdateNetwork()
             handleNetworkChange()
         }
 
         override fun onLost(network: Network) {
             networks.remove(network)
+            networkDnsMap.remove(network)
             onUpdateNetwork()
             handleNetworkChange()
+        }
+
+        override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
+            val dnsList = linkProperties.dnsServers.map { it.asSocketAddressText(53) }
+            networkDnsMap[network] = dnsList
+            android.util.Log.i("VpnPlugin", "onLinkPropertiesChanged network=$network dns=$dnsList")
+            onUpdateNetwork()
         }
     }
 
@@ -316,6 +334,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             android.util.Log.e("VpnPlugin", "Failed to unregister network callback: ${it.message}")
         }.also {
             networks.clear()
+            networkDnsMap.clear()
             onUpdateNetwork()
         }
     }
