@@ -280,7 +280,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
         return if (result.isBlank()) {
             android.util.Log.w("VpnPlugin", "getAllNetworksDns: all methods failed, using fallback DNS")
-            "114.114.114.114,119.29.29.29"
+            "114.114.114.114:53,119.29.29.29:53"
         } else {
             result
         }
@@ -312,6 +312,9 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     private val request = NetworkRequest.Builder().apply {
         addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN)
         addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            addCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND)
+        }
         addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
     }.build()
 
