@@ -159,7 +159,7 @@ class TrackerInfoItem extends ConsumerWidget {
           builder: (_, type) {
             return AdaptiveSheetScaffold(
               type: type,
-              body: TrackerInfoDetailView(trackerInfo: trackerInfo),
+              body: TrackerInfoDetailView(trackerInfo: trackerInfo, detailTitle: detailTitle),
               title: detailTitle,
             );
           },
@@ -288,8 +288,9 @@ class _ProcessIconState extends State<_ProcessIcon> {
 
 class TrackerInfoDetailView extends ConsumerWidget {
   final TrackerInfo trackerInfo;
+  final String detailTitle;
 
-  const TrackerInfoDetailView({super.key, required this.trackerInfo});
+  const TrackerInfoDetailView({super.key, required this.trackerInfo, required this.detailTitle});
 
   String _getRuleText(TrackerInfo info) {
     final rule = info.rule;
@@ -428,10 +429,11 @@ class TrackerInfoDetailView extends ConsumerWidget {
         title: appLocalizations.download,
         desc: TrafficValue(value: info.download).show,
       ),
-      _buildItem(
-        title: appLocalizations.realTimeSpeed,
-        desc: Traffic(up: info.uploadSpeed, down: info.downloadSpeed).toString(),
-      ),
+      if (detailTitle.contains(appLocalizations.connection))
+        _buildItem(
+          title: appLocalizations.realTimeSpeed,
+          desc: Traffic(up: info.uploadSpeed, down: info.downloadSpeed).toString(),
+        ),
       if (info.metadata.destinationGeoIP.isNotEmpty)
         _buildItem(
           title: appLocalizations.destinationGeoIP,
