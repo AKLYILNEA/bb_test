@@ -118,16 +118,11 @@ class ClashService extends ClashHandlerInterface {
   }
 
   Future<void> _waitForCoreReady() async {
-    const maxAttempts = 10;
-    const interval = Duration(milliseconds: 500);
-
-    for (var attempt = 1; attempt <= maxAttempts; attempt++) {
-      if (socketCompleter.isCompleted) return;
-      await Future.delayed(interval);
+    try {
+      await socketCompleter.future.timeout(const Duration(seconds: 8));
+    } on TimeoutException {
+      commonPrint.log('Core socket ready timeout after 8s');
     }
-    commonPrint.log(
-      'Core ready timeout after ${maxAttempts * interval.inMilliseconds}ms',
-    );
   }
 
   @override
@@ -188,6 +183,7 @@ class ClashService extends ClashHandlerInterface {
   @override
   Future<bool> preload() async {
     await serverCompleter.future;
+    await _waitForCoreReady();
     return true;
   }
 }
