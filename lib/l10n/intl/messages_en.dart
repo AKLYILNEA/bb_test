@@ -224,6 +224,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "connectionsDesc": MessageLookupByLibrary.simpleMessage(
       "View active connections",
     ),
+    "connectionsSort": MessageLookupByLibrary.simpleMessage("Connections Sort"),
     "connectivity": MessageLookupByLibrary.simpleMessage("Connectivity:"),
     "contactMe": MessageLookupByLibrary.simpleMessage("Contact Me"),
     "content": MessageLookupByLibrary.simpleMessage("Content"),
@@ -829,6 +830,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Disconnect on network change (WiFi/Mobile)",
     ),
     "rainbowScheme": MessageLookupByLibrary.simpleMessage("Rainbow"),
+    "realTimeSpeed": MessageLookupByLibrary.simpleMessage("Real-time Speed"),
     "recovery": MessageLookupByLibrary.simpleMessage("Restore"),
     "recoveryAll": MessageLookupByLibrary.simpleMessage("Restore All Data"),
     "recoveryProfiles": MessageLookupByLibrary.simpleMessage(
@@ -1033,6 +1035,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "tonalSpotScheme": MessageLookupByLibrary.simpleMessage("Tonal Spot"),
     "tooManyRules": MessageLookupByLibrary.simpleMessage("Max 2 rules allowed"),
     "tools": MessageLookupByLibrary.simpleMessage("Tools"),
+    "totalTraffic": MessageLookupByLibrary.simpleMessage("Total Traffic"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("Tproxy Port"),
     "trafficUsage": MessageLookupByLibrary.simpleMessage("Traffic Usage"),
     "trayEnhancement": MessageLookupByLibrary.simpleMessage("Tray Enhancement"),

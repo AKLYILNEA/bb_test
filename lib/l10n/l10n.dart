@@ -189,6 +189,36 @@ class AppLocalizations {
     );
   }
 
+  /// `Real-time Speed`
+  String get realTimeSpeed {
+    return Intl.message(
+      'Real-time Speed',
+      name: 'realTimeSpeed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Connections Sort`
+  String get connectionsSort {
+    return Intl.message(
+      'Connections Sort',
+      name: 'connectionsSort',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Total Traffic`
+  String get totalTraffic {
+    return Intl.message(
+      'Total Traffic',
+      name: 'totalTraffic',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Outbound Mode`
   String get outboundMode {
     return Intl.message(

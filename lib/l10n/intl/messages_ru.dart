@@ -222,6 +222,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "connectionsDesc": MessageLookupByLibrary.simpleMessage(
       "Просмотр текущих соединений",
     ),
+    "connectionsSort": MessageLookupByLibrary.simpleMessage(
+      "Сортировка соединений",
+    ),
     "connectivity": MessageLookupByLibrary.simpleMessage("Подключение:"),
     "contactMe": MessageLookupByLibrary.simpleMessage("Связаться со мной"),
     "content": MessageLookupByLibrary.simpleMessage("Содержимое"),
@@ -843,6 +846,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Активно отключать соединения при изменении сети",
     ),
     "rainbowScheme": MessageLookupByLibrary.simpleMessage("Радуга"),
+    "realTimeSpeed": MessageLookupByLibrary.simpleMessage(
+      "Скорость в реальном времени",
+    ),
     "recovery": MessageLookupByLibrary.simpleMessage("Восстановить"),
     "recoveryAll": MessageLookupByLibrary.simpleMessage("Все данные"),
     "recoveryProfiles": MessageLookupByLibrary.simpleMessage("Только профили"),
@@ -1051,6 +1057,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "tonalSpotScheme": MessageLookupByLibrary.simpleMessage("Тональный акцент"),
     "tooManyRules": MessageLookupByLibrary.simpleMessage("Максимум 2 правила"),
     "tools": MessageLookupByLibrary.simpleMessage("Настройки"),
+    "totalTraffic": MessageLookupByLibrary.simpleMessage("Общий трафик"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("Порт Tproxy"),
     "trafficUsage": MessageLookupByLibrary.simpleMessage("Трафик"),
     "trayEnhancement": MessageLookupByLibrary.simpleMessage("Улучшение трея"),
