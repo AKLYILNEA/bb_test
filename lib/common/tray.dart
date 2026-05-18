@@ -154,7 +154,7 @@ class Tray {
           subMenuItems.add(
             MenuItem.checkbox(
               label: label,
-              checked: trayState.selectedMap[group.name] == proxy.name,
+              checked: group.getCurrentSelectedName(trayState.selectedMap[group.name] ?? '') == proxy.name,
               onClick: (_) {
                 final appController = globalState.appController;
                 appController.updateCurrentSelectedMap(group.name, proxy.name);
@@ -303,7 +303,9 @@ class Tray {
     _loadingFrame = 0;
     _loadingTimer = Timer.periodic(const Duration(milliseconds: 500), (_) async {
       _loadingFrame = (_loadingFrame + 1) % _loadingFrames.length;
-      await globalState.appController.updateTray(false, true);
+      if (!trayManager.isMenuOpen) {
+        await globalState.appController.updateTray(false, true);
+      }
     });
   }
 
