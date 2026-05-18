@@ -11,6 +11,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_js
   hotkey_manager_windows
   proxy
+  restart_app
   screen_retriever_windows
   tray_manager
   url_launcher_windows

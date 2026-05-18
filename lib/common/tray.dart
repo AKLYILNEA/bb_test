@@ -7,6 +7,7 @@ import 'package:bett_box/views/proxies/common.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:restart_app/restart_app.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -211,8 +212,15 @@ class Tray {
         await _copyEnv(trayState.port);
       },
     );
+    final restartMenuItem = MenuItem(
+      label: appLocalizations.restartApp,
+      onClick: (_) async {
+        await Restart.restartApp();
+      },
+    );
     menuItems.add(autoStartMenuItem);
     menuItems.add(copyEnvVarMenuItem);
+    menuItems.add(restartMenuItem);
 
     if (!system.isAndroid) {
       final wakelockMenuItem = MenuItem.checkbox(

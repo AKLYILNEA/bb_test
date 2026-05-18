@@ -901,6 +901,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "DNS-соединения следуют правилам",
     ),
     "restart": MessageLookupByLibrary.simpleMessage("Перезапуск"),
+    "restartApp": MessageLookupByLibrary.simpleMessage("Перезапустить"),
     "restartCoreDesc": MessageLookupByLibrary.simpleMessage(
       "Перезапустить ядро вручную?",
     ),

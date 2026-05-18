@@ -629,6 +629,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "respectRules": MessageLookupByLibrary.simpleMessage("遵守規則"),
     "respectRulesDesc": MessageLookupByLibrary.simpleMessage("DNS 連線跟隨 Rules"),
     "restart": MessageLookupByLibrary.simpleMessage("重啟"),
+    "restartApp": MessageLookupByLibrary.simpleMessage("重啟軟件"),
     "restartCoreDesc": MessageLookupByLibrary.simpleMessage("是否手動重啟內核？"),
     "restartCoreTitle": MessageLookupByLibrary.simpleMessage("重啟內核"),
     "restartTip": MessageLookupByLibrary.simpleMessage("重啟TUN後改變生效"),

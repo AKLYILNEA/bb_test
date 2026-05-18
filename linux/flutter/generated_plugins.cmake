@@ -9,6 +9,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_js
   gtk
   hotkey_manager_linux
+  restart_app
   screen_retriever_linux
   tray_manager
   url_launcher_linux

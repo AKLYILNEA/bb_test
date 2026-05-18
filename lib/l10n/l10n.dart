@@ -219,6 +219,11 @@ class AppLocalizations {
     );
   }
 
+  /// `Restart App`
+  String get restartApp {
+    return Intl.message('Restart App', name: 'restartApp', desc: '', args: []);
+  }
+
   /// `Outbound Mode`
   String get outboundMode {
     return Intl.message(
