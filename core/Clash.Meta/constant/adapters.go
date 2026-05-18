@@ -47,6 +47,9 @@ const (
 	Sudoku
 	Masque
 	TrustTunnel
+	OpenVPN
+	Tailscale
+	GostRelay
 )
 
 const (
@@ -85,7 +88,7 @@ func (c Chain) Last() string {
 	case 0:
 		return ""
 	default:
-		return c[len(c)-1]
+		return c[0]
 	}
 }
 
@@ -219,6 +222,12 @@ func (at AdapterType) String() string {
 		return "Masque"
 	case TrustTunnel:
 		return "TrustTunnel"
+	case OpenVPN:
+		return "OpenVPN"
+	case Tailscale:
+		return "Tailscale"
+	case GostRelay:
+		return "GostRelay"
 	case Relay:
 		return "Relay"
 	case Selector:
