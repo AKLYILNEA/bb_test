@@ -167,10 +167,20 @@ TrayState trayState(Ref ref) {
   final delayMap = ref.watch(delayDataSourceProvider);
   final testUrl = ref.watch(getRealTestUrlProvider(''));
   final urlDelayMap = delayMap[testUrl] ?? {};
+  final allGroups = ref.watch(groupsProvider);
+  final allSelectedMap = ref.watch(selectedMapProvider);
 
   for (final group in groups) {
     for (final proxy in group.all) {
-      delays[proxy.name] = urlDelayMap[proxy.name];
+      final cardState = _getProxyCardState(
+        allGroups,
+        allSelectedMap,
+        ProxyCardState(proxyName: proxy.name),
+      );
+      final leafName = cardState.proxyName;
+      delays[proxy.name] = leafName.isNotEmpty
+          ? urlDelayMap[leafName]
+          : urlDelayMap[proxy.name];
     }
   }
 
