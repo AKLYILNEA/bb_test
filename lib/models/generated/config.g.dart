@@ -168,8 +168,7 @@ _VpnProps _$VpnPropsFromJson(Map<String, dynamic> json) => _VpnProps(
   disableQuic: json['disableQuic'] as bool? ?? false,
   excludeChina: json['excludeChina'] as bool? ?? false,
   trayEnhancement: json['trayEnhancement'] as bool? ?? true,
-  fcmOptimization: json['fcmOptimization'] as bool? ?? false,
-  quickResponse: json['quickResponse'] as bool? ?? false,
+  quickResponse: json['quickResponse'] as bool? ?? true,
   accessControl: json['accessControl'] == null
       ? defaultAccessControl
       : AccessControl.fromJson(json['accessControl'] as Map<String, dynamic>),
@@ -188,7 +187,6 @@ Map<String, dynamic> _$VpnPropsToJson(_VpnProps instance) => <String, dynamic>{
   'disableQuic': instance.disableQuic,
   'excludeChina': instance.excludeChina,
   'trayEnhancement': instance.trayEnhancement,
-  'fcmOptimization': instance.fcmOptimization,
   'quickResponse': instance.quickResponse,
   'accessControl': instance.accessControl,
 };

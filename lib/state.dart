@@ -755,11 +755,6 @@ class GlobalState {
 
 
 
-    if (config.vpnProps.fcmOptimization) {
-      final fcmRules = ['DOMAIN,mtalk.google.com,DIRECT'];
-      rules = [...fcmRules, ...rules];
-    }
-
     if (config.vpnProps.disableQuic) {
       final isRussian = config.appSetting.locale?.toLowerCase().startsWith('ru') ?? false;
       final quicRules = config.vpnProps.excludeChina && !isRussian

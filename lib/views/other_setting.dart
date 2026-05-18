@@ -161,57 +161,6 @@ class StoreFixItem extends ConsumerWidget {
   }
 }
 
-class FcmOptimizationItem extends ConsumerWidget {
-  const FcmOptimizationItem({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final fcmOptimization = ref.watch(
-      vpnSettingProvider.select((state) => state.fcmOptimization),
-    );
-
-    return ListItem.switchItem(
-      title: Text(appLocalizations.fcmOptimization),
-      subtitle: Text(appLocalizations.fcmOptimizationDesc),
-      delegate: SwitchDelegate(
-        value: fcmOptimization,
-        onChanged: (bool value) async {
-          // Update FCM optimization state
-          ref
-              .read(vpnSettingProvider.notifier)
-              .updateState(
-                (state) => state.copyWith(
-                  fcmOptimization: value,
-                  // Force disable allowBypass when FCM optimization is on (Android only)
-                  allowBypass: value && system.isAndroid
-                      ? false
-                      : state.allowBypass,
-                ),
-              );
-
-          // Update hosts mapping
-          final currentHosts = Map<String, String>.from(
-            ref.read(patchClashConfigProvider).hosts,
-          );
-
-          if (value) {
-            // Add FCM hosts mapping (comma-separated IPs)
-            currentHosts['mtalk.google.com'] =
-                '142.250.107.188, 108.177.125.188';
-          } else {
-            // Remove FCM hosts mapping
-            currentHosts.remove('mtalk.google.com');
-          }
-
-          ref
-              .read(patchClashConfigProvider.notifier)
-              .updateState((state) => state.copyWith(hosts: currentHosts));
-        },
-      ),
-    );
-  }
-}
-
 class QuickResponseItem extends ConsumerWidget {
   const QuickResponseItem({super.key});
 
@@ -513,7 +462,6 @@ class OtherSettingView extends ConsumerWidget {
       if (smartAutoStop) const NetworkMatchItem(),
       if (system.isAndroid) const DozeSuspendItem(),
       if (system.isAndroid) const QuickResponseItem(),
-      const FcmOptimizationItem(),
       const StoreFixItem(),
       const DisableQuicItem(),
       if (!system.isAndroid) const TrayEnhancementItem(),

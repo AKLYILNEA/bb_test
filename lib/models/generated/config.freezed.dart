@@ -909,7 +909,7 @@ as double?,
 /// @nodoc
 mixin _$VpnProps {
 
- bool get enable; bool get systemProxy; bool get allowBypass; bool get bypassPrivateRoute; bool get dozeSuspend; bool get smartAutoStop; String get smartAutoStopNetworks; bool get storeFix; bool get networkFix; bool get disableQuic; bool get excludeChina; bool get trayEnhancement; bool get fcmOptimization; bool get quickResponse; AccessControl get accessControl;
+ bool get enable; bool get systemProxy; bool get allowBypass; bool get bypassPrivateRoute; bool get dozeSuspend; bool get smartAutoStop; String get smartAutoStopNetworks; bool get storeFix; bool get networkFix; bool get disableQuic; bool get excludeChina; bool get trayEnhancement; bool get quickResponse; AccessControl get accessControl;
 /// Create a copy of VpnProps
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -922,16 +922,16 @@ $VpnPropsCopyWith<VpnProps> get copyWith => _$VpnPropsCopyWithImpl<VpnProps>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is VpnProps&&(identical(other.enable, enable) || other.enable == enable)&&(identical(other.systemProxy, systemProxy) || other.systemProxy == systemProxy)&&(identical(other.allowBypass, allowBypass) || other.allowBypass == allowBypass)&&(identical(other.bypassPrivateRoute, bypassPrivateRoute) || other.bypassPrivateRoute == bypassPrivateRoute)&&(identical(other.dozeSuspend, dozeSuspend) || other.dozeSuspend == dozeSuspend)&&(identical(other.smartAutoStop, smartAutoStop) || other.smartAutoStop == smartAutoStop)&&(identical(other.smartAutoStopNetworks, smartAutoStopNetworks) || other.smartAutoStopNetworks == smartAutoStopNetworks)&&(identical(other.storeFix, storeFix) || other.storeFix == storeFix)&&(identical(other.networkFix, networkFix) || other.networkFix == networkFix)&&(identical(other.disableQuic, disableQuic) || other.disableQuic == disableQuic)&&(identical(other.excludeChina, excludeChina) || other.excludeChina == excludeChina)&&(identical(other.trayEnhancement, trayEnhancement) || other.trayEnhancement == trayEnhancement)&&(identical(other.fcmOptimization, fcmOptimization) || other.fcmOptimization == fcmOptimization)&&(identical(other.quickResponse, quickResponse) || other.quickResponse == quickResponse)&&(identical(other.accessControl, accessControl) || other.accessControl == accessControl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is VpnProps&&(identical(other.enable, enable) || other.enable == enable)&&(identical(other.systemProxy, systemProxy) || other.systemProxy == systemProxy)&&(identical(other.allowBypass, allowBypass) || other.allowBypass == allowBypass)&&(identical(other.bypassPrivateRoute, bypassPrivateRoute) || other.bypassPrivateRoute == bypassPrivateRoute)&&(identical(other.dozeSuspend, dozeSuspend) || other.dozeSuspend == dozeSuspend)&&(identical(other.smartAutoStop, smartAutoStop) || other.smartAutoStop == smartAutoStop)&&(identical(other.smartAutoStopNetworks, smartAutoStopNetworks) || other.smartAutoStopNetworks == smartAutoStopNetworks)&&(identical(other.storeFix, storeFix) || other.storeFix == storeFix)&&(identical(other.networkFix, networkFix) || other.networkFix == networkFix)&&(identical(other.disableQuic, disableQuic) || other.disableQuic == disableQuic)&&(identical(other.excludeChina, excludeChina) || other.excludeChina == excludeChina)&&(identical(other.trayEnhancement, trayEnhancement) || other.trayEnhancement == trayEnhancement)&&(identical(other.quickResponse, quickResponse) || other.quickResponse == quickResponse)&&(identical(other.accessControl, accessControl) || other.accessControl == accessControl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,enable,systemProxy,allowBypass,bypassPrivateRoute,dozeSuspend,smartAutoStop,smartAutoStopNetworks,storeFix,networkFix,disableQuic,excludeChina,trayEnhancement,fcmOptimization,quickResponse,accessControl);
+int get hashCode => Object.hash(runtimeType,enable,systemProxy,allowBypass,bypassPrivateRoute,dozeSuspend,smartAutoStop,smartAutoStopNetworks,storeFix,networkFix,disableQuic,excludeChina,trayEnhancement,quickResponse,accessControl);
 
 @override
 String toString() {
-  return 'VpnProps(enable: $enable, systemProxy: $systemProxy, allowBypass: $allowBypass, bypassPrivateRoute: $bypassPrivateRoute, dozeSuspend: $dozeSuspend, smartAutoStop: $smartAutoStop, smartAutoStopNetworks: $smartAutoStopNetworks, storeFix: $storeFix, networkFix: $networkFix, disableQuic: $disableQuic, excludeChina: $excludeChina, trayEnhancement: $trayEnhancement, fcmOptimization: $fcmOptimization, quickResponse: $quickResponse, accessControl: $accessControl)';
+  return 'VpnProps(enable: $enable, systemProxy: $systemProxy, allowBypass: $allowBypass, bypassPrivateRoute: $bypassPrivateRoute, dozeSuspend: $dozeSuspend, smartAutoStop: $smartAutoStop, smartAutoStopNetworks: $smartAutoStopNetworks, storeFix: $storeFix, networkFix: $networkFix, disableQuic: $disableQuic, excludeChina: $excludeChina, trayEnhancement: $trayEnhancement, quickResponse: $quickResponse, accessControl: $accessControl)';
 }
 
 
@@ -942,7 +942,7 @@ abstract mixin class $VpnPropsCopyWith<$Res>  {
   factory $VpnPropsCopyWith(VpnProps value, $Res Function(VpnProps) _then) = _$VpnPropsCopyWithImpl;
 @useResult
 $Res call({
- bool enable, bool systemProxy, bool allowBypass, bool bypassPrivateRoute, bool dozeSuspend, bool smartAutoStop, String smartAutoStopNetworks, bool storeFix, bool networkFix, bool disableQuic, bool excludeChina, bool trayEnhancement, bool fcmOptimization, bool quickResponse, AccessControl accessControl
+ bool enable, bool systemProxy, bool allowBypass, bool bypassPrivateRoute, bool dozeSuspend, bool smartAutoStop, String smartAutoStopNetworks, bool storeFix, bool networkFix, bool disableQuic, bool excludeChina, bool trayEnhancement, bool quickResponse, AccessControl accessControl
 });
 
 
@@ -959,7 +959,7 @@ class _$VpnPropsCopyWithImpl<$Res>
 
 /// Create a copy of VpnProps
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? enable = null,Object? systemProxy = null,Object? allowBypass = null,Object? bypassPrivateRoute = null,Object? dozeSuspend = null,Object? smartAutoStop = null,Object? smartAutoStopNetworks = null,Object? storeFix = null,Object? networkFix = null,Object? disableQuic = null,Object? excludeChina = null,Object? trayEnhancement = null,Object? fcmOptimization = null,Object? quickResponse = null,Object? accessControl = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? enable = null,Object? systemProxy = null,Object? allowBypass = null,Object? bypassPrivateRoute = null,Object? dozeSuspend = null,Object? smartAutoStop = null,Object? smartAutoStopNetworks = null,Object? storeFix = null,Object? networkFix = null,Object? disableQuic = null,Object? excludeChina = null,Object? trayEnhancement = null,Object? quickResponse = null,Object? accessControl = null,}) {
   return _then(_self.copyWith(
 enable: null == enable ? _self.enable : enable // ignore: cast_nullable_to_non_nullable
 as bool,systemProxy: null == systemProxy ? _self.systemProxy : systemProxy // ignore: cast_nullable_to_non_nullable
@@ -973,7 +973,6 @@ as bool,networkFix: null == networkFix ? _self.networkFix : networkFix // ignore
 as bool,disableQuic: null == disableQuic ? _self.disableQuic : disableQuic // ignore: cast_nullable_to_non_nullable
 as bool,excludeChina: null == excludeChina ? _self.excludeChina : excludeChina // ignore: cast_nullable_to_non_nullable
 as bool,trayEnhancement: null == trayEnhancement ? _self.trayEnhancement : trayEnhancement // ignore: cast_nullable_to_non_nullable
-as bool,fcmOptimization: null == fcmOptimization ? _self.fcmOptimization : fcmOptimization // ignore: cast_nullable_to_non_nullable
 as bool,quickResponse: null == quickResponse ? _self.quickResponse : quickResponse // ignore: cast_nullable_to_non_nullable
 as bool,accessControl: null == accessControl ? _self.accessControl : accessControl // ignore: cast_nullable_to_non_nullable
 as AccessControl,
@@ -1070,10 +1069,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool enable,  bool systemProxy,  bool allowBypass,  bool bypassPrivateRoute,  bool dozeSuspend,  bool smartAutoStop,  String smartAutoStopNetworks,  bool storeFix,  bool networkFix,  bool disableQuic,  bool excludeChina,  bool trayEnhancement,  bool fcmOptimization,  bool quickResponse,  AccessControl accessControl)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool enable,  bool systemProxy,  bool allowBypass,  bool bypassPrivateRoute,  bool dozeSuspend,  bool smartAutoStop,  String smartAutoStopNetworks,  bool storeFix,  bool networkFix,  bool disableQuic,  bool excludeChina,  bool trayEnhancement,  bool quickResponse,  AccessControl accessControl)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _VpnProps() when $default != null:
-return $default(_that.enable,_that.systemProxy,_that.allowBypass,_that.bypassPrivateRoute,_that.dozeSuspend,_that.smartAutoStop,_that.smartAutoStopNetworks,_that.storeFix,_that.networkFix,_that.disableQuic,_that.excludeChina,_that.trayEnhancement,_that.fcmOptimization,_that.quickResponse,_that.accessControl);case _:
+return $default(_that.enable,_that.systemProxy,_that.allowBypass,_that.bypassPrivateRoute,_that.dozeSuspend,_that.smartAutoStop,_that.smartAutoStopNetworks,_that.storeFix,_that.networkFix,_that.disableQuic,_that.excludeChina,_that.trayEnhancement,_that.quickResponse,_that.accessControl);case _:
   return orElse();
 
 }
@@ -1091,10 +1090,10 @@ return $default(_that.enable,_that.systemProxy,_that.allowBypass,_that.bypassPri
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool enable,  bool systemProxy,  bool allowBypass,  bool bypassPrivateRoute,  bool dozeSuspend,  bool smartAutoStop,  String smartAutoStopNetworks,  bool storeFix,  bool networkFix,  bool disableQuic,  bool excludeChina,  bool trayEnhancement,  bool fcmOptimization,  bool quickResponse,  AccessControl accessControl)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool enable,  bool systemProxy,  bool allowBypass,  bool bypassPrivateRoute,  bool dozeSuspend,  bool smartAutoStop,  String smartAutoStopNetworks,  bool storeFix,  bool networkFix,  bool disableQuic,  bool excludeChina,  bool trayEnhancement,  bool quickResponse,  AccessControl accessControl)  $default,) {final _that = this;
 switch (_that) {
 case _VpnProps():
-return $default(_that.enable,_that.systemProxy,_that.allowBypass,_that.bypassPrivateRoute,_that.dozeSuspend,_that.smartAutoStop,_that.smartAutoStopNetworks,_that.storeFix,_that.networkFix,_that.disableQuic,_that.excludeChina,_that.trayEnhancement,_that.fcmOptimization,_that.quickResponse,_that.accessControl);case _:
+return $default(_that.enable,_that.systemProxy,_that.allowBypass,_that.bypassPrivateRoute,_that.dozeSuspend,_that.smartAutoStop,_that.smartAutoStopNetworks,_that.storeFix,_that.networkFix,_that.disableQuic,_that.excludeChina,_that.trayEnhancement,_that.quickResponse,_that.accessControl);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1111,10 +1110,10 @@ return $default(_that.enable,_that.systemProxy,_that.allowBypass,_that.bypassPri
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool enable,  bool systemProxy,  bool allowBypass,  bool bypassPrivateRoute,  bool dozeSuspend,  bool smartAutoStop,  String smartAutoStopNetworks,  bool storeFix,  bool networkFix,  bool disableQuic,  bool excludeChina,  bool trayEnhancement,  bool fcmOptimization,  bool quickResponse,  AccessControl accessControl)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool enable,  bool systemProxy,  bool allowBypass,  bool bypassPrivateRoute,  bool dozeSuspend,  bool smartAutoStop,  String smartAutoStopNetworks,  bool storeFix,  bool networkFix,  bool disableQuic,  bool excludeChina,  bool trayEnhancement,  bool quickResponse,  AccessControl accessControl)?  $default,) {final _that = this;
 switch (_that) {
 case _VpnProps() when $default != null:
-return $default(_that.enable,_that.systemProxy,_that.allowBypass,_that.bypassPrivateRoute,_that.dozeSuspend,_that.smartAutoStop,_that.smartAutoStopNetworks,_that.storeFix,_that.networkFix,_that.disableQuic,_that.excludeChina,_that.trayEnhancement,_that.fcmOptimization,_that.quickResponse,_that.accessControl);case _:
+return $default(_that.enable,_that.systemProxy,_that.allowBypass,_that.bypassPrivateRoute,_that.dozeSuspend,_that.smartAutoStop,_that.smartAutoStopNetworks,_that.storeFix,_that.networkFix,_that.disableQuic,_that.excludeChina,_that.trayEnhancement,_that.quickResponse,_that.accessControl);case _:
   return null;
 
 }
@@ -1126,7 +1125,7 @@ return $default(_that.enable,_that.systemProxy,_that.allowBypass,_that.bypassPri
 @JsonSerializable()
 
 class _VpnProps implements VpnProps {
-  const _VpnProps({this.enable = true, this.systemProxy = false, this.allowBypass = false, this.bypassPrivateRoute = true, this.dozeSuspend = true, this.smartAutoStop = false, this.smartAutoStopNetworks = '', this.storeFix = false, this.networkFix = false, this.disableQuic = false, this.excludeChina = false, this.trayEnhancement = true, this.fcmOptimization = false, this.quickResponse = false, this.accessControl = defaultAccessControl});
+  const _VpnProps({this.enable = true, this.systemProxy = false, this.allowBypass = false, this.bypassPrivateRoute = true, this.dozeSuspend = true, this.smartAutoStop = false, this.smartAutoStopNetworks = '', this.storeFix = false, this.networkFix = false, this.disableQuic = false, this.excludeChina = false, this.trayEnhancement = true, this.quickResponse = true, this.accessControl = defaultAccessControl});
   factory _VpnProps.fromJson(Map<String, dynamic> json) => _$VpnPropsFromJson(json);
 
 @override@JsonKey() final  bool enable;
@@ -1141,7 +1140,6 @@ class _VpnProps implements VpnProps {
 @override@JsonKey() final  bool disableQuic;
 @override@JsonKey() final  bool excludeChina;
 @override@JsonKey() final  bool trayEnhancement;
-@override@JsonKey() final  bool fcmOptimization;
 @override@JsonKey() final  bool quickResponse;
 @override@JsonKey() final  AccessControl accessControl;
 
@@ -1158,16 +1156,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VpnProps&&(identical(other.enable, enable) || other.enable == enable)&&(identical(other.systemProxy, systemProxy) || other.systemProxy == systemProxy)&&(identical(other.allowBypass, allowBypass) || other.allowBypass == allowBypass)&&(identical(other.bypassPrivateRoute, bypassPrivateRoute) || other.bypassPrivateRoute == bypassPrivateRoute)&&(identical(other.dozeSuspend, dozeSuspend) || other.dozeSuspend == dozeSuspend)&&(identical(other.smartAutoStop, smartAutoStop) || other.smartAutoStop == smartAutoStop)&&(identical(other.smartAutoStopNetworks, smartAutoStopNetworks) || other.smartAutoStopNetworks == smartAutoStopNetworks)&&(identical(other.storeFix, storeFix) || other.storeFix == storeFix)&&(identical(other.networkFix, networkFix) || other.networkFix == networkFix)&&(identical(other.disableQuic, disableQuic) || other.disableQuic == disableQuic)&&(identical(other.excludeChina, excludeChina) || other.excludeChina == excludeChina)&&(identical(other.trayEnhancement, trayEnhancement) || other.trayEnhancement == trayEnhancement)&&(identical(other.fcmOptimization, fcmOptimization) || other.fcmOptimization == fcmOptimization)&&(identical(other.quickResponse, quickResponse) || other.quickResponse == quickResponse)&&(identical(other.accessControl, accessControl) || other.accessControl == accessControl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VpnProps&&(identical(other.enable, enable) || other.enable == enable)&&(identical(other.systemProxy, systemProxy) || other.systemProxy == systemProxy)&&(identical(other.allowBypass, allowBypass) || other.allowBypass == allowBypass)&&(identical(other.bypassPrivateRoute, bypassPrivateRoute) || other.bypassPrivateRoute == bypassPrivateRoute)&&(identical(other.dozeSuspend, dozeSuspend) || other.dozeSuspend == dozeSuspend)&&(identical(other.smartAutoStop, smartAutoStop) || other.smartAutoStop == smartAutoStop)&&(identical(other.smartAutoStopNetworks, smartAutoStopNetworks) || other.smartAutoStopNetworks == smartAutoStopNetworks)&&(identical(other.storeFix, storeFix) || other.storeFix == storeFix)&&(identical(other.networkFix, networkFix) || other.networkFix == networkFix)&&(identical(other.disableQuic, disableQuic) || other.disableQuic == disableQuic)&&(identical(other.excludeChina, excludeChina) || other.excludeChina == excludeChina)&&(identical(other.trayEnhancement, trayEnhancement) || other.trayEnhancement == trayEnhancement)&&(identical(other.quickResponse, quickResponse) || other.quickResponse == quickResponse)&&(identical(other.accessControl, accessControl) || other.accessControl == accessControl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,enable,systemProxy,allowBypass,bypassPrivateRoute,dozeSuspend,smartAutoStop,smartAutoStopNetworks,storeFix,networkFix,disableQuic,excludeChina,trayEnhancement,fcmOptimization,quickResponse,accessControl);
+int get hashCode => Object.hash(runtimeType,enable,systemProxy,allowBypass,bypassPrivateRoute,dozeSuspend,smartAutoStop,smartAutoStopNetworks,storeFix,networkFix,disableQuic,excludeChina,trayEnhancement,quickResponse,accessControl);
 
 @override
 String toString() {
-  return 'VpnProps(enable: $enable, systemProxy: $systemProxy, allowBypass: $allowBypass, bypassPrivateRoute: $bypassPrivateRoute, dozeSuspend: $dozeSuspend, smartAutoStop: $smartAutoStop, smartAutoStopNetworks: $smartAutoStopNetworks, storeFix: $storeFix, networkFix: $networkFix, disableQuic: $disableQuic, excludeChina: $excludeChina, trayEnhancement: $trayEnhancement, fcmOptimization: $fcmOptimization, quickResponse: $quickResponse, accessControl: $accessControl)';
+  return 'VpnProps(enable: $enable, systemProxy: $systemProxy, allowBypass: $allowBypass, bypassPrivateRoute: $bypassPrivateRoute, dozeSuspend: $dozeSuspend, smartAutoStop: $smartAutoStop, smartAutoStopNetworks: $smartAutoStopNetworks, storeFix: $storeFix, networkFix: $networkFix, disableQuic: $disableQuic, excludeChina: $excludeChina, trayEnhancement: $trayEnhancement, quickResponse: $quickResponse, accessControl: $accessControl)';
 }
 
 
@@ -1178,7 +1176,7 @@ abstract mixin class _$VpnPropsCopyWith<$Res> implements $VpnPropsCopyWith<$Res>
   factory _$VpnPropsCopyWith(_VpnProps value, $Res Function(_VpnProps) _then) = __$VpnPropsCopyWithImpl;
 @override @useResult
 $Res call({
- bool enable, bool systemProxy, bool allowBypass, bool bypassPrivateRoute, bool dozeSuspend, bool smartAutoStop, String smartAutoStopNetworks, bool storeFix, bool networkFix, bool disableQuic, bool excludeChina, bool trayEnhancement, bool fcmOptimization, bool quickResponse, AccessControl accessControl
+ bool enable, bool systemProxy, bool allowBypass, bool bypassPrivateRoute, bool dozeSuspend, bool smartAutoStop, String smartAutoStopNetworks, bool storeFix, bool networkFix, bool disableQuic, bool excludeChina, bool trayEnhancement, bool quickResponse, AccessControl accessControl
 });
 
 
@@ -1195,7 +1193,7 @@ class __$VpnPropsCopyWithImpl<$Res>
 
 /// Create a copy of VpnProps
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? enable = null,Object? systemProxy = null,Object? allowBypass = null,Object? bypassPrivateRoute = null,Object? dozeSuspend = null,Object? smartAutoStop = null,Object? smartAutoStopNetworks = null,Object? storeFix = null,Object? networkFix = null,Object? disableQuic = null,Object? excludeChina = null,Object? trayEnhancement = null,Object? fcmOptimization = null,Object? quickResponse = null,Object? accessControl = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? enable = null,Object? systemProxy = null,Object? allowBypass = null,Object? bypassPrivateRoute = null,Object? dozeSuspend = null,Object? smartAutoStop = null,Object? smartAutoStopNetworks = null,Object? storeFix = null,Object? networkFix = null,Object? disableQuic = null,Object? excludeChina = null,Object? trayEnhancement = null,Object? quickResponse = null,Object? accessControl = null,}) {
   return _then(_VpnProps(
 enable: null == enable ? _self.enable : enable // ignore: cast_nullable_to_non_nullable
 as bool,systemProxy: null == systemProxy ? _self.systemProxy : systemProxy // ignore: cast_nullable_to_non_nullable
@@ -1209,7 +1207,6 @@ as bool,networkFix: null == networkFix ? _self.networkFix : networkFix // ignore
 as bool,disableQuic: null == disableQuic ? _self.disableQuic : disableQuic // ignore: cast_nullable_to_non_nullable
 as bool,excludeChina: null == excludeChina ? _self.excludeChina : excludeChina // ignore: cast_nullable_to_non_nullable
 as bool,trayEnhancement: null == trayEnhancement ? _self.trayEnhancement : trayEnhancement // ignore: cast_nullable_to_non_nullable
-as bool,fcmOptimization: null == fcmOptimization ? _self.fcmOptimization : fcmOptimization // ignore: cast_nullable_to_non_nullable
 as bool,quickResponse: null == quickResponse ? _self.quickResponse : quickResponse // ignore: cast_nullable_to_non_nullable
 as bool,accessControl: null == accessControl ? _self.accessControl : accessControl // ignore: cast_nullable_to_non_nullable
 as AccessControl,
