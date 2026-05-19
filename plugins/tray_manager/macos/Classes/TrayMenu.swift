@@ -17,6 +17,10 @@ public class TrayMenu: NSMenu, NSMenuDelegate {
     required init(coder: NSCoder) {
         super.init(coder: coder)
     }
+
+    private func menuItemTitle(_ label: String, _ sublabel: String) -> String {
+        return sublabel.isEmpty ? label : "\(label)\t\(sublabel)"
+    }
     
     public init(_ args: [String: Any]) {
         super.init(title: "")
@@ -29,6 +33,7 @@ public class TrayMenu: NSMenu, NSMenuDelegate {
             let id: Int = itemDict["id"] as! Int
             let type: String = itemDict["type"] as! String
             let label: String = itemDict["label"] as? String ?? ""
+            let sublabel: String = itemDict["sublabel"] as? String ?? ""
             let toolTip: String = itemDict["toolTip"] as? String ?? ""
             let checked: Bool? = itemDict["checked"] as? Bool
             let disabled: Bool = itemDict["disabled"] as? Bool ?? true
@@ -40,7 +45,7 @@ public class TrayMenu: NSMenu, NSMenuDelegate {
             }
             
             menuItem.tag = id
-            menuItem.title = label
+            menuItem.title = menuItemTitle(label, sublabel)
             menuItem.toolTip = toolTip
             menuItem.isEnabled = !disabled
             menuItem.action = !disabled ? #selector(statusItemMenuButtonClicked) : nil
@@ -95,10 +100,11 @@ public class TrayMenu: NSMenu, NSMenuDelegate {
                 let menuItem = self.items[index]
                 let itemDict = item as! [String: Any]
                 let label: String = itemDict["label"] as? String ?? ""
+                let sublabel: String = itemDict["sublabel"] as? String ?? ""
                 let disabled: Bool = itemDict["disabled"] as? Bool ?? false
                 let checked: Bool? = itemDict["checked"] as? Bool
                 
-                menuItem.title = label
+                menuItem.title = menuItemTitle(label, sublabel)
                 menuItem.isEnabled = !disabled
                 menuItem.action = !disabled ? #selector(statusItemMenuButtonClicked) : nil
                 

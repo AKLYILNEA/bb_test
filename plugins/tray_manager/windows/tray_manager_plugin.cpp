@@ -204,6 +204,10 @@ void TrayManagerPlugin::_CreateMenu(HMENU menu, flutter::EncodableMap args) {
         std::get<std::string>(item_map.at(flutter::EncodableValue("type")));
     std::string label =
         std::get<std::string>(item_map.at(flutter::EncodableValue("label")));
+    auto* sublabel = std::get_if<std::string>(ValueOrNull(item_map, "sublabel"));
+    if (sublabel != nullptr && !sublabel->empty()) {
+      label = label + "\t" + *sublabel;
+    }
     auto* checked = std::get_if<bool>(ValueOrNull(item_map, "checked"));
     bool disabled =
         std::get<bool>(item_map.at(flutter::EncodableValue("disabled")));
@@ -249,6 +253,10 @@ void TrayManagerPlugin::_UpdateMenuLabels(HMENU menu, flutter::EncodableMap args
         std::get<flutter::EncodableMap>(items[i]);
     std::string label =
         std::get<std::string>(item_map.at(flutter::EncodableValue("label")));
+    auto* sublabel = std::get_if<std::string>(ValueOrNull(item_map, "sublabel"));
+    if (sublabel != nullptr && !sublabel->empty()) {
+      label = label + "\t" + *sublabel;
+    }
     auto* checked = std::get_if<bool>(ValueOrNull(item_map, "checked"));
     bool disabled = std::get<bool>(item_map.at(flutter::EncodableValue("disabled")));
 
@@ -256,8 +264,10 @@ void TrayManagerPlugin::_UpdateMenuLabels(HMENU menu, flutter::EncodableMap args
     mii.fMask = MIIM_ID | MIIM_SUBMENU;
     if (GetMenuItemInfo(menu, i, TRUE, &mii)) {
       if (mii.hSubMenu != NULL) {
-        _UpdateMenuLabels(mii.hSubMenu, std::get<flutter::EncodableMap>(
-            item_map.at(flutter::EncodableValue("submenu"))));
+        auto submenu_it = item_map.find(flutter::EncodableValue("submenu"));
+        if (submenu_it != item_map.end()) {
+          _UpdateMenuLabels(mii.hSubMenu, std::get<flutter::EncodableMap>(submenu_it->second));
+        }
       } else {
         std::wstring wlabel = g_converter.from_bytes(label);
         MENUITEMINFO update_mii = { sizeof(MENUITEMINFO) };
@@ -288,17 +298,17 @@ std::optional<LRESULT> TrayManagerPlugin::HandleWindowProc(HWND hWnd,
       Shell_NotifyIcon(NIM_DELETE, &nid);
       DestroyIcon(nid.hIcon);
     }
+  } else if (message == WM_INITMENUPOPUP) {
+    HMENU hmenu = (HMENU)wParam;
+    if (hmenu == hMenu && !is_menu_open_) {
+      is_menu_open_ = true;
+      channel->InvokeMethod("onMenuOpen",
+                            std::make_unique<flutter::EncodableValue>());
+    }
   } else if (message == WM_MENUSELECT) {
     HMENU hmenu = (HMENU)lParam;
     if (hmenu == hMenu || hmenu == NULL) {
-      int itemIndex = (int)LOWORD(wParam);
       UINT flags = (UINT)HIWORD(wParam);
-
-      if (itemIndex == 0 && !is_menu_open_) {
-        is_menu_open_ = true;
-        channel->InvokeMethod("onMenuOpen",
-                              std::make_unique<flutter::EncodableValue>());
-      }
 
       if (hmenu == NULL && flags == 0xFFFF && is_menu_open_) {
         is_menu_open_ = false;
@@ -465,6 +475,12 @@ void TrayManagerPlugin::PopUpContextMenu(
   }
   TrackPopupMenu(hMenu, TPM_BOTTOMALIGN | TPM_LEFTALIGN, static_cast<int>(x),
                  static_cast<int>(y), 0, hWnd, NULL);
+  // Fallback: ensure onMenuClose is sent if WM_MENUSELECT didn't trigger it
+  if (is_menu_open_) {
+    is_menu_open_ = false;
+    channel->InvokeMethod("onMenuClose",
+                          std::make_unique<flutter::EncodableValue>());
+  }
   result->Success(flutter::EncodableValue(true));
 }
 

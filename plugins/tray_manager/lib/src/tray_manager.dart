@@ -42,6 +42,27 @@ class TrayManager {
 
   bool get isMenuOpen => _isMenuOpen;
 
+  Map<String, dynamic> _menuToJson(Menu menu) {
+    return {
+      'items': menu.items?.map(_menuItemToJson).toList(),
+    }..removeWhere((key, value) => value == null);
+  }
+
+  Map<String, dynamic> _menuItemToJson(MenuItem item) {
+    return {
+      'id': item.id,
+      'key': item.key,
+      'type': item.type,
+      'label': item.label ?? '',
+      'sublabel': item.sublabel,
+      'toolTip': item.toolTip,
+      'icon': item.icon,
+      'checked': item.checked,
+      'disabled': item.disabled,
+      'submenu': item.submenu == null ? null : _menuToJson(item.submenu!),
+    }..removeWhere((key, value) => value == null);
+  }
+
   Future<void> _methodCallHandler(MethodCall call) async {
     if (call.method == 'onMenuOpen') {
       _isMenuOpen = true;
@@ -197,7 +218,7 @@ class TrayManager {
   }) async {
     _menu = menu;
     final Map<String, dynamic> arguments = {
-      'menu': menu.toJson(),
+      'menu': _menuToJson(menu),
       'keepMenuOpen': keepMenuOpen && _isMenuOpen,
       'brightness': brightness?.name,
     };

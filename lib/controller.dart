@@ -965,6 +965,10 @@ class AppController {
     _ref.read(delayDataSourceProvider.notifier).setDelay(delay);
   }
 
+  int? getTrayProxyDelay({required String proxyName, String? testUrl}) {
+    return _ref.read(getDelayProvider(proxyName: proxyName, testUrl: testUrl));
+  }
+
   void toPage(PageLabel pageLabel) {
     final context = globalState.navigatorKey.currentState?.context;
     if (context != null && context.mounted) {

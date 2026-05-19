@@ -17,12 +17,14 @@ class Tray {
   Timer? _debounceTimer;
   TrayState? _pendingState;
   bool _isUpdating = false;
+  bool _pendingFocus = false;
+  bool _pendingSilent = false;
 
   static const _debounceDelay = Duration(milliseconds: 300);
 
   Timer? _loadingTimer;
   int _loadingFrame = 0;
-  final List<String> _loadingFrames = ['  .', ' ..', '...'];
+  final List<String> _loadingFrames = ['.', '..', '...'];
 
   bool _isTesting = false;
   String? _testingGroupId;
@@ -69,11 +71,13 @@ class Tray {
 
     if (_isUpdating) {
       _pendingState = trayState;
+      _pendingFocus = focus;
+      _pendingSilent = silent;
       return;
     }
 
     if (focus) {
-      await _doUpdate(trayState: trayState, focus: focus);
+      await _doUpdate(trayState: trayState, focus: focus, silent: silent);
     } else if (silent) {
       _debounceTimer = Timer(const Duration(milliseconds: 50), () async {
         await _doUpdate(trayState: trayState, focus: focus, silent: silent);
@@ -148,13 +152,21 @@ class Tray {
 
         subMenuItems.add(MenuItem.separator());
 
-        for (final proxy in group.all) {
-          final delay = trayState.delays[proxy.name];
-          final label = _formatProxyLabel(proxy.name, delay);
+        final proxies = globalState.appController.getSortProxies(
+          proxies: group.all,
+          sortType: globalState.config.proxiesStyle.sortType,
+          testUrl: group.testUrl,
+        );
+        for (final proxy in proxies) {
+          final delay = globalState.appController.getTrayProxyDelay(
+            proxyName: proxy.name,
+            testUrl: group.testUrl,
+          );
 
           subMenuItems.add(
             MenuItem.checkbox(
-              label: label,
+              label: proxy.name,
+              sublabel: _formatProxySublabel(delay),
               checked: group.getCurrentSelectedName(trayState.selectedMap[group.name] ?? '') == proxy.name,
               onClick: (_) {
                 final appController = globalState.appController;
@@ -259,8 +271,16 @@ class Tray {
 
       if (_pendingState != null) {
         final pending = _pendingState;
+        final pendingFocus = _pendingFocus;
+        final pendingSilent = _pendingSilent;
         _pendingState = null;
-        await _doUpdate(trayState: pending!, focus: false);
+        _pendingFocus = false;
+        _pendingSilent = false;
+        await _doUpdate(
+          trayState: pending!,
+          focus: pendingFocus,
+          silent: pendingSilent,
+        );
       }
     }
   }
@@ -292,28 +312,38 @@ class Tray {
     }
   }
 
-  String _formatProxyLabel(String name, int? delay) {
-    final sep = system.isWindows ? '\t' : '  ';
+  String _formatProxySublabel(int? delay) {
     if (delay == null) {
-      return name;
+      return '';
     } else if (delay == 0) {
-      final frame = _loadingFrames[_loadingFrame];
-      return '$name$sep$frame';
+      return system.isMacOS ? _loadingFrames[_loadingFrame] : '...';
     } else if (delay < 0) {
-      return '$name$sep×';
+      return '×';
     } else {
-      return '$name$sep${delay}ms';
+      return '${delay}ms';
     }
   }
 
   void _startLoadingAnimation() {
+    if (!system.isMacOS) {
+      return;
+    }
     _loadingTimer?.cancel();
     _loadingFrame = 0;
-    _loadingTimer = Timer.periodic(const Duration(milliseconds: 500), (_) async {
-      _loadingFrame = (_loadingFrame + 1) % _loadingFrames.length;
-      if (!trayManager.isMenuOpen) {
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (!_isTesting) return;
+      _scheduleLoadingUpdate();
+    });
+  }
+
+  void _scheduleLoadingUpdate() {
+    if (!_isTesting || !system.isMacOS) return;
+    _loadingTimer = Timer(const Duration(milliseconds: 300), () async {
+      if (trayManager.isMenuOpen) {
+        _loadingFrame = (_loadingFrame + 1) % _loadingFrames.length;
         await globalState.appController.updateTray(false, true);
       }
+      _scheduleLoadingUpdate();
     });
   }
 
@@ -327,8 +357,6 @@ class Tray {
     if (_isTesting) return;
 
     final appController = globalState.appController;
-    final testUrl = appController.getRealTestUrl('');
-
     final testableProxies = group.all.where((p) {
       final name = p.name.toUpperCase();
       return name != 'REJECT' && name != 'REJECT-DROP' && name != 'PASS';
@@ -338,28 +366,39 @@ class Tray {
     _testingGroupId = group.name;
 
     try {
+      final testingEntries = <String>{};
 
       for (final proxy in testableProxies) {
-        appController.setDelay(Delay(
-          url: testUrl,
-          name: proxy.name,
-          value: 0,
-        ));
+        final state = appController.getProxyCardState(proxy.name);
+        final name = state.proxyName;
+        if (name.isEmpty || _isNonTestableProxyName(name)) continue;
+        final url = appController.getRealTestUrl(
+          state.testUrl.getSafeValue(group.testUrl ?? ''),
+        );
+        final entryKey = '$url\n$name';
+        if (!testingEntries.add(entryKey)) continue;
+        appController.setDelay(Delay(url: url, name: name, value: 0));
       }
 
       _startLoadingAnimation();
 
-      await globalState.appController.updateTray(false, true);
+      await appController.updateTray(false, true);
 
-      await delayTest(testableProxies);
+      await delayTest(
+        testableProxies,
+        group.testUrl,
+        system.isMacOS ? () => appController.updateTray(false, true) : null,
+      );
     } catch (e) {
       commonPrint.log('Delay test error: $e');
       for (final proxy in testableProxies) {
-        appController.setDelay(Delay(
-          url: testUrl,
-          name: proxy.name,
-          value: -1,
-        ));
+        final state = appController.getProxyCardState(proxy.name);
+        final name = state.proxyName;
+        if (name.isEmpty || _isNonTestableProxyName(name)) continue;
+        final url = appController.getRealTestUrl(
+          state.testUrl.getSafeValue(group.testUrl ?? ''),
+        );
+        appController.setDelay(Delay(url: url, name: name, value: -1));
       }
     } finally {
       _stopLoadingAnimation();
@@ -367,8 +406,13 @@ class Tray {
       _isTesting = false;
       _testingGroupId = null;
 
-      await globalState.appController.updateTray(false, true);
+      await appController.updateTray(false, true);
     }
+  }
+
+  bool _isNonTestableProxyName(String proxyName) {
+    final name = proxyName.toUpperCase();
+    return name == 'REJECT' || name == 'REJECT-DROP' || name == 'PASS';
   }
 }
 

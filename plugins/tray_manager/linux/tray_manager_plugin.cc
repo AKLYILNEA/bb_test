@@ -66,6 +66,55 @@ static void _on_menu_unmapped(GtkWidget* widget, gpointer user_data) {
   }
 }
 
+static const char* _lookup_string_or_empty(FlValue* value, const char* key) {
+  FlValue* string_value = fl_value_lookup_string(value, key);
+  if (string_value == nullptr) return "";
+  return fl_value_get_string(string_value);
+}
+
+static GtkWidget* _create_menu_item_box(const char* label,
+                                        const char* sublabel) {
+  GtkWidget* box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 16);
+  GtkWidget* left_label = gtk_label_new(label);
+  GtkWidget* right_label = gtk_label_new(sublabel);
+
+  gtk_label_set_xalign(GTK_LABEL(left_label), 0.0);
+  gtk_label_set_xalign(GTK_LABEL(right_label), 1.0);
+  gtk_widget_set_hexpand(left_label, TRUE);
+  gtk_widget_set_margin_start(right_label, 24);
+
+  gtk_box_pack_start(GTK_BOX(box), left_label, TRUE, TRUE, 0);
+  gtk_box_pack_end(GTK_BOX(box), right_label, FALSE, FALSE, 0);
+
+  return box;
+}
+
+static void _set_menu_item_text(GtkWidget* item, const char* label,
+                                const char* sublabel) {
+  if (!GTK_IS_BIN(item)) {
+    return;
+  }
+
+  GtkWidget* child = gtk_bin_get_child(GTK_BIN(item));
+  if (!GTK_IS_BOX(child)) {
+    gtk_menu_item_set_label(GTK_MENU_ITEM(item), label);
+    return;
+  }
+
+  GList* children = gtk_container_get_children(GTK_CONTAINER(child));
+  GtkWidget* left_label = GTK_WIDGET(g_list_nth_data(children, 0));
+  GtkWidget* right_label = GTK_WIDGET(g_list_nth_data(children, 1));
+
+  if (left_label != nullptr && GTK_IS_LABEL(left_label)) {
+    gtk_label_set_text(GTK_LABEL(left_label), label);
+  }
+  if (right_label != nullptr && GTK_IS_LABEL(right_label)) {
+    gtk_label_set_text(GTK_LABEL(right_label), sublabel);
+  }
+
+  g_list_free(children);
+}
+
 static void _update_menu_labels(GtkWidget* menu_widget, FlValue* args) {
   FlValue* items_value = fl_value_lookup_string(args, "items");
   gint item_count = fl_value_get_length(items_value);
@@ -93,10 +142,11 @@ static void _update_menu_labels(GtkWidget* menu_widget, FlValue* args) {
 
     const char* label =
         fl_value_get_string(fl_value_lookup_string(item_value, "label"));
+    const char* sublabel = _lookup_string_or_empty(item_value, "sublabel");
     const bool disabled =
         fl_value_get_bool(fl_value_lookup_string(item_value, "disabled"));
 
-    gtk_menu_item_set_label(GTK_MENU_ITEM(item), label);
+    _set_menu_item_text(item, label, sublabel);
     gtk_widget_set_sensitive(item, !disabled);
 
     if (strcmp(type, "checkbox") == 0 && GTK_IS_CHECK_MENU_ITEM(item)) {
@@ -127,6 +177,7 @@ GtkWidget* _create_menu(FlValue* args) {
         fl_value_get_string(fl_value_lookup_string(item_value, "type"));
     const char* label =
         fl_value_get_string(fl_value_lookup_string(item_value, "label"));
+    const char* sublabel = _lookup_string_or_empty(item_value, "sublabel");
     const bool disabled =
         fl_value_get_bool(fl_value_lookup_string(item_value, "disabled"));
 
@@ -136,21 +187,27 @@ GtkWidget* _create_menu(FlValue* args) {
       gtk_menu_shell_append(GTK_MENU_SHELL(menu),
                             gtk_separator_menu_item_new());
     } else {
-      GtkWidget* item = gtk_menu_item_new_with_label(label);
-
-      if (disabled) {
-        gtk_widget_set_sensitive(item, FALSE);
-      }
-
+      GtkWidget* item = nullptr;
       if (strcmp(type, "checkbox") == 0) {
-        item = gtk_check_menu_item_new_with_label(label);
+        item = gtk_check_menu_item_new();
         const auto checked_value =
             fl_value_lookup_string(item_value, "checked");
         if (checked_value != nullptr) {
           const auto checked = fl_value_get_bool(checked_value);
           gtk_check_menu_item_set_active((GtkCheckMenuItem*)item, checked);
         }
-      } else if (strcmp(type, "submenu") == 0) {
+      } else {
+        item = gtk_menu_item_new();
+      }
+
+      gtk_container_add(GTK_CONTAINER(item),
+                        _create_menu_item_box(label, sublabel));
+
+      if (disabled) {
+        gtk_widget_set_sensitive(item, FALSE);
+      }
+
+      if (strcmp(type, "submenu") == 0) {
         GtkWidget* sub_menu =
             _create_menu(fl_value_lookup_string(item_value, "submenu"));
         gtk_menu_item_set_submenu(GTK_MENU_ITEM(item), sub_menu);
