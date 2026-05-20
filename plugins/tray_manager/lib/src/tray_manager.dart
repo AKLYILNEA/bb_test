@@ -216,10 +216,13 @@ class TrayManager {
     bool keepMenuOpen = false,
     Brightness? brightness,
   }) async {
-    _menu = menu;
+    final bool willKeepOpen = keepMenuOpen && _isMenuOpen;
+    if (!willKeepOpen) {
+      _menu = menu;
+    }
     final Map<String, dynamic> arguments = {
       'menu': _menuToJson(menu),
-      'keepMenuOpen': keepMenuOpen && _isMenuOpen,
+      'keepMenuOpen': willKeepOpen,
       'brightness': brightness?.name,
     };
     await _channel.invokeMethod('setContextMenu', arguments);

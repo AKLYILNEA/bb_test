@@ -238,7 +238,7 @@ class Tray {
       final wakelockMenuItem = MenuItem.checkbox(
         label: appLocalizations.wakelock,
         onClick: (_) async {
-          await _toggleWakelock();
+          await _toggleWakelock(trayState.wakelockEnabled);
         },
         checked: trayState.wakelockEnabled,
       );
@@ -295,17 +295,24 @@ class Tray {
     await Clipboard.setData(ClipboardData(text: cmdline));
   }
 
-  Future<void> _toggleWakelock() async {
+  Future<void> _toggleWakelock(bool currentEnabled) async {
     try {
-      final enabled = await WakelockPlus.enabled;
-      if (enabled) {
-        await WakelockPlus.disable();
+      if (currentEnabled) {
+        try {
+          await WakelockPlus.disable();
+        } catch (e) {
+          commonPrint.log('WakeLock disable OS error: $e');
+        }
         globalState.appController.stopWakelockAutoRecovery();
       } else {
-        await WakelockPlus.enable();
+        try {
+          await WakelockPlus.enable();
+        } catch (e) {
+          commonPrint.log('WakeLock enable OS error: $e');
+        }
         globalState.appController.startWakelockAutoRecovery();
       }
-      globalState.updateWakelockState(!enabled);
+      globalState.updateWakelockState(!currentEnabled);
       await globalState.appController.updateTray();
     } catch (e) {
       commonPrint.log('WakeLock toggle error: $e');
