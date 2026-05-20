@@ -70,8 +70,10 @@ func init() {
 	envknob.SetNoLogsNoSupport()
 	if runtime.GOOS == "android" { // Android SDK 30 no longer permits Go's net.Interfaces to work (Issue 2293)
 		netmon.RegisterInterfaceGetter(func() (nif []netmon.Interface, err error) {
+			log.Debugln("[Tailscale] InterfaceGetter: start, IsForceAnet: %v", anet.IsForceAnet())
 			ifaces, err := anet.Interfaces()
 			if err != nil {
+				log.Warnln("[Tailscale] anet.Interfaces failed: %v", err)
 				return nil, err
 			}
 			for _, iff := range ifaces {
