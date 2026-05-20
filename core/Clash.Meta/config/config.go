@@ -302,6 +302,8 @@ type RawTun struct {
 	IncludeAndroidUser                    []int          `yaml:"include-android-user" json:"include-android-user,omitempty"`
 	IncludePackage                        []string       `yaml:"include-package" json:"include-package,omitempty"`
 	ExcludePackage                        []string       `yaml:"exclude-package" json:"exclude-package,omitempty"`
+	IncludeMACAddress                     []string       `yaml:"include-mac-address" json:"include-mac-address,omitempty"`
+	ExcludeMACAddress                     []string       `yaml:"exclude-mac-address" json:"exclude-mac-address,omitempty"`
 	EndpointIndependentNat                bool           `yaml:"endpoint-independent-nat" json:"endpoint-independent-nat,omitempty"`
 	UDPTimeout                            int64          `yaml:"udp-timeout" json:"udp-timeout,omitempty"`
 	DisableICMPForwarding                 bool           `yaml:"disable-icmp-forwarding" json:"disable-icmp-forwarding,omitempty"`
@@ -653,7 +655,7 @@ func ParseRawConfig(rawCfg *RawConfig) (*Config, error) {
 	}
 	config.TLS = tlsCfg
 
-	proxies, providers, err := parseProxies(rawCfg, nil)
+	proxies, providers, err := parseProxies(rawCfg)
 	if err != nil {
 		return nil, err
 	}
@@ -852,7 +854,7 @@ func parseTLS(cfg *RawConfig) (*TLS, error) {
 	}, nil
 }
 
-func parseProxies(cfg *RawConfig, tunnel C.Tunnel) (proxies map[string]C.Proxy, providersMap map[string]P.ProxyProvider, err error) {
+func parseProxies(cfg *RawConfig) (proxies map[string]C.Proxy, providersMap map[string]P.ProxyProvider, err error) {
 	proxies = make(map[string]C.Proxy)
 	providersMap = make(map[string]P.ProxyProvider)
 	proxiesConfig := cfg.Proxy
@@ -911,7 +913,7 @@ func parseProxies(cfg *RawConfig, tunnel C.Tunnel) (proxies map[string]C.Proxy, 
 			return nil, nil, fmt.Errorf("can not defined a provider called `%s`", provider.ReservedName)
 		}
 
-		pd, err := provider.ParseProxyProvider(name, mapping, tunnel)
+		pd, err := provider.ParseProxyProvider(name, mapping, T.Tunnel)
 		if err != nil {
 			return nil, nil, fmt.Errorf("parse proxy provider %s error: %w", name, err)
 		}
@@ -1215,6 +1217,12 @@ func parseNameServer(servers []string, respectRules bool, preferH3 bool) ([]dns.
 			dnsNetType = "quic" // DNS over QUIC
 		case "system":
 			dnsNetType = "system" // System DNS
+		case "ts", "tailscale":
+			addr = u.Host
+			dnsNetType = "tailscale" // Tailscale DNS via proxy name
+			if addr == "" {
+				err = errors.New("missing Tailscale proxy name")
+			}
 		case "dhcp":
 			addr = server[len("dhcp://"):] // some special notation cannot be parsed by url
 			dnsNetType = "dhcp"            // UDP from DHCP
@@ -1680,6 +1688,8 @@ func parseTun(rawTun RawTun, dns *DNS, general *General) error {
 		IncludeAndroidUser:                    rawTun.IncludeAndroidUser,
 		IncludePackage:                        rawTun.IncludePackage,
 		ExcludePackage:                        rawTun.ExcludePackage,
+		IncludeMACAddress:                     rawTun.IncludeMACAddress,
+		ExcludeMACAddress:                     rawTun.ExcludeMACAddress,
 		EndpointIndependentNat:                rawTun.EndpointIndependentNat,
 		UDPTimeout:                            rawTun.UDPTimeout,
 		DisableICMPForwarding:                 rawTun.DisableICMPForwarding,
