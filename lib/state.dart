@@ -44,6 +44,7 @@ class GlobalState {
   late Measure measure;
   late CommonTheme theme;
   late Color accentColor;
+  // ignore: deprecated_member_use
   CorePalette? corePalette;
   DateTime? startTime;
   UpdateTasks tasks = [];
