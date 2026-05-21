@@ -862,6 +862,9 @@ class AppController {
         commonPrint.log('Fallback applyProfile also failed: $e2');
       }
     }
+    
+    await updateGroups();
+    
     autoLaunch?.updateStatus(_ref.read(appSettingProvider).autoLaunch);
     autoUpdateProfiles();
     autoCheckUpdate();
