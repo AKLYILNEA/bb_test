@@ -114,7 +114,7 @@ jobs:
           channel: ${{ contains(matrix.os, 'arm') && 'master' || 'stable' }}
           cache: true
           cache-key: flutter-${{ matrix.platform }}-${{ matrix.arch }}-${{ hashFiles('**/pubspec.lock') }}
-          flutter-version: ${{ contains(matrix.os, 'arm') && '1c6c6f4' || '3.44.0' }}
+          flutter-version: ${{ contains(matrix.os, 'arm') && '' || '3.44.0' }}
 
       - name: Use prebuilt QuickJS bridge (Windows arm64)
         if: matrix.platform == 'windows' && matrix.arch == 'arm64'
