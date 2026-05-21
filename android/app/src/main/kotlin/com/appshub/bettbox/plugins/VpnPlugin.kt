@@ -60,10 +60,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     private var suspendModule: SuspendModule? = null
 
     private var quickResponseEnabled = false
-    private var disconnectCount = 0
-    private var disconnectWindowStart = 0L
-    private val disconnectWindowMs = 5000L
-    private val maxDisconnectsInWindow = 3
+    private var quickResponseJob: Job? = null
     private var lastNetworkType: Int? = null
     private var lastDns = ""
 
@@ -359,21 +356,14 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             ServicePlugin.notifyNetworkChanged()
             
             if (!quickResponseEnabled) return
-            if (GlobalState.currentRunState != RunState.START) return
 
-            val now = System.currentTimeMillis()
-            
-            if (now - disconnectWindowStart > disconnectWindowMs) {
-                disconnectWindowStart = now
-                disconnectCount = 0
-            }
-            
-            if (disconnectCount < maxDisconnectsInWindow) {
-                disconnectCount++
-                android.util.Log.d("VpnPlugin", "Quick Response: Network changed, closing connections ($disconnectCount/$maxDisconnectsInWindow)")
-                invokeDart("closeConnections")
-            } else {
-                android.util.Log.d("VpnPlugin", "Quick Response: Disconnect limit reached, ignoring")
+            quickResponseJob?.cancel()
+            quickResponseJob = scope.launch {
+                delay(500)
+                if (GlobalState.currentRunState == RunState.START) {
+                    android.util.Log.d("VpnPlugin", "Quick Response: Network changed, closing connections")
+                    invokeDart("closeConnections")
+                }
             }
         }
     }
