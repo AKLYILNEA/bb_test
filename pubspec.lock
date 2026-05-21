@@ -1079,10 +1079,9 @@ packages:
   re_editor:
     dependency: "direct main"
     description:
-      name: re_editor
-      sha256: dd4e6ca7350a8fa0cda4e425b82a0c3c010f0f6b3f618c74223e05b8129ab629
-      url: "https://pub.dev"
-    source: hosted
+      path: "plugins/re-editor"
+      relative: true
+    source: path
     version: "0.8.0"
   re_highlight:
     dependency: "direct main"
