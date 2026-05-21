@@ -148,7 +148,7 @@ class ProxyCard extends StatelessWidget {
       return nameWidget;
     }
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         CommonTargetIcon(src: subGroupIcon, size: measure.bodyMediumHeight),
@@ -162,27 +162,21 @@ class ProxyCard extends StatelessWidget {
     if (type == ProxyCardType.min) {
       return SizedBox(
         height: measure.bodyMediumHeight * 1,
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: EmojiText(
-            proxy.name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: context.textTheme.bodyMedium,
-          ),
+        child: EmojiText(
+          proxy.name,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: context.textTheme.bodyMedium,
         ),
       );
     } else {
       return SizedBox(
         height: measure.bodyMediumHeight * 2,
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: EmojiText(
-            proxy.name,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: context.textTheme.bodyMedium,
-          ),
+        child: EmojiText(
+          proxy.name,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: context.textTheme.bodyMedium,
         ),
       );
     }
