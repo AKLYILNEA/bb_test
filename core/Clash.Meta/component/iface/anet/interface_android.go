@@ -72,7 +72,7 @@ func InterfaceByIndex(index int) (*net.Interface, error) {
 	if err != nil {
 		return nil, &net.OpError{Op: "route", Net: "ip+net", Source: nil, Addr: nil, Err: err}
 	}
-	ifi, err = interfaceByIndex(ift, index)
+	ifi, err := interfaceByIndex(ift, index)
 	if err != nil {
 		err = &net.OpError{Op: "route", Net: "ip+net", Source: nil, Addr: nil, Err: err}
 	}
@@ -81,9 +81,11 @@ func InterfaceByIndex(index int) (*net.Interface, error) {
 
 // InterfaceByName returns the interface specified by name.
 func InterfaceByName(name string) (*net.Interface, error) {
-	ifi, err := net.InterfaceByName(name)
-	if err == nil {
-		return ifi, nil
+	if !IsForceAnet() {
+		ifi, err := net.InterfaceByName(name)
+		if err == nil {
+			return ifi, nil
+		}
 	}
 	if name == "" {
 		return nil, &net.OpError{Op: "route", Net: "ip+net", Source: nil, Addr: nil, Err: errInvalidInterfaceName}

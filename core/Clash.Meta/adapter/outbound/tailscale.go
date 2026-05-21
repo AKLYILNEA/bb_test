@@ -27,6 +27,7 @@ import (
 	"github.com/metacubex/tailscale/tailcfg"
 	"github.com/metacubex/tailscale/tsnet"
 	D "github.com/miekg/dns"
+	"github.com/samber/lo"
 )
 
 type Tailscale struct {
@@ -79,6 +80,7 @@ func init() {
 			for _, iff := range ifaces {
 				addrs, err := anet.InterfaceAddrsByInterface(&iff)
 				if err != nil {
+					log.Warnln("[Tailscale] anet.InterfaceAddrsByInterface(%v) failed: %v", iff.Name, err)
 					continue
 				}
 				nif = append(nif, netmon.Interface{
@@ -86,6 +88,15 @@ func init() {
 					AltAddrs:  addrs,
 				})
 			}
+
+			log.Debugln("[Tailscale] InterfaceGetter: %v", lo.Map(nif, func(item netmon.Interface, index int) string {
+				var addrs any
+				addrs, err := item.Addrs()
+				if err != nil {
+					addrs = err
+				}
+				return fmt.Sprintf("{Name: %s, Addrs: %v, IsUp: %v, IsLoopback: %v}", item.Name, addrs, item.IsUp(), item.IsLoopback())
+			}))
 			return
 		})
 	}
@@ -126,15 +137,30 @@ func NewTailscale(option TailscaleOption) (*Tailscale, error) {
 	}
 	outbound.dialer = option.NewDialer(outbound.DialOptions())
 	outbound.server = &tsnet.Server{
-		Dir:                  option.StateDir,
-		Hostname:             option.Hostname,
-		AuthKey:              option.AuthKey,
-		ControlURL:           option.ControlURL,
-		Ephemeral:            option.Ephemeral,
-		SystemDialer:         outbound.dialer.DialContext,
-		SystemPacketListener: tailscalePacketListener{dialer: outbound.dialer}.ListenPacket,
-		ExtraRootCAs:         ca.GetCertPool(),
-		LookupHook:           tailscaleLookupHook,
+		Dir:        option.StateDir,
+		Hostname:   option.Hostname,
+		AuthKey:    option.AuthKey,
+		ControlURL: option.ControlURL,
+		Ephemeral:  option.Ephemeral,
+		SystemDialer: func(ctx context.Context, network, address string) (net.Conn, error) {
+			log.Debugln("[Tailscale](%s) SystemDialer: start dial %s %s", option.Name, network, address)
+			conn, err := outbound.dialer.DialContext(ctx, network, address)
+			log.Debugln("[Tailscale](%s) SystemDialer: finish dial %s %s, err: %v", option.Name, network, address, err)
+			return conn, err
+		},
+		SystemPacketListener: func(ctx context.Context, network, address string) (net.PacketConn, error) {
+			log.Debugln("[Tailscale](%s) SystemPacketListener: start listen %s %s", option.Name, network, address)
+			pc, err := outbound.dialer.ListenPacket(ctx, network, address, netip.AddrPort{})
+			log.Debugln("[Tailscale](%s) SystemPacketListener: finish listen %s %s, err: %v", option.Name, network, address, err)
+			return pc, err
+		},
+		ExtraRootCAs: ca.GetCertPool(),
+		LookupHook: func(ctx context.Context, host string) ([]netip.Addr, error) {
+			log.Debugln("[Tailscale](%s) LookupHook: start lookup %s", option.Name, host)
+			ips, err := resolver.LookupIPWithResolver(ctx, host, resolver.ProxyServerHostResolver)
+			log.Debugln("[Tailscale](%s) LookupHook: finish lookup %s, ips: %v, err: %v", option.Name, host, ips, err)
+			return ips, err
+		},
 		UserLogf: func(format string, args ...any) {
 			log.Infoln("[Tailscale](%s) %s", option.Name, fmt.Sprintf(format, args...))
 		},
@@ -311,10 +337,6 @@ func tailscaleExitNodeNeedsStatus(option TailscaleOption) bool {
 	return !ok
 }
 
-func tailscaleLookupHook(ctx context.Context, host string) ([]netip.Addr, error) {
-	return resolver.LookupIPWithResolver(ctx, host, resolver.ProxyServerHostResolver)
-}
-
 func (t *Tailscale) DialContext(ctx context.Context, metadata *C.Metadata) (_ C.Conn, err error) {
 	if err = t.ensureStarted(ctx); err != nil {
 		return nil, err
@@ -445,12 +467,4 @@ func (t *Tailscale) Close() error {
 		return t.server.Close()
 	}
 	return nil
-}
-
-type tailscalePacketListener struct {
-	dialer C.Dialer
-}
-
-func (l tailscalePacketListener) ListenPacket(ctx context.Context, network, address string) (net.PacketConn, error) {
-	return l.dialer.ListenPacket(ctx, network, address, netip.AddrPort{})
 }
