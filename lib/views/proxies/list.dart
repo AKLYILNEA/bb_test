@@ -1,11 +1,11 @@
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
-import 'package:bett_box/providers/config.dart';
-import 'package:bett_box/providers/state.dart';
+import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'card.dart';
@@ -80,7 +80,7 @@ class _ProxyGroupsListState extends State<_ProxyGroupsList> {
       trackVisibility: true,
       child: CustomScrollView(
         controller: _scrollController,
-        cacheExtent: 500,
+        scrollCacheExtent: const ScrollCacheExtent.pixels(500),
         slivers: [
           SliverPadding(
             padding: const EdgeInsets.all(16),
@@ -184,6 +184,13 @@ class _GroupHeader extends ConsumerWidget {
       getSelectedProxyNameProvider(group.name),
     ).getSafeValue('');
 
+    final selectedProxyIcon = ref.watch(
+      groupsProvider.select((groups) {
+        if (selectedProxyName.isEmpty) return '';
+        return groups.getGroup(selectedProxyName)?.icon ?? '';
+      }),
+    );
+
     return CommonCard(
       radius: 16,
       type: CommonCardType.filled,
@@ -210,10 +217,20 @@ class _GroupHeader extends ConsumerWidget {
                         style: context.textTheme.labelMedium?.toLight,
                       ),
                       if (selectedProxyName.isNotEmpty) ...[
-                        const SizedBox(width: 8),
+                        Text(
+                          '  •  ',
+                          style: context.textTheme.labelMedium?.toLight,
+                        ),
+                        if (selectedProxyIcon.isNotEmpty) ...[
+                          CommonTargetIcon(
+                            src: selectedProxyIcon,
+                            size: globalState.measure.labelMediumHeight,
+                          ),
+                          const SizedBox(width: 4),
+                        ],
                         Flexible(
                           child: EmojiText(
-                            '•  $selectedProxyName',
+                            selectedProxyName,
                             style: context.textTheme.labelMedium?.toLight,
                             overflow: TextOverflow.ellipsis,
                           ),
