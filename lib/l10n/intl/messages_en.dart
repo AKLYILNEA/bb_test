@@ -616,6 +616,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "Max 2 IPs/CIDRs, comma-separated",
     ),
     "networkSpeed": MessageLookupByLibrary.simpleMessage("Network Speed"),
+    "networkSpeedNotification": MessageLookupByLibrary.simpleMessage(
+      "Speed in Notification",
+    ),
+    "networkSpeedNotificationDesc": MessageLookupByLibrary.simpleMessage(
+      "Show current speed in the notification bar",
+    ),
     "networkType": MessageLookupByLibrary.simpleMessage("Network Type"),
     "neutralScheme": MessageLookupByLibrary.simpleMessage("Neutral"),
     "noAnimation": MessageLookupByLibrary.simpleMessage("Default"),

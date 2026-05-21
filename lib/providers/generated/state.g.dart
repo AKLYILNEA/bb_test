@@ -258,7 +258,7 @@ final profilesSelectorStateProvider =
 // ignore: unused_element
 typedef ProfilesSelectorStateRef =
     AutoDisposeProviderRef<ProfilesSelectorState>;
-String _$filterGroupsStateHash() => r'c50aafbb50f98a66e21fc069d22031351d93a0ab';
+String _$filterGroupsStateHash() => r'31e2e642a456991cc2d103627efacb75d796791c';
 
 /// Copied from Dart SDK
 class _SystemHash {

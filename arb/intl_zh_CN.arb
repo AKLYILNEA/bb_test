@@ -53,6 +53,8 @@
   "storeFixDesc": "修复Google Play商店下载异常",
   "disableQuic": "禁用QUIC",
   "disableQuicDesc": "禁用QUIC以解决特定网络问题",
+  "networkSpeedNotification": "网速通知",
+  "networkSpeedNotificationDesc": "在通知栏显示当前网速和订阅信息",
   "trayEnhancement": "托盘增强",
   "trayEnhancementDesc": "在托盘区右键菜单中控制代理组",
   "excludeChina": "排除国内",

@@ -438,6 +438,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "輸入 IP 或 CIDR，最多 2 個，以逗號分隔",
     ),
     "networkSpeed": MessageLookupByLibrary.simpleMessage("網路速度"),
+    "networkSpeedNotification": MessageLookupByLibrary.simpleMessage("網速通知"),
+    "networkSpeedNotificationDesc": MessageLookupByLibrary.simpleMessage(
+      "在通知欄顯示當前網速和訂閱資訊",
+    ),
     "networkType": MessageLookupByLibrary.simpleMessage("網路類型"),
     "neutralScheme": MessageLookupByLibrary.simpleMessage("中性"),
     "noAnimation": MessageLookupByLibrary.simpleMessage("預設"),

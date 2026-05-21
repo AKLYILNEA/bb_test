@@ -11,6 +11,7 @@ import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/l10n/l10n.dart';
 import 'package:bett_box/plugins/app.dart';
 import 'package:bett_box/plugins/service.dart';
+import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/providers/state.dart' as providers_state;
 
 import 'package:bett_box/widgets/dialog.dart';
@@ -188,7 +189,12 @@ class GlobalState {
         _scheduleBackgroundCleanup();
       }
       render?.pause();
-      stopUpdateTasks();
+      
+      final networkSpeedNotification = appController.ref.read(vpnSettingProvider).networkSpeedNotification;
+      if (!networkSpeedNotification) {
+        stopUpdateTasks();
+      }
+      
       dashboardRefreshManager.stop();
       return;
     }
@@ -197,7 +203,12 @@ class GlobalState {
       _scheduleBackgroundCleanup();
     }
     render?.pause();
-    stopUpdateTasks();
+    
+    final networkSpeedNotification = appController.ref.read(vpnSettingProvider).networkSpeedNotification;
+    if (!networkSpeedNotification) {
+      stopUpdateTasks();
+    }
+    
     dashboardRefreshManager.stop();
   }
 

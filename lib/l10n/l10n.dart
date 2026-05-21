@@ -469,6 +469,26 @@ class AppLocalizations {
     );
   }
 
+  /// `Speed in Notification`
+  String get networkSpeedNotification {
+    return Intl.message(
+      'Speed in Notification',
+      name: 'networkSpeedNotification',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Show current speed in the notification bar`
+  String get networkSpeedNotificationDesc {
+    return Intl.message(
+      'Show current speed in the notification bar',
+      name: 'networkSpeedNotificationDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Tray Enhancement`
   String get trayEnhancement {
     return Intl.message(

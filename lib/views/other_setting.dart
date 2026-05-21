@@ -395,6 +395,32 @@ class DisableQuicItem extends ConsumerWidget {
   }
 }
 
+class NetworkSpeedNotificationItem extends ConsumerWidget {
+  const NetworkSpeedNotificationItem({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final networkSpeedNotification = ref.watch(
+      vpnSettingProvider.select((state) => state.networkSpeedNotification),
+    );
+    return ListItem.switchItem(
+      title: Text(appLocalizations.networkSpeedNotification),
+      subtitle: Text(appLocalizations.networkSpeedNotificationDesc),
+      delegate: SwitchDelegate(
+        value: networkSpeedNotification,
+        onChanged: (bool value) async {
+          ref
+              .read(vpnSettingProvider.notifier)
+              .updateState((state) => state.copyWith(networkSpeedNotification: value));
+          if (!value && system.isAndroid) {
+            await service?.restoreNotification();
+          }
+        },
+      ),
+    );
+  }
+}
+
 class TrayEnhancementItem extends ConsumerWidget {
   const TrayEnhancementItem({super.key});
 
@@ -464,6 +490,7 @@ class OtherSettingView extends ConsumerWidget {
       if (system.isAndroid) const QuickResponseItem(),
       const StoreFixItem(),
       const DisableQuicItem(),
+      if (system.isAndroid) const NetworkSpeedNotificationItem(),
       if (!system.isAndroid) const TrayEnhancementItem(),
       if (disableQuic && !isRussian) const ExcludeChinaItem(),
       if (system.isWindows) const HighPriorityItem(),

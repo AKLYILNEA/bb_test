@@ -53,6 +53,8 @@
   "storeFixDesc": "Fix Play Store download issues",
   "disableQuic": "Disable QUIC",
   "disableQuicDesc": "Disable QUIC to resolve specific network issues",
+  "networkSpeedNotification": "Speed in Notification",
+  "networkSpeedNotificationDesc": "Show current speed in the notification bar",
   "trayEnhancement": "Tray Enhancement",
   "trayEnhancementDesc": "Control proxy groups in the system tray context menu",
   "excludeChina": "Exclude China",

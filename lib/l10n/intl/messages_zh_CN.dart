@@ -424,6 +424,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "输入IP或CIDR，最多2个，以逗号分隔",
     ),
     "networkSpeed": MessageLookupByLibrary.simpleMessage("网络速度"),
+    "networkSpeedNotification": MessageLookupByLibrary.simpleMessage("网速通知"),
+    "networkSpeedNotificationDesc": MessageLookupByLibrary.simpleMessage(
+      "在通知栏显示当前网速和订阅信息",
+    ),
     "networkType": MessageLookupByLibrary.simpleMessage("网络类型"),
     "neutralScheme": MessageLookupByLibrary.simpleMessage("中性"),
     "noAnimation": MessageLookupByLibrary.simpleMessage("默认"),

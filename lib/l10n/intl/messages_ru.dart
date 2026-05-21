@@ -620,6 +620,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "Введите IP или CIDR, максимум 2, через запятую",
     ),
     "networkSpeed": MessageLookupByLibrary.simpleMessage("Скорость сети"),
+    "networkSpeedNotification": MessageLookupByLibrary.simpleMessage(
+      "Скорость в уведомлениях",
+    ),
+    "networkSpeedNotificationDesc": MessageLookupByLibrary.simpleMessage(
+      "Показывать текущую скорость в панели уведомлений",
+    ),
     "networkType": MessageLookupByLibrary.simpleMessage("Тип сети"),
     "neutralScheme": MessageLookupByLibrary.simpleMessage("Нейтральный"),
     "noAnimation": MessageLookupByLibrary.simpleMessage("По умолчанию"),

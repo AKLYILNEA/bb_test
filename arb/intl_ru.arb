@@ -53,6 +53,8 @@
   "storeFixDesc": "Исправляет проблемы загрузки Google Play",
   "disableQuic": "Отключить QUIC",
   "disableQuicDesc": "Отключить QUIC для решения сетевых проблем",
+  "networkSpeedNotification": "Скорость в уведомлениях",
+  "networkSpeedNotificationDesc": "Показывать текущую скорость в панели уведомлений",
   "trayEnhancement": "Улучшение трея",
   "trayEnhancementDesc": "Управление группами прокси в контекстном меню трея",
   "excludeChina": "Исключить Китай",

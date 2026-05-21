@@ -31,6 +31,7 @@ class AppController {
 
   final BuildContext context;
   final WidgetRef _ref;
+  WidgetRef get ref => _ref;
 
   Timer? _wakelockSyncTimer;
   Completer<void>? _restartLock;
@@ -272,11 +273,28 @@ class AppController {
   Future<void> updateTraffic() async {
     _ref.read(totalTrafficProvider.notifier).value = await clashCore
         .getTotalTraffic();
-    if (!await _shouldUpdateDashboardTick()) {
+    
+    final shouldUpdateDashboard = await _shouldUpdateDashboardTick();
+    final networkSpeedNotification = system.isAndroid && _ref.read(vpnSettingProvider).networkSpeedNotification;
+
+    if (!shouldUpdateDashboard && !networkSpeedNotification) {
       return;
     }
+    
     final traffic = await clashCore.getTraffic();
-    _ref.read(trafficsProvider.notifier).addTraffic(traffic);
+    
+    if (shouldUpdateDashboard) {
+      _ref.read(trafficsProvider.notifier).addTraffic(traffic);
+    }
+
+    if (networkSpeedNotification) {
+      final currentProfileId = _ref.read(currentProfileIdProvider);
+      final profiles = _ref.read(profilesProvider);
+      final profile = profiles.where((e) => e.id == currentProfileId).firstOrNull;
+      final profileName = profile?.label ?? 'Bettbox';
+      final speedInfo = traffic.toString();
+      await vpn_service.service?.updateNotificationSpeed(profileName, speedInfo);
+    }
   }
 
   Future<void> addProfile(Profile profile) async {
