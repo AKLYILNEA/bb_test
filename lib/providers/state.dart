@@ -268,6 +268,10 @@ GroupsState filterGroupsState(Ref ref, String query) {
   final lowQuery = query.toLowerCase();
   final groups = currentGroups.value
       .map((group) {
+        final groupNameMatch = group.name.toLowerCase().contains(lowQuery);
+        if (groupNameMatch) {
+          return group;
+        }
         return group.copyWith(
           all: group.all
               .where((proxy) => proxy.name.toLowerCase().contains(lowQuery))
