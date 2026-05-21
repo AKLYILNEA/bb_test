@@ -582,13 +582,14 @@ func handleTCPConn(connCtx C.ConnContext) {
 
 		if N.NeedHandshake(remoteConn) {
 			defer func() {
-				for _, chain := range remoteConn.Chains() {
-					if chain == "REJECT" {
-						err = nil
-						return
-					}
-				}
 				if err != nil {
+					_ = remoteConn.Close()
+					for _, chain := range remoteConn.Chains() {
+						if chain == "REJECT" {
+							err = nil
+							return
+						}
+					}
 					remoteConn = nil
 				}
 			}()
