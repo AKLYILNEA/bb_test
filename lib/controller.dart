@@ -238,6 +238,7 @@ class AppController {
   }
 
   Future<void> updateRunTime() async {
+    if (globalState.backgroundMode.value) return;
     final startTime = globalState.startTime;
     if (startTime == null) {
       if (_ref.read(runTimeProvider) != null) {
