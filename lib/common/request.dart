@@ -95,12 +95,12 @@ class Request {
   }
 
   final List<String> _ipInfoSources = [
-    'https://api.cloudflare.com/cdn-cgi/trace',
+    'https://1.1.1.1/cdn-cgi/trace',
     'https://cp.cloudflare.com/cdn-cgi/trace',
   ];
 
   final List<String> _domesticIpSources = [
-    'https://www.teamviewer.cn/cdn-cgi/trace',
+    'https://www.qualcomm.cn/cdn-cgi/trace',
     'https://www.cloudflare-cn.com/cdn-cgi/trace',
   ];
 

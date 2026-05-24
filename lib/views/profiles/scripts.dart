@@ -49,11 +49,10 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
   }
 
   void _handleShowScriptSettings() {
-    final profiles = globalState.config.profiles;
     showSheet(
       context: context,
       builder: (_, type) {
-        return _ScriptSettingsSheet(type: type, profiles: profiles);
+        return _ScriptSettingsSheet(type: type);
       },
     );
   }
@@ -340,15 +339,14 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
 
 class _ScriptSettingsSheet extends ConsumerWidget {
   final SheetType type;
-  final List<Profile> profiles;
 
   const _ScriptSettingsSheet({
     required this.type,
-    required this.profiles,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final profiles = ref.watch(profilesProvider);
     return AdaptiveSheetScaffold(
       type: type,
       body: profiles.isEmpty
