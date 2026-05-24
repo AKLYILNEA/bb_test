@@ -251,7 +251,11 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
     }
 
     override fun onRevoke() {
-        runCatching { VpnPlugin.handleStop() }
+        runCatching {
+            VpnPlugin.handleStop()
+            getSystemService(android.app.NotificationManager::class.java)
+                ?.cancel(GlobalState.NOTIFICATION_ID)
+        }.onFailure { Log.e(TAG, "onRevoke error: ${it.message}") }
         super.onRevoke()
     }
 
