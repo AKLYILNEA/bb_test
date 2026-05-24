@@ -77,21 +77,46 @@ class Request {
         'https://api.github.com/repos/$repository/releases/latest',
         options: Options(responseType: ResponseType.json),
       );
-      if (response.statusCode != 200) return null;
-      final data = response.data as Map<String, dynamic>;
-      final remoteVersion = data['tag_name'];
-      final version = globalState.packageInfo.version;
-      final hasUpdate =
-          utils.compareVersions(remoteVersion.replaceAll('v', ''), version) > 0;
-      if (!hasUpdate) return null;
-      return data;
-    } on DioException catch (e) {
-      commonPrint.log('Check update failed: ${e.message}');
-      return null;
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+        final remoteVersion = data['tag_name'];
+        final version = globalState.packageInfo.version;
+        final hasUpdate =
+            utils.compareVersions(remoteVersion.replaceAll('v', ''), version) > 0;
+        if (!hasUpdate) return null;
+        return data;
+      }
     } catch (e) {
-      commonPrint.log('Check update error: $e');
-      return null;
+      commonPrint.log('GitHub API check update failed: $e. Trying fallback...');
     }
+
+    try {
+      final response = await _dio.get(
+        'https://github.com/$repository/releases/latest',
+        options: Options(
+          followRedirects: false,
+          validateStatus: (status) => status != null && status >= 300 && status < 400,
+        ),
+      );
+      final location = response.headers.value('location');
+      if (location != null && location.contains('/releases/tag/')) {
+        final remoteVersion = location.split('/').last.trim();
+        if (remoteVersion.isNotEmpty) {
+          final version = globalState.packageInfo.version;
+          final hasUpdate =
+              utils.compareVersions(remoteVersion.replaceAll('v', ''), version) > 0;
+          if (!hasUpdate) return null;
+          return {
+            'tag_name': remoteVersion,
+            'html_url': 'https://github.com/$repository/releases/latest',
+            'body': 'New version available. Please visit GitHub to download.',
+          };
+        }
+      }
+    } catch (e) {
+      commonPrint.log('Fallback check update failed: $e');
+    }
+    return null;
   }
 
   final List<String> _ipInfoSources = [
