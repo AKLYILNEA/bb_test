@@ -347,6 +347,7 @@ class _ScriptSettingsSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profiles = ref.watch(profilesProvider);
+    final currentProfileId = ref.watch(currentProfileIdProvider);
     return AdaptiveSheetScaffold(
       type: type,
       body: profiles.isEmpty
@@ -356,6 +357,7 @@ class _ScriptSettingsSheet extends ConsumerWidget {
               itemCount: profiles.length,
               itemBuilder: (_, index) {
                 final profile = profiles[index];
+                final isCurrentProfile = profile.id == currentProfileId;
                 return Container(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: CommonCard(
@@ -365,11 +367,14 @@ class _ScriptSettingsSheet extends ConsumerWidget {
                       title: Text(profile.label ?? profile.id),
                       trailing: Switch(
                         value: profile.useScriptOverride,
-                        onChanged: (value) {
+                        onChanged: (value) async {
                           ref.read(profilesProvider.notifier).updateProfile(
                             profile.id,
                             (p) => p.copyWith(useScriptOverride: value),
                           );
+                          if (isCurrentProfile) {
+                            await globalState.appController.applyProfile(silence: true);
+                          }
                         },
                       ),
                     ),
