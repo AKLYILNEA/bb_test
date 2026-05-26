@@ -108,7 +108,7 @@ class System {
       final escapedCorePath = _shellEscape(appPath.corePath);
       final result = await Process.run(shell, [
         '-c',
-        'echo $escapedPassword | sudo -S chown root:root $escapedCorePath && echo $escapedPassword | sudo -S chmod u+s $escapedCorePath',
+        'echo $escapedPassword | sudo -S chown root:root $escapedCorePath && echo $escapedPassword | sudo -S chmod u+s $escapedCorePath && sync',
       ]);
       return result.exitCode == 0 ? AuthorizeCode.success : AuthorizeCode.error;
     }
