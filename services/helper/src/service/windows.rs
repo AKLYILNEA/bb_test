@@ -54,7 +54,14 @@ async fn run_windows_service() -> anyhow::Result<()> {
         move |event| -> ServiceControlHandlerResult {
             match event {
                 ServiceControl::Interrogate => ServiceControlHandlerResult::NoError,
-                ServiceControl::Stop => std::process::exit(0),
+                ServiceControl::Stop => {
+                    if let Ok(mut guard) = PROCESS.lock() {
+                        if let Some(ref mut child) = *guard {
+                            let _ = child.kill();
+                        }
+                    }
+                    std::process::exit(0)
+                }
                 _ => ServiceControlHandlerResult::NotImplemented,
             }
         },

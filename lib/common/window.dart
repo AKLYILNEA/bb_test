@@ -13,6 +13,8 @@ class Window {
     final props = globalState.config.windowProps;
     final acquire = await singleInstanceLock.acquire();
     if (!acquire) {
+      commonPrint.log('SingleInstanceLock: another instance detected or lock failed, exiting');
+      await Future.delayed(const Duration(milliseconds: 100));
       exit(0);
     }
     if (system.isWindows) {
