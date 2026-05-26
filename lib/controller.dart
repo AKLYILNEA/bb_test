@@ -59,6 +59,53 @@ class AppController {
     debouncer.call(FunctionTag.updateGroups, updateGroups);
   }
 
+  void updateGroupsIfNeededDebounce() {
+    debouncer.call(FunctionTag.updateGroups, updateGroupsIfNeeded);
+  }
+
+  Future<void> updateGroupsIfNeeded() async {
+    try {
+      final proxies = await clashCore.clashInterface.getProxies();
+      if (proxies.isEmpty) return;
+
+      final currentGroups = _ref.read(groupsProvider);
+      if (currentGroups.isEmpty) {
+        await updateGroups();
+        return;
+      }
+
+      bool hasChanged = false;
+      final currentProfile = _ref.read(currentProfileProvider);
+      final selectedMap = currentProfile != null
+          ? Map<String, String>.from(currentProfile.selectedMap)
+          : <String, String>{};
+
+      for (final group in currentGroups) {
+        final proxyData = proxies[group.name] as Map<String, dynamic>?;
+        if (proxyData != null) {
+          final now = proxyData['now'] as String?;
+          if (now != null && now != group.now) {
+            hasChanged = true;
+            if (currentProfile != null) {
+              selectedMap[group.name] = now;
+            }
+          }
+        }
+      }
+
+      if (hasChanged) {
+        await updateGroups();
+        if (currentProfile != null) {
+          _ref.read(profilesProvider.notifier).setProfile(
+                currentProfile.copyWith(selectedMap: selectedMap),
+              );
+        }
+      }
+    } catch (e) {
+      commonPrint.log('updateGroupsIfNeeded error: $e');
+    }
+  }
+
   void addCheckIpNumDebounce() {
     debouncer.call(FunctionTag.addCheckIpNum, () {
       _ref.read(checkIpNumProvider.notifier).add();

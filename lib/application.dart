@@ -113,7 +113,7 @@ class ApplicationState extends ConsumerState<Application>
   void _autoUpdateGroupTask() {
     _autoUpdateGroupTaskTimer = Timer.periodic(
       const Duration(seconds: 60),
-      (_) => globalState.appController.updateGroupsDebounce(),
+      (_) => globalState.appController.updateGroupsIfNeededDebounce(),
     );
   }
 

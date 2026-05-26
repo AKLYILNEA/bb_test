@@ -166,6 +166,7 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
       await globalState.resumeForegroundUpdates();
       await globalState.appController.syncWakelockIfNeeded();
       _scheduleMissedUpdateCheck();
+      globalState.appController.updateGroupsIfNeededDebounce();
 
       final hasDetection = ref
           .read(dashboardStateProvider)
