@@ -1,4 +1,4 @@
-use crate::service::hub::run_service;
+use crate::service::hub::{run_service, PROCESS};
 
 use std::ffi::OsString;
 use std::time::Duration;

@@ -99,7 +99,7 @@ fn sha256_file_with_lock(file: &File, path: &str) -> Result<String, Error> {
 
 static LOGS: Lazy<Arc<Mutex<VecDeque<String>>>> =
     Lazy::new(|| Arc::new(Mutex::new(VecDeque::with_capacity(MAX_LOG_ENTRIES))));
-static PROCESS: Lazy<Arc<Mutex<Option<std::process::Child>>>> =
+pub static PROCESS: Lazy<Arc<Mutex<Option<std::process::Child>>>> =
     Lazy::new(|| Arc::new(Mutex::new(None)));
 static AUTH_KEY: Lazy<Arc<Mutex<Option<Vec<u8>>>>> =
     Lazy::new(|| Arc::new(Mutex::new(None)));

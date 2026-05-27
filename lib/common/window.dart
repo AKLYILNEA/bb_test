@@ -7,9 +7,8 @@ import 'package:flutter_acrylic/flutter_acrylic.dart' as acrylic;
 import 'package:screen_retriever/screen_retriever.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
-
 class Window {
-  Future<void> init(int version) async {
+  Future<void> init() async {
     final props = globalState.config.windowProps;
     final acquire = await singleInstanceLock.acquire();
     if (!acquire) {
@@ -22,17 +21,15 @@ class Window {
       protocol.register('clashmeta');
       protocol.register('bettbox');
     }
-    if ((version > 10 && system.isMacOS)) {
+    await windowManager.ensureInitialized();
+    if (system.isMacOS) {
       await acrylic.Window.initialize();
     }
-    await windowManager.ensureInitialized();
     WindowOptions windowOptions = WindowOptions(
       size: Size(props.width, props.height),
       minimumSize: const Size(380, 400),
     );
-    if (!system.isMacOS || version > 10) {
-      await windowManager.setTitleBarStyle(TitleBarStyle.hidden);
-    }
+    await windowManager.setTitleBarStyle(TitleBarStyle.hidden);
     if (!system.isMacOS) {
       final left = props.left ?? 0;
       final top = props.top ?? 0;
