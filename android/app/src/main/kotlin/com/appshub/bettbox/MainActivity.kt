@@ -1,6 +1,9 @@
 package com.appshub.bettbox
 
+import android.app.UiModeManager
 import android.content.Context
+import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.appshub.bettbox.plugins.AppPlugin
@@ -18,8 +21,22 @@ class MainActivity : FlutterActivity() {
         private const val MAIN_ENGINE_ID = "bettbox_main_engine"
     }
 
+    private fun isTvDevice(context: Context): Boolean {
+        val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as? UiModeManager
+        if (uiModeManager?.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION) {
+            return true
+        }
+        val packageManager = context.packageManager
+        return packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
+                || packageManager.hasSystemFeature(PackageManager.FEATURE_TELEVISION)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+        if (isTvDevice(this)) {
+            setTheme(R.style.NormalTheme)
+        } else {
+            installSplashScreen()
+        }
         super.onCreate(savedInstanceState)
     }
 
