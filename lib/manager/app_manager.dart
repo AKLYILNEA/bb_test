@@ -64,6 +64,7 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _updateDashboardRefreshState();
       detectionState.tryStartCheck();
+      globalState.appController.updateGroupsIfNeededDebounce();
     });
     if (window == null) {
       return;

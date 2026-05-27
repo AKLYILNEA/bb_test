@@ -10,7 +10,8 @@ class JavaScriptRuntimeManager {
     String scriptContent,
     Map<String, dynamic> config,
   ) async {
-    final runtime = getJavascriptRuntime();
+    final runtime = getJavascriptRuntime(xhr: false);
+    final engineId = runtime.getEngineInstanceId();
     try {
       final configJs = json.encode(config);
       final res = await runtime.evaluateAsync('''
@@ -26,6 +27,7 @@ class JavaScriptRuntimeManager {
       };
       return value ?? config;
     } finally {
+      JavascriptRuntime.channelFunctionsRegistered.remove(engineId);
       if (!Platform.isMacOS) {
         runtime.dispose();
       }
