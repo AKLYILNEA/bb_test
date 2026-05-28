@@ -63,7 +63,7 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _updateDashboardRefreshState();
       detectionState.tryStartCheck();
-      globalState.appController.updateGroupsIfNeededDebounce();
+      globalState.appController.updateGroupsDebounce();
     });
     if (window == null) {
       return;
@@ -166,7 +166,7 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
       await globalState.resumeForegroundUpdates();
       await globalState.appController.syncWakelockIfNeeded();
       _scheduleMissedUpdateCheck();
-      globalState.appController.updateGroupsIfNeededDebounce();
+      globalState.appController.updateGroupsDebounce();
 
       final hasDetection = ref
           .read(dashboardStateProvider)
