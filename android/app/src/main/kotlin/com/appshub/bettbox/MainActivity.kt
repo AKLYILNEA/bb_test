@@ -32,7 +32,8 @@ class MainActivity : FlutterActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (isTvDevice(this)) {
+        val isEngineCached = FlutterEngineCache.getInstance().contains(MAIN_ENGINE_ID)
+        if (isTvDevice(this) || isEngineCached) {
             setTheme(R.style.NormalTheme)
         } else {
             installSplashScreen()
