@@ -15,7 +15,9 @@ class TunnelListWidget extends ConsumerWidget {
     );
 
     if (tunnels.isEmpty) {
-      return NullStatus(label: appLocalizations.noData);
+      return SizedBox.expand(
+        child: NullStatus(label: appLocalizations.noData),
+      );
     }
 
     return ListView.builder(
