@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/state.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_acrylic/flutter_acrylic.dart' as acrylic;
 import 'package:screen_retriever/screen_retriever.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
+
 class Window {
   Future<void> init() async {
     final props = globalState.config.windowProps;
@@ -22,9 +22,6 @@ class Window {
       protocol.register('bettbox');
     }
     await windowManager.ensureInitialized();
-    if (system.isMacOS) {
-      await acrylic.Window.initialize();
-    }
     WindowOptions windowOptions = WindowOptions(
       size: Size(props.width, props.height),
       minimumSize: const Size(380, 400),
@@ -60,10 +57,6 @@ class Window {
   }
 
   void updateMacOSBrightness(Brightness brightness) {
-    if (!system.isMacOS) {
-      return;
-    }
-    acrylic.Window.overrideMacOSBrightness(dark: brightness == Brightness.dark);
   }
 
   Future<void> show() async {
