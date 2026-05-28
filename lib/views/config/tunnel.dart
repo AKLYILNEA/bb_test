@@ -14,12 +14,6 @@ class TunnelListWidget extends ConsumerWidget {
       patchClashConfigProvider.select((state) => state.tunnels),
     );
 
-    if (tunnels.isEmpty) {
-      return SizedBox.expand(
-        child: NullStatus(label: appLocalizations.noData),
-      );
-    }
-
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -225,10 +219,12 @@ class TunnelListView extends ConsumerWidget {
     );
 
     return Scaffold(
-      body: ListView(
-        padding: const EdgeInsets.only(top: 16),
-        children: [const TunnelListWidget()],
-      ),
+      body: tunnels.isEmpty
+          ? Center(child: NullStatus(label: appLocalizations.noData))
+          : ListView(
+              padding: const EdgeInsets.only(top: 16),
+              children: [const TunnelListWidget()],
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showTunnelDialog(context, ref, tunnels),
         child: const Icon(Icons.add),
