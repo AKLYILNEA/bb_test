@@ -466,9 +466,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("Глобально"),
     "go": MessageLookupByLibrary.simpleMessage("Перейти"),
     "goDownload": MessageLookupByLibrary.simpleMessage("Перейти к загрузке"),
-    "harmonyFont": MessageLookupByLibrary.simpleMessage("Шрифт Harmony"),
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("Исправление шрифта"),
     "harmonyFontDesc": MessageLookupByLibrary.simpleMessage(
-      "Использовать оптимизированный HarmonyOS Sans",
+      "Встроенный шрифт для исправления отображения",
     ),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage(
       "Сохранить изменения кэша?",

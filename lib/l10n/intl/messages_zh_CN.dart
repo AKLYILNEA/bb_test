@@ -322,10 +322,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("全局"),
     "go": MessageLookupByLibrary.simpleMessage("前往"),
     "goDownload": MessageLookupByLibrary.simpleMessage("前往下载"),
-    "harmonyFont": MessageLookupByLibrary.simpleMessage("鸿蒙字体"),
-    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage(
-      "使用优化的HarmonyOS Sans",
-    ),
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("字体修复"),
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("使用内置字体解决显示异常问题"),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage("是否缓存修改"),
     "healthCheckTimeout": MessageLookupByLibrary.simpleMessage("超时时间"),
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(

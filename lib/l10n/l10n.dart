@@ -4569,20 +4569,15 @@ class AppLocalizations {
     );
   }
 
-  /// `HarmonyOS Font`
+  /// `Font Fix`
   String get harmonyFont {
-    return Intl.message(
-      'HarmonyOS Font',
-      name: 'harmonyFont',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Font Fix', name: 'harmonyFont', desc: '', args: []);
   }
 
-  /// `Use optimized HarmonyOS Sans font`
+  /// `Use built-in font to fix display issues`
   String get harmonyFontDesc {
     return Intl.message(
-      'Use optimized HarmonyOS Sans font',
+      'Use built-in font to fix display issues',
       name: 'harmonyFontDesc',
       desc: '',
       args: [],
