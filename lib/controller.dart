@@ -2029,17 +2029,31 @@ class AppController {
       return res;
     } catch (e) {
       commonPrint.log('$e');
+      final errorMessage = _formatErrorMessage(e);
       if (realSilence) {
-        globalState.showNotifier(e.toString());
+        globalState.showNotifier(errorMessage);
       } else {
         globalState.showMessage(
           title: title ?? appLocalizations.tip,
-          message: TextSpan(text: e.toString()),
+          message: TextSpan(text: errorMessage),
         );
       }
       return null;
     } finally {
       _ref.read(loadingProvider.notifier).value = false;
     }
+  }
+
+  String _formatErrorMessage(dynamic error) {
+    final errorStr = error.toString();
+
+    final statusCodeMatch = RegExp(r'statusCode: (\d+)').firstMatch(errorStr);
+    final statusCode = statusCodeMatch?.group(1);
+
+    if (statusCode != null) {
+      return appLocalizations.profileImportFailed(statusCode);
+    }
+
+    return error.toString();
   }
 }

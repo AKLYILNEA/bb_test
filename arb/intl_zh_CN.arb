@@ -628,5 +628,6 @@
   "restartCoreDesc": "是否手动重启内核？",
   "highRefreshRate": "高刷新率",
   "highRefreshRateDesc": "启用设备最高刷新率支持",
-  "useGlobalScriptOverride": "使用全局脚本覆写"
+  "useGlobalScriptOverride": "使用全局脚本覆写",
+  "profileImportFailed": "配置导入失败，请检查网络问题并尝试重置订阅链接(HTTP错误代码: {statusCode})"
 }

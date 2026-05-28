@@ -627,5 +627,6 @@
   "restartCoreDesc": "Manually restart the core?",
   "highRefreshRate": "High Refresh Rate",
   "highRefreshRateDesc": "Enable highest refresh rate support",
-  "useGlobalScriptOverride": "Use Global Script Override"
+  "useGlobalScriptOverride": "Use Global Script Override",
+  "profileImportFailed": "Failed to import profile. Please check your network and try resetting the subscription link (HTTP error code: {statusCode})"
 }
