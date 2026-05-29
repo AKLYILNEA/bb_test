@@ -576,7 +576,9 @@ class AppController {
 
         for (final newGroup in newGroups) {
           final oldGroup = currentGroups.firstWhereOrNull((g) => g.name == newGroup.name);
-          if (oldGroup != null && newGroup.now != oldGroup.now) {
+          if (oldGroup != null &&
+              newGroup.type == GroupType.Selector &&
+              newGroup.now != oldGroup.now) {
             if (selectedMap[newGroup.name] != newGroup.realNow) {
               selectedMap[newGroup.name] = newGroup.realNow;
               hasChanged = true;
