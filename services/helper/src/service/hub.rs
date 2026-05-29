@@ -231,7 +231,7 @@ fn start(start_params: StartParams) -> String {
     result
 }
 
-fn stop() -> String {
+pub fn stop() -> String {
     let mut process = PROCESS.lock().unwrap();
     if let Some(mut child) = process.take() {
         let _ = child.kill();

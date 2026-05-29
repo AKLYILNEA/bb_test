@@ -1,4 +1,4 @@
-use crate::service::hub::{run_service, PROCESS};
+use crate::service::hub::run_service;
 
 use std::ffi::OsString;
 use std::time::Duration;
@@ -55,12 +55,11 @@ async fn run_windows_service() -> anyhow::Result<()> {
             match event {
                 ServiceControl::Interrogate => ServiceControlHandlerResult::NoError,
                 ServiceControl::Stop => {
-                    if let Ok(mut guard) = PROCESS.lock() {
-                        if let Some(ref mut child) = *guard {
-                            let _ = child.kill();
-                        }
-                    }
-                    std::process::exit(0)
+                    std::thread::spawn(|| {
+                        crate::service::hub::stop();
+                        std::process::exit(0);
+                    });
+                    ServiceControlHandlerResult::NoError
                 }
                 _ => ServiceControlHandlerResult::NotImplemented,
             }
