@@ -290,9 +290,12 @@ Win32Window::MessageHandler(HWND hwnd,
   case WM_POWERBROADCAST:
     if (wparam == PBT_APMRESUMESUSPEND || wparam == PBT_APMRESUMEAUTOMATIC)
     {
-      RECT rect = GetClientArea();
-      PostMessage(hwnd, WM_SIZE, SIZE_RESTORED,
-                  MAKELPARAM(rect.right - rect.left, rect.bottom - rect.top));
+      if (IsWindowVisible(hwnd))
+      {
+        RECT rect = GetClientArea();
+        PostMessage(hwnd, WM_SIZE, SIZE_RESTORED,
+                    MAKELPARAM(rect.right - rect.left, rect.bottom - rect.top));
+      }
     }
     return TRUE;
   }
