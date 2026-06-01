@@ -182,31 +182,18 @@ class GlobalState {
         return;
       }
       animationEnabled.value = false;
-      if (!backgroundMode.value) {
-        backgroundMode.value = true;
-        _scheduleBackgroundCleanup();
-      }
-      render?.pause();
-      
-      final networkSpeedNotification = appController.ref.read(vpnSettingProvider).networkSpeedNotification;
-      if (!networkSpeedNotification) {
-        stopUpdateTasks();
-      }
-      
-      dashboardRefreshManager.stop();
-      return;
     }
     if (!backgroundMode.value) {
       backgroundMode.value = true;
       _scheduleBackgroundCleanup();
     }
     render?.pause();
-    
+
     final networkSpeedNotification = appController.ref.read(vpnSettingProvider).networkSpeedNotification;
     if (!networkSpeedNotification) {
       stopUpdateTasks();
     }
-    
+
     dashboardRefreshManager.stop();
   }
 
@@ -266,11 +253,17 @@ class GlobalState {
   }
 
   void cleanupBackgroundResources() async {
+    if (!backgroundMode.value) return;
+
     final imageCache = PaintingBinding.instance.imageCache;
     imageCache.clearLiveImages();
-    await Future.delayed(const Duration(milliseconds: 500));
+
+    await Future.delayed(const Duration(milliseconds: 250));
+    if (!backgroundMode.value) return;
     WidgetsBinding.instance.handleMemoryPressure();
-    await Future.delayed(const Duration(milliseconds: 500));
+
+    await Future.delayed(const Duration(milliseconds: 250));
+    if (!backgroundMode.value) return;
     await clashCore.requestGc();
   }
 
