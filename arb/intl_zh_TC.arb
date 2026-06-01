@@ -561,7 +561,7 @@
   "clearData": "清除資料",
   "zoom": "縮放",
   "textScale": "文字縮放",
-  "lightIcon": "丹青留白",
+  "lightIcon": "浅色图标",
   "lightIconDesc": "手動切換淺色系桌面應用程式圖示",
   "harmonyFont": "字體修復",
   "harmonyFontDesc": "使用內建字體解決顯示異常問題",
