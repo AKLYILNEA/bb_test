@@ -17,36 +17,17 @@ class SmartAutoStopItem extends ConsumerWidget {
     final smartAutoStop = ref.watch(
       vpnSettingProvider.select((state) => state.smartAutoStop),
     );
-    final isQuickResponseEnabled =
-        system.isAndroid &&
-        ref.watch(vpnSettingProvider.select((state) => state.quickResponse));
 
     return ListItem.switchItem(
       title: Text(appLocalizations.smartAutoStop),
       subtitle: Text(appLocalizations.smartAutoStopDesc),
       delegate: SwitchDelegate(
         value: smartAutoStop,
-        onChanged: isQuickResponseEnabled
-            ? null
-            : (bool value) async {
-                ref
-                    .read(vpnSettingProvider.notifier)
-                    .updateState(
-                      (state) => state.copyWith(
-                        smartAutoStop: value,
-                        quickResponse: value ? false : state.quickResponse,
-                      ),
-                    );
-
-                if (system.isAndroid) {
-                  if (value) {
-                    await service?.setQuickResponse(false);
-                  } else {
-                    // When turning off smart auto stop, no need to auto-turn-on quickResponse
-                    // User has to explicitly turn it on.
-                  }
-                }
-              },
+        onChanged: (bool value) async {
+          ref
+              .read(vpnSettingProvider.notifier)
+              .updateState((state) => state.copyWith(smartAutoStop: value));
+        },
       ),
     );
   }
@@ -60,9 +41,6 @@ class NetworkMatchItem extends ConsumerWidget {
     final smartAutoStopNetworks = ref.watch(
       vpnSettingProvider.select((state) => state.smartAutoStopNetworks),
     );
-    final isQuickResponseEnabled =
-        system.isAndroid &&
-        ref.watch(vpnSettingProvider.select((state) => state.quickResponse));
 
     return ListItem.input(
       title: Text(appLocalizations.networkMatch),
@@ -74,17 +52,15 @@ class NetworkMatchItem extends ConsumerWidget {
       delegate: InputDelegate(
         title: appLocalizations.networkMatch,
         value: smartAutoStopNetworks,
-        onChanged: isQuickResponseEnabled
-            ? null
-            : (String? value) {
-                if (value != null) {
-                  ref
-                      .read(vpnSettingProvider.notifier)
-                      .updateState(
-                        (state) => state.copyWith(smartAutoStopNetworks: value),
-                      );
-                }
-              },
+        onChanged: (String? value) {
+          if (value != null) {
+            ref
+                .read(vpnSettingProvider.notifier)
+                .updateState(
+                  (state) => state.copyWith(smartAutoStopNetworks: value),
+                );
+          }
+        },
         validator: (String? value) {
           if (value == null || value.isEmpty) return null;
           return NetworkMatcher.getValidationError(
@@ -169,31 +145,21 @@ class QuickResponseItem extends ConsumerWidget {
     final quickResponse = ref.watch(
       vpnSettingProvider.select((state) => state.quickResponse),
     );
-    final isSmartAutoStopEnabled = ref.watch(
-      vpnSettingProvider.select((state) => state.smartAutoStop),
-    );
 
     return ListItem.switchItem(
       title: Text(appLocalizations.quickResponse),
       subtitle: Text(appLocalizations.quickResponseDesc),
       delegate: SwitchDelegate(
         value: quickResponse,
-        onChanged: isSmartAutoStopEnabled
-            ? null
-            : (bool value) async {
-                ref
-                    .read(vpnSettingProvider.notifier)
-                    .updateState(
-                      (state) => state.copyWith(
-                        quickResponse: value,
-                        smartAutoStop: value ? false : state.smartAutoStop,
-                      ),
-                    );
+        onChanged: (bool value) async {
+          ref
+              .read(vpnSettingProvider.notifier)
+              .updateState((state) => state.copyWith(quickResponse: value));
 
-                if (system.isAndroid) {
-                  await service?.setQuickResponse(value);
-                }
-              },
+          if (system.isAndroid) {
+            await service?.setQuickResponse(value);
+          }
+        },
       ),
     );
   }
@@ -321,7 +287,9 @@ class HighPriorityItem extends ConsumerWidget {
         onChanged: (bool value) async {
           ref
               .read(appSettingProvider.notifier)
-              .updateState((state) => state.copyWith(enableHighPriority: value));
+              .updateState(
+                (state) => state.copyWith(enableHighPriority: value),
+              );
 
           if (system.isWindows) {
             try {
@@ -411,7 +379,9 @@ class NetworkSpeedNotificationItem extends ConsumerWidget {
         onChanged: (bool value) async {
           ref
               .read(vpnSettingProvider.notifier)
-              .updateState((state) => state.copyWith(networkSpeedNotification: value));
+              .updateState(
+                (state) => state.copyWith(networkSpeedNotification: value),
+              );
           if (!value && system.isAndroid) {
             await service?.restoreNotification();
           }
@@ -435,11 +405,11 @@ class TrayEnhancementItem extends ConsumerWidget {
       delegate: SwitchDelegate(
         value: trayEnhancement,
         onChanged: (bool value) async {
-            ref
-                .read(vpnSettingProvider.notifier)
-                .updateState((state) => state.copyWith(trayEnhancement: value));
-            await globalState.appController.updateTray();
-          },
+          ref
+              .read(vpnSettingProvider.notifier)
+              .updateState((state) => state.copyWith(trayEnhancement: value));
+          await globalState.appController.updateTray();
+        },
       ),
     );
   }
@@ -480,7 +450,9 @@ class OtherSettingView extends ConsumerWidget {
     final disableQuic = ref.watch(
       vpnSettingProvider.select((state) => state.disableQuic),
     );
-    final locale = ref.watch(appSettingProvider.select((state) => state.locale));
+    final locale = ref.watch(
+      appSettingProvider.select((state) => state.locale),
+    );
     final isRussian = locale?.toLowerCase().startsWith('ru') ?? false;
 
     List<Widget> items = [

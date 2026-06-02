@@ -46,9 +46,12 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
       } else if (method == 'quickResponse') {
         final vpnProps = ref.read(vpnSettingProvider);
         if (vpnProps.quickResponse) {
-          commonPrint.log(
-            'Network change: Closing connections.',
-          );
+          final startTime = globalState.startTime;
+          if (startTime != null &&
+              DateTime.now().difference(startTime) <
+                  const Duration(seconds: 3)) {
+            return;
+          }
           clashCore.closeConnections();
         }
       }
@@ -151,7 +154,8 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
       // Dedup: only act on state transitions
       if (shouldStop && !isSmartStopped) {
         // Need to stop, but only if VPN is actually running
-        final isRunning = ref.read(runTimeProvider) != null || globalState.isStart;
+        final isRunning =
+            ref.read(runTimeProvider) != null || globalState.isStart;
         if (isRunning) {
           ref.read(isSmartStoppedProvider.notifier).set(true);
           commonPrint.log('Smart Auto Stop: Stopping ...');
@@ -165,8 +169,6 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
       }
     });
   }
-
-
 
   Future<List<String>> _getNativeLocalIpAddresses() async {
     try {
