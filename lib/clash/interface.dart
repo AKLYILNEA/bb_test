@@ -201,7 +201,7 @@ abstract class ClashHandlerInterface with ClashInterface {
     return await invoke<String>(
       method: ActionMethod.updateConfig,
       data: json.encode(updateParams),
-      timeout: Duration(minutes: 2),
+      timeout: const Duration(seconds: 60),
     );
   }
 
@@ -210,7 +210,7 @@ abstract class ClashHandlerInterface with ClashInterface {
     final res = await invoke<Result>(
       method: ActionMethod.getConfig,
       data: path,
-      timeout: Duration(minutes: 2),
+      timeout: const Duration(seconds: 60),
       defaultValue: Result.success({}),
     );
     return res;
@@ -222,7 +222,7 @@ abstract class ClashHandlerInterface with ClashInterface {
     return await invoke<String>(
       method: ActionMethod.setupConfig,
       data: data,
-      timeout: Duration(minutes: 2),
+      timeout: const Duration(seconds: 60),
     );
   }
 
