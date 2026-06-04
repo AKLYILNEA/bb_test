@@ -34,7 +34,8 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m6(label) => "${label} must be a number";
 
-  static String m7(label) => "${label} must be between 1024 and 49151";
+  static String m7(label) =>
+      "${label} must be between 1024 and 49151, 0 to disable";
 
   static String m8(statusCode) =>
       "Failed to import profile. Please check your network and try resetting the subscription link (HTTP error code: ${statusCode})";

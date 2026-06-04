@@ -593,7 +593,7 @@
   "socksPort": "Socks 連接埠",
   "redirPort": "Redir 連接埠",
   "tproxyPort": "Tproxy 連接埠",
-  "portTip": "{label} 必須在 1024 到 49151 之間",
+  "portTip": "{label} 必須在 1024 到 49151 之間, 0為關閉",
   "portConflictTip": "請輸入不同的連接埠",
   "import": "匯入",
   "importFromCode": "透過程式碼匯入",

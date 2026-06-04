@@ -4794,10 +4794,10 @@ class AppLocalizations {
     return Intl.message('Tproxy Port', name: 'tproxyPort', desc: '', args: []);
   }
 
-  /// `{label} must be between 1024 and 49151`
+  /// `{label} must be between 1024 and 49151, 0 to disable`
   String portTip(Object label) {
     return Intl.message(
-      '$label must be between 1024 and 49151',
+      '$label must be between 1024 and 49151, 0 to disable',
       name: 'portTip',
       desc: '',
       args: [label],

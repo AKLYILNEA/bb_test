@@ -593,7 +593,7 @@
   "socksPort": "Socks端口",
   "redirPort": "Redir端口",
   "tproxyPort": "Tproxy端口",
-  "portTip": "{label} 必须在 1024 到 49151 之间",
+  "portTip": "{label} 必须在 1024 到 49151 之间, 0为关闭",
   "portConflictTip": "请输入不同的端口",
   "import": "导入",
   "importFromCode": "通过代码导入",

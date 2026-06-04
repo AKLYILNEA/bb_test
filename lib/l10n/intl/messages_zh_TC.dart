@@ -34,7 +34,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m6(label) => "${label}必須為數字";
 
-  static String m7(label) => "${label} 必須在 1024 到 49151 之間";
+  static String m7(label) => "${label} 必須在 1024 到 49151 之間, 0為關閉";
 
   static String m8(statusCode) =>
       "配置導入失敗，請檢查網路問題並嘗試重置訂閱連結(HTTP錯誤代碼: ${statusCode})";

@@ -594,7 +594,7 @@
   "socksPort": "Порт Socks",
   "redirPort": "Порт перенаправления",
   "tproxyPort": "Порт Tproxy",
-  "portTip": "{label} должен быть от 1024 до 49151",
+  "portTip": "{label} должен быть от 1024 до 49151, 0 для отключения",
   "portConflictTip": "Введите разные порты",
   "import": "Импорт",
   "importFromCode": "Импорт из кода",

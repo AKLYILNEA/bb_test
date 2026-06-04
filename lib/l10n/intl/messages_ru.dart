@@ -34,7 +34,8 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m6(label) => "${label} должен быть числом";
 
-  static String m7(label) => "${label} должен быть от 1024 до 49151";
+  static String m7(label) =>
+      "${label} должен быть от 1024 до 49151, 0 для отключения";
 
   static String m8(statusCode) =>
       "Не удалось импортировать профиль. Проверьте подключение к сети и попробуйте сбросить ссылку подписки (код ошибки HTTP: ${statusCode})";
