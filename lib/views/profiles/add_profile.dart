@@ -165,6 +165,7 @@ class _URLFormDialogState extends State<URLFormDialog> {
           runSpacing: 16,
           children: [
             TextField(
+              autofocus: true,
               keyboardType: TextInputType.url,
               minLines: 1,
               maxLines: 5,
