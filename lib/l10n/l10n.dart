@@ -489,6 +489,26 @@ class AppLocalizations {
     );
   }
 
+  /// `Title Buttons`
+  String get alwaysShowTitleBar {
+    return Intl.message(
+      'Title Buttons',
+      name: 'alwaysShowTitleBar',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Always show the title bar buttons in the top-right corner`
+  String get alwaysShowTitleBarDesc {
+    return Intl.message(
+      'Always show the title bar buttons in the top-right corner',
+      name: 'alwaysShowTitleBarDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Tray Enhancement`
   String get trayEnhancement {
     return Intl.message(
@@ -574,10 +594,10 @@ class AppLocalizations {
     return Intl.message('Network Fix', name: 'networkFix', desc: '', args: []);
   }
 
-  /// `Fix Windows network globe icon issue`
+  /// `Fix system network globe icon issue`
   String get networkFixDesc {
     return Intl.message(
-      'Fix Windows network globe icon issue',
+      'Fix system network globe icon issue',
       name: 'networkFixDesc',
       desc: '',
       args: [],

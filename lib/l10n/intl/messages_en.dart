@@ -100,6 +100,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "alreadyInWhitelist": MessageLookupByLibrary.simpleMessage(
       "Already in whitelist",
     ),
+    "alwaysShowTitleBar": MessageLookupByLibrary.simpleMessage("Title Buttons"),
+    "alwaysShowTitleBarDesc": MessageLookupByLibrary.simpleMessage(
+      "Always show the title bar buttons in the top-right corner",
+    ),
     "app": MessageLookupByLibrary.simpleMessage("App"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage(
       "App Access Control",
@@ -612,7 +616,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "networkFix": MessageLookupByLibrary.simpleMessage("Network Fix"),
     "networkFixDesc": MessageLookupByLibrary.simpleMessage(
-      "Fix Windows network globe icon issue",
+      "Fix system network globe icon issue",
     ),
     "networkMatch": MessageLookupByLibrary.simpleMessage("Network Match"),
     "networkMatchHint": MessageLookupByLibrary.simpleMessage(

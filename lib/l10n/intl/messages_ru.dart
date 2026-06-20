@@ -100,6 +100,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "alreadyInWhitelist": MessageLookupByLibrary.simpleMessage(
       "Уже в белом списке",
     ),
+    "alwaysShowTitleBar": MessageLookupByLibrary.simpleMessage(
+      "Кнопки заголовка",
+    ),
+    "alwaysShowTitleBarDesc": MessageLookupByLibrary.simpleMessage(
+      "Всегда показывать кнопки в правом верхнем углу",
+    ),
     "app": MessageLookupByLibrary.simpleMessage("Приложение"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage(
       "Контроль доступа",
@@ -616,7 +622,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "networkDetection": MessageLookupByLibrary.simpleMessage("Ваш IP адрес"),
     "networkFix": MessageLookupByLibrary.simpleMessage("Исправление сети"),
     "networkFixDesc": MessageLookupByLibrary.simpleMessage(
-      "Исправляет значок сети Windows",
+      "Исправляет значок сети в системе",
     ),
     "networkMatch": MessageLookupByLibrary.simpleMessage("Сопоставление сети"),
     "networkMatchHint": MessageLookupByLibrary.simpleMessage(

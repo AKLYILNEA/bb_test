@@ -80,6 +80,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "allowLan": MessageLookupByLibrary.simpleMessage("局域网代理"),
     "allowLanDesc": MessageLookupByLibrary.simpleMessage("允许通过局域网访问代理"),
     "alreadyInWhitelist": MessageLookupByLibrary.simpleMessage("当前应用已在白名单内"),
+    "alwaysShowTitleBar": MessageLookupByLibrary.simpleMessage("标题按钮"),
+    "alwaysShowTitleBarDesc": MessageLookupByLibrary.simpleMessage(
+      "始终显示右上角的标题栏按钮",
+    ),
     "app": MessageLookupByLibrary.simpleMessage("应用"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("应用访问控制"),
     "appDesc": MessageLookupByLibrary.simpleMessage("处理应用相关设置"),
@@ -417,9 +421,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "networkDesc": MessageLookupByLibrary.simpleMessage("修改网络相关设置"),
     "networkDetection": MessageLookupByLibrary.simpleMessage("网络检测"),
     "networkFix": MessageLookupByLibrary.simpleMessage("网络修复"),
-    "networkFixDesc": MessageLookupByLibrary.simpleMessage(
-      "修复Windows网络检测地球图标问题",
-    ),
+    "networkFixDesc": MessageLookupByLibrary.simpleMessage("修复系统网络检测地球图标问题"),
     "networkMatch": MessageLookupByLibrary.simpleMessage("网络匹配"),
     "networkMatchHint": MessageLookupByLibrary.simpleMessage(
       "输入IP或CIDR，最多2个，以逗号分隔",

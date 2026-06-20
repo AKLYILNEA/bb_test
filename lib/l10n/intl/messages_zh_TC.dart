@@ -82,6 +82,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "allowLan": MessageLookupByLibrary.simpleMessage("區域網路代理"),
     "allowLanDesc": MessageLookupByLibrary.simpleMessage("允許透過區域網路存取代理"),
     "alreadyInWhitelist": MessageLookupByLibrary.simpleMessage("目前應用程式已在白名單內"),
+    "alwaysShowTitleBar": MessageLookupByLibrary.simpleMessage("標題按鈕"),
+    "alwaysShowTitleBarDesc": MessageLookupByLibrary.simpleMessage(
+      "始終顯示右上角的標題欄按鈕",
+    ),
     "app": MessageLookupByLibrary.simpleMessage("應用"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("應用存取控制"),
     "appDesc": MessageLookupByLibrary.simpleMessage("處理應用相關設定"),
@@ -431,9 +435,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "networkDesc": MessageLookupByLibrary.simpleMessage("修改網路相關設定"),
     "networkDetection": MessageLookupByLibrary.simpleMessage("網路檢測"),
     "networkFix": MessageLookupByLibrary.simpleMessage("網路修復"),
-    "networkFixDesc": MessageLookupByLibrary.simpleMessage(
-      "修復 Windows 網路檢測地球圖示問題",
-    ),
+    "networkFixDesc": MessageLookupByLibrary.simpleMessage("修復系統網路檢測地球圖示問題"),
     "networkMatch": MessageLookupByLibrary.simpleMessage("網路匹配"),
     "networkMatchHint": MessageLookupByLibrary.simpleMessage(
       "輸入 IP 或 CIDR，最多 2 個，以逗號分隔",
