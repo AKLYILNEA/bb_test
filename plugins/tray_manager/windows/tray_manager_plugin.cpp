@@ -100,15 +100,14 @@ class TrayManagerPlugin : public flutter::Plugin {
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> g_converter;
 
   flutter::PluginRegistrarWindows* registrar;
-  NOTIFYICONDATA nid;
-  NOTIFYICONIDENTIFIER niif;
+  NOTIFYICONDATA nid{};
+  NOTIFYICONIDENTIFIER niif{};
   // do create pop-up menu only once.
   HMENU hMenu = CreatePopupMenu();
   bool tray_icon_setted = false;
   UINT windows_taskbar_created_message_id = 0;
 
   bool is_menu_open_ = false;
-  bool should_reopen_menu_ = false;
 
   // The ID of the WindowProc delegate registration.
   int window_proc_id = -1;
@@ -183,6 +182,10 @@ TrayManagerPlugin::TrayManagerPlugin(flutter::PluginRegistrarWindows* registrar)
 }
 
 TrayManagerPlugin::~TrayManagerPlugin() {
+  if (hMenu) {
+    DestroyMenu(hMenu);
+    hMenu = NULL;
+  }
   registrar->UnregisterTopLevelWindowProcDelegate(window_proc_id);
 }
 
@@ -193,7 +196,7 @@ void TrayManagerPlugin::_CreateMenu(HMENU menu, flutter::EncodableMap args) {
   int count = GetMenuItemCount(menu);
   for (int i = 0; i < count; i++) {
     // always remove at 0 because they shift every time
-    RemoveMenu(menu, 0, MF_BYPOSITION);
+    DeleteMenu(menu, 0, MF_BYPOSITION);
   }
 
   for (flutter::EncodableValue item_value : items) {
@@ -296,8 +299,12 @@ std::optional<LRESULT> TrayManagerPlugin::HandleWindowProc(HWND hWnd,
   if (message == WM_DESTROY) {
     if (tray_icon_setted) {
       Shell_NotifyIcon(NIM_DELETE, &nid);
-      DestroyIcon(nid.hIcon);
     }
+    if (nid.hIcon != nullptr) {
+      DestroyIcon(nid.hIcon);
+      nid.hIcon = nullptr;
+    }
+    tray_icon_setted = false;
   } else if (message == WM_INITMENUPOPUP) {
     HMENU hmenu = (HMENU)wParam;
     if (hmenu == hMenu && !is_menu_open_) {
@@ -336,6 +343,12 @@ std::optional<LRESULT> TrayManagerPlugin::HandleWindowProc(HWND hWnd,
       default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     };
+  } else if (message == WM_POWERBROADCAST) {
+    if (wParam == PBT_APMRESUMESUSPEND || wParam == PBT_APMRESUMEAUTOMATIC || wParam == PBT_APMRESUMECRITICAL) {
+      if (tray_icon_setted) {
+        Shell_NotifyIcon(NIM_MODIFY, &nid);
+      }
+    }
   } else if (message == windows_taskbar_created_message_id) {
     if (windows_taskbar_created_message_id != 0 && tray_icon_setted) {
       // restore the icon with the existing resource.
@@ -353,8 +366,13 @@ HWND TrayManagerPlugin::GetMainWindow() {
 void TrayManagerPlugin::Destroy(
     const flutter::MethodCall<flutter::EncodableValue>& method_call,
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result) {
-  Shell_NotifyIcon(NIM_DELETE, &nid);
-  DestroyIcon(nid.hIcon);
+  if (tray_icon_setted) {
+    Shell_NotifyIcon(NIM_DELETE, &nid);
+  }
+  if (nid.hIcon != nullptr) {
+    DestroyIcon(nid.hIcon);
+    nid.hIcon = nullptr;
+  }
   tray_icon_setted = false;
 
   result->Success(flutter::EncodableValue(true));
@@ -373,6 +391,7 @@ void TrayManagerPlugin::SetIcon(
 
   if (nid.hIcon != nullptr) {
     DestroyIcon(nid.hIcon);
+    nid.hIcon = nullptr;
   }
 
   nid.hIcon = static_cast<HICON>(
@@ -391,6 +410,7 @@ void TrayManagerPlugin::_ApplyIcon() {
   } else {
     nid.cbSize = sizeof(NOTIFYICONDATA);
     nid.hWnd = GetMainWindow();
+    nid.uID = 1;
     nid.uCallbackMessage = WM_MYMESSAGE;
     nid.uFlags = NIF_MESSAGE | NIF_ICON;
     Shell_NotifyIcon(NIM_ADD, &nid);
