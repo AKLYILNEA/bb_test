@@ -1,6 +1,7 @@
 package trojan
 
 import (
+	"context"
 	"errors"
 	"io"
 	"net"
@@ -37,7 +38,7 @@ type Listener struct {
 	handler    *sing.ListenerHandler
 }
 
-func New(config LC.TrojanServer, tunnel C.Tunnel, additions ...inbound.Addition) (sl *Listener, err error) {
+func New(config LC.TrojanServer, lc C.InboundListenConfig, tunnel C.Tunnel, additions ...inbound.Addition) (sl *Listener, err error) {
 	if len(additions) == 0 {
 		additions = []inbound.Addition{
 			inbound.WithInName("DEFAULT-TROJAN"),
@@ -160,7 +161,7 @@ func New(config LC.TrojanServer, tunnel C.Tunnel, additions ...inbound.Addition)
 		addr := addr
 
 		//TCP
-		l, err := inbound.Listen("tcp", addr)
+		l, err := lc.Listen(context.Background(), "tcp", addr)
 		if err != nil {
 			return nil, err
 		}
@@ -168,8 +169,8 @@ func New(config LC.TrojanServer, tunnel C.Tunnel, additions ...inbound.Addition)
 			l = realityBuilder.NewListener(l)
 		} else if tlsConfig.GetCertificate != nil {
 			l = tls.NewListener(l, tlsConfig)
-		} else if !config.TrojanSSOption.Enabled {
-			return nil, errors.New("disallow using Trojan without both certificates/reality/ss config")
+		} else if !config.TrojanSSOption.Enabled && !config.AllowInsecure {
+			return nil, errors.New("disallow using Trojan without both certificates/reality/ss/allow-insecure config")
 		}
 		sl.listeners = append(sl.listeners, l)
 

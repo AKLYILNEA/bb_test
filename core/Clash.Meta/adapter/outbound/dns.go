@@ -38,7 +38,7 @@ func (d *Dns) ListenPacketContext(ctx context.Context, metadata *C.Metadata) (C.
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	return newPacketConn(&dnsPacketConn{
+	return NewPacketConn(&dnsPacketConn{
 		response: make(chan dnsPacket, 1),
 		ctx:      ctx,
 		cancel:   cancel,
@@ -107,7 +107,7 @@ func (d *dnsPacketConn) WriteTo(p []byte, addr net.Addr) (n int, err error) {
 		ctx, cancel := context.WithTimeout(d.ctx, resolver.DefaultDnsRelayTimeout)
 		defer cancel()
 
-		buf, err = resolver.RelayDnsPacket(ctx, buf[:len(p)], buf)
+		buf, err := resolver.RelayDnsPacket(ctx, buf[:len(p)], buf)
 		if err != nil {
 			put()
 			return

@@ -21,6 +21,8 @@ const (
 	RejectDrop
 	Compatible
 	Pass
+	PassRule
+	Rematch
 	Dns
 
 	Relay
@@ -184,6 +186,10 @@ func (at AdapterType) String() string {
 		return "Compatible"
 	case Pass:
 		return "Pass"
+	case PassRule:
+		return "PassRule"
+	case Rematch:
+		return "Rematch"
 	case Dns:
 		return "Dns"
 	case Shadowsocks:

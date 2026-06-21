@@ -21,6 +21,7 @@ type VlessOption struct {
 	ClientAuthType  string        `inbound:"client-auth-type,omitempty"`
 	ClientAuthCert  string        `inbound:"client-auth-cert,omitempty"`
 	EchKey          string        `inbound:"ech-key,omitempty"`
+	AllowInsecure   bool          `inbound:"allow-insecure,omitempty"`
 	RealityConfig   RealityConfig `inbound:"reality-config,omitempty"`
 	MuxOption       MuxOption     `inbound:"mux-option,omitempty"`
 }
@@ -121,6 +122,7 @@ func NewVless(options *VlessOption) (*Vless, error) {
 			ClientAuthType:  options.ClientAuthType,
 			ClientAuthCert:  options.ClientAuthCert,
 			EchKey:          options.EchKey,
+			AllowInsecure:   options.AllowInsecure,
 			RealityConfig:   options.RealityConfig.Build(),
 			MuxOption:       options.MuxOption.Build(),
 		},
@@ -146,7 +148,7 @@ func (v *Vless) Address() string {
 // Listen implements constant.InboundListener
 func (v *Vless) Listen(tunnel C.Tunnel) error {
 	var err error
-	v.l, err = sing_vless.New(v.vs, tunnel, v.Additions()...)
+	v.l, err = sing_vless.New(v.vs, v.ListenConfig(), tunnel, v.Additions()...)
 	if err != nil {
 		return err
 	}
