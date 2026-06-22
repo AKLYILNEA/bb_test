@@ -394,14 +394,14 @@ class BuildCommand extends Command {
   Future<void> _setMacOSCompatibleBuild(bool enable) async {
     final infoPlistPath = 'macos/Runner/Info.plist';
     final file = File(infoPlistPath);
-    
+
     if (!await file.exists()) {
       print('Warning: Info.plist not found at $infoPlistPath');
       return;
     }
-    
+
     var content = await file.readAsString();
-    
+
     // Check if FLTDisableImpeller key exists
     if (content.contains('<key>FLTDisableImpeller</key>')) {
       // Update existing key
@@ -426,9 +426,11 @@ class BuildCommand extends Command {
         '$impellerEntry</dict>\n</plist>',
       );
     }
-    
+
     await file.writeAsString(content);
-    print('macOS ${enable ? "Compatible" : "Standard"} build: FLTDisableImpeller set to $enable');
+    print(
+      'macOS ${enable ? "Compatible" : "Standard"} build: FLTDisableImpeller set to $enable',
+    );
   }
 
   Future<void> _buildDistributor({
@@ -436,17 +438,21 @@ class BuildCommand extends Command {
     required String targets,
     String args = '',
     required String env,
+    required String suffix,
   }) async {
     final sentryDsn = Platform.environment['SENTRY_DSN'] ?? '';
     final sentryArg = sentryDsn.isNotEmpty
         ? ' --build-dart-define=SENTRY_DSN=$sentryDsn'
+        : '';
+    final suffixArg = suffix.isNotEmpty
+        ? ' --build-dart-define=APP_ASSET_SUFFIX=$suffix'
         : '';
 
     await Build.getDistributor();
     await Build.exec(
       name: name,
       Build.getExecutable(
-        'flutter_distributor package --skip-clean --platform ${target.name} --targets $targets --flutter-build-args=verbose$args$sentryArg --build-dart-define=APP_ENV=$env',
+        'flutter_distributor package --skip-clean --platform ${target.name} --targets $targets --flutter-build-args=verbose$args$sentryArg$suffixArg --build-dart-define=APP_ENV=$env',
       ),
     );
   }
@@ -491,6 +497,29 @@ class BuildCommand extends Command {
 
     final String desc = compatible ? '$archName-compatible' : (archName ?? '');
 
+    String appAssetSuffix = '';
+    switch (target) {
+      case Target.windows:
+        appAssetSuffix = 'windows-$desc-setup.exe';
+        break;
+      case Target.macos:
+        appAssetSuffix = 'macos-$desc.dmg';
+        break;
+      case Target.linux:
+        break;
+      case Target.android:
+        if (archName == 'universal') {
+          appAssetSuffix = 'android-universal.apk';
+        } else if (arch == Arch.arm64) {
+          appAssetSuffix = 'android-arm64-v8a.apk';
+        } else if (arch == Arch.arm) {
+          appAssetSuffix = 'android-armeabi-v7a.apk';
+        } else if (arch == Arch.amd64) {
+          appAssetSuffix = 'android-x86_64.apk';
+        }
+        break;
+    }
+
     switch (target) {
       case Target.windows:
         final token = target != Target.android
@@ -502,6 +531,7 @@ class BuildCommand extends Command {
           targets: 'exe',
           args: ' --description $desc --build-dart-define=CORE_SHA256=$token',
           env: env,
+          suffix: appAssetSuffix,
         );
         return;
       case Target.linux:
@@ -510,15 +540,20 @@ class BuildCommand extends Command {
           'deb',
           if (arch == Arch.amd64) 'appimage',
           if (arch == Arch.amd64) 'rpm',
-        ].join(',');
+        ];
         final defaultTarget = targetMap[arch];
         await _getLinuxDependencies(arch!);
-        _buildDistributor(
-          target: target,
-          targets: targets,
-          args: ' --description $desc --build-target-platform $defaultTarget',
-          env: env,
-        );
+        for (final t in targets) {
+          final ext = t == 'appimage' ? 'AppImage' : t;
+          final currentSuffix = 'linux-$desc.$ext';
+          await _buildDistributor(
+            target: target,
+            targets: t,
+            args: ' --description $desc --build-target-platform $defaultTarget',
+            env: env,
+            suffix: currentSuffix,
+          );
+        }
         return;
       case Target.android:
         final targetMap = {
@@ -541,6 +576,7 @@ class BuildCommand extends Command {
           targets: 'apk',
           args: buildArgs,
           env: env,
+          suffix: appAssetSuffix,
         );
         return;
       case Target.macos:
@@ -556,6 +592,7 @@ class BuildCommand extends Command {
           targets: 'dmg',
           args: ' --description $desc',
           env: env,
+          suffix: appAssetSuffix,
         );
         return;
     }
