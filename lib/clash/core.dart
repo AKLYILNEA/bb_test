@@ -39,7 +39,7 @@ class ClashCore {
     if (!await homeDir.exists()) {
       await homeDir.create(recursive: true);
     }
-    const geoFileNameList = [mmdbFileName, geoSiteFileName, asnFileName];
+    const geoFileNameList = [mmdbFileName, geoSiteFileName, asnFileName, bundleMRSFileName];
     try {
       for (final geoFileName in geoFileNameList) {
         final geoFile = File(join(homePath, geoFileName));

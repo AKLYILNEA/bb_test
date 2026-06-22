@@ -35,6 +35,7 @@ const mmdbFileName = 'geoip.metadb';
 const asnFileName = 'ASN.mmdb';
 const geoIpFileName = 'GeoIP.dat';
 const geoSiteFileName = 'GeoSite.dat';
+const bundleMRSFileName = 'BundleMRS.7z';
 final double kHeaderHeight = system.isDesktop
     ? !system.isMacOS
           ? 40
