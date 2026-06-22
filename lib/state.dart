@@ -516,7 +516,9 @@ class GlobalState {
     }
     rawConfig['tun']['enable'] = realPatchConfig.tun.enable;
     rawConfig['tun']['device'] = realPatchConfig.tun.device;
-    rawConfig['tun']['dns-hijack'] = realPatchConfig.tun.dnsHijack;
+    final dnsHijack = realPatchConfig.tun.dnsHijack;
+    rawConfig['tun']['dns-hijack'] =
+        dnsHijack.isEmpty ? const ['any:53'] : dnsHijack;
     rawConfig['tun']['stack'] = realPatchConfig.tun.stack.name;
     rawConfig['tun']['route-address'] = realPatchConfig.tun.routeAddress;
     rawConfig['tun']['route-exclude-address'] = realPatchConfig.tun.routeExcludeAddress;
@@ -613,7 +615,7 @@ class GlobalState {
     if (system.isAndroid && rawConfig['dns']['listen'] != null) {
       final listen = rawConfig['dns']['listen'] as String;
       if (listen.endsWith(':53')) {
-        rawConfig['dns']['listen'] = listen.replaceAll(':53', ':1053');
+        rawConfig['dns']['listen'] = listen.replaceAll(':53', ':10053');
       }
     }
 

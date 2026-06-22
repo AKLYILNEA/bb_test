@@ -7,6 +7,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LogLevelItem extends ConsumerWidget {
   const LogLevelItem({super.key});
@@ -672,15 +673,35 @@ class ControlSecretItem extends ConsumerWidget {
         secret.isEmpty ? appLocalizations.controlSecretDesc : secret,
       ),
       trailing: secret.isNotEmpty
-          ? IconButton(
-              icon: const Icon(Icons.copy),
-              tooltip: appLocalizations.copy,
-              onPressed: () {
-                Clipboard.setData(ClipboardData(text: secret));
-                if (context.mounted) {
-                  context.showSnackBar(appLocalizations.secretCopied);
-                }
-              },
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.open_in_new),
+                  tooltip: appLocalizations.onlinePanel,
+                  onPressed: () async {
+                    final uri = Uri.parse(
+                      'http://127.0.0.1:9090/ui/#/setup?hostname=127.0.0.1&port=9090&secret=$secret',
+                    );
+                    if (await canLaunchUrl(uri)) {
+                      await launchUrl(
+                        uri,
+                        mode: LaunchMode.externalApplication,
+                      );
+                    }
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.copy),
+                  tooltip: appLocalizations.copy,
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: secret));
+                    if (context.mounted) {
+                      context.showSnackBar(appLocalizations.secretCopied);
+                    }
+                  },
+                ),
+              ],
             )
           : null,
       onTap: () async {
