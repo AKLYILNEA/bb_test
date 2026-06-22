@@ -72,6 +72,19 @@ class MessageLookup extends MessageLookupByLibrary {
     "adminAutoLaunch": MessageLookupByLibrary.simpleMessage("管理员自启动"),
     "adminAutoLaunchDesc": MessageLookupByLibrary.simpleMessage("使用管理员模式开机自启动"),
     "advancedSettings": MessageLookupByLibrary.simpleMessage("进阶设置"),
+    "ageKeyGenerateTitle": MessageLookupByLibrary.simpleMessage("Age Key 生成"),
+    "ageKeyPairGeneratedSuccess": MessageLookupByLibrary.simpleMessage(
+      "已生成X25519密钥对, 请妥善保存",
+    ),
+    "agePrivateKeyLabel": MessageLookupByLibrary.simpleMessage("Age 私钥"),
+    "agePrivateKeyRequired": MessageLookupByLibrary.simpleMessage(
+      "请先输入正确的Age 私钥",
+    ),
+    "agePublicKeyLabel": MessageLookupByLibrary.simpleMessage("Age 公钥"),
+    "ageSecretKeyInvalidValidationDesc": MessageLookupByLibrary.simpleMessage(
+      "请输入有效的 Age 私钥 (必须以 AGE-SECRET-KEY- 开头)",
+    ),
+    "ageSecretKeyOptional": MessageLookupByLibrary.simpleMessage("Age 私钥 (可选)"),
     "ago": MessageLookupByLibrary.simpleMessage("前"),
     "agree": MessageLookupByLibrary.simpleMessage("同意"),
     "allApps": MessageLookupByLibrary.simpleMessage("所有应用"),
@@ -317,6 +330,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "fruitSaladScheme": MessageLookupByLibrary.simpleMessage("果缤纷"),
     "general": MessageLookupByLibrary.simpleMessage("常规"),
     "generalDesc": MessageLookupByLibrary.simpleMessage("修改通用设置"),
+    "generateFromPrivateKey": MessageLookupByLibrary.simpleMessage("从Age私钥生成"),
     "generateSecret": MessageLookupByLibrary.simpleMessage("生成"),
     "geoData": MessageLookupByLibrary.simpleMessage("地理数据"),
     "geodataLoader": MessageLookupByLibrary.simpleMessage("GEO节能"),

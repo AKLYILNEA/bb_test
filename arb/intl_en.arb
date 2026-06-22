@@ -630,5 +630,16 @@
   "highRefreshRate": "High Refresh Rate",
   "highRefreshRateDesc": "Enable highest refresh rate support",
   "useGlobalScriptOverride": "Use Global Script Override",
-  "profileImportFailed": "Failed to import profile. Please check your network and try resetting the subscription link (HTTP error code: {statusCode})"
+  "profileImportFailed": "Failed to import profile. Please check your network and try resetting the subscription link (HTTP error code: {statusCode})",
+  "authorized": "Authorized",
+  "unauthorized": "Unauthorized",
+  "ageSecretKeyOptional": "Age Secret Key (Optional)",
+  "ageSecretKeyInvalidValidationDesc": "Please enter a valid Age secret key (must start with AGE-SECRET-KEY-)",
+  "ageKeyGenerateTitle": "Age Key Generation",
+  "agePrivateKeyLabel": "Age Private Key",
+  "agePublicKeyLabel": "Age Public Key",
+  "generateFromPrivateKey": "Generate from Age private key",
+  "ageKeyPairGeneratedSuccess": "X25519 Key pair generated, please keep it safe",
+  "agePrivateKeyRequired": "Please enter a correct Age private key first"
 }
+

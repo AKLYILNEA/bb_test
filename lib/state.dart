@@ -777,9 +777,11 @@ class GlobalState {
   }
 
   Future<Map<String, dynamic>> getProfileConfig(String profileId) async {
+    final profile = config.profiles.getProfile(profileId);
+    final ageSecretKey = profile?.ageSecretKey;
     final configMap = await switch (clashLibHandler != null) {
-      true => clashLibHandler!.getConfig(profileId),
-      false => clashCore.getConfig(profileId),
+      true => clashLibHandler!.getConfig(profileId, ageSecretKey: ageSecretKey),
+      false => clashCore.getConfig(profileId, ageSecretKey: ageSecretKey),
     };
     configMap['rules'] = configMap['rule'];
     configMap.remove('rule');

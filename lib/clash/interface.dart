@@ -18,9 +18,13 @@ mixin ClashInterface {
 
   Future<bool> forceGc();
 
-  FutureOr<String> validateConfig(String data);
+  FutureOr<String> validateConfig(String data, {String? ageSecretKey});
 
-  FutureOr<Result> getConfig(String path);
+  FutureOr<Result> getConfig(String path, {String? ageSecretKey});
+
+  Future<Map<String, String>> generateAgeKeyPair();
+
+  Future<Result<String>> convertAgeSecretKeyToPublicKey(String secretKey);
 
   Future<String> asyncTestDelay(String url, String proxyName);
 
@@ -102,7 +106,11 @@ abstract class ClashHandlerInterface with ClashInterface {
           completer?.complete(true);
           return;
         case ActionMethod.getConfig:
+        case ActionMethod.convertAgeSecretKeyToPublicKey:
           completer?.complete(result.toResult);
+          return;
+        case ActionMethod.generateAgeKeyPair:
+          completer?.complete(result.data);
           return;
         default:
           completer?.complete(result.data);
@@ -192,8 +200,15 @@ abstract class ClashHandlerInterface with ClashInterface {
   }
 
   @override
-  FutureOr<String> validateConfig(String data) {
-    return invoke<String>(method: ActionMethod.validateConfig, data: data);
+  FutureOr<String> validateConfig(String data, {String? ageSecretKey}) {
+    final params = {
+      'data': data,
+      'age-secret-key': ageSecretKey ?? '',
+    };
+    return invoke<String>(
+      method: ActionMethod.validateConfig,
+      data: json.encode(params),
+    );
   }
 
   @override
@@ -206,10 +221,14 @@ abstract class ClashHandlerInterface with ClashInterface {
   }
 
   @override
-  Future<Result> getConfig(String path) async {
+  Future<Result> getConfig(String path, {String? ageSecretKey}) async {
+    final params = {
+      'path': path,
+      'age-secret-key': ageSecretKey ?? '',
+    };
     final res = await invoke<Result>(
       method: ActionMethod.getConfig,
-      data: path,
+      data: json.encode(params),
       timeout: const Duration(seconds: 60),
       defaultValue: Result.success({}),
     );
@@ -379,5 +398,27 @@ abstract class ClashHandlerInterface with ClashInterface {
   @override
   FutureOr<bool> flushDnsCache() {
     return invoke<bool>(method: ActionMethod.flushDnsCache);
+  }
+
+  @override
+  Future<Map<String, String>> generateAgeKeyPair() async {
+    final res = await invoke<Map>(
+      method: ActionMethod.generateAgeKeyPair,
+    );
+    return res.map((key, value) => MapEntry(key.toString(), value.toString()));
+  }
+
+  @override
+  Future<Result<String>> convertAgeSecretKeyToPublicKey(String secretKey) async {
+    final res = await invoke<Result>(
+      method: ActionMethod.convertAgeSecretKeyToPublicKey,
+      data: secretKey,
+      defaultValue: Result.error('error'),
+    );
+    return Result<String>(
+      data: res.data?.toString(),
+      type: res.type,
+      message: res.message,
+    );
   }
 }

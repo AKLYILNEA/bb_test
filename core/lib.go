@@ -79,8 +79,13 @@ func sendMessage(message Message) {
 
 //export getConfig
 func getConfig(s *C.char) *C.char {
-	path := C.GoString(s)
-	config, err := handleGetConfig(path)
+	paramsString := C.GoString(s)
+	var params GetConfigParams
+	err := json.Unmarshal([]byte(paramsString), &params)
+	if err != nil {
+		params.Path = paramsString
+	}
+	config, err := handleGetConfig(&params)
 	if err != nil {
 		return C.CString("")
 	}

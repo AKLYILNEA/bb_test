@@ -631,5 +631,16 @@
   "highRefreshRate": "高刷新率",
   "highRefreshRateDesc": "启用设备最高刷新率支持",
   "useGlobalScriptOverride": "使用全局脚本覆写",
-  "profileImportFailed": "配置导入失败，请检查网络问题并尝试重置订阅链接(HTTP错误代码: {statusCode})"
+  "profileImportFailed": "配置导入失败，请检查网络问题并尝试重置订阅链接(HTTP错误代码: {statusCode})",
+  "authorized": "已授权",
+  "unauthorized": "未授权",
+  "ageSecretKeyOptional": "Age 私钥 (可选)",
+  "ageSecretKeyInvalidValidationDesc": "请输入有效的 Age 私钥 (必须以 AGE-SECRET-KEY- 开头)",
+  "ageKeyGenerateTitle": "Age Key 生成",
+  "agePrivateKeyLabel": "Age 私钥",
+  "agePublicKeyLabel": "Age 公钥",
+  "generateFromPrivateKey": "从Age私钥生成",
+  "ageKeyPairGeneratedSuccess": "已生成X25519密钥对, 请妥善保存",
+  "agePrivateKeyRequired": "请先输入正确的Age 私钥"
 }
+

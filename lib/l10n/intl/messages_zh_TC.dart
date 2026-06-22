@@ -74,6 +74,19 @@ class MessageLookup extends MessageLookupByLibrary {
       "使用管理員模式開機自動啟動",
     ),
     "advancedSettings": MessageLookupByLibrary.simpleMessage("進階設定"),
+    "ageKeyGenerateTitle": MessageLookupByLibrary.simpleMessage("Age Key 生成"),
+    "ageKeyPairGeneratedSuccess": MessageLookupByLibrary.simpleMessage(
+      "已生成X25519密鑰對, 請妥善保存",
+    ),
+    "agePrivateKeyLabel": MessageLookupByLibrary.simpleMessage("Age 私鑰"),
+    "agePrivateKeyRequired": MessageLookupByLibrary.simpleMessage(
+      "請先輸入正確的Age 私鑰",
+    ),
+    "agePublicKeyLabel": MessageLookupByLibrary.simpleMessage("Age 公鑰"),
+    "ageSecretKeyInvalidValidationDesc": MessageLookupByLibrary.simpleMessage(
+      "請輸入有效的 Age 私鑰 (必須以 AGE-SECRET-KEY- 開頭)",
+    ),
+    "ageSecretKeyOptional": MessageLookupByLibrary.simpleMessage("Age 私鑰 (可選)"),
     "ago": MessageLookupByLibrary.simpleMessage("前"),
     "agree": MessageLookupByLibrary.simpleMessage("同意"),
     "allApps": MessageLookupByLibrary.simpleMessage("所有應用程式"),
@@ -323,6 +336,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "fruitSaladScheme": MessageLookupByLibrary.simpleMessage("果繽紛"),
     "general": MessageLookupByLibrary.simpleMessage("一般"),
     "generalDesc": MessageLookupByLibrary.simpleMessage("修改一般設定"),
+    "generateFromPrivateKey": MessageLookupByLibrary.simpleMessage("從Age私鑰生成"),
     "generateSecret": MessageLookupByLibrary.simpleMessage("產生"),
     "geoData": MessageLookupByLibrary.simpleMessage("地理資料"),
     "geodataLoader": MessageLookupByLibrary.simpleMessage("GEO 節能"),

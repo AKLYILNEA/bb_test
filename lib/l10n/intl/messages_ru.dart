@@ -87,6 +87,27 @@ class MessageLookup extends MessageLookupByLibrary {
     "advancedSettings": MessageLookupByLibrary.simpleMessage(
       "Расширенные настройки",
     ),
+    "ageKeyGenerateTitle": MessageLookupByLibrary.simpleMessage(
+      "Генерация ключа Age",
+    ),
+    "ageKeyPairGeneratedSuccess": MessageLookupByLibrary.simpleMessage(
+      "Пара ключей X25519 создана, сохраните её в надёжном месте",
+    ),
+    "agePrivateKeyLabel": MessageLookupByLibrary.simpleMessage(
+      "Закрытый ключ Age",
+    ),
+    "agePrivateKeyRequired": MessageLookupByLibrary.simpleMessage(
+      "Пожалуйста, сначала введите корректный закрытый ключ Age",
+    ),
+    "agePublicKeyLabel": MessageLookupByLibrary.simpleMessage(
+      "Открытый ключ Age",
+    ),
+    "ageSecretKeyInvalidValidationDesc": MessageLookupByLibrary.simpleMessage(
+      "Пожалуйста, введите корректный приватный ключ Age (должен начинаться с AGE-SECRET-KEY-)",
+    ),
+    "ageSecretKeyOptional": MessageLookupByLibrary.simpleMessage(
+      "Приватный ключ Age (необязательно)",
+    ),
     "ago": MessageLookupByLibrary.simpleMessage(" назад"),
     "agree": MessageLookupByLibrary.simpleMessage("Согласен"),
     "allApps": MessageLookupByLibrary.simpleMessage("Все приложения"),
@@ -457,6 +478,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "general": MessageLookupByLibrary.simpleMessage("Общие"),
     "generalDesc": MessageLookupByLibrary.simpleMessage(
       "Изменить общие настройки",
+    ),
+    "generateFromPrivateKey": MessageLookupByLibrary.simpleMessage(
+      "Создать из закрытого ключа Age",
     ),
     "generateSecret": MessageLookupByLibrary.simpleMessage("Сгенерировать"),
     "geoData": MessageLookupByLibrary.simpleMessage("Геоданные"),

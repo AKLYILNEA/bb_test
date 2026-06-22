@@ -87,6 +87,25 @@ class MessageLookup extends MessageLookupByLibrary {
     "advancedSettings": MessageLookupByLibrary.simpleMessage(
       "Advanced Settings",
     ),
+    "ageKeyGenerateTitle": MessageLookupByLibrary.simpleMessage(
+      "Age Key Generation",
+    ),
+    "ageKeyPairGeneratedSuccess": MessageLookupByLibrary.simpleMessage(
+      "X25519 Key pair generated, please keep it safe",
+    ),
+    "agePrivateKeyLabel": MessageLookupByLibrary.simpleMessage(
+      "Age Private Key",
+    ),
+    "agePrivateKeyRequired": MessageLookupByLibrary.simpleMessage(
+      "Please enter a correct Age private key first",
+    ),
+    "agePublicKeyLabel": MessageLookupByLibrary.simpleMessage("Age Public Key"),
+    "ageSecretKeyInvalidValidationDesc": MessageLookupByLibrary.simpleMessage(
+      "Please enter a valid Age secret key (must start with AGE-SECRET-KEY-)",
+    ),
+    "ageSecretKeyOptional": MessageLookupByLibrary.simpleMessage(
+      "Age Secret Key (Optional)",
+    ),
     "ago": MessageLookupByLibrary.simpleMessage(" Ago"),
     "agree": MessageLookupByLibrary.simpleMessage("Agree"),
     "allApps": MessageLookupByLibrary.simpleMessage("All Apps"),
@@ -451,6 +470,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "general": MessageLookupByLibrary.simpleMessage("General"),
     "generalDesc": MessageLookupByLibrary.simpleMessage(
       "Modify general settings",
+    ),
+    "generateFromPrivateKey": MessageLookupByLibrary.simpleMessage(
+      "Generate from Age private key",
     ),
     "generateSecret": MessageLookupByLibrary.simpleMessage("Generate"),
     "geoData": MessageLookupByLibrary.simpleMessage("GeoData"),

@@ -239,15 +239,24 @@ class ClashLibHandler {
     return DateTime.fromMillisecondsSinceEpoch(int.parse(runTimeString));
   }
 
-  Future<Map<String, dynamic>> getConfig(String id) async {
+  Future<Map<String, dynamic>> getConfig(String id, {String? ageSecretKey}) async {
     final path = await appPath.getProfilePath(id);
-    final pathChar = path.toNativeUtf8().cast<Char>();
-    final configRaw = clashFFI.getConfig(pathChar);
-    final configString = configRaw.cast<Utf8>().toDartString();
-    malloc.free(pathChar);
-    clashFFI.freeCString(configRaw);
-    if (configString.isEmpty) return {};
-    return json.decode(configString);
+    final params = {
+      'path': path,
+      'age-secret-key': ageSecretKey ?? '',
+    };
+    return using((arena) {
+      final pathChar = json.encode(params).toNativeUtf8(allocator: arena).cast<Char>();
+      final configRaw = clashFFI.getConfig(pathChar);
+      if (configRaw == nullptr) return <String, dynamic>{};
+      try {
+        final configString = configRaw.cast<Utf8>().toDartString();
+        if (configString.isEmpty) return <String, dynamic>{};
+        return json.decode(configString) as Map<String, dynamic>;
+      } finally {
+        clashFFI.freeCString(configRaw);
+      }
+    });
   }
 
   Future<String> quickStart(
