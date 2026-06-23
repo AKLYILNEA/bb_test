@@ -6,6 +6,8 @@ import 'dart:isolate';
 import 'package:archive/archive_io.dart';
 import 'package:bett_box/clash/clash.dart';
 import 'package:bett_box/enum/enum.dart';
+import 'package:bett_box/helper/helper.dart';
+
 import 'package:bett_box/plugins/app.dart';
 import 'package:bett_box/plugins/service.dart' as vpn_service;
 import 'package:bett_box/providers/providers.dart';
@@ -454,9 +456,6 @@ class AppController {
   }
 
   Future<Result<bool>> _requestAdmin(bool enableTun) async {
-    if (system.isWindows && kDebugMode) {
-      return Result.success(false);
-    }
     final realTunEnable = _ref.read(realTunEnableProvider);
     if (enableTun != realTunEnable && realTunEnable == false) {
       final code = await system.authorizeCore();
@@ -695,10 +694,13 @@ class AppController {
 
   Future<void> setProcessPriority(bool enable) async {
     if (!system.isWindows) return;
-
+    
     try {
-      await system.setProcessPriority('Bettbox.exe', enable);
-      await request.setProcessPriorityByHelper('BettboxCore.exe', enable);
+      await system.setProcessPriority('${AppIdentity.mainExecutableName}.exe', enable);
+      await helperClient.setProcessPriority(
+        '${AppIdentity.coreExecutableName}.exe',
+        enable,
+      );
     } catch (e) {
       commonPrint.log('Set process priority error: $e');
       rethrow;
