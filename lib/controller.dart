@@ -141,6 +141,36 @@ class AppController {
 
     if (isDesktop && patchConfig.tun.enable) {
       await _quickSetupConfig(enableTun: false);
+
+      if (system.isMacOS) {
+        try {
+          final res = await _requestAdmin(true);
+          if (res.needRestart) {
+            await restartCore();
+            return;
+          }
+          await globalState.handleStart([updateRunTime, updateTraffic]);
+          if (!res.isError) {
+            Future.microtask(() async {
+              try {
+                await _updateClashConfig();
+              } catch (e) {
+                commonPrint.log('FastStart macOS TUN update failed: $e');
+              }
+              _backgroundLoad();
+            });
+          } else {
+            _backgroundLoad();
+          }
+        } catch (e) {
+          commonPrint.log('FastStart macOS auth error: $e');
+          await globalState.handleStart([updateRunTime, updateTraffic]);
+          _backgroundLoad();
+        }
+        _scheduleCheckIpRefresh();
+        return;
+      }
+
       await globalState.handleStart([updateRunTime, updateTraffic]);
 
       Future.microtask(() async {
@@ -148,7 +178,9 @@ class AppController {
           final res = await _requestAdmin(true);
           if (res.needRestart) {
             await restartCore();
-          } else if (!res.isError) {
+            return;
+          }
+          if (!res.isError) {
             await _updateClashConfig();
           }
         } catch (e) {
@@ -465,9 +497,9 @@ class AppController {
         case AuthorizeCode.none:
           break;
         case AuthorizeCode.error:
-          if (system.isWindows) {
-            globalState.showNotifier(appLocalizations.tunEnableRequireAdmin);
-          }
+          globalState.showNotifier(
+            'TUN mode requires administrator privileges.',
+          );
           enableTun = false;
           break;
       }
@@ -694,9 +726,12 @@ class AppController {
 
   Future<void> setProcessPriority(bool enable) async {
     if (!system.isWindows) return;
-    
+
     try {
-      await system.setProcessPriority('${AppIdentity.mainExecutableName}.exe', enable);
+      await system.setProcessPriority(
+        '${AppIdentity.mainExecutableName}.exe',
+        enable,
+      );
       await helperClient.setProcessPriority(
         '${AppIdentity.coreExecutableName}.exe',
         enable,
@@ -1079,9 +1114,7 @@ class AppController {
                 decorationColor: Theme.of(context).colorScheme.primary,
               ),
             ),
-            TextSpan(
-              text: appLocalizations.create,
-            ),
+            TextSpan(text: appLocalizations.create),
           ],
         ),
       );
