@@ -106,8 +106,16 @@ class AppController {
       final wasRunning = _ref.read(runTimeProvider.notifier).isStart;
       if (wasRunning) {
         await globalState.handleStop();
+        _ref.read(runTimeProvider.notifier).value = null;
       }
-      await Future.delayed(const Duration(milliseconds: 500));
+      if (system.isAndroid) {
+        clashCore.closeConnections();
+        await clashCore.flushFakeIP();
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
+      if (system.isDesktop) {
+        await clashService!.reStart();
+      }
       await _initCore();
       if (wasRunning) {
         if (system.isDesktop) {
@@ -533,9 +541,10 @@ class AppController {
     addCheckIpNumDebounce();
   }
 
-  void handleChangeProfile() {
+  Future<void> handleChangeProfile() async {
     _ref.read(delayDataSourceProvider.notifier).value = {};
-    applyProfile();
+    await applyProfile(silence: true);
+    await restartCore();
     _ref.read(logsProvider.notifier).value = FixedList(maxLength);
     _ref.read(requestsProvider.notifier).value = FixedList(maxLength);
     globalState.computeHeightMapCache = {};
