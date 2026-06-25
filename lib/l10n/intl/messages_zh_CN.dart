@@ -756,6 +756,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "trayEnhancementDesc": MessageLookupByLibrary.simpleMessage(
       "在托盘区右键菜单中控制代理组",
     ),
+    "trayIconInvert": MessageLookupByLibrary.simpleMessage("托盘反转"),
+    "trayIconInvertDesc": MessageLookupByLibrary.simpleMessage(
+      "针对当前托盘图标颜色取反设置",
+    ),
     "tryManualRefresh": MessageLookupByLibrary.simpleMessage("请尝试手动刷新"),
     "tun": MessageLookupByLibrary.simpleMessage("虚拟网卡"),
     "tunDesc": MessageLookupByLibrary.simpleMessage("接管当前设备全局流量"),

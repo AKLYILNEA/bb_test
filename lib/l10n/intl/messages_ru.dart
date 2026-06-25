@@ -1114,6 +1114,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "trayEnhancementDesc": MessageLookupByLibrary.simpleMessage(
       "Управление группами прокси в контекстном меню трея",
     ),
+    "trayIconInvert": MessageLookupByLibrary.simpleMessage(
+      "Инвертировать значок трея",
+    ),
+    "trayIconInvertDesc": MessageLookupByLibrary.simpleMessage(
+      "Инвертировать цвет текущего значка в трее",
+    ),
     "tryManualRefresh": MessageLookupByLibrary.simpleMessage(
       "Обновите вручную",
     ),

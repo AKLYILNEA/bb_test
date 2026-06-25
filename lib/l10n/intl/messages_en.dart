@@ -1093,6 +1093,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "trayEnhancementDesc": MessageLookupByLibrary.simpleMessage(
       "Control proxy groups in the system tray context menu",
     ),
+    "trayIconInvert": MessageLookupByLibrary.simpleMessage("Invert Tray Icon"),
+    "trayIconInvertDesc": MessageLookupByLibrary.simpleMessage(
+      "Invert the current tray icon color",
+    ),
     "tryManualRefresh": MessageLookupByLibrary.simpleMessage(
       "Please try manual refresh",
     ),

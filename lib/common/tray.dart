@@ -50,6 +50,8 @@ class Tray {
             brightness ??
             WidgetsBinding.instance.platformDispatcher.platformBrightness,
         isStart: isStart,
+        invertTrayIcon:
+            system.isWindows && globalState.config.themeProps.invertTrayIcon,
       ),
       isTemplate: system.isMacOS,
     );

@@ -4609,6 +4609,26 @@ class AppLocalizations {
     return Intl.message('Text Scaling', name: 'textScale', desc: '', args: []);
   }
 
+  /// `Invert Tray Icon`
+  String get trayIconInvert {
+    return Intl.message(
+      'Invert Tray Icon',
+      name: 'trayIconInvert',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Invert the current tray icon color`
+  String get trayIconInvertDesc {
+    return Intl.message(
+      'Invert the current tray icon color',
+      name: 'trayIconInvertDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Light Icon`
   String get lightIcon {
     return Intl.message('Light Icon', name: 'lightIcon', desc: '', args: []);
