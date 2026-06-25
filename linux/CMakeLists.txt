@@ -8,9 +8,6 @@ set(SENTRY_BACKEND none CACHE STRING "Sentry backend" FORCE)
 # the on-disk name of your application.
 set(BINARY_NAME "Bettbox")
 
-if(DEFINED ENV{BETTBOX_COMPATIBLE_BUILD} AND "$ENV{BETTBOX_COMPATIBLE_BUILD}" STREQUAL "1")
-  add_definitions(-DFLUTTER_DISABLE_IMPELLER=1)
-endif()
 
 # The unique GTK application identifier for this application. See:
 # https://wiki.gnome.org/HowDoI/ChooseApplicationID

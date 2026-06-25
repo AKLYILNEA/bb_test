@@ -6,9 +6,6 @@ project(Bettbox LANGUAGES CXX)
 # the on-disk name of your application.
 set(BINARY_NAME "Bettbox")
 
-if(DEFINED ENV{BETTBOX_COMPATIBLE_BUILD} AND "$ENV{BETTBOX_COMPATIBLE_BUILD}" STREQUAL "1")
-  add_definitions(-DFLUTTER_DISABLE_IMPELLER=1)
-endif()
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.

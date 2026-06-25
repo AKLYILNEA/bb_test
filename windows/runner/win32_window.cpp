@@ -291,32 +291,9 @@ Win32Window::MessageHandler(HWND hwnd,
     UpdateTheme(hwnd);
     return 0;
 
-  case WM_POWERBROADCAST:
-    if (wparam == PBT_APMRESUMESUSPEND || wparam == PBT_APMRESUMEAUTOMATIC || wparam == PBT_APMRESUMECRITICAL)
-    {
-      SetTimer(hwnd, kResumeTimerId, 500, nullptr);
-    }
-    else if (wparam == PBT_APMSUSPEND)
-    {
-      KillTimer(hwnd, kResumeTimerId);
-    }
-    return TRUE;
-
-  case WM_TIMER:
-    if (wparam == kResumeTimerId)
-    {
-      KillTimer(hwnd, kResumeTimerId);
-      if (IsWindowVisible(hwnd) && !IsIconic(hwnd))
-      {
-        RECT rect = GetClientArea();
-        PostMessage(hwnd, WM_SIZE, SIZE_RESTORED,
-                    MAKELPARAM(rect.right - rect.left, rect.bottom - rect.top));
-      }
-    }
-    return 0;
   }
 
-  return DefWindowProc(window_handle_, message, wparam, lparam);
+  return DefWindowProc(hwnd, message, wparam, lparam);
 }
 
 void Win32Window::Destroy()
