@@ -504,7 +504,10 @@ class GlobalState {
         fakeIpRangeV6: patchConfig.dns.fakeIpRangeV6,
       ),
     );
-    rawConfig['external-controller'] = realPatchConfig.externalController.value;
+    rawConfig['external-controller'] = realPatchConfig.allowLan
+        ? realPatchConfig.externalController.value
+            .replaceAll('127.0.0.1', '0.0.0.0')
+        : realPatchConfig.externalController.value;
     if (realPatchConfig.externalController == ExternalControllerStatus.open) {
       final secret = realPatchConfig.secret;
       if (secret != null && secret.isNotEmpty) {
