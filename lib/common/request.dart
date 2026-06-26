@@ -94,8 +94,9 @@ class Request {
 
   Future<Map<String, dynamic>?> checkForUpdate() async {
     try {
+      final t = DateTime.now().millisecondsSinceEpoch;
       final response = await _dio.get(
-        'https://github.com/$repository/releases/latest',
+        'https://github.com/$repository/releases/latest?t=$t',
         options: Options(
           followRedirects: false,
           validateStatus: (status) =>
