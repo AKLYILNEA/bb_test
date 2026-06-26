@@ -404,10 +404,10 @@ class AppLocalizations {
     );
   }
 
-  /// `Max 2 rules allowed`
+  /// `Max 5 rules allowed`
   String get tooManyRules {
     return Intl.message(
-      'Max 2 rules allowed',
+      'Max 5 rules allowed',
       name: 'tooManyRules',
       desc: '',
       args: [],

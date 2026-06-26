@@ -1105,7 +1105,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "toggle": MessageLookupByLibrary.simpleMessage("Переключить"),
     "tonalSpotScheme": MessageLookupByLibrary.simpleMessage("Тональный акцент"),
-    "tooManyRules": MessageLookupByLibrary.simpleMessage("Максимум 2 правила"),
+    "tooManyRules": MessageLookupByLibrary.simpleMessage("Максимум 5 правил"),
     "tools": MessageLookupByLibrary.simpleMessage("Настройки"),
     "totalTraffic": MessageLookupByLibrary.simpleMessage("Общий трафик"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("Порт Tproxy"),

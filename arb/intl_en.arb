@@ -46,7 +46,7 @@
   "coreConnected": "Connected",
   "coreSuspended": "Suspended",
   "invalidIpFormat": "Invalid IP or CIDR format",
-  "tooManyRules": "Max 2 rules allowed",
+  "tooManyRules": "Max 5 rules allowed",
   "dozeSuspend": "Doze Support",
   "dozeSuspendDesc": "Sync with system Doze mode",
   "storeFix": "Store Fix",

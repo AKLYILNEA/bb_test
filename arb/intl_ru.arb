@@ -46,7 +46,7 @@
   "coreConnected": "Подключено",
   "coreSuspended": "Приостановлено",
   "invalidIpFormat": "Неверный формат IP или CIDR",
-  "tooManyRules": "Максимум 2 правила",
+  "tooManyRules": "Максимум 5 правил",
   "dozeSuspend": "Поддержка Doze",
   "dozeSuspendDesc": "Синхронизация с режимом сна Android",
   "storeFix": "Исправление магазина",

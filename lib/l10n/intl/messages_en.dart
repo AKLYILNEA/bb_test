@@ -1084,7 +1084,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "tlsPortSniffer": MessageLookupByLibrary.simpleMessage("TLS Port Sniffing"),
     "toggle": MessageLookupByLibrary.simpleMessage("Toggle"),
     "tonalSpotScheme": MessageLookupByLibrary.simpleMessage("Tonal Spot"),
-    "tooManyRules": MessageLookupByLibrary.simpleMessage("Max 2 rules allowed"),
+    "tooManyRules": MessageLookupByLibrary.simpleMessage("Max 5 rules allowed"),
     "tools": MessageLookupByLibrary.simpleMessage("Tools"),
     "totalTraffic": MessageLookupByLibrary.simpleMessage("Total Traffic"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("Tproxy Port"),

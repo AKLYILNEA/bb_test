@@ -771,7 +771,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "tlsPortSniffer": MessageLookupByLibrary.simpleMessage("TLS 連接埠嗅探"),
     "toggle": MessageLookupByLibrary.simpleMessage("切換"),
     "tonalSpotScheme": MessageLookupByLibrary.simpleMessage("調性點綴"),
-    "tooManyRules": MessageLookupByLibrary.simpleMessage("最多允許 2 個規則"),
+    "tooManyRules": MessageLookupByLibrary.simpleMessage("最多允許 5 個規則"),
     "tools": MessageLookupByLibrary.simpleMessage("更多"),
     "totalTraffic": MessageLookupByLibrary.simpleMessage("傳輸總量"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("Tproxy 連接埠"),

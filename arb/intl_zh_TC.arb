@@ -46,7 +46,7 @@
   "coreConnected": "已連線",
   "coreSuspended": "已掛起",
   "invalidIpFormat": "無效的 IP 或 CIDR 格式",
-  "tooManyRules": "最多允許 2 個規則",
+  "tooManyRules": "最多允許 5 個規則",
   "dozeSuspend": "休眠支援",
   "dozeSuspendDesc": "開啟後同步系統 Doze 休眠模式",
   "storeFix": "商店修復",
