@@ -130,7 +130,7 @@ class Request {
 
   final List<String> _ipInfoSources = [
     'https://1.1.1.1/cdn-cgi/trace',
-    'https://cp.cloudflare.com/cdn-cgi/trace',
+    'https://162.159.36.1/cdn-cgi/trace',
   ];
 
   final List<String> _domesticIpSources = [
@@ -217,7 +217,6 @@ class Request {
   }) async {
     return _checkIpFromSources(_domesticIpSources, cancelToken, timeout);
   }
-
 }
 
 final request = Request();
