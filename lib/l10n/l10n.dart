@@ -744,10 +744,10 @@ class AppLocalizations {
     return Intl.message('TUN', name: 'tun', desc: '', args: []);
   }
 
-  /// `Take over global device traffic`
+  /// `Use TUN to take over device traffic`
   String get tunDesc {
     return Intl.message(
-      'Take over global device traffic',
+      'Use TUN to take over device traffic',
       name: 'tunDesc',
       desc: '',
       args: [],
@@ -3984,10 +3984,10 @@ class AppLocalizations {
     );
   }
 
-  /// `Enable endpoint-independent NAT`
+  /// `Optimize UDP/P2P application experience`
   String get endpointIndependentNatDesc {
     return Intl.message(
-      'Enable endpoint-independent NAT',
+      'Optimize UDP/P2P application experience',
       name: 'endpointIndependentNatDesc',
       desc: '',
       args: [],
@@ -4147,6 +4147,16 @@ class AppLocalizations {
   /// `Memory Info`
   String get memoryInfo {
     return Intl.message('Memory Info', name: 'memoryInfo', desc: '', args: []);
+  }
+
+  /// `The current memory information value displayed is the dynamic stack memory usage of the core during runtime, not the complete APP memory statistics, for reference only.`
+  String get memoryInfoDesc {
+    return Intl.message(
+      'The current memory information value displayed is the dynamic stack memory usage of the core during runtime, not the complete APP memory statistics, for reference only.',
+      name: 'memoryInfoDesc',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Cancel`

@@ -272,7 +272,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "enableOverride": MessageLookupByLibrary.simpleMessage("启用覆写"),
     "endpointIndependentNat": MessageLookupByLibrary.simpleMessage("NAT增强"),
     "endpointIndependentNatDesc": MessageLookupByLibrary.simpleMessage(
-      "启用独立于端点的NAT",
+      "优化UDP/P2P应用体验",
     ),
     "entries": MessageLookupByLibrary.simpleMessage("个条目"),
     "exclude": MessageLookupByLibrary.simpleMessage("后台隐藏"),
@@ -327,7 +327,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "fileIsUpdate": MessageLookupByLibrary.simpleMessage("文件有修改，是否保存修改"),
     "filterSystemApp": MessageLookupByLibrary.simpleMessage("过滤系统应用"),
     "findProcessMode": MessageLookupByLibrary.simpleMessage("查找进程"),
-    "findProcessModeDesc": MessageLookupByLibrary.simpleMessage("开启后会将可以查找进程"),
+    "findProcessModeDesc": MessageLookupByLibrary.simpleMessage("开启后可以匹配查找进程"),
     "fontFamily": MessageLookupByLibrary.simpleMessage("字体"),
     "forceDnsMapping": MessageLookupByLibrary.simpleMessage("强制 DNS 映射"),
     "forceDnsMappingDesc": MessageLookupByLibrary.simpleMessage(
@@ -347,7 +347,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "generateSecret": MessageLookupByLibrary.simpleMessage("生成"),
     "geoData": MessageLookupByLibrary.simpleMessage("地理数据"),
     "geodataLoader": MessageLookupByLibrary.simpleMessage("GEO节能"),
-    "geodataLoaderDesc": MessageLookupByLibrary.simpleMessage("开启后使用GEO低内存加载器"),
+    "geodataLoaderDesc": MessageLookupByLibrary.simpleMessage("使用GEO低内存加载器"),
     "geoipCode": MessageLookupByLibrary.simpleMessage("Geoip代码"),
     "getOriginRules": MessageLookupByLibrary.simpleMessage("获取原始规则"),
     "global": MessageLookupByLibrary.simpleMessage("全局"),
@@ -423,6 +423,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "loose": MessageLookupByLibrary.simpleMessage("宽松"),
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("重新获取IP"),
     "memoryInfo": MessageLookupByLibrary.simpleMessage("内存信息"),
+    "memoryInfoDesc": MessageLookupByLibrary.simpleMessage(
+      "当前内存信息数值显示为内核运行时的动态堆栈内存占用，非完整APP内存统计，仅供参考。",
+    ),
     "messageTest": MessageLookupByLibrary.simpleMessage("消息测试"),
     "messageTestTip": MessageLookupByLibrary.simpleMessage("这是一条消息。"),
     "min": MessageLookupByLibrary.simpleMessage("最小"),
@@ -766,7 +769,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "tryManualRefresh": MessageLookupByLibrary.simpleMessage("请尝试手动刷新"),
     "tun": MessageLookupByLibrary.simpleMessage("虚拟网卡"),
-    "tunDesc": MessageLookupByLibrary.simpleMessage("接管当前设备全局流量"),
+    "tunDesc": MessageLookupByLibrary.simpleMessage("使用TUN接管设备流量"),
     "tunEnableRequireAdmin": MessageLookupByLibrary.simpleMessage(
       "启用虚拟网卡需要管理员权限，请以管理员身份运行程序",
     ),

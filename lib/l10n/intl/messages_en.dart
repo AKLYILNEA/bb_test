@@ -391,7 +391,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "NAT Enhancement",
     ),
     "endpointIndependentNatDesc": MessageLookupByLibrary.simpleMessage(
-      "Enable endpoint-independent NAT",
+      "Optimize UDP/P2P application experience",
     ),
     "entries": MessageLookupByLibrary.simpleMessage(" entries"),
     "exclude": MessageLookupByLibrary.simpleMessage("Hide from Recents"),
@@ -616,6 +616,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "loose": MessageLookupByLibrary.simpleMessage("Loose"),
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("Refresh IP"),
     "memoryInfo": MessageLookupByLibrary.simpleMessage("Memory Info"),
+    "memoryInfoDesc": MessageLookupByLibrary.simpleMessage(
+      "The current memory information value displayed is the dynamic stack memory usage of the core during runtime, not the complete APP memory statistics, for reference only.",
+    ),
     "messageTest": MessageLookupByLibrary.simpleMessage("Message Test"),
     "messageTestTip": MessageLookupByLibrary.simpleMessage(
       "This is a message.",
@@ -1108,7 +1111,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "tun": MessageLookupByLibrary.simpleMessage("TUN"),
     "tunDesc": MessageLookupByLibrary.simpleMessage(
-      "Take over global device traffic",
+      "Use TUN to take over device traffic",
     ),
     "tunEnableRequireAdmin": MessageLookupByLibrary.simpleMessage(
       "TUN requires admin privileges. Please run as Administrator.",

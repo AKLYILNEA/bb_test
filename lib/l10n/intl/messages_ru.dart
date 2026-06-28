@@ -394,7 +394,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Улучшенный NAT",
     ),
     "endpointIndependentNatDesc": MessageLookupByLibrary.simpleMessage(
-      "Включить NAT независимый от конечной точки",
+      "Оптимизация работы приложений UDP/P2P",
     ),
     "entries": MessageLookupByLibrary.simpleMessage(" записей"),
     "exclude": MessageLookupByLibrary.simpleMessage("Скрыть из недавних"),
@@ -472,7 +472,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "findProcessMode": MessageLookupByLibrary.simpleMessage("Поиск процесса"),
     "findProcessModeDesc": MessageLookupByLibrary.simpleMessage(
-      "Включить поиск процесса",
+      "Включить сопоставление процессов",
     ),
     "fontFamily": MessageLookupByLibrary.simpleMessage("Шрифт"),
     "forceDnsMapping": MessageLookupByLibrary.simpleMessage(
@@ -625,6 +625,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "loose": MessageLookupByLibrary.simpleMessage("Максимальная"),
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("Обновить IP"),
     "memoryInfo": MessageLookupByLibrary.simpleMessage("Расход памяти"),
+    "memoryInfoDesc": MessageLookupByLibrary.simpleMessage(
+      "Текущее значение памяти — это динамическое потребление стека ядра во время выполнения, а не полная статистика памяти приложения, только для справки.",
+    ),
     "messageTest": MessageLookupByLibrary.simpleMessage("Тест сообщения"),
     "messageTestTip": MessageLookupByLibrary.simpleMessage(
       "Это тестовое сообщение.",
@@ -1131,7 +1134,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "tun": MessageLookupByLibrary.simpleMessage("Виртуальный адаптер"),
     "tunDesc": MessageLookupByLibrary.simpleMessage(
-      "Перехват всего трафика устройства",
+      "Использовать TUN для перехвата трафика устройства",
     ),
     "tunEnableRequireAdmin": MessageLookupByLibrary.simpleMessage(
       "Для включения виртуального адаптера требуются права администратора. Запустите программу от имени администратора.",
