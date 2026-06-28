@@ -751,10 +751,6 @@ class AppController {
         return;
       }
       _updateGroupsRetryCount++;
-
-      commonPrint.log(
-        'updateGroups initial load failed ($_updateGroupsRetryCount/$maxRetryRounds), scheduling retry in ${retryDelay.inSeconds}s: $e',
-      );
       _updateGroupsRetryTimer?.cancel();
       _updateGroupsRetryTimer = Timer(retryDelay, () {
         if (generation != _coreGeneration) return;
