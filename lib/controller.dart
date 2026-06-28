@@ -107,7 +107,14 @@ class AppController {
   }
 
   Future<void> restartCore() {
-    return _coreLifecycleLock.synchronized(() => _restartCore());
+    return _coreLifecycleLock.synchronized(() async {
+      _ref.read(isRestartingCoreProvider.notifier).state = true;
+      try {
+        await _restartCore();
+      } finally {
+        _ref.read(isRestartingCoreProvider.notifier).state = false;
+      }
+    });
   }
 
   Future<void> _restartCore({
@@ -591,7 +598,12 @@ class AppController {
     return _coreLifecycleLock.synchronized(() async {
       _ref.read(delayDataSourceProvider.notifier).value = {};
       if (hardRestart) {
-        await _restartCore();
+        _ref.read(isRestartingCoreProvider.notifier).state = true;
+        try {
+          await _restartCore();
+        } finally {
+          _ref.read(isRestartingCoreProvider.notifier).state = false;
+        }
       } else {
         if (system.isAndroid) {
           clashCore.closeConnections();
