@@ -447,6 +447,8 @@
   "fallback": "Fallback",
   "fallbackDesc": "Usually offshore DNS",
   "fallbackFilter": "Fallback Filter",
+  "fallbackConcurrent": "Fallback Concurrent",
+  "fallbackConcurrentDesc": "Query default DNS and Fallback synchronously",
   "geoipCode": "GeoIP Code",
   "ipcidr": "IP/CIDR",
   "domain": "Domain",

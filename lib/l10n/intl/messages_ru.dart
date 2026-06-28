@@ -440,6 +440,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "fakeipRangeV6": MessageLookupByLibrary.simpleMessage("Диапазон FakeIPv6"),
     "fakeipTtl": MessageLookupByLibrary.simpleMessage("Время жизни FakeIP"),
     "fallback": MessageLookupByLibrary.simpleMessage("Резервный DNS"),
+    "fallbackConcurrent": MessageLookupByLibrary.simpleMessage(
+      "Параллельный запрос Fallback",
+    ),
+    "fallbackConcurrentDesc": MessageLookupByLibrary.simpleMessage(
+      "Одновременный запрос к основному DNS и Fallback",
+    ),
     "fallbackDesc": MessageLookupByLibrary.simpleMessage(
       "Обычно используются зарубежные DNS",
     ),

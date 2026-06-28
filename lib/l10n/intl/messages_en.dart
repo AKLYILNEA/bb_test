@@ -437,6 +437,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "fakeipRangeV6": MessageLookupByLibrary.simpleMessage("FakeIPv6 Range"),
     "fakeipTtl": MessageLookupByLibrary.simpleMessage("FakeIP TTL"),
     "fallback": MessageLookupByLibrary.simpleMessage("Fallback"),
+    "fallbackConcurrent": MessageLookupByLibrary.simpleMessage(
+      "Fallback Concurrent",
+    ),
+    "fallbackConcurrentDesc": MessageLookupByLibrary.simpleMessage(
+      "Query default DNS and Fallback synchronously",
+    ),
     "fallbackDesc": MessageLookupByLibrary.simpleMessage(
       "Usually offshore DNS",
     ),

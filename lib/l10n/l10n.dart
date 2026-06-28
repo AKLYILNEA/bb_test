@@ -3719,6 +3719,26 @@ class AppLocalizations {
     );
   }
 
+  /// `Fallback Concurrent`
+  String get fallbackConcurrent {
+    return Intl.message(
+      'Fallback Concurrent',
+      name: 'fallbackConcurrent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Query default DNS and Fallback synchronously`
+  String get fallbackConcurrentDesc {
+    return Intl.message(
+      'Query default DNS and Fallback synchronously',
+      name: 'fallbackConcurrentDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `GeoIP Code`
   String get geoipCode {
     return Intl.message('GeoIP Code', name: 'geoipCode', desc: '', args: []);

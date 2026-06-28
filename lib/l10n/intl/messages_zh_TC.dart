@@ -314,6 +314,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "fakeipRangeV6": MessageLookupByLibrary.simpleMessage("FakeIPv6 範圍"),
     "fakeipTtl": MessageLookupByLibrary.simpleMessage("FakeIP 有效時間"),
     "fallback": MessageLookupByLibrary.simpleMessage("Fallback"),
+    "fallbackConcurrent": MessageLookupByLibrary.simpleMessage("Fallback併發"),
+    "fallbackConcurrentDesc": MessageLookupByLibrary.simpleMessage(
+      "使用默認DNS和Fallback同步查詢",
+    ),
     "fallbackDesc": MessageLookupByLibrary.simpleMessage("一般情況下使用境外 DNS"),
     "fallbackFilter": MessageLookupByLibrary.simpleMessage("Fallback 過濾"),
     "fcmOptimization": MessageLookupByLibrary.simpleMessage("FCM 優化"),

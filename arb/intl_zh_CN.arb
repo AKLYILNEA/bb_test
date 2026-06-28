@@ -447,6 +447,8 @@
   "fallback": "Fallback",
   "fallbackDesc": "一般情况下使用境外DNS",
   "fallbackFilter": "Fallback过滤",
+  "fallbackConcurrent": "Fallback并发",
+  "fallbackConcurrentDesc": "使用默认DNS和Fallback同步查询",
   "geoipCode": "Geoip代码",
   "ipcidr": "IP/掩码",
   "domain": "域名",

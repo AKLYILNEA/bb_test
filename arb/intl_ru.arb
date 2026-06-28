@@ -447,6 +447,8 @@
   "fallback": "Резервный DNS",
   "fallbackDesc": "Обычно используются зарубежные DNS",
   "fallbackFilter": "Фильтр резервного DNS",
+  "fallbackConcurrent": "Параллельный запрос Fallback",
+  "fallbackConcurrentDesc": "Одновременный запрос к основному DNS и Fallback",
   "geoipCode": "Код GeoIP",
   "ipcidr": "IP/CIDR",
   "domain": "Домен",
