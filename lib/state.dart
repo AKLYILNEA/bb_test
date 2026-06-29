@@ -463,14 +463,24 @@ class GlobalState {
   }
 
   Future<SetupParams> getSetupParams({required ClashConfig pathConfig}) async {
-    final clashConfig = await patchRawConfig(patchConfig: pathConfig);
-    final params = SetupParams(
-      config: clashConfig,
-      selectedMap: config.currentProfile?.selectedMap ?? {},
-      testUrl: config.appSetting.testUrl,
-      overrideTestUrl: config.overrideTestUrl,
-    );
-    return params;
+    try {
+      final clashConfig = await patchRawConfig(patchConfig: pathConfig);
+      final params = SetupParams(
+        config: clashConfig,
+        selectedMap: config.currentProfile?.selectedMap ?? {},
+        testUrl: config.appSetting.testUrl,
+        overrideTestUrl: config.overrideTestUrl,
+      );
+      return params;
+    } catch (e) {
+      commonPrint.log('Failed to parse config in getSetupParams: $e');
+      final fallback = getLastSuccessfulConfig();
+      if (fallback != null) {
+        showNotifier('${appLocalizations.profileParseErrorDesc}: $e');
+        return fallback;
+      }
+      rethrow;
+    }
   }
 
   void backupSuccessfulConfig(SetupParams params) {
@@ -826,10 +836,18 @@ class GlobalState {
 
       config['proxy-providers'] ??= {};
 
-      return JavaScriptRuntimeManager.evaluateScript(
-        currentScript.content,
-        config,
-      );
+      try {
+        return await JavaScriptRuntimeManager.evaluateScript(
+          currentScript.content,
+          config,
+        );
+      } catch (e) {
+        commonPrint.log('Script execution failed: $e');
+        globalState.showNotifier(
+          '${appLocalizations.profileParseErrorDesc}: $e',
+        );
+        return config;
+      }
     });
   }
 }
