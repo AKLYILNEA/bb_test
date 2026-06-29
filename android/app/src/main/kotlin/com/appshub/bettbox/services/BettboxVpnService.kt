@@ -11,6 +11,7 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.os.Parcel
+import android.os.PowerManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.appshub.bettbox.GlobalState
@@ -47,14 +48,23 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
         
         unlockReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                if (isSpeedNotificationEnabled) {
+                if (GlobalState.isSmartStopped) {
+                    resetNotificationBuilder()
+                    CoroutineScope(Dispatchers.Main).launch {
+                        startForeground()
+                    }
+                } else if (isSpeedNotificationEnabled) {
                     cachedBuilder?.build()?.let {
                         getSystemService(android.app.NotificationManager::class.java)?.notify(GlobalState.NOTIFICATION_ID, it)
                     }
                 }
             }
         }
-        registerReceiver(unlockReceiver, IntentFilter(Intent.ACTION_USER_PRESENT), if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Context.RECEIVER_NOT_EXPORTED else 0)
+        val filter = IntentFilter().apply {
+            addAction(Intent.ACTION_USER_PRESENT)
+            addAction(Intent.ACTION_SCREEN_ON)
+        }
+        registerReceiver(unlockReceiver, filter, if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Context.RECEIVER_NOT_EXPORTED else 0)
     }
 
     override suspend fun start(options: VpnOptions): Int = with(Builder()) {
@@ -215,6 +225,11 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
 
     @SuppressLint("ForegroundServiceType")
     private suspend fun updateNotificationSpeed(profileName: String, speedInfo: String) {
+        val powerManager = getSystemService(Context.POWER_SERVICE) as? PowerManager
+        if (powerManager?.isInteractive == false) {
+            return
+        }
+
         val builder = notificationBuilder()
         val separator = " ︙ "
         val combinedText = "$profileName$separator$speedInfo"
@@ -233,7 +248,7 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
             .setStyle(null)
             .setTicker(combinedText)
             .build()
-            
+
         if (hasStartedForeground) {
             runCatching {
                 getSystemService(android.app.NotificationManager::class.java)?.notify(GlobalState.NOTIFICATION_ID, notification)
