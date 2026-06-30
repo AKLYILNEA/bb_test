@@ -8,24 +8,44 @@ class JavaScriptRuntimeManager {
     String scriptContent,
     Map<String, dynamic> config,
   ) async {
-    final engine = IsolateQjs();
-    try {
-      final configJs = json.encode(config);
-      final res = await engine.evaluate('''
-        (async function() {
-          $scriptContent
-          return await main($configJs);
-        })();
-      ''');
-      
-      if (res is Map) {
-        return _deepCastMap(res);
+    final result = await _evaluateWithRetry(scriptContent, config);
+    if (result is Map) {
+      return _deepCastMap(result);
+    }
+    return config;
+  }
+
+  static Future<dynamic> _evaluateWithRetry(
+    String scriptContent,
+    Map<String, dynamic> config, {
+    int maxRetries = 1,
+  }) async {
+    var attempt = 0;
+    while (true) {
+      final engine = IsolateQjs();
+      try {
+        final configJs = json.encode(config);
+        return await engine.evaluate('''
+          var console = {
+            log: function(...args) { if (typeof print !== 'undefined') print(...args); },
+            warn: function(...args) { if (typeof print !== 'undefined') print('WARN:', ...args); },
+            error: function(...args) { if (typeof print !== 'undefined') print('ERROR:', ...args); },
+            info: function(...args) { if (typeof print !== 'undefined') print('INFO:', ...args); },
+            debug: function(...args) { if (typeof print !== 'undefined') print('DEBUG:', ...args); }
+          };
+          (function() {
+            $scriptContent
+            return main($configJs);
+          })();
+        ''');
+      } catch (e) {
+        if (attempt >= maxRetries) {
+          throw 'JS Script Error: $e';
+        }
+        attempt++;
+      } finally {
+        engine.close();
       }
-      return config;
-    } catch (e) {
-      throw 'JS Script Error: $e';
-    } finally {
-      engine.close();
     }
   }
 
