@@ -11,7 +11,7 @@ Bettbox is a multi-platform proxy client based on an early version of FlClash, r
 
 Following the principle of "Better Experience", Bettbox inherits the excellent user interface of the original project while deeply optimizing numerous details and internal logic. It aims to be a Mihomo client that delivers a smooth frontend experience, silent and power-efficient background operation, and long-term stability.
 
-**Supported Core Protocols**: Shadowsocks ( R / 2022 ), Trojan, VMess, VLESS ( XHTTP / Reality ), Hysteria ( v1 / v2 ), TUIC, WireGuard, Tailscale, OpenVPN, SSH, AnyTLS, Mieru, Snell ( v1-v5 ), Masque, Sudoku, Gost-relay, as well as standard HTTP/Socks5, etc.
+**Supported Core Protocols**: Shadowsocks ( R / 2022 ), Trojan, VMess, VLESS ( XHTTP / Reality ), Hysteria ( v1 / v2 ), TUIC, WireGuard, Tailscale, OpenVPN, SSH, AnyTLS, Mieru, Snell ( v1-v5 ), Masque, TrustTunnel, Sudoku, Gost-relay, as well as standard HTTP/Socks5, etc.
 
 Bettbox stands for: Better Experience, Out of the box.
 
@@ -55,7 +55,7 @@ Please visit the [Releases](https://github.com/appshubcc/Bettbox/releases) page 
 ## 🚀 Core Features
 
 ### Enhanced User Experience
-* **Out of the box**: Stable permission handling and seamless TUN/VPN integration. Pre-configured with optimized routing parameters for the mainland environment, ensuring peak performance immediately after installation.
+* **Out of the box**: Stable permission handling and seamless TUN/VPN integration. Pre-configured with optimized parameters instead of default examples, ensuring a usable state out of the box.
 * **Refined UI**: Carefully polished interface and interactions. Operates lightly in the background, ensuring low battery consumption on mobile devices and minimal CPU footprint on desktops.
 
 ### Security and Stability
@@ -63,12 +63,12 @@ Please visit the [Releases](https://github.com/appshubcc/Bettbox/releases) page 
 * **Resilience**: Optimized for extreme network scenarios. Features an elegant fallback mechanism for configuration errors to ensure continuous, reliable service.
 
 ### Flexible Customization
-* **Visual Configuration**: Offers comprehensive UI-based settings. All modifications take effect instantly without the need for manual configuration file editing.
+* **Visual Settings**: Offers comprehensive UI-based settings. Supports immediate effect of changes without the need for manual configuration file editing.
 * **Dashboard Widgets**: Includes built-in widgets that allow you to intuitively monitor real-time network speeds and operational status directly from the home screen.
 * **Personalization**: Supports multiple color themes, custom icons, and 10 dynamic network speed test animations.
 
 ### Performance and Compatibility
-* **Performance First**: Native support for desktop ARM64. Implements CPU hardware grading and overall Flutter performance optimizations.
+* **Performance First**: Native support for desktop ARM64. Implements CPU hardware grading and overall Flutter communication/response performance optimizations.
 * **Broad Compatibility**: Actively maintains "Compatible" builds tailored for legacy hardware and older operating systems to extend device lifecycles.
 * **Community-Driven**: We prioritize high-quality issues and actively incorporate community feedback.
 
