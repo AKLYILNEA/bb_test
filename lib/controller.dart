@@ -635,7 +635,9 @@ class AppController {
       try {
         await updateProfile(profile);
       } catch (e) {
-        commonPrint.log(e.toString());
+        commonPrint.log(
+          '[AutoUpdate] Failed to update ${profile.label ?? profile.id}: ${e.formatError}',
+        );
       }
     }
   }
@@ -664,7 +666,9 @@ class AppController {
         );
         await updateProfile(profile);
       } catch (e) {
-        commonPrint.log('[MissedUpdate] Failed to update ${profile.id}: $e');
+        commonPrint.log(
+          '[MissedUpdate] Failed to update ${profile.label ?? profile.id}: ${e.formatError}',
+        );
       }
       if (profilesToUpdate.length > 1) {
         await Future.delayed(const Duration(seconds: 2));
@@ -2166,7 +2170,7 @@ class AppController {
       final res = await futureFunction();
       return res;
     } catch (e) {
-      commonPrint.log('$e');
+      commonPrint.log(e.formatError);
       final errorMessage = _formatErrorMessage(e);
       if (realSilence) {
         globalState.showNotifier(errorMessage);
@@ -2194,6 +2198,6 @@ class AppController {
       return appLocalizations.profileImportFailed(statusCode);
     }
 
-    return error.toString();
+    return error.formatError;
   }
 }

@@ -71,3 +71,16 @@ extension StringExtensionSafe on String? {
     return this?.isEmpty != false ? defaultValue : this!;
   }
 }
+
+extension ObjectExtension on Object {
+  String get formatError {
+    final errorStr = toString();
+    if (errorStr.contains('DioException [bad response]')) {
+      final match = RegExp(r'status code of (\d+)').firstMatch(errorStr);
+      if (match != null) {
+        return 'DioException [bad response]: ${match.group(1)}';
+      }
+    }
+    return errorStr;
+  }
+}
