@@ -141,16 +141,7 @@ foreach(bundled_library ${PLUGIN_BUNDLED_LIBRARIES})
     COMPONENT Runtime)
 endforeach(bundled_library)
 
-set(FLUTTER_JS_LIB "${CMAKE_CURRENT_SOURCE_DIR}/flutter/ephemeral/.plugin_symlinks/flutter_js/linux/shared/libquickjs_c_bridge_plugin.so")
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64" OR CMAKE_SYSTEM_PROCESSOR MATCHES "arm64" OR CMAKE_SYSTEM_PROCESSOR MATCHES "ARM64")
-  set(OVERRIDE_LIB "${CMAKE_CURRENT_SOURCE_DIR}/overrides/flutter_js/arm64/libquickjs_c_bridge_plugin.so")
-  if(EXISTS "${OVERRIDE_LIB}")
-    set(FLUTTER_JS_LIB "${OVERRIDE_LIB}")
-  endif()
-endif()
-if(EXISTS "${FLUTTER_JS_LIB}")
-  install(FILES "${FLUTTER_JS_LIB}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}" COMPONENT Runtime)
-endif()
+
 
 # Fully re-copy the assets directory on each build to avoid having stale files
 # from a previous install.

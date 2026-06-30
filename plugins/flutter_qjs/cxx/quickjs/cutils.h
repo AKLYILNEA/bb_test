@@ -30,6 +30,10 @@
 
 #ifdef _MSC_VER
 #include <intrin.h>
+#include <malloc.h>
+#ifndef alloca
+#define alloca _alloca
+#endif
 #endif
 
 /* set if CPU is big endian */

@@ -18,4 +18,5 @@ target_compile_options(quickjs PRIVATE "-DDUMP_LEAKS")
 if(MSVC)
     # https://github.com/ekibun/flutter_qjs/issues/7
     target_compile_options(quickjs PRIVATE "/Oi-")
+    target_compile_definitions(quickjs PRIVATE "alloca=_alloca")
 endif()
