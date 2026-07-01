@@ -42,21 +42,19 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
     @Volatile
     private var isSpeedNotificationEnabled = false
 
+    @Volatile
+    private var lastNotificationText: String? = null
+
     override fun onCreate() {
         super.onCreate()
         GlobalState.initServiceEngine()
-        
+
         unlockReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                if (GlobalState.isSmartStopped) {
-                    resetNotificationBuilder()
-                    CoroutineScope(Dispatchers.Main).launch {
-                        startForeground()
-                    }
-                } else if (isSpeedNotificationEnabled) {
-                    cachedBuilder?.build()?.let {
-                        getSystemService(android.app.NotificationManager::class.java)?.notify(GlobalState.NOTIFICATION_ID, it)
-                    }
+                lastNotificationText = null
+                resetNotificationBuilder()
+                CoroutineScope(Dispatchers.Main).launch {
+                    startForeground()
                 }
             }
         }
@@ -148,6 +146,7 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
         if (isStopped) return
         isStopped = true
         hasStartedForeground = false
+        lastNotificationText = null
 
         runCatching {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -193,6 +192,7 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
             content = getString(R.string.service_running)
         }
 
+        lastNotificationText = null
         val builder = notificationBuilder()
 
         val separator = " ︙ "
@@ -214,25 +214,26 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
             .build()
 
         if (!hasStartedForeground) {
-            this.startForeground(notification, useSpecialType = !GlobalState.isSmartStopped)
             hasStartedForeground = true
-        } else {
-            runCatching {
-                getSystemService(android.app.NotificationManager::class.java)?.notify(GlobalState.NOTIFICATION_ID, notification)
-            }.onFailure { Log.e(TAG, "startForeground notify error: ${it.message}") }
         }
+        this.startForeground(notification, useSpecialType = !GlobalState.isSmartStopped)
     }
 
     @SuppressLint("ForegroundServiceType")
-    private suspend fun updateNotificationSpeed(profileName: String, speedInfo: String) {
+    internal suspend fun updateNotificationSpeed(profileName: String, speedInfo: String) {
         val powerManager = getSystemService(Context.POWER_SERVICE) as? PowerManager
         if (powerManager?.isInteractive == false) {
             return
         }
 
-        val builder = notificationBuilder()
         val separator = " ︙ "
         val combinedText = "$profileName$separator$speedInfo"
+        if (combinedText == lastNotificationText) {
+            return
+        }
+        lastNotificationText = combinedText
+
+        val builder = notificationBuilder()
         val spannable = android.text.SpannableString(combinedText)
         val startIndex = profileName.length + separator.length
         if (startIndex in 1..combinedText.length) {
@@ -251,8 +252,8 @@ class BettboxVpnService : VpnService(), BaseServiceInterface {
 
         if (hasStartedForeground) {
             runCatching {
-                getSystemService(android.app.NotificationManager::class.java)?.notify(GlobalState.NOTIFICATION_ID, notification)
-            }.onFailure { Log.e(TAG, "updateNotificationSpeed notify error: ${it.message}") }
+                this.startForeground(notification, useSpecialType = !GlobalState.isSmartStopped)
+            }.onFailure { Log.e(TAG, "updateNotificationSpeed startForeground error: ${it.message}") }
         }
     }
 
