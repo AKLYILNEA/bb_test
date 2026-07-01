@@ -309,6 +309,10 @@ class AppController {
       throw message;
     }
     globalState.backupSuccessfulConfig(params);
+    if (system.isDesktop) {
+      final prefs = await preferences.sharedPreferencesCompleter.future;
+      await prefs?.setBool('is_tun_running', realTunEnable);
+    }
     lastProfileModified = await _ref.read(
       currentProfileProvider.select((state) => state?.profileLastModified),
     );
@@ -541,6 +545,11 @@ class AppController {
       updateParams.copyWith.tun(enable: realTunEnable),
     );
     if (message.isNotEmpty) throw message;
+
+    if (system.isDesktop) {
+      final prefs = await preferences.sharedPreferencesCompleter.future;
+      await prefs?.setBool('is_tun_running', realTunEnable);
+    }
   }
 
   Future<Result<bool>> _requestAdmin(bool enableTun) async {

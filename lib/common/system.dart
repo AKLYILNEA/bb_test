@@ -79,6 +79,7 @@ class System {
     if (await checkIsAdmin()) return AuthorizeCode.none;
 
     if (system.isWindows) {
+      if (await windows?._isHelperHealthy() ?? false) return AuthorizeCode.none;
       final result = await windows?.registerService();
       return result == true ? AuthorizeCode.success : AuthorizeCode.error;
     }
