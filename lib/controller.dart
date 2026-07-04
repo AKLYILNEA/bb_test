@@ -49,6 +49,8 @@ class AppController {
 
   AppController(this.context, WidgetRef ref) : _ref = ref;
 
+  DateTime _lastModeChangeTime = DateTime.fromMillisecondsSinceEpoch(0);
+
   void setupClashConfigDebounce() {
     debouncer.call(FunctionTag.setupClashConfig, () async {
       await safeRun(() async {
@@ -719,6 +721,24 @@ class AppController {
 
       if (newGroups.isEmpty) {
         throw 'getProxiesGroups returned empty after inner retries, forcing outer retry';
+      }
+
+      try {
+        final activeMode = await clashCore.getMode();
+        final currentMode = _ref.read(patchClashConfigProvider).mode;
+        if (activeMode != currentMode) {
+          if (DateTime.now().difference(_lastModeChangeTime) > const Duration(seconds: 2)) {
+            _ref
+                .read(patchClashConfigProvider.notifier)
+                .updateState((state) => state.copyWith(mode: activeMode));
+            if (activeMode == Mode.global) {
+              updateCurrentGroupName(GroupName.GLOBAL.name);
+            }
+            addCheckIpNumDebounce();
+          }
+        }
+      } catch (e) {
+        commonPrint.log('Failed to sync active mode: $e');
       }
 
       final currentProfile = _ref.read(currentProfileProvider);
@@ -1438,6 +1458,7 @@ class AppController {
   }
 
   void changeMode(Mode mode) {
+    _lastModeChangeTime = DateTime.now();
     _ref
         .read(patchClashConfigProvider.notifier)
         .updateState((state) => state.copyWith(mode: mode));
@@ -1464,6 +1485,7 @@ class AppController {
   }
 
   void updateMode() {
+    _lastModeChangeTime = DateTime.now();
     _ref.read(patchClashConfigProvider.notifier).updateState((state) {
       final index = Mode.values.indexWhere((item) => item == state.mode);
       if (index == -1) {

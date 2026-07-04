@@ -443,6 +443,10 @@ func handleGetMemory(fn func(value string)) {
 	}()
 }
 
+func handleGetMode() string {
+	return tunnel.Mode().String()
+}
+
 func handleSetState(params string) {
 	_ = json.Unmarshal([]byte(params), state.CurrentState)
 }

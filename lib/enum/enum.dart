@@ -253,6 +253,7 @@ enum ActionMethod {
   generateAgeKeyPair,
   convertAgeSecretKeyToPublicKey,
   decryptAgeConfig,
+  getMode,
 
   ///Android,
   setState,
