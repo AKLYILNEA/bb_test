@@ -88,7 +88,7 @@ jobs:
           echo "storePassword=${{ secrets.STORE_PASSWORD }}" >> android/local.properties
           echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/local.properties
           
-      - name: Setup Java
+      - name: Setup Java (Android)
         if: matrix.platform == 'android'
         uses: actions/setup-java@v5
         with:
@@ -114,7 +114,7 @@ jobs:
           channel: ${{ contains(matrix.os, 'arm') && 'master' || 'stable' }}
           cache: true
           cache-key: flutter-${{ matrix.platform }}-${{ matrix.arch }}-${{ hashFiles('**/pubspec.lock') }}
-          flutter-version: ${{ contains(matrix.os, 'arm') && '' || '3.44.2' }}
+          flutter-version: ${{ contains(matrix.os, 'arm') && '' || '3.44.4' }}
 
 
       - name: Clean Gradle (Android)
@@ -123,8 +123,8 @@ jobs:
           cd android
           flutter clean
 
-      - name: Patch for Windows TUN
-        if: matrix.platform == 'windows' && matrix.compatible == true
+      - name: Patch for Windows
+        if: matrix.platform == 'windows'
         shell: bash
         run: |
           cd core

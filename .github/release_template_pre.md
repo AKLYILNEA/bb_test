@@ -4,11 +4,6 @@
 
 <div align="left">
 
-##  🛩️ 推荐链接
-### 高性价比： [Nano](https://edu.360buyimg.men/auth/register?code=P6hOCEVw)  〢  [良心云](https://xn--9kqz23b19z.com/#/register?code=VTnrQYAj)  〢  [一分机场](https://xn--4gqx1hgtfdmt.com/#/register?code=AuCiXprV)
-
-简评 : ❚ 高性价比机场，支持流媒体与AI解锁，群友反馈口碑尚可，Nano推荐10元/300GB/月，良心云和一分机场推荐21元/1000GB永久套餐; ❚ 注: 机场服务与Bettbox软件无直接关联，请自行判定
-
 ### ✈️ Telegram 社区交流
 
 </div>
@@ -40,6 +35,20 @@
 | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg" alt="Linux" width="28"/> | Linux Kernel 5.4+<br>*(Compatible for Older CPU)* | <a href="https://github.com/appshubcc/Bettbox/releases/download/vVERSION/Bettbox-BASE_VERSION-linux-amd64.AppImage"><img src="https://img.shields.io/badge/AppImage-x64-f84e29?logo=linux&logoColor=white&style=flat-square&labelColor=222222"></a> <a href="https://github.com/appshubcc/Bettbox/releases/download/vVERSION/Bettbox-BASE_VERSION-linux-amd64.deb"><img src="https://img.shields.io/badge/DEB-x64-A81D33?logo=debian&logoColor=white&style=flat-square&labelColor=222222"></a><br><a href="https://github.com/appshubcc/Bettbox/releases/download/vVERSION/Bettbox-BASE_VERSION-linux-arm64.deb"><img src="https://img.shields.io/badge/DEB-ARM64-A81D33?logo=debian&logoColor=white&style=flat-square&labelColor=222222"></a> <a href="https://github.com/appshubcc/Bettbox/releases/download/vVERSION/Bettbox-BASE_VERSION-linux-amd64.rpm"><img src="https://img.shields.io/badge/RPM-x64-CC0000?logo=redhat&logoColor=white&style=flat-square&labelColor=222222"></a><br><a href="https://github.com/appshubcc/Bettbox/releases/download/vVERSION/Bettbox-BASE_VERSION-linux-amd64-compatible.deb"><img src="https://img.shields.io/badge/DEB-Compatible%20x64-555555?logo=debian&logoColor=white&style=flat-square&labelColor=222222"></a> |
 ---
 </div>
+
+###   🛩️ 推荐链接
+### [良心云](https://xn--9kqz23b19z.com/#/register?code=VTnrQYAj)  〢  [一分机场](https://xn--4gqx1hgtfdmt.com/#/register?code=AuCiXprV)  〢  [赔钱机场](https://xn--mes358aby2apfg.com/register?code=z7TUZLmM&cover=sfw)
+
+**简评** : ❚ 相对性价比较高，20元/1000GB/永久套餐值得推荐，群友反馈口碑尚可; 需要注意: 机场服务与Bettbox软件无直接关联，最终效果请自行判定
+
+### ☕ 赞助支持
+
+**如果您觉得这个项目对您有所帮助，可以通过以下方式赞助开发或使用上方的推荐链接：**
+
+* TRON (TRC-20)：   <code>TCkTtZfF2WrciZLaJj3e1aqrh3zdTnCkDa</code>
+* EVM Compatible：  <code>0xF8B1B39431013359D83F38a4e403087624618E67</code>
+* Solana：  <code>C2YQPcKR2YmrPtBvkE13wckjgescUfMA5HzUioR4rQUd</code>
+* Bitcoin： <code>bc1qu950cl6035qvllmzk6cfw3l30j2lg3cq9n6g6h</code>
 
 ### 🐛 Feedback / 问题反馈
 

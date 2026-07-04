@@ -7,39 +7,15 @@
   <strong>Another Better Mihomo Client</strong>
 </p>
 
-Bettbox is a multi-platform proxy client based on an early version of FlClash, refactored and powered by the Mihomo (Clash Meta) core.
+**Bettbox is a multi-platform proxy client based on an early version of FlClash, refactored and powered by the Mihomo (Clash Meta) core.**
 
 Following the principle of "Better Experience", Bettbox inherits the excellent user interface of the original project while deeply optimizing numerous details and internal logic. It aims to be a Mihomo client that delivers a smooth frontend experience, silent and power-efficient background operation, and long-term stability.
 
-**Supported Core Protocols**: Shadowsocks ( R / 2022 ), Trojan, VMess, VLESS ( XHTTP / Reality ), Hysteria ( v1 / v2 ), TUIC, WireGuard, Tailscale, OpenVPN, SSH, AnyTLS, Mieru, Snell ( v1-v5 ), Masque, TrustTunnel, Sudoku, Gost-relay, as well as standard HTTP/Socks5, etc.
+**Supported Core Protocols**: Shadowsocks ( R / 2022 / ShadowTLS / Restls ), Trojan, VMess, VLESS ( XHTTP / Reality ), Hysteria ( v1 / v2 ), TUIC, WireGuard, Tailscale, OpenVPN, SSH, AnyTLS, Mieru, Snell ( v1-v5 ), Masque, TrustTunnel, Sudoku, Gost-relay, as well as standard HTTP/Socks5, etc.
 
 Bettbox stands for: Better Experience, Out of the box.
 
 [![Latest Release](https://img.shields.io/github/v/release/appshubcc/Bettbox?style=for-the-badge&logo=github&color=238636&label=Release)](https://github.com/appshubcc/Bettbox/releases/latest) [![Core](https://img.shields.io/github/v/release/MetaCubeX/mihomo?style=for-the-badge&logo=go&logoColor=white&color=8A2BE2&label=Mihomo)](https://github.com/MetaCubeX/mihomo/releases/latest) [![Downloads](https://img.shields.io/github/downloads/appshubcc/Bettbox/total?style=for-the-badge&logo=github&color=007ec6)](https://github.com/appshubcc/Bettbox/releases) 
-
----
-
-## Recommended Services
-### Cost-Effective: [LiangXinYun](https://xn--9kqz23b19z.com/#/register?code=VTnrQYAj)   〢   [YiFenJiChang](https://xn--4gqx1hgtfdmt.com/#/register?code=AuCiXprV)
-
-**Brief Review**: ❚ ❚ Highly cost-effective starting at ¥2. Offers ¥6/1000GB per month or ¥21/1000GB for permanent bandwidth. Supports AI tools and partial streaming media unlock. Well-received by the community. Note: This is an independent affiliate recommendation. The service is not directly affiliated with the Bettbox software. Please use at your own discretion.
-
----
-
-
-## 🛠️ Installation
-
-Please visit the [Releases](https://github.com/appshubcc/Bettbox/releases) page to download the latest installer for your system.
-
-**Other Installation Methods:**
-- ArchLinux: `yay -S bettbox-bin` or `paru -S bettbox-bin`
-
-* **Desktop**: Windows (x64/arm64), macOS (Intel/Apple Silicon), Linux (x64/arm64)
-* **Windows 7**: Please use in conjunction with [[VxKex]](https://github.com/i486/VxKex/releases).
-* **Android**: ARMv8 / ARMv7 / x86_64 / Universal
-* **Android TV**: Supported (ARMv7 32-bit recommended).
-* **HarmonyOS NEXT**: Please use in conjunction with [[ZhuoYiTong]](https://harmonyos.cool/android-app).
-
 ---
 ### ✈️ Telegram Community
 
@@ -50,49 +26,69 @@ Please visit the [Releases](https://github.com/appshubcc/Bettbox/releases) page 
 [![Telegram Group](https://img.shields.io/badge/Appshub-Chat-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/appshub_chat) [![Telegram Channel](https://img.shields.io/badge/Appshub-Channel-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/appshub_channel)
 
 ---
+
+### ☕ Sponsorship
+
+**If you find this project helpful, you can sponsor the development through the following methods:**
+
+* TRON (TRC-20): <code>TCkTtZfF2WrciZLaJj3e1aqrh3zdTnCkDa</code>
+* EVM Compatible: <code>0xF8B1B39431013359D83F38a4e403087624618E67</code>
+* Solana: <code>C2YQPcKR2YmrPtBvkE13wckjgescUfMA5HzUioR4rQUd</code>
+* Bitcoin: <code>bc1qu950cl6035qvllmzk6cfw3l30j2lg3cq9n6g6h</code>
+
+---
+
+
+## 🛠️ Installation
+
+Please visit the [Releases](https://github.com/appshubcc/Bettbox/releases) page to download the latest installer for your system.
+
+**Other Installation Methods:**</br>
+**ArchLinux:** <code>yay -S bettbox-bin or paru -S bettbox-bin</code>
+
+* **Mainstream Desktop**: **Windows** (x64/arm64), **macOS** (Intel/Apple Silicon), **Linux** (x64/arm64)
+* **Windows 7**: Please use in conjunction with [[VxKex]](https://github.com/i486/VxKex/releases).
+* **Android**: **Android** (ARMv8/ ARMv7/ x86_64/ Universal)
+* **Android TV**: Fully supported, ARMv7 32-bit optional
+* **HarmonyOS NEXT**: Please use in conjunction with [[ZhuoYiTong]](https://harmonyos.cool/android-app).
+
+---
 </div>
 
 ## 🚀 Core Features
 
-### Enhanced User Experience
-* **Out of the box**: Stable permission handling and seamless TUN/VPN integration. Pre-configured with optimized parameters instead of default examples, ensuring a usable state out of the box.
-* **Refined UI**: Carefully polished interface and interactions. Operates lightly in the background, ensuring low battery consumption on mobile devices and minimal CPU footprint on desktops.
-
-### Security and Stability
-* **Security Guardian**: The core engine closely tracks the Mihomo mainline, rapidly adopting new features while enforcing strict cross-platform permission controls.
-* **Resilience**: Optimized for extreme network scenarios. Features an elegant fallback mechanism for configuration errors to ensure continuous, reliable service.
-
-### Flexible Customization
+* **Out of the box**: Stable permission handling and seamless TUN/VPN integration. Pre-configured with plenty of optimizations and details, ensuring a usable state right out of the box.
+* **Refined UI**: Carefully polished interface and functional interactions. Smooth high-framerate frontend animations, low energy consumption on mobile devices, and minimal CPU footprint on desktops.
+* **Security Guardian**: The core engine closely tracks the Mihomo mainline branch and actively adapts to the latest features, maintaining strict cross-platform permission controls and verifications.
+* **Resilience**: Optimized stability under multi-platform extreme scenarios. Built-in dual error detection mechanism with YAML format validation and early pre-parsing.
+* **Performance First**: Native support for multi-platform ARM64 architecture. Implements hardware grading and overall Flutter optimization, fully utilizing hardware performance.
+* **Enhanced Tools**: Supports seamless smart start/stop across platforms, Android sleep mode support, one-click QUIC disable, system tray menu enhancements, and more.
 * **Visual Settings**: Offers comprehensive UI-based settings. Supports immediate effect of changes without the need for manual configuration file editing.
 * **Dashboard Widgets**: Includes built-in widgets that allow you to intuitively monitor real-time network speeds and operational status directly from the home screen.
-* **Personalization**: Supports multiple color themes, custom icons, and 10 dynamic network speed test animations.
-
-### Performance and Compatibility
-* **Performance First**: Native support for desktop ARM64. Implements CPU hardware grading and overall Flutter communication/response performance optimizations.
+* **Personalization**: Supports multiple color themes, custom icons/titles, and even includes 10 beautiful dynamic network speed test animations.
 * **Broad Compatibility**: Actively maintains "Compatible" builds tailored for legacy hardware and older operating systems to extend device lifecycles.
-* **Community-Driven**: We prioritize high-quality issues and actively incorporate community feedback.
-
-### Open Source and Transparent
-* **Automated Builds**: Fully transparent CI/CD pipeline powered by GitHub Actions. What you see in the code is exactly what you get in the release.
-* **Zero Privacy Risk**: Completely free and ad-free. The source code is open to public auditing, strictly prohibiting any background telemetry or data collection.
+* **Zero Privacy Risk**: Open source, ad-free. Fully transparent CI/CD pipeline and open to public auditing, strictly prohibiting any background telemetry or data collection.
+* **Community-Driven**: We carefully evaluate community feedback and prioritize high-quality issues, your voice won't be drowned out.
 
 ---
 
 ## ❓ FAQ
 
 1. **Cannot launch after installation?**
-   - For older Android devices, verify that your system meets the minimum requirement (Android 8.0+).
-   - For older desktop devices, ensure you have downloaded the appropriate "Compatible" version for your CPU architecture.
+   - For older Android devices, please verify **if it meets Bettbox's minimum system requirements**: Android 8.0+
+   - For older desktop devices, please verify **if you need to download a specific CPU grade Compatible version**
    - If the issue persists, please open an Issue.
 
 2. **Common Desktop Issues**
-   - **Windows Administrator Privileges**: Handled automatically during installation; no manual authorization is required afterward.
-   - **Unable to start TUN adapter**: On macOS and Linux, ensure you enter the correct administrator password when prompted.
-   - **Other errors**: Please provide runtime logs and verify that no conflicting proxy software is running simultaneously.
+   - Windows Administrator Privileges: Handled automatically during installation, **no manual authorization is required afterward**.
+   - Unable to start TUN adapter: On macOS and Linux, **please ensure you enter the correct password to grant permissions**.
+   - Other errors: Please provide Debug info, and **ensure no conflicting proxy software or services are running**.
+   - If the issue persists, please open an Issue.
 
 3. **Unable to import subscription links**
-   - Attempt to reset or refresh the subscription link in your browser first to ensure it is active.
-   - Verify that the link is formatted for Clash (Mihomo).
+   - **Please make sure to try resetting the link first to ensure it's active before importing.**
+   - **Ensure that the imported link is in Clash (Mihomo) format.**
+   - If the issue persists, please open an Issue.
 
 4. **To be continued...**
 
@@ -112,7 +108,7 @@ Example for Windows:
 
 Bettbox is built upon the following foundational projects:
 
-* [FlClash](https://github.com/chen08209/FlClash) - An excellent open-source GUI by developer Chen.
+* [FlClash](https://github.com/chen08209/FlClash) - An excellent open-source GUI by master Chen.
 * [Mihomo](https://github.com/MetaCubeX/mihomo) - A powerful, flexible, and robust proxy core.
 
 We also drew inspiration from the following open-source projects during development (listed in order of reference):
