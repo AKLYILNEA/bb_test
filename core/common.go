@@ -302,12 +302,12 @@ func setupConfig(params *SetupParams) error {
 	var err error
 	currentConfig, err = config.ParseRawConfig(params.Config)
 	if err != nil {
-		currentConfig, _ = config.ParseRawConfig(config.DefaultRawConfig())
+		return err
 	}
 	hub.ApplyConfig(currentConfig)
 	patchSelectGroup(params.SelectedMap)
 	updateListeners()
-	return err
+	return nil
 }
 
 func UnmarshalJson(data []byte, v any) error {

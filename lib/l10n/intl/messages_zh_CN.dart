@@ -43,7 +43,7 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m10(label) => "${label} 必须在 1024 到 49151 之间, 0为关闭";
 
   static String m11(statusCode) =>
-      "配置导入失败，请检查网络问题并尝试重置订阅链接(HTTP错误代码: ${statusCode})";
+      "配置导入失败，请检查网络状况或尝试重置订阅链接( HTTP错误代码: ${statusCode} )";
 
   static String m12(count) => "已选择 ${count} 项";
 

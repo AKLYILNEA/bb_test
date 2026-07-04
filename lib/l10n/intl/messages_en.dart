@@ -47,7 +47,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "${label} must be between 1024 and 49151, 0 to disable";
 
   static String m11(statusCode) =>
-      "Failed to import profile. Please check your network and try resetting the subscription link (HTTP error code: ${statusCode})";
+      "Failed to import profile. Please check your network status or try resetting the subscription link ( HTTP error code: ${statusCode} )";
 
   static String m12(count) => "${count} items selected";
 

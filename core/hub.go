@@ -96,7 +96,7 @@ func handleValidateConfig(params *ValidateConfigParams) string {
 		defer age.SetGlobalSecretKeys()
 	}
 
-	_, err := config.UnmarshalRawConfig([]byte(params.Data))
+	_, err := config.Parse([]byte(params.Data))
 	if err != nil {
 		return err.Error()
 	}

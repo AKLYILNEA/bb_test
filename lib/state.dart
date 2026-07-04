@@ -60,8 +60,6 @@ class GlobalState {
   Timer? _backgroundCleanupTimer;
   final Lock _scriptEvaluateLock = Lock();
 
-  SetupParams? _lastSuccessfulSetupParams;
-
   bool isInit = false;
 
   bool get isStart => startTime != null && startTime!.isBeforeNow;
@@ -482,36 +480,14 @@ class GlobalState {
   }
 
   Future<SetupParams> getSetupParams({required ClashConfig pathConfig}) async {
-    try {
-      final clashConfig = await patchRawConfig(patchConfig: pathConfig);
-      final params = SetupParams(
-        config: clashConfig,
-        selectedMap: config.currentProfile?.selectedMap ?? {},
-        testUrl: config.appSetting.testUrl,
-        overrideTestUrl: config.overrideTestUrl,
-      );
-      return params;
-    } catch (e) {
-      commonPrint.log('Failed to parse config in getSetupParams: $e');
-      final fallback = getLastSuccessfulConfig();
-      if (fallback != null) {
-        showNotifier('${appLocalizations.profileParseErrorDesc}: $e');
-        return fallback;
-      }
-      rethrow;
-    }
-  }
-
-  void backupSuccessfulConfig(SetupParams params) {
-    if (_lastSuccessfulSetupParams == params) {
-      return;
-    }
-    _lastSuccessfulSetupParams = params;
-    commonPrint.log('Current config protected');
-  }
-
-  SetupParams? getLastSuccessfulConfig() {
-    return _lastSuccessfulSetupParams;
+    final clashConfig = await patchRawConfig(patchConfig: pathConfig);
+    final params = SetupParams(
+      config: clashConfig,
+      selectedMap: config.currentProfile?.selectedMap ?? {},
+      testUrl: config.appSetting.testUrl,
+      overrideTestUrl: config.overrideTestUrl,
+    );
+    return params;
   }
 
   Future<Map<String, dynamic>> patchRawConfig({

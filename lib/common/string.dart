@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 
+import 'app_localizations.dart';
 import 'print.dart';
 
 extension StringExtension on String {
@@ -78,7 +79,7 @@ extension ObjectExtension on Object {
     if (errorStr.contains('DioException [bad response]')) {
       final match = RegExp(r'status code of (\d+)').firstMatch(errorStr);
       if (match != null) {
-        return 'DioException [bad response]: ${match.group(1)}';
+        return appLocalizations.profileImportFailed(match.group(1)!);
       }
     }
     return errorStr;

@@ -5204,10 +5204,10 @@ class AppLocalizations {
     );
   }
 
-  /// `Failed to import profile. Please check your network and try resetting the subscription link (HTTP error code: {statusCode})`
+  /// `Failed to import profile. Please check your network status or try resetting the subscription link ( HTTP error code: {statusCode} )`
   String profileImportFailed(Object statusCode) {
     return Intl.message(
-      'Failed to import profile. Please check your network and try resetting the subscription link (HTTP error code: $statusCode)',
+      'Failed to import profile. Please check your network status or try resetting the subscription link ( HTTP error code: $statusCode )',
       name: 'profileImportFailed',
       desc: '',
       args: [statusCode],

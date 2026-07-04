@@ -305,10 +305,9 @@ class AppController {
     );
     final message = await clashCore.setupConfig(params);
     if (message.isNotEmpty) {
-      await _rollbackConfig();
+      commonPrint.log('[Core] Setup config failed: $message');
       throw message;
     }
-    globalState.backupSuccessfulConfig(params);
     if (system.isDesktop) {
       final prefs = await preferences.sharedPreferencesCompleter.future;
       await prefs?.setBool('is_tun_running', realTunEnable);
@@ -594,7 +593,12 @@ class AppController {
   Future<void> applyProfile({bool silence = false}) {
     return _coreLifecycleLock.synchronized(() async {
       if (silence) {
-        await _applyProfile();
+        try {
+          await _applyProfile();
+        } catch (err) {
+          globalState.showNotifier(err.toString());
+          rethrow;
+        }
       } else {
         await safeRun(() async {
           await _applyProfile();
@@ -618,7 +622,13 @@ class AppController {
           clashCore.closeConnections();
           await clashCore.flushFakeIP();
         }
-        await _applyProfile();
+        final prevProfileId = _ref.read(currentProfileIdProvider);
+        try {
+          await _applyProfile();
+        } catch (err) {
+          _ref.read(currentProfileIdProvider.notifier).value = prevProfileId;
+          globalState.showNotifier(err.toString());
+        }
       }
       _ref.read(logsProvider.notifier).value = FixedList(maxLength);
       _ref.read(requestsProvider.notifier).value = FixedList(maxLength);
@@ -779,7 +789,13 @@ class AppController {
       if (profile.type == ProfileType.file) {
         continue;
       }
-      await updateProfile(profile);
+      try {
+        await updateProfile(profile);
+      } catch (e) {
+        commonPrint.log(
+          '[UpdateProfiles] Failed to update ${profile.label ?? profile.id}: ${e.formatError}',
+        );
+      }
     }
   }
 
@@ -2148,23 +2164,6 @@ class AppController {
     return mergedWidgets.isNotEmpty ? mergedWidgets : defaultDashboardWidgets;
   }
 
-  /// Rollback
-  Future<void> _rollbackConfig() async {
-    final lastConfig = globalState.getLastSuccessfulConfig();
-    if (lastConfig == null) {
-      commonPrint.log('No backup config available for rollback');
-      return;
-    }
-
-    try {
-      commonPrint.log('Rolling back to last successful config');
-      await clashCore.setupConfig(lastConfig);
-      commonPrint.log('Config rollback successful');
-    } catch (e) {
-      commonPrint.log('Config rollback failed: $e');
-    }
-  }
-
   Future<T?> safeRun<T>(
     FutureOr<T> Function() futureFunction, {
     String? title,
@@ -2178,7 +2177,7 @@ class AppController {
       }
       final res = await futureFunction();
       return res;
-    } catch (e) {
+    } on Object catch (e) {
       commonPrint.log(e.formatError);
       final errorMessage = _formatErrorMessage(e);
       if (realSilence) {
@@ -2200,7 +2199,7 @@ class AppController {
   String _formatErrorMessage(dynamic error) {
     final errorStr = error.toString();
 
-    final statusCodeMatch = RegExp(r'statusCode: (\d+)').firstMatch(errorStr);
+    final statusCodeMatch = RegExp(r'status code of (\d+)').firstMatch(errorStr);
     final statusCode = statusCodeMatch?.group(1);
 
     if (statusCode != null) {
