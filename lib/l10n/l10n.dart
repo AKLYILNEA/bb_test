@@ -69,9 +69,9 @@ class AppLocalizations {
     return Intl.message('Direct', name: 'direct', desc: '', args: []);
   }
 
-  /// `Dashboard`
+  /// `Dash`
   String get dashboard {
-    return Intl.message('Dashboard', name: 'dashboard', desc: '', args: []);
+    return Intl.message('Dash', name: 'dashboard', desc: '', args: []);
   }
 
   /// `Custom Dashboard Title`
@@ -234,10 +234,10 @@ class AppLocalizations {
     );
   }
 
-  /// `Network Detection`
+  /// `Network`
   String get networkDetection {
     return Intl.message(
-      'Network Detection',
+      'Network',
       name: 'networkDetection',
       desc: '',
       args: [],
@@ -2114,9 +2114,9 @@ class AppLocalizations {
     );
   }
 
-  /// `Intranet IP`
+  /// `Local IP`
   String get intranetIP {
-    return Intl.message('Intranet IP', name: 'intranetIP', desc: '', args: []);
+    return Intl.message('Local IP', name: 'intranetIP', desc: '', args: []);
   }
 
   /// `View`
@@ -2614,14 +2614,9 @@ class AppLocalizations {
     return Intl.message('Stop', name: 'stop', desc: '', args: []);
   }
 
-  /// `Power Switch`
+  /// `Power`
   String get powerSwitch {
-    return Intl.message(
-      'Power Switch',
-      name: 'powerSwitch',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Power', name: 'powerSwitch', desc: '', args: []);
   }
 
   /// `Uptime`
@@ -3984,10 +3979,10 @@ class AppLocalizations {
     );
   }
 
-  /// `Optimize UDP/P2P application experience`
+  /// `Optimize UDP/P2P experience`
   String get endpointIndependentNatDesc {
     return Intl.message(
-      'Optimize UDP/P2P application experience',
+      'Optimize UDP/P2P experience',
       name: 'endpointIndependentNatDesc',
       desc: '',
       args: [],
@@ -4144,9 +4139,9 @@ class AppLocalizations {
     );
   }
 
-  /// `Memory Info`
+  /// `Memory`
   String get memoryInfo {
-    return Intl.message('Memory Info', name: 'memoryInfo', desc: '', args: []);
+    return Intl.message('Memory', name: 'memoryInfo', desc: '', args: []);
   }
 
   /// `The current memory information value displayed is the dynamic stack memory usage of the core during runtime, not the complete APP memory statistics, for reference only.`
@@ -4192,6 +4187,16 @@ class AppLocalizations {
       desc: '',
       args: [],
     );
+  }
+
+  /// `Active`
+  String get navConnections {
+    return Intl.message('Active', name: 'navConnections', desc: '', args: []);
+  }
+
+  /// `More`
+  String get navTools {
+    return Intl.message('More', name: 'navTools', desc: '', args: []);
   }
 
   /// `Copy Successful`
@@ -4444,10 +4449,10 @@ class AppLocalizations {
     );
   }
 
-  /// `Modify general settings`
+  /// `Modify global settings`
   String get generalDesc {
     return Intl.message(
-      'Modify general settings',
+      'Modify global settings',
       name: 'generalDesc',
       desc: '',
       args: [],
@@ -5059,14 +5064,9 @@ class AppLocalizations {
     return Intl.message('Log', name: 'log', desc: '', args: []);
   }
 
-  /// `Active Connections`
+  /// `Active`
   String get connection {
-    return Intl.message(
-      'Active Connections',
-      name: 'connection',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Active', name: 'connection', desc: '', args: []);
   }
 
   /// `Request`

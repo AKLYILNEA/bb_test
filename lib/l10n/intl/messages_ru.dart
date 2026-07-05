@@ -258,7 +258,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Максимальное количество параллельных тестов задержки",
     ),
     "confirm": MessageLookupByLibrary.simpleMessage("Подтвердить"),
-    "connection": MessageLookupByLibrary.simpleMessage("Активные соединения"),
+    "connection": MessageLookupByLibrary.simpleMessage("Активные"),
     "connections": MessageLookupByLibrary.simpleMessage("Соединения"),
     "connectionsDesc": MessageLookupByLibrary.simpleMessage(
       "Просмотр текущих соединений",
@@ -295,7 +295,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "customUrl": MessageLookupByLibrary.simpleMessage("Пользовательский URL"),
     "cut": MessageLookupByLibrary.simpleMessage("Вырезать"),
     "dark": MessageLookupByLibrary.simpleMessage("Тёмная"),
-    "dashboard": MessageLookupByLibrary.simpleMessage("Главная"),
+    "dashboard": MessageLookupByLibrary.simpleMessage("Обзор"),
     "days": m0,
     "defaultNameserver": MessageLookupByLibrary.simpleMessage(
       "DNS по умолчанию",
@@ -394,7 +394,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Улучшенный NAT",
     ),
     "endpointIndependentNatDesc": MessageLookupByLibrary.simpleMessage(
-      "Оптимизация работы приложений UDP/P2P",
+      "Оптимизация работы UDP/P2P",
     ),
     "entries": MessageLookupByLibrary.simpleMessage(" записей"),
     "exclude": MessageLookupByLibrary.simpleMessage("Скрыть из недавних"),
@@ -493,7 +493,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "fruitSaladScheme": MessageLookupByLibrary.simpleMessage("Фруктовый микс"),
     "general": MessageLookupByLibrary.simpleMessage("Общие"),
     "generalDesc": MessageLookupByLibrary.simpleMessage(
-      "Изменить общие настройки",
+      "Изменить глобальные настройки",
     ),
     "generateFromPrivateKey": MessageLookupByLibrary.simpleMessage(
       "Создать из закрытого ключа",
@@ -624,7 +624,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "loose": MessageLookupByLibrary.simpleMessage("Максимальная"),
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("Обновить IP"),
-    "memoryInfo": MessageLookupByLibrary.simpleMessage("Расход памяти"),
+    "memoryInfo": MessageLookupByLibrary.simpleMessage("Память"),
     "memoryInfoDesc": MessageLookupByLibrary.simpleMessage(
       "Текущее значение памяти — это динамическое потребление стека ядра во время выполнения, а не полная статистика памяти приложения, только для справки.",
     ),
@@ -661,9 +661,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "navBarHapticFeedbackDesc": MessageLookupByLibrary.simpleMessage(
       "Вибрация при переключении нижней панели навигации",
     ),
+    "navConnections": MessageLookupByLibrary.simpleMessage("Связи"),
+    "navTools": MessageLookupByLibrary.simpleMessage("Еще"),
     "network": MessageLookupByLibrary.simpleMessage("Сеть"),
     "networkDesc": MessageLookupByLibrary.simpleMessage("Настройки сети"),
-    "networkDetection": MessageLookupByLibrary.simpleMessage("Ваш IP адрес"),
+    "networkDetection": MessageLookupByLibrary.simpleMessage("Сеть IP"),
     "networkFix": MessageLookupByLibrary.simpleMessage("Исправление сети"),
     "networkFixDesc": MessageLookupByLibrary.simpleMessage(
       "Исправляет значок сети в системе",
@@ -833,7 +835,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Введите разные порты",
     ),
     "portTip": m10,
-    "powerSwitch": MessageLookupByLibrary.simpleMessage("Переключатель"),
+    "powerSwitch": MessageLookupByLibrary.simpleMessage("Запуск"),
     "preferH3Desc": MessageLookupByLibrary.simpleMessage(
       "Приоритет HTTP/3 для DoH",
     ),
@@ -862,7 +864,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "profileUrlNullValidationDesc": MessageLookupByLibrary.simpleMessage(
       "Введите URL профиля",
     ),
-    "profiles": MessageLookupByLibrary.simpleMessage("Профили"),
+    "profiles": MessageLookupByLibrary.simpleMessage("Конфиг"),
     "profilesSort": MessageLookupByLibrary.simpleMessage("Сортировка профилей"),
     "progress": MessageLookupByLibrary.simpleMessage("Прогресс"),
     "project": MessageLookupByLibrary.simpleMessage("Проект"),

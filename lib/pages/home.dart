@@ -250,7 +250,7 @@ class _HomePageState extends State<HomePage> {
       case PageLabel.profiles:
         return appLocalizations.profiles;
       case PageLabel.tools:
-        return appLocalizations.tools;
+        return appLocalizations.navTools;
       case PageLabel.logs:
         return appLocalizations.logs;
       case PageLabel.requests:
@@ -260,7 +260,7 @@ class _HomePageState extends State<HomePage> {
       case PageLabel.script:
         return appLocalizations.script;
       case PageLabel.connections:
-        return appLocalizations.connections;
+        return appLocalizations.navConnections;
     }
   }
 }

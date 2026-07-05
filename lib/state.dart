@@ -809,6 +809,35 @@ class GlobalState {
       rawConfig['proxy-groups'] = originalProxyGroups;
     }
 
+    final globalClientFingerprint = rawConfig['global-client-fingerprint'];
+    if (rawConfig['proxies'] is List) {
+      final proxiesList = rawConfig['proxies'] as List;
+      for (final proxy in proxiesList) {
+        if (proxy is! Map) continue;
+
+        final type = proxy['type']?.toString().toLowerCase();
+        final isTls = proxy['tls'] == true;
+
+        bool supportClientFingerprint = false;
+        if (type == 'trojan' || type == 'anytls') {
+          supportClientFingerprint = true;
+        } else if ((type == 'vmess' || type == 'vless') && isTls) {
+          supportClientFingerprint = true;
+        }
+
+        if (supportClientFingerprint) {
+          if (globalClientFingerprint != null &&
+              proxy['client-fingerprint'] == null) {
+            proxy['client-fingerprint'] = globalClientFingerprint;
+          }
+
+          if (proxy['client-fingerprint'] == 'chrome') {
+            proxy['client-fingerprint'] = 'firefox';
+          }
+        }
+      }
+    }
+
     rawConfig['rule'] = rules;
     return rawConfig;
   }

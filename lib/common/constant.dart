@@ -51,7 +51,7 @@ const repository = 'appshubcc/Bettbox';
 const defaultExternalController = '127.0.0.1:9090';
 const maxMobileWidth = 600;
 const maxLaptopWidth = 840;
-const defaultTestUrl = 'https://g.cn/generate_204';
+const defaultTestUrl = 'https://www.apple.com/library/test/success.html';
 
 // Preset test URLs
 const presetTestUrls = [
@@ -63,7 +63,7 @@ const presetTestUrls = [
 ];
 
 // Preset NTP servers
-const defaultNtpServer = 'ntp.aliyun.com';
+const defaultNtpServer = 'time.apple.com';
 const presetNtpServers = [
   'ntp.aliyun.com',
   'time.apple.com',

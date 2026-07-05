@@ -272,7 +272,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "enableOverride": MessageLookupByLibrary.simpleMessage("启用覆写"),
     "endpointIndependentNat": MessageLookupByLibrary.simpleMessage("NAT增强"),
     "endpointIndependentNatDesc": MessageLookupByLibrary.simpleMessage(
-      "优化UDP/P2P应用体验",
+      "优化 UDP/P2P 应用体验",
     ),
     "entries": MessageLookupByLibrary.simpleMessage("个条目"),
     "exclude": MessageLookupByLibrary.simpleMessage("后台隐藏"),
@@ -342,7 +342,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "fourColumns": MessageLookupByLibrary.simpleMessage("四列"),
     "fruitSaladScheme": MessageLookupByLibrary.simpleMessage("果缤纷"),
     "general": MessageLookupByLibrary.simpleMessage("常规"),
-    "generalDesc": MessageLookupByLibrary.simpleMessage("修改通用设置"),
+    "generalDesc": MessageLookupByLibrary.simpleMessage("修改全局通用设置"),
     "generateFromPrivateKey": MessageLookupByLibrary.simpleMessage("从Age私钥生成"),
     "generateSecret": MessageLookupByLibrary.simpleMessage("生成"),
     "geoData": MessageLookupByLibrary.simpleMessage("地理数据"),
@@ -447,6 +447,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "navBarHapticFeedbackDesc": MessageLookupByLibrary.simpleMessage(
       "底部导航栏切换震动反馈",
     ),
+    "navConnections": MessageLookupByLibrary.simpleMessage("连接"),
+    "navTools": MessageLookupByLibrary.simpleMessage("更多"),
     "network": MessageLookupByLibrary.simpleMessage("网络"),
     "networkDesc": MessageLookupByLibrary.simpleMessage("修改网络相关设置"),
     "networkDetection": MessageLookupByLibrary.simpleMessage("网络检测"),
