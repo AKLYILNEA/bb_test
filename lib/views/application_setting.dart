@@ -190,6 +190,30 @@ class AnimateTabItem extends ConsumerWidget {
   }
 }
 
+class AlwaysShowTitleBarItem extends ConsumerWidget {
+  const AlwaysShowTitleBarItem({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final alwaysShowTitleBar = ref.watch(
+      vpnSettingProvider.select((state) => state.alwaysShowTitleBar),
+    );
+    return ListItem.switchItem(
+      title: Text(appLocalizations.alwaysShowTitleBar),
+      subtitle: Text(appLocalizations.alwaysShowTitleBarDesc),
+      delegate: SwitchDelegate(
+        value: alwaysShowTitleBar,
+        onChanged: (bool value) async {
+          ref
+              .read(vpnSettingProvider.notifier)
+              .updateState((state) => state.copyWith(alwaysShowTitleBar: value));
+        },
+      ),
+    );
+  }
+}
+
+
 class NavBarHapticFeedbackItem extends ConsumerWidget {
   const NavBarHapticFeedbackItem({super.key});
 
@@ -256,7 +280,11 @@ class ApplicationSettingView extends StatelessWidget {
           ],
           AutoRunItem(),
           if (system.isAndroid) ...[HiddenItem()],
-          AnimateTabItem(),
+          if (system.isDesktop) ...[
+            if (system.isWindows || system.isLinux) const AlwaysShowTitleBarItem(),
+          ] else ...[
+            const AnimateTabItem(),
+          ],
           if (system.isAndroid) ...[
             NavBarHapticFeedbackItem(),
           ],

@@ -328,7 +328,7 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
       FocusManager.instance.primaryFocus?.unfocus();
     }
     
-    final isAnimateToPage = ref.read(appSettingProvider).isAnimateToPage;
+    final isAnimateToPage = system.isDesktop || ref.read(appSettingProvider).isAnimateToPage;
     final isMobile = ref.read(isMobileViewProvider);
     if (isAnimateToPage && isMobile && !ignoreAnimateTo) {
       await _pageController.animateToPage(
