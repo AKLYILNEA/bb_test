@@ -258,7 +258,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Максимальное количество параллельных тестов задержки",
     ),
     "confirm": MessageLookupByLibrary.simpleMessage("Подтвердить"),
-    "connection": MessageLookupByLibrary.simpleMessage("Активные"),
+    "connection": MessageLookupByLibrary.simpleMessage("Соединения"),
     "connections": MessageLookupByLibrary.simpleMessage("Соединения"),
     "connectionsDesc": MessageLookupByLibrary.simpleMessage(
       "Просмотр текущих соединений",
@@ -665,7 +665,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "navTools": MessageLookupByLibrary.simpleMessage("Еще"),
     "network": MessageLookupByLibrary.simpleMessage("Сеть"),
     "networkDesc": MessageLookupByLibrary.simpleMessage("Настройки сети"),
-    "networkDetection": MessageLookupByLibrary.simpleMessage("Сеть IP"),
+    "networkDetection": MessageLookupByLibrary.simpleMessage("IP сети"),
     "networkFix": MessageLookupByLibrary.simpleMessage("Исправление сети"),
     "networkFixDesc": MessageLookupByLibrary.simpleMessage(
       "Исправляет значок сети в системе",
