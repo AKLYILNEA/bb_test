@@ -23,6 +23,8 @@ import (
 	rp "github.com/metacubex/mihomo/rules/provider"
 	"github.com/metacubex/mihomo/tunnel"
 	"os"
+	"runtime"
+	"runtime/debug"
 	"sync"
 )
 
@@ -320,6 +322,8 @@ func setupConfig(params *SetupParams) error {
 	hub.ApplyConfig(currentConfig)
 	patchSelectGroup(params.SelectedMap)
 	updateListeners()
+	runtime.GC()
+	debug.FreeOSMemory()
 	return nil
 }
 

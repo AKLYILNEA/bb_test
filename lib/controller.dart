@@ -727,7 +727,8 @@ class AppController {
         final activeMode = await clashCore.getMode();
         final currentMode = _ref.read(patchClashConfigProvider).mode;
         if (activeMode != currentMode) {
-          if (DateTime.now().difference(_lastModeChangeTime) > const Duration(seconds: 2)) {
+          if (DateTime.now().difference(_lastModeChangeTime) >
+              const Duration(seconds: 2)) {
             _ref
                 .read(patchClashConfigProvider.notifier)
                 .updateState((state) => state.copyWith(mode: activeMode));
@@ -2221,7 +2222,9 @@ class AppController {
   String _formatErrorMessage(dynamic error) {
     final errorStr = error.toString();
 
-    final statusCodeMatch = RegExp(r'status code of (\d+)').firstMatch(errorStr);
+    final statusCodeMatch = RegExp(
+      r'status code of (\d+)',
+    ).firstMatch(errorStr);
     final statusCode = statusCodeMatch?.group(1);
 
     if (statusCode != null) {

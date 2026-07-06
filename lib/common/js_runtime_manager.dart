@@ -44,7 +44,7 @@ class JavaScriptRuntimeManager {
         }
         attempt++;
       } finally {
-        engine.close();
+        await engine.close();
       }
     }
   }
