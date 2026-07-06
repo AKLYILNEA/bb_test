@@ -238,6 +238,12 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "clearCacheTitle": MessageLookupByLibrary.simpleMessage("Очистить кэш"),
     "clearData": MessageLookupByLibrary.simpleMessage("Очистить данные"),
+    "clearDataTipDesc": MessageLookupByLibrary.simpleMessage(
+      "Это действие сбросит настройки приложения. Пожалуйста, сделайте резервную копию. Вы уверены, что хотите продолжить?",
+    ),
+    "clearDataTipTitle": MessageLookupByLibrary.simpleMessage(
+      "Опасная операция",
+    ),
     "clipboard": MessageLookupByLibrary.simpleMessage("Буфер обмена"),
     "clipboardDesc": MessageLookupByLibrary.simpleMessage(
       "Автоматически получать ссылки из буфера обмена",
@@ -393,8 +399,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "endpointIndependentNat": MessageLookupByLibrary.simpleMessage(
       "Улучшенный NAT",
     ),
+    "endpointIndependentNatConfirmDesc": MessageLookupByLibrary.simpleMessage(
+      "Включение функции Endpoint-Independent NAT может незначительно снизить производительность. Рекомендуется включать её только в случае необходимости и если вы с ней знакомы.",
+    ),
     "endpointIndependentNatDesc": MessageLookupByLibrary.simpleMessage(
-      "Оптимизация работы UDP/P2P",
+      "Оптимизация работы UDP/P2P приложений",
     ),
     "entries": MessageLookupByLibrary.simpleMessage(" записей"),
     "exclude": MessageLookupByLibrary.simpleMessage("Скрыть из недавних"),

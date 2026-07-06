@@ -235,6 +235,12 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "clearCacheTitle": MessageLookupByLibrary.simpleMessage("Clear Cache"),
     "clearData": MessageLookupByLibrary.simpleMessage("Clear Data"),
+    "clearDataTipDesc": MessageLookupByLibrary.simpleMessage(
+      "This operation will reset the application. Please make backups. Are you sure you want to continue?",
+    ),
+    "clearDataTipTitle": MessageLookupByLibrary.simpleMessage(
+      "Dangerous Operation",
+    ),
     "clipboard": MessageLookupByLibrary.simpleMessage("Clipboard"),
     "clipboardDesc": MessageLookupByLibrary.simpleMessage(
       "Get profile link from clipboard",
@@ -390,8 +396,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "endpointIndependentNat": MessageLookupByLibrary.simpleMessage(
       "NAT Enhancement",
     ),
+    "endpointIndependentNatConfirmDesc": MessageLookupByLibrary.simpleMessage(
+      "Enabling Endpoint-Independent NAT feature may slightly degrade performance. It is recommended to enable it only if necessary and you are familiar with it.",
+    ),
     "endpointIndependentNatDesc": MessageLookupByLibrary.simpleMessage(
-      "Optimize UDP/P2P experience",
+      "Optimize UDP/P2P application experience",
     ),
     "entries": MessageLookupByLibrary.simpleMessage(" entries"),
     "exclude": MessageLookupByLibrary.simpleMessage("Hide from Recents"),

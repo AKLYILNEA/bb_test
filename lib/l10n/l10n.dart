@@ -3979,11 +3979,21 @@ class AppLocalizations {
     );
   }
 
-  /// `Optimize UDP/P2P experience`
+  /// `Optimize UDP/P2P application experience`
   String get endpointIndependentNatDesc {
     return Intl.message(
-      'Optimize UDP/P2P experience',
+      'Optimize UDP/P2P application experience',
       name: 'endpointIndependentNatDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enabling Endpoint-Independent NAT feature may slightly degrade performance. It is recommended to enable it only if necessary and you are familiar with it.`
+  String get endpointIndependentNatConfirmDesc {
+    return Intl.message(
+      'Enabling Endpoint-Independent NAT feature may slightly degrade performance. It is recommended to enable it only if necessary and you are familiar with it.',
+      name: 'endpointIndependentNatConfirmDesc',
       desc: '',
       args: [],
     );
@@ -4637,6 +4647,26 @@ class AppLocalizations {
   /// `Clear Data`
   String get clearData {
     return Intl.message('Clear Data', name: 'clearData', desc: '', args: []);
+  }
+
+  /// `Dangerous Operation`
+  String get clearDataTipTitle {
+    return Intl.message(
+      'Dangerous Operation',
+      name: 'clearDataTipTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This operation will reset the application. Please make backups. Are you sure you want to continue?`
+  String get clearDataTipDesc {
+    return Intl.message(
+      'This operation will reset the application. Please make backups. Are you sure you want to continue?',
+      name: 'clearDataTipDesc',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Text Scaling`
