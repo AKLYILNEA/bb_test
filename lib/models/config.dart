@@ -72,7 +72,7 @@ abstract class AppSettingProps with _$AppSettingProps {
     @Default(true) bool onlyStatisticsProxy,
     @Default(false) bool autoLaunch,
     @Default(false) bool silentLaunch,
-    @Default(true) bool smartDelayLaunch,
+    @Default(false) bool smartDelayLaunch,
     @Default(false) bool autoRun,
     @Default(true) bool openLogs,
     @Default(true) bool closeConnections,

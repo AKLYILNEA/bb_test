@@ -15,7 +15,7 @@ _AppSettingProps _$AppSettingPropsFromJson(Map<String, dynamic> json) =>
       onlyStatisticsProxy: json['onlyStatisticsProxy'] as bool? ?? true,
       autoLaunch: json['autoLaunch'] as bool? ?? false,
       silentLaunch: json['silentLaunch'] as bool? ?? false,
-      smartDelayLaunch: json['smartDelayLaunch'] as bool? ?? true,
+      smartDelayLaunch: json['smartDelayLaunch'] as bool? ?? false,
       autoRun: json['autoRun'] as bool? ?? false,
       openLogs: json['openLogs'] as bool? ?? true,
       closeConnections: json['closeConnections'] as bool? ?? true,
