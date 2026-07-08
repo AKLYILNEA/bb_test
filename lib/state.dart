@@ -551,8 +551,8 @@ class GlobalState {
     rawConfig['tun']['route-address'] = realPatchConfig.tun.routeAddress;
     rawConfig['tun']['route-exclude-address'] =
         realPatchConfig.tun.routeExcludeAddress;
-    rawConfig['tun']['auto-route'] = true;
-    rawConfig['tun']['auto-detect-interface'] = true;
+    rawConfig['tun']['auto-route'] = !system.isAndroid;
+    rawConfig['tun']['auto-detect-interface'] = !system.isAndroid;
     rawConfig['tun']['strict-route'] = realPatchConfig.tun.strictRoute;
     rawConfig['tun']['endpoint-independent-nat'] =
         realPatchConfig.tun.endpointIndependentNat;
