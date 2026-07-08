@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net"
 	"runtime"
+	"runtime/debug"
 	"sort"
 	"strconv"
 	"time"
@@ -65,6 +66,10 @@ func handleStopListener() bool {
 	defer runLock.Unlock()
 	isRunning = false
 	listener.StopListener()
+	go func() {
+		runtime.GC()
+		debug.FreeOSMemory()
+	}()
 	return true
 }
 
@@ -72,10 +77,13 @@ func handleGetIsInit() bool {
 	return isInit
 }
 
-func handleForceGc() {
+func handleForceGc(forceFreeOSMemory bool) {
 	go func() {
-		log.Infoln("[APP] request force GC")
+		log.Infoln("[APP] Request force GC", forceFreeOSMemory)
 		runtime.GC()
+		if forceFreeOSMemory {
+			debug.FreeOSMemory()
+		}
 	}()
 }
 
@@ -83,6 +91,7 @@ func handleShutdown() bool {
 	stopListeners()
 	executor.Shutdown()
 	runtime.GC()
+	debug.FreeOSMemory()
 	isInit = false
 	return true
 }

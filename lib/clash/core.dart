@@ -304,8 +304,8 @@ class ClashCore {
     clashInterface.stopLog();
   }
 
-  Future<void> requestGc() async {
-    await clashInterface.forceGc();
+  Future<void> requestGc({bool forceFreeOSMemory = false}) async {
+    await clashInterface.forceGc(forceFreeOSMemory: forceFreeOSMemory);
   }
 
   Future<void> flushFakeIP() async {
