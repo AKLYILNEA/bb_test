@@ -126,7 +126,7 @@ func handleDecryptAgeConfig(params *DecryptAgeConfigParams) string {
 func handleGetProxies() map[string]constant.Proxy {
 	runLock.Lock()
 	defer runLock.Unlock()
-	return getProxiesWithProviders()
+	return tunnel.Proxies()
 }
 
 func handleChangeProxy(data string, fn func(string string)) {
@@ -141,8 +141,7 @@ func handleChangeProxy(data string, fn func(string string)) {
 		}
 		groupName := *params.GroupName
 		proxyName := *params.ProxyName
-		proxies := getProxiesWithProviders()
-		group, ok := proxies[groupName]
+		group, ok := tunnel.Proxies()[groupName]
 		if !ok {
 			fn("Not found group")
 			return
@@ -218,8 +217,7 @@ func handleAsyncTestDelay(paramsString string, fn func(string)) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*time.Duration(params.Timeout))
 		defer cancel()
 
-		proxies := getProxiesWithProviders()
-		proxy := proxies[params.ProxyName]
+		proxy := tunnel.ProxiesWithProviders()[params.ProxyName]
 
 		delayData := &Delay{
 			Name: params.ProxyName,
