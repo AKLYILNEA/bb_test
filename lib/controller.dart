@@ -885,6 +885,10 @@ class AppController {
     try {
       stopWakelockAutoRecovery();
       await globalState.handleBackground();
+      if (system.isDesktop) {
+        final prefs = await preferences.sharedPreferencesCompleter.future;
+        await prefs?.setBool('is_tun_running', false);
+      }
       await savePreferences();
       if (macOS != null) {
         await macOS!.updateDns(true);
