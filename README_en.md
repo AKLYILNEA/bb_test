@@ -27,17 +27,6 @@ Bettbox stands for: Better Experience, Out of the box.
 
 ---
 
-### ☕ Sponsorship
-
-**If you find this project helpful, you can sponsor the development through the following methods:**
-
-* TRON (TRC-20): <code>TCkTtZfF2WrciZLaJj3e1aqrh3zdTnCkDa</code>
-* EVM Compatible: <code>0xF8B1B39431013359D83F38a4e403087624618E67</code>
-* Solana: <code>C2YQPcKR2YmrPtBvkE13wckjgescUfMA5HzUioR4rQUd</code>
-* Bitcoin: <code>bc1qu950cl6035qvllmzk6cfw3l30j2lg3cq9n6g6h</code>
-
----
-
 
 ## 🛠️ Installation
 
@@ -45,6 +34,7 @@ Please visit the [Releases](https://github.com/appshubcc/Bettbox/releases) page 
 
 **Other Installation Methods:**</br>
 **ArchLinux:** <code>yay -S bettbox-bin or paru -S bettbox-bin</code>
+**Compatible Version:** <code>yay -S bettbox-compatible-bin or paru -S bettbox-compatible-bin</code>
 
 * **Mainstream Desktop**: **Windows** (x64/arm64), **macOS** (Intel/Apple Silicon), **Linux** (x64/arm64)
 * **Windows 7**: Please use in conjunction with [[VxKex]](https://github.com/i486/VxKex/releases).
@@ -104,14 +94,22 @@ Example for Windows:
 
 ---
 
+### ☕ Sponsorship
+
+**If you find this project helpful, you can sponsor the development through the following methods:**
+
+* TRON (TRC-20): <code>TCkTtZfF2WrciZLaJj3e1aqrh3zdTnCkDa</code>
+* EVM Compatible: <code>0xF8B1B39431013359D83F38a4e403087624618E67</code>
+* Solana: <code>C2YQPcKR2YmrPtBvkE13wckjgescUfMA5HzUioR4rQUd</code>
+* Bitcoin: <code>bc1qu950cl6035qvllmzk6cfw3l30j2lg3cq9n6g6h</code>
+
+---
+
 ## ❤️ Acknowledgements
 
-Bettbox is built upon the following foundational projects:
+* [FlClash](https://github.com/chen08209/FlClash) - [Mihomo](https://github.com/MetaCubeX/mihomo)
 
-* [FlClash](https://github.com/chen08209/FlClash) - An excellent open-source GUI by master Chen.
-* [Mihomo](https://github.com/MetaCubeX/mihomo) - A powerful, flexible, and robust proxy core.
-
-We also drew inspiration from the following open-source projects during development (listed in order of reference):
+Other references (listed in chronological order):
 
 [CMFA](https://github.com/MetaCubeX/ClashMetaForAndroid), [Sparkle](https://github.com/xishang0128/sparkle), [SFA](https://github.com/SagerNet/sing-box-for-android), [HUSI](https://github.com/xchacha20-poly1305/husi), [V2rayN](https://github.com/2dust/v2rayN)
 
