@@ -345,8 +345,18 @@ class BuildCommand extends Command {
     }
     argParser.addOption(
       'out',
-      valueHelp: [if (target.same) 'app', 'core'].join(','),
+      valueHelp: [
+        if (target.same) 'app',
+        'core',
+        'core-only',
+        'helper',
+      ].join(','),
       help: 'The $name build arch',
+    );
+    argParser.addOption(
+      'core-hash',
+      help:
+          'SHA256 hash of the (signed) core binary, used when --out=helper to embed the correct TOKEN',
     );
     argParser.addOption(
       'env',
@@ -613,6 +623,22 @@ class BuildCommand extends Command {
       mode: mode,
       compatible: compatible,
     );
+
+    if (out == 'core-only') {
+      return;
+    }
+
+    if (out == 'helper') {
+      if (target != Target.windows) {
+        throw '--out helper is only supported for windows';
+      }
+      final coreHash = argResults?['core-hash'] as String?;
+      if (coreHash == null || coreHash.isEmpty) {
+        throw '--core-hash is required when --out=helper';
+      }
+      await Build.buildHelper(target, coreHash);
+      return;
+    }
 
     if (out != 'app') {
       if (target == Target.windows) {
