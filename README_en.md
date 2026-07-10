@@ -1,5 +1,5 @@
 <h4 align="right">
-  <a href="README.md">简体中文</a> | <strong>English</strong> | <a href="README_ru.md">Русский</a>
+  <a href="README.md">简体中文</a> | <strong>English</strong> | <a href="README_ru.md">Русский</a> | <a href="README_fa.md">فارسی</a> | <a href="README_ja.md">日本語</a> | <a href="README_ko.md">한국어</a>
 </h4>
 
 <h1 align="center">⚡ Bettbox</h1>
@@ -7,7 +7,7 @@
   <strong>Another Better Mihomo Client</strong>
 </p>
 
-**Bettbox is a multi-platform proxy client based on an early version of FlClash, refactored and powered by the Mihomo (Clash Meta) core.**
+**Bettbox is a multi-platform network debugging and traffic splitting client based on an early version of FlClash, refactored and powered by the Mihomo (Clash Meta) core.**
 
 Following the principle of "Better Experience", Bettbox inherits the excellent user interface of the original project while deeply optimizing numerous details and internal logic. It aims to be a Mihomo client that delivers a smooth frontend experience, silent and power-efficient background operation, and long-term stability.
 
@@ -28,19 +28,14 @@ Bettbox stands for: Better Experience, Out of the box.
 ---
 
 
-## 🛠️ Installation
-
-Please visit the [Releases](https://github.com/appshubcc/Bettbox/releases) page to download the latest installer for your system.
-
-**Other Installation Methods:**</br>
-**ArchLinux:** <code>yay -S bettbox-bin or paru -S bettbox-bin</code>
-**Compatible Version:** <code>yay -S bettbox-compatible-bin or paru -S bettbox-compatible-bin</code>
-
-* **Mainstream Desktop**: **Windows** (x64/arm64), **macOS** (Intel/Apple Silicon), **Linux** (x64/arm64)
-* **Windows 7**: Please use in conjunction with [[VxKex]](https://github.com/i486/VxKex/releases).
-* **Android**: **Android** (ARMv8/ ARMv7/ x86_64/ Universal)
+* **All Desktop Platforms**: **Windows** (x64/arm64), **macOS** (Intel/Apple Silicon), **Linux** (x64/arm64)
+* **Android Devices**: Android (ARMv8/ ARMv7/ x86_64/ Universal)
 * **Android TV**: Fully supported, ARMv7 32-bit optional
 * **HarmonyOS NEXT**: Please use in conjunction with [[ZhuoYiTong]](https://harmonyos.cool/android-app).
+
+**Other Installation Methods:**<br>
+**ArchLinux:** <code>yay -S bettbox-bin or paru -S bettbox-bin</code><br>
+**AMD64=v1:** <code>yay -S bettbox-compatible-bin or paru -S bettbox-compatible-bin</code>
 
 ---
 </div>
@@ -52,7 +47,7 @@ Please visit the [Releases](https://github.com/appshubcc/Bettbox/releases) page 
 * **Security Guardian**: The core engine closely tracks the Mihomo mainline branch and actively adapts to the latest features, maintaining strict cross-platform permission controls and verifications.
 * **Resilience**: Optimized stability under multi-platform extreme scenarios. Built-in dual error detection mechanism with YAML format validation and early pre-parsing.
 * **Performance First**: Native support for multi-platform ARM64 architecture. Implements hardware grading and overall Flutter optimization, fully utilizing hardware performance.
-* **Enhanced Tools**: Supports seamless smart start/stop across platforms, Android sleep mode support, one-click QUIC disable, system tray menu enhancements, and more.
+* **Enhanced Tools**: First multi-platform seamless smart start/stop, Android sleep mode support, one-click QUIC disable, system tray menu enhancements, and more.
 * **Visual Settings**: Offers comprehensive UI-based settings. Supports immediate effect of changes without the need for manual configuration file editing.
 * **Dashboard Widgets**: Includes built-in widgets that allow you to intuitively monitor real-time network speeds and operational status directly from the home screen.
 * **Personalization**: Supports multiple color themes, custom icons/titles, and even includes 10 beautiful dynamic network speed test animations.
@@ -64,23 +59,36 @@ Please visit the [Releases](https://github.com/appshubcc/Bettbox/releases) page 
 
 ## ❓ FAQ
 
-1. **Cannot launch after installation?**
-   - For older Android devices, please verify **if it meets Bettbox's minimum system requirements**: Android 8.0+
-   - For older desktop devices, please verify **if you need to download a specific CPU grade Compatible version**
-   - If the issue persists, please open an Issue.
+1. **Installation, Startup and Security:**
+   - For Android devices, please check **if sufficient background permissions are granted and if it meets the minimum system requirements**: Android 8.0+
+   - For older desktop devices, please check the system platform architecture **to see if you need to download a specific CPU grade Compatible version**
+   - **Security: The Bettbox project is completely open source and transparent. The current codebase has passed security auditing by the Signpath Foundation.**
 
-2. **Common Desktop Issues**
+2. **Common Desktop Issues:**
    - Windows Administrator Privileges: Handled automatically during installation, **no manual authorization is required afterward**.
    - Unable to start TUN adapter: On macOS and Linux, **please ensure you enter the correct password to grant permissions**.
    - Other errors: Please provide Debug info, and **ensure no conflicting proxy software or services are running**.
    - If the issue persists, please open an Issue.
 
-3. **Unable to import subscription links**
-   - **Please make sure to try resetting the link first to ensure it's active before importing.**
+3. **macOS Installation Guide:**
+   - After downloading the version matching your platform (Intel/Apple Silicon), double-click to open the Bettbox-macos-xx.dmg file.
+   - Drag the Bettbox icon into the Applications folder to complete the installation.
+   - **Bypass Gatekeeper security blocks for first launch** (since we currently do not purchase Apple developer certificates):
+     - **Recommended**: Open the "Applications" folder, **right-click the Bettbox icon**, select **"Open"**, then click **"Open"** again in the confirmation dialog.
+     - **Alternative**: If double-clicking is blocked, go to Mac "System Settings" -> "Privacy & Security", find Bettbox and click **"Open Anyway"**.
+   - The first time you enable TUN mode, the system will prompt you for password authentication. Please enter your Mac user password to allow Bettbox to configure the network.
+   - **If it says "is damaged and can't be opened, you should move it to the Trash":**
+     - This is a false positive of macOS Gatekeeper for unsigned software. Open Terminal and run the following command to remove the quarantine flag:
+       ```bash
+       xattr -d com.apple.quarantine /Applications/Bettbox.app
+       ```
+
+4. **Unable to import subscription links:**
+   - **Please make sure to try resetting the link first** to ensure it's active before importing.
    - **Ensure that the imported link is in Clash (Mihomo) format.**
    - If the issue persists, please open an Issue.
 
-4. **To be continued...**
+5. **To be continued...**
 
 ---
 
@@ -88,9 +96,12 @@ Please visit the [Releases](https://github.com/appshubcc/Bettbox/releases) page 
 
 Example for Windows:
 
-* Requires a Windows environment (≥ Windows 10)
-* Dependencies: Visual Studio, Flutter SDK ≥ 3.44, Golang, Inno Setup, Rust
-* Build command: `dart .\setup.dart windows --arch amd64 --compatible` (the `--compatible` flag is optional)
+* You need a Windows device (system ≥ Windows 10)
+* Other required environment: Git, Visual Studio, Flutter 3.44.x, Golang, Inno Setup, Rust
+* `flutter pub get` (get dependencies)
+* `dart .\setup.dart windows --arch amd64 --out core` (only build Core)
+* `dart .\setup.dart windows --arch amd64 --out app --compatible` (optional compatible version)
+* Once built, the final artifacts are located in the `dist/` directory
 
 ---
 
@@ -107,9 +118,9 @@ Example for Windows:
 
 ## ❤️ Acknowledgements
 
-* [FlClash](https://github.com/chen08209/FlClash) - [Mihomo](https://github.com/MetaCubeX/mihomo)
+* **[FlClash](https://github.com/chen08209/FlClash)** - **[Mihomo](https://github.com/MetaCubeX/mihomo)**
 
-Other references (listed in chronological order):
+Other open-source project references (listed in chronological order):
 
 [CMFA](https://github.com/MetaCubeX/ClashMetaForAndroid), [Sparkle](https://github.com/xishang0128/sparkle), [SFA](https://github.com/SagerNet/sing-box-for-android), [HUSI](https://github.com/xchacha20-poly1305/husi), [V2rayN](https://github.com/2dust/v2rayN)
 
