@@ -172,6 +172,12 @@ class AppController {
   }
 
   Future<void> _fastStart() async {
+    final currentProfile = _ref.read(currentProfileProvider);
+    if (currentProfile == null) {
+      commonPrint.log('Fast start aborted: No active profile configured.');
+      return;
+    }
+
     final patchConfig = _ref.read(patchClashConfigProvider);
     final isDesktop = system.isDesktop;
 
@@ -1171,8 +1177,9 @@ class AppController {
         }
       }
     }
-    final shouldStart =
-        globalState.isStart || _ref.read(appSettingProvider).autoRun;
+    final hasProfile = _ref.read(currentProfileProvider) != null;
+    final shouldStart = hasProfile &&
+        (globalState.isStart || _ref.read(appSettingProvider).autoRun);
 
     if (shouldStart) {
       try {

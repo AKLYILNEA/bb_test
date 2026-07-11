@@ -107,6 +107,10 @@ class ClashCore {
               final name = proxyMap['name'];
               if (name != null) {
                 allProxies[name] = proxyMap;
+                final suffix = '[${provider.name}]';
+                if (!name.endsWith(suffix)) {
+                  allProxies['$name$suffix'] = proxyMap;
+                }
               }
             }
           }
