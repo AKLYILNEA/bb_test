@@ -670,6 +670,9 @@ class GlobalState {
       final ntp = realPatchConfig.ntp;
       rawConfig['ntp'] = ntp.toJson();
     }
+    if (system.isAndroid) {
+      rawConfig['ntp']['enable'] = false;
+    }
     if (rawConfig['sniffer'] == null) {
       rawConfig['sniffer'] = {};
     }
@@ -836,10 +839,6 @@ class GlobalState {
           if (globalClientFingerprint != null &&
               proxy['client-fingerprint'] == null) {
             proxy['client-fingerprint'] = globalClientFingerprint;
-          }
-
-          if (proxy['client-fingerprint'] == 'chrome') {
-            proxy['client-fingerprint'] = 'firefox';
           }
         }
       }
