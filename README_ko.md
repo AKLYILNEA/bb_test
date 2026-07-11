@@ -121,7 +121,10 @@ Windows 환경을 예로 들면:
 
 ## ❤️ 감사의 글
 
-* **[FlClash](https://github.com/chen08209/FlClash)** - **[Mihomo](https://github.com/MetaCubeX/mihomo)**
+**[FlClash GUI](https://github.com/chen08209/FlClash)** - **[Mihomo Core](https://github.com/MetaCubeX/mihomo)**
+
+* Bettbox 프로젝트의 Windows 디지털 서명은 **[SignPath](https://signpath.io)**에서 제공하며, 코드는 보안 검토를 통과했습니다.
+* 오픈 소스 커뮤니티에 대한 아낌없는 지원을 해주신 **SignPath 재단 (SignPath Foundation)**에 진심으로 감사드립니다.
 
 기타 오픈소스 프로젝트 (시간 경과 순):
 

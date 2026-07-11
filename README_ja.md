@@ -121,7 +121,10 @@ Windowsを例にとると：
 
 ## ❤️ 謝辞
 
-* **[FlClash](https://github.com/chen08209/FlClash)** - **[Mihomo](https://github.com/MetaCubeX/mihomo)**
+**[FlClash GUI](https://github.com/chen08209/FlClash)** - **[Mihomo Core](https://github.com/MetaCubeX/mihomo)**
+
+* BettboxプロジェクトのWindowsデジタル署名は**[SignPath](https://signpath.io)**によって提供され、コードはセキュリティ監査を通過しています。
+* オープンソースコミュニティへの多大なご支援に対して、**SignPath財団 (SignPath Foundation)**に心より感謝申し上げます。
 
 その他のオープンソースプロジェクト（時系列順）：
 

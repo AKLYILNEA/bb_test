@@ -118,7 +118,10 @@
 
 ## ❤️ Благодарности
 
-* **[FlClash](https://github.com/chen08209/FlClash)** - **[Mihomo](https://github.com/MetaCubeX/mihomo)**
+**[FlClash GUI](https://github.com/chen08209/FlClash)** - **[Mihomo Core](https://github.com/MetaCubeX/mihomo)**
+
+* Цифровая подпись Windows для проекта Bettbox предоставлена **[SignPath](https://signpath.io)**, и код прошёл аудит безопасности.
+* Искренняя благодарность фонду **SignPath Foundation** за активную поддержку сообщества открытого исходного кода.
 
 Другие проекты (в хронологическом порядке):
 

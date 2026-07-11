@@ -118,7 +118,10 @@ Example for Windows:
 
 ## ❤️ Acknowledgements
 
-* **[FlClash](https://github.com/chen08209/FlClash)** - **[Mihomo](https://github.com/MetaCubeX/mihomo)**
+**[FlClash GUI](https://github.com/chen08209/FlClash)** - **[Mihomo Core](https://github.com/MetaCubeX/mihomo)**
+
+* The Windows digital signature for the Bettbox project is provided by **[SignPath](https://signpath.io)**, and the code has passed security reviews.
+* Heartfelt thanks to the **SignPath Foundation** for their generous support of the open-source community.
 
 Other open-source project references (listed in chronological order):
 
