@@ -434,8 +434,8 @@ class AppController {
     _ref.read(localIpProvider.notifier).value = await utils.getLocalIpAddress();
   }
 
-  Future<void> updateProfile(Profile profile) async {
-    final newProfile = await profile.update();
+  Future<void> updateProfile(Profile profile, {bool validate = true}) async {
+    final newProfile = await profile.update(validate: validate);
     _ref
         .read(profilesProvider.notifier)
         .setProfile(newProfile.copyWith(isUpdating: false));
@@ -1338,6 +1338,7 @@ class AppController {
         ).update();
       },
       needLoading: true,
+      silence: false,
       title: appLocalizations.add,
     );
     if (profile != null) {
@@ -1361,6 +1362,7 @@ class AppController {
         return await Profile.normal(label: platformFile?.name).saveFile(bytes);
       },
       needLoading: true,
+      silence: false,
       title: appLocalizations.add,
     );
     if (profile != null) {
@@ -2219,7 +2221,6 @@ class AppController {
     bool needLoading = false,
     bool silence = true,
   }) async {
-    final realSilence = needLoading == true ? true : silence;
     try {
       if (needLoading) {
         _ref.read(loadingProvider.notifier).value = true;
@@ -2229,10 +2230,13 @@ class AppController {
     } on Object catch (e) {
       commonPrint.log(e.formatError);
       final errorMessage = _formatErrorMessage(e);
-      if (realSilence) {
+      if (needLoading) {
+        _ref.read(loadingProvider.notifier).value = false;
+      }
+      if (silence) {
         globalState.showNotifier(errorMessage);
       } else {
-        globalState.showMessage(
+        await globalState.showMessage(
           title: title ?? appLocalizations.tip,
           message: TextSpan(text: errorMessage),
         );
