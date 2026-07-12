@@ -284,6 +284,7 @@ class _ConfigViewState extends State<ConfigView> {
         ),
       ),
     ];
+
     return generateListView(items.separated(const Divider(height: 0)).toList());
   }
 }

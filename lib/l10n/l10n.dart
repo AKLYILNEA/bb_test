@@ -2434,6 +2434,26 @@ class AppLocalizations {
     );
   }
 
+  /// `Classic Theme`
+  String get classicTheme {
+    return Intl.message(
+      'Classic Theme',
+      name: 'classicTheme',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Use a more classic and simple Flutter theme`
+  String get classicThemeDesc {
+    return Intl.message(
+      'Use a more classic and simple Flutter theme',
+      name: 'classicThemeDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Pure Black Mode`
   String get pureBlackMode {
     return Intl.message(

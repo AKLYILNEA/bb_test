@@ -31,50 +31,123 @@ class GoogleBottomNavBar extends ConsumerWidget {
     final enableHapticFeedback = ref.watch(
       appSettingProvider.select((state) => state.enableNavBarHapticFeedback),
     );
+    final classicTheme = ref.watch(
+      themeSettingProvider.select((state) => (state.classicTheme as dynamic) == true),
+    );
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: context.colorScheme.surfaceContainer,
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 20,
-            color: Colors.black.withValues(alpha: 0.15),
+    final tabsList = navigationItems
+        .map(
+          (e) => GButton(
+            icon: _extractIconData(e.icon),
+            text: Intl.message(e.label.name),
           ),
-        ],
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
+        )
+        .toList();
+
+    void handleTabChange(int index) {
+      // Trigger vibration only if haptic feedback enabled
+      if (system.isAndroid && enableHapticFeedback) {
+        HapticFeedback.selectionClick(); // Lighter haptic feedback
+      }
+      onTabChange(index);
+    }
+
+    if (classicTheme) {
+      return Container(
+        decoration: BoxDecoration(
+          color: context.colorScheme.surfaceContainer,
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 20,
+              color: Colors.black.withValues(alpha: 0.15),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
+            child: GNav(
+              rippleColor: enableHapticFeedback
+                  ? context.colorScheme.onSurface.withValues(alpha: 0.15)
+                  : Colors.transparent, // Disabling ripple may disable haptic feedback
+              hoverColor: context.colorScheme.onSurface.withValues(alpha: 0.1),
+              haptic: enableHapticFeedback, // Control GNav haptic feedback
+              gap: 8,
+              activeColor: context.colorScheme.onSecondaryContainer,
+              iconSize: 24,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              duration: const Duration(milliseconds: 250),
+              tabBackgroundColor: context.colorScheme.secondaryContainer,
+              color: context.colorScheme.onSurfaceVariant,
+              tabs: tabsList,
+              selectedIndex: selectedIndex,
+              onTabChange: handleTabChange,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return RepaintBoundary(
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 16,
+          right: 16,
+          bottom: bottomPadding > 0 ? bottomPadding : 12,
+          top: 8,
+        ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8),
+          decoration: BoxDecoration(
+            color: context.colorScheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(36),
+            border: Border.all(
+              color: context.colorScheme.outlineVariant.withValues(
+                alpha: context.colorScheme.brightness == Brightness.light
+                    ? 0.5
+                    : 0.4,
+              ),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 30,
+                offset: const Offset(0, 10),
+                color: Colors.black.withValues(
+                  alpha: context.colorScheme.brightness == Brightness.light
+                      ? 0.08
+                      : 0.18,
+                ),
+              ),
+              BoxShadow(
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+                color: Colors.black.withValues(
+                  alpha: context.colorScheme.brightness == Brightness.light
+                      ? 0.04
+                      : 0.1,
+                ),
+              ),
+            ],
+          ),
           child: GNav(
             rippleColor: enableHapticFeedback
                 ? context.colorScheme.onSurface.withValues(alpha: 0.15)
-                : Colors.transparent, // Disabling ripple may disable haptic feedback
+                : Colors
+                      .transparent, // Disabling ripple may disable haptic feedback
             hoverColor: context.colorScheme.onSurface.withValues(alpha: 0.1),
             haptic: enableHapticFeedback, // Control GNav haptic feedback
             gap: 8,
             activeColor: context.colorScheme.onSecondaryContainer,
             iconSize: 24,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             duration: const Duration(milliseconds: 250),
             tabBackgroundColor: context.colorScheme.secondaryContainer,
             color: context.colorScheme.onSurfaceVariant,
-            curve: Curves.easeInOut,
-            tabs: navigationItems
-                .map(
-                  (e) => GButton(
-                    icon: _extractIconData(e.icon),
-                    text: Intl.message(e.label.name),
-                  ),
-                )
-                .toList(),
+            tabs: tabsList,
             selectedIndex: selectedIndex,
-            onTabChange: (index) {
-              // Trigger vibration only if haptic feedback enabled
-              if (system.isAndroid && enableHapticFeedback) {
-                HapticFeedback.selectionClick(); // Lighter haptic feedback
-              }
-              onTabChange(index);
-            },
+            onTabChange: handleTabChange,
           ),
         ),
       ),

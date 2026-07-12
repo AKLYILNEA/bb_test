@@ -163,6 +163,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "checkUpdateError": MessageLookupByLibrary.simpleMessage("目前的應用程式已經是最新版了"),
     "checking": MessageLookupByLibrary.simpleMessage("檢測中..."),
     "circle": MessageLookupByLibrary.simpleMessage("圓環流轉"),
+    "classicTheme": MessageLookupByLibrary.simpleMessage("經典主題"),
+    "classicThemeDesc": MessageLookupByLibrary.simpleMessage(
+      "使用更加經典質樸的Flutter主題",
+    ),
     "clearCacheDesc": MessageLookupByLibrary.simpleMessage(
       "是否需要清理 FakeIP & DNS 快取？",
     ),

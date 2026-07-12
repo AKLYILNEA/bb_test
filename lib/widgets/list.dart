@@ -4,6 +4,8 @@ import 'package:bett_box/models/models.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/open_container.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:bett_box/providers/providers.dart';
 
 import 'card.dart';
 import 'input.dart';
@@ -513,19 +515,95 @@ class ListHeader extends StatelessWidget {
   }
 }
 
+class SectionContainer extends ConsumerWidget {
+  final String? title;
+  final List<Widget> items;
+  final List<Widget>? actions;
+  final bool separated;
+  final bool plain;
+
+  const SectionContainer({
+    super.key,
+    this.title,
+    required this.items,
+    this.actions,
+    this.separated = true,
+    this.plain = false,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final classicTheme = ref.watch(
+      themeSettingProvider.select((state) => (state.classicTheme as dynamic) == true),
+    );
+
+    if (classicTheme || plain) {
+      final genItems = separated
+          ? items.separated(const Divider(height: 0))
+          : items;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (items.isNotEmpty && title != null)
+            ListHeader(title: title!, actions: actions),
+          ...genItems,
+        ],
+      );
+    }
+
+    final cleanItems = items.where((widget) => widget is! Divider).toList();
+    if (cleanItems.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (title != null)
+          ListHeader(title: title!, actions: actions),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+          child: CommonCard(
+            type: CommonCardType.filled,
+            child: Column(
+              children: [
+                for (var i = 0; i < cleanItems.length; i++) ...[
+                  cleanItems[i],
+                  if (i != cleanItems.length - 1)
+                    Divider(
+                      height: 1,
+                      thickness: 1,
+                      color: context.colorScheme.outlineVariant.withValues(
+                        alpha: context.colorScheme.brightness == Brightness.light ? 0.3 : 0.2,
+                      ),
+                      indent: 16,
+                      endIndent: 16,
+                    ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 List<Widget> generateSection({
   String? title,
   required Iterable<Widget> items,
   List<Widget>? actions,
   bool separated = true,
+  bool plain = false,
 }) {
-  final genItems = separated
-      ? items.separated(const Divider(height: 0))
-      : items;
   return [
-    if (items.isNotEmpty && title != null)
-      ListHeader(title: title, actions: actions),
-    ...genItems,
+    SectionContainer(
+      title: title,
+      items: items.toList(),
+      actions: actions,
+      separated: separated,
+      plain: plain,
+    ),
   ];
 }
 
@@ -564,9 +642,50 @@ List<Widget> generateInfoSection({
 }
 
 Widget generateListView(List<Widget> items) {
-  return ListView.builder(
-    itemCount: items.length,
-    itemBuilder: (_, index) => items[index],
-    padding: const EdgeInsets.only(bottom: 16),
+  return Consumer(
+    builder: (context, ref, _) {
+      final classicTheme = ref.watch(
+        themeSettingProvider.select((state) => (state.classicTheme as dynamic) == true),
+      );
+
+      if (classicTheme) {
+        return ListView.builder(
+          itemCount: items.length,
+          itemBuilder: (_, index) => items[index],
+          padding: const EdgeInsets.only(bottom: 16),
+        );
+      }
+
+      final cleanItems = items.where((widget) => widget is! Divider).toList();
+      if (cleanItems.isEmpty) return const SizedBox.shrink();
+
+      return ListView.builder(
+        padding: const EdgeInsets.only(bottom: 24, top: 12),
+        itemCount: cleanItems.length,
+        itemBuilder: (context, index) {
+          final item = cleanItems[index];
+
+          if (item is SectionContainer) {
+            return item;
+          }
+
+          if (item is ListHeader || item is InfoHeader) {
+            return item;
+          }
+
+          if (item is SizedBox) {
+            return item;
+          }
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: CommonCard(
+              type: CommonCardType.filled,
+              child: item,
+            ),
+          );
+        },
+      );
+    },
   );
 }

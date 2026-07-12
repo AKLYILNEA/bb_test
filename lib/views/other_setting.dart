@@ -519,15 +519,6 @@ class OtherSettingView extends ConsumerWidget {
       return const Center(child: Text('No settings available'));
     }
 
-    return ListView.separated(
-      itemBuilder: (_, index) {
-        final item = items[index];
-        return item;
-      },
-      separatorBuilder: (_, _) {
-        return const Divider(height: 0);
-      },
-      itemCount: items.length,
-    );
+    return generateListView(items);
   }
 }

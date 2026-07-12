@@ -98,7 +98,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     final measure = globalState.measure;
     final contentRowHeight = [40.0, measure.titleMediumHeight + 4 + measure.labelMediumHeight]
         .reduce((a, b) => a > b ? a : b);
-    return 24.0 + contentRowHeight;
+    return 28.0 + contentRowHeight;
   }
 
   void _scrollToSelected(String groupName) {

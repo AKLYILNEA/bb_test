@@ -178,6 +178,10 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
 
   @override
   Widget build(BuildContext context) {
+    final classicTheme = ref.watch(
+      themeSettingProvider.select((state) => (state.classicTheme as dynamic) == true),
+    );
+
     return CommonScaffold(
       title: appLocalizations.connections,
       onKeywordsUpdate: _onKeywordsUpdate,
@@ -227,40 +231,73 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
             controller: _scrollController,
             child: ListView.builder(
               controller: _scrollController,
+              padding: EdgeInsets.only(
+                bottom: classicTheme ? 0 : 16,
+                top: classicTheme ? 0 : 8,
+              ),
               itemBuilder: (context, index) {
-              if (index.isOdd) {
-                return const Divider(height: 0);
-              }
-              final itemIndex = index ~/ 2;
-              if (itemIndex >= connections.length) {
-                return const SizedBox.shrink();
-              }
-              final trackerInfo = connections[itemIndex];
-              return TrackerInfoItem(
-                key: ValueKey(trackerInfo.id),
-                trackerInfo: trackerInfo,
-                onClickKeyword: (value) {
-                  context.commonScaffoldState?.addKeyword(value);
-                },
-                trailing: IconButton(
-                  padding: EdgeInsets.zero,
-                  visualDensity: VisualDensity.compact,
-                  style: const ButtonStyle(
-                    minimumSize: WidgetStatePropertyAll(Size.zero),
-                  ),
-                  icon: const Icon(Icons.block),
-                  onPressed: () => _handleBlockConnection(trackerInfo.id),
-                ),
-                detailTitle: appLocalizations.details
-              );
-            },
-            itemExtentBuilder: (index, _) {
-              if (index.isOdd) {
-                return 0;
-              }
-              return TrackerInfoItem.height;
-            },
-              itemCount: connections.length * 2 - 1,
+                if (classicTheme) {
+                  if (index.isOdd) {
+                    return const Divider(height: 0);
+                  }
+                  final itemIndex = index ~/ 2;
+                  if (itemIndex >= connections.length) {
+                    return const SizedBox.shrink();
+                  }
+                  final trackerInfo = connections[itemIndex];
+                  return TrackerInfoItem(
+                    key: ValueKey(trackerInfo.id),
+                    trackerInfo: trackerInfo,
+                    onClickKeyword: (value) {
+                      context.commonScaffoldState?.addKeyword(value);
+                    },
+                    trailing: IconButton(
+                      padding: EdgeInsets.zero,
+                      visualDensity: VisualDensity.compact,
+                      style: const ButtonStyle(
+                        minimumSize: WidgetStatePropertyAll(Size.zero),
+                      ),
+                      icon: const Icon(Icons.block),
+                      onPressed: () => _handleBlockConnection(trackerInfo.id),
+                    ),
+                    detailTitle: appLocalizations.details,
+                  );
+                } else {
+                  final trackerInfo = connections[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    child: CommonCard(
+                      type: CommonCardType.filled,
+                      child: TrackerInfoItem(
+                        key: ValueKey(trackerInfo.id),
+                        trackerInfo: trackerInfo,
+                        onClickKeyword: (value) {
+                          context.commonScaffoldState?.addKeyword(value);
+                        },
+                        trailing: IconButton(
+                          padding: EdgeInsets.zero,
+                          visualDensity: VisualDensity.compact,
+                          style: const ButtonStyle(
+                            minimumSize: WidgetStatePropertyAll(Size.zero),
+                          ),
+                          icon: const Icon(Icons.block),
+                          onPressed: () => _handleBlockConnection(trackerInfo.id),
+                        ),
+                        detailTitle: appLocalizations.details,
+                      ),
+                    ),
+                  );
+                }
+              },
+              itemExtentBuilder: classicTheme
+                  ? (index, _) {
+                      if (index.isOdd) {
+                        return 0;
+                      }
+                      return TrackerInfoItem.height;
+                    }
+                  : null,
+              itemCount: classicTheme ? connections.length * 2 - 1 : connections.length,
             ),
           );
         },

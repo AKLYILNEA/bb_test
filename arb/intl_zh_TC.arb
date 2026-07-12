@@ -300,6 +300,8 @@
   "autoCloseConnectionsDesc": "切換節點後自動關閉連線",
   "onlyStatisticsProxy": "代理流量統計",
   "onlyStatisticsProxyDesc": "開啟後將只統計代理流量",
+  "classicTheme": "經典主題",
+  "classicThemeDesc": "使用更加經典質樸的Flutter主題",
   "pureBlackMode": "純黑模式",
   "keepAliveIntervalDesc": "TCP 保持活動間隔",
   "entries": "個項目",

@@ -101,6 +101,9 @@ class _LogsViewState extends ConsumerState<LogsView> {
   Widget build(BuildContext context) {
     final logs = ref.watch(filteredLogsProvider);
     final hasLogs = logs.isNotEmpty;
+    final classicTheme = ref.watch(
+      themeSettingProvider.select((state) => (state.classicTheme as dynamic) == true),
+    );
 
     return CommonScaffold(
       actions: [
@@ -144,50 +147,62 @@ class _LogsViewState extends ConsumerState<LogsView> {
                 controller: _scrollController,
                 enable: _autoScrollToEnd,
                 dataSource: logs,
-                child: CommonScrollBar(
-                  controller: _scrollController,
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final contentHeight = logs.length * LogItem.height;
-                      final listViewHeight = contentHeight < constraints.maxHeight
-                          ? contentHeight
-                          : constraints.maxHeight;
-
-                      return SizedBox(
-                        height: listViewHeight,
-                        child: ListView.builder(
-                          physics: const NextClampingScrollPhysics(),
-                          reverse: true,
-                          controller: _scrollController,
-                          itemBuilder: (_, index) {
-                            if (index.isOdd) {
-                              return const Divider(height: 0);
+                  child: CommonScrollBar(
+                    controller: _scrollController,
+                    child: ListView.builder(
+                      physics: const NextClampingScrollPhysics(),
+                      reverse: true,
+                      shrinkWrap: true,
+                      controller: _scrollController,
+                      padding: EdgeInsets.only(
+                        bottom: classicTheme ? 0 : 16,
+                        top: classicTheme ? 0 : 8,
+                      ),
+                      itemBuilder: (_, index) {
+                        if (classicTheme) {
+                          if (index.isOdd) {
+                            return const Divider(height: 0);
+                          }
+                          final itemIndex = index ~/ 2;
+                          if (itemIndex >= logs.length) {
+                            return const SizedBox.shrink();
+                          }
+                          final log = logs[itemIndex];
+                          return LogItem(
+                            key: ValueKey(log.dateTime),
+                            log: log,
+                            onClick: (value) {
+                              context.commonScaffoldState?.addKeyword(value);
+                            },
+                          );
+                        } else {
+                          final log = logs[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                            child: CommonCard(
+                              type: CommonCardType.filled,
+                              child: LogItem(
+                                key: ValueKey(log.dateTime),
+                                log: log,
+                                onClick: (value) {
+                                  context.commonScaffoldState?.addKeyword(value);
+                                },
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      itemExtentBuilder: classicTheme
+                          ? (index, _) {
+                              if (index.isOdd) {
+                                return 0;
+                              }
+                              return LogItem.height;
                             }
-                            final itemIndex = index ~/ 2;
-                            if (itemIndex >= logs.length) {
-                              return const SizedBox.shrink();
-                            }
-                            final log = logs[itemIndex];
-                            return LogItem(
-                              key: ValueKey(log.dateTime),
-                              log: log,
-                              onClick: (value) {
-                                context.commonScaffoldState?.addKeyword(value);
-                              },
-                            );
-                          },
-                          itemExtentBuilder: (index, _) {
-                            if (index.isOdd) {
-                              return 0;
-                            }
-                            return LogItem.height;
-                          },
-                          itemCount: logs.length * 2 - 1,
-                        ),
-                      );
-                    },
+                          : null,
+                      itemCount: classicTheme ? logs.length * 2 - 1 : logs.length,
+                    ),
                   ),
-                ),
               ),
             ),
     );
@@ -216,11 +231,9 @@ class LogItem extends StatelessWidget {
       child: ListItem(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         onTap: () {
-        globalState.showCommonDialog(child: LogDetailDialog(log: log));
-      },
-      title: SizedBox(
-        height: globalState.measure.bodyLargeHeight * 2,
-        child: Text(
+          globalState.showCommonDialog(child: LogDetailDialog(log: log));
+        },
+        title: Text(
           log.payload,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
@@ -228,29 +241,28 @@ class LogItem extends StatelessWidget {
             color: log.logLevel.color,
           ),
         ),
-      ),
-      subtitle: Column(
-        children: [
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              CommonChip(
-                onPressed: () {
-                  onClick?.call(log.logLevel.name);
-                },
-                label: log.logLevel.name,
-              ),
-              Text(
-                log.dateTime,
-                style: context.textTheme.bodySmall?.copyWith(
-                  color: context.colorScheme.onSurface.opacity80,
+        subtitle: Column(
+          children: [
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CommonChip(
+                  onPressed: () {
+                    onClick?.call(log.logLevel.name);
+                  },
+                  label: log.logLevel.name,
                 ),
-              ),
-            ],
-          ),
-        ],
-      ),
+                Text(
+                  log.dateTime,
+                  style: context.textTheme.bodySmall?.copyWith(
+                    color: context.colorScheme.onSurface.opacity80,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

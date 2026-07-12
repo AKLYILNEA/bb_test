@@ -2,6 +2,7 @@ import 'package:bett_box/common/common.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
+import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -61,6 +62,10 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
     final requests = ref.watch(filteredRequestsProvider);
     final hasRequests = requests.isNotEmpty;
 
+    final classicTheme = ref.watch(
+      themeSettingProvider.select((state) => (state.classicTheme as dynamic) == true),
+    );
+
     return CommonScaffold(
       title: appLocalizations.requests,
       actions: [
@@ -98,47 +103,60 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
                   dataSource: requests,
                   enable: _autoScrollToEnd,
                   onCancelToEnd: _cancelAutoScroll,
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final contentHeight = requests.length * TrackerInfoItem.height;
-                      final listViewHeight = contentHeight < constraints.maxHeight
-                          ? contentHeight
-                          : constraints.maxHeight;
-
-                      return SizedBox(
-                        height: listViewHeight,
-                        child: ListView.builder(
-                          reverse: true,
-                          physics: const NextClampingScrollPhysics(),
-                          controller: _scrollController,
-                          itemBuilder: (_, index) {
-                            if (index.isOdd) {
-                              return const Divider(height: 0);
-                            }
-                            final itemIndex = index ~/ 2;
-                            if (itemIndex >= requests.length) {
-                              return const SizedBox.shrink();
-                            }
-                            final trackerInfo = requests[itemIndex];
-                            return TrackerInfoItem(
+                  child: ListView.builder(
+                    reverse: true,
+                    physics: const NextClampingScrollPhysics(),
+                    shrinkWrap: true,
+                    controller: _scrollController,
+                    padding: EdgeInsets.only(
+                      bottom: classicTheme ? 0 : 16,
+                      top: classicTheme ? 0 : 8,
+                    ),
+                    itemBuilder: (_, index) {
+                      if (classicTheme) {
+                        if (index.isOdd) {
+                          return const Divider(height: 0);
+                        }
+                        final itemIndex = index ~/ 2;
+                        if (itemIndex >= requests.length) {
+                          return const SizedBox.shrink();
+                        }
+                        final trackerInfo = requests[itemIndex];
+                        return TrackerInfoItem(
+                          key: ValueKey(trackerInfo.id),
+                          trackerInfo: trackerInfo,
+                          onClickKeyword: (value) {
+                            context.commonScaffoldState?.addKeyword(value);
+                          },
+                          detailTitle: appLocalizations.details,
+                        );
+                      } else {
+                        final trackerInfo = requests[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                          child: CommonCard(
+                            type: CommonCardType.filled,
+                            child: TrackerInfoItem(
                               key: ValueKey(trackerInfo.id),
                               trackerInfo: trackerInfo,
                               onClickKeyword: (value) {
                                 context.commonScaffoldState?.addKeyword(value);
                               },
-                              detailTitle: appLocalizations.details
-                            );
-                          },
-                          itemExtentBuilder: (index, _) {
+                              detailTitle: appLocalizations.details,
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    itemExtentBuilder: classicTheme
+                        ? (index, _) {
                             if (index.isOdd) {
                               return 0;
                             }
                             return TrackerInfoItem.height;
-                          },
-                          itemCount: requests.length * 2 - 1,
-                        ),
-                      );
-                    },
+                          }
+                        : null,
+                    itemCount: classicTheme ? requests.length * 2 - 1 : requests.length,
                   ),
                 ),
               ),

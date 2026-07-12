@@ -43,8 +43,19 @@ const List<DashboardWidget> defaultDashboardWidgets = [
   DashboardWidget.tunButton,
   DashboardWidget.outboundMode,
   DashboardWidget.networkDetection,
-  DashboardWidget.trafficUsage,
   DashboardWidget.intranetIp,
+  DashboardWidget.trafficUsage,
+  DashboardWidget.memoryInfo,
+  DashboardWidget.connectionsCount,
+  DashboardWidget.startButton,
+];
+
+const List<DashboardWidget> defaultAndroidDashboardWidgets = [
+  DashboardWidget.networkSpeed,
+  DashboardWidget.outboundModeV2,
+  DashboardWidget.trafficUsage,
+  DashboardWidget.networkDetection,
+  DashboardWidget.connectionsCount,
   DashboardWidget.memoryInfo,
   DashboardWidget.startButton,
 ];
@@ -56,9 +67,13 @@ List<DashboardWidget> dashboardWidgetsSafeFormJson(
     return dashboardWidgets
             ?.map((e) => $enumDecode(_$DashboardWidgetEnumMap, e))
             .toList() ??
-        defaultDashboardWidgets;
+        (system.isAndroid
+            ? defaultAndroidDashboardWidgets
+            : defaultDashboardWidgets);
   } catch (_) {
-    return defaultDashboardWidgets;
+    return system.isAndroid
+        ? defaultAndroidDashboardWidgets
+        : defaultDashboardWidgets;
   }
 }
 
@@ -94,14 +109,15 @@ abstract class AppSettingProps with _$AppSettingProps {
       _$AppSettingPropsFromJson(json);
 
   factory AppSettingProps.safeFromJson(Map<String, Object?>? json) {
-    final props = json == null
+    var props = json == null
         ? defaultAppSettingProps
         : AppSettingProps.fromJson(json);
 
-    return props.copyWith(
-      minimizeOnExit: true,
-      openLogs: true,
-    );
+    if (json == null && system.isAndroid) {
+      props = props.copyWith(dashboardWidgets: defaultAndroidDashboardWidgets);
+    }
+
+    return props.copyWith(minimizeOnExit: true, openLogs: true);
   }
 }
 
@@ -131,8 +147,8 @@ extension AccessControlExt on AccessControl {
 @freezed
 abstract class WindowProps with _$WindowProps {
   const factory WindowProps({
-    @Default(750) double width,
-    @Default(600) double height,
+    @Default(910) double width,
+    @Default(620) double height,
     double? top,
     double? left,
   }) = _WindowProps;
@@ -156,7 +172,7 @@ abstract class VpnProps with _$VpnProps {
     @Default(false) bool disableQuic,
     @Default(false) bool networkSpeedNotification,
     @Default(false) bool excludeChina,
-    @Default(true) bool trayEnhancement,
+    @Default(false) bool trayEnhancement,
     @Default(true) bool alwaysShowTitleBar,
     @Default(true) bool quickResponse,
     @Default(defaultAccessControl) AccessControl accessControl,
@@ -230,6 +246,7 @@ abstract class ThemeProps with _$ThemeProps {
     @Default(ThemeMode.system) ThemeMode themeMode,
     @Default(DynamicSchemeVariant.content) DynamicSchemeVariant schemeVariant,
     @Default(false) bool pureBlack,
+    @Default(false) bool classicTheme,
     @Default(TextScale()) TextScale textScale,
     @Default(false) bool useLightIcon,
     @Default(false) bool useHarmonyFont,

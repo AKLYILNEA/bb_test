@@ -233,6 +233,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "checking": MessageLookupByLibrary.simpleMessage("Проверка..."),
     "circle": MessageLookupByLibrary.simpleMessage("Круг"),
+    "classicTheme": MessageLookupByLibrary.simpleMessage("Классическая тема"),
+    "classicThemeDesc": MessageLookupByLibrary.simpleMessage(
+      "Использовать более классическую и простую тему Flutter",
+    ),
     "clearCacheDesc": MessageLookupByLibrary.simpleMessage(
       "Очистить кэш FakeIP и DNS?",
     ),

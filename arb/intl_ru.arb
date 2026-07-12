@@ -300,6 +300,8 @@
   "autoCloseConnectionsDesc": "Закрывать соединения при смене узла",
   "onlyStatisticsProxy": "Только прокси-трафик",
   "onlyStatisticsProxyDesc": "Считать только трафик через прокси",
+  "classicTheme": "Классическая тема",
+  "classicThemeDesc": "Использовать более классическую и простую тему Flutter",
   "pureBlackMode": "Чистый чёрный",
   "keepAliveIntervalDesc": "Интервал TCP keep-alive",
   "entries": " записей",

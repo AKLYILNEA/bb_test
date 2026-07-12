@@ -161,6 +161,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "checkUpdateError": MessageLookupByLibrary.simpleMessage("当前应用已经是最新版了"),
     "checking": MessageLookupByLibrary.simpleMessage("检测中..."),
     "circle": MessageLookupByLibrary.simpleMessage("圆环流转"),
+    "classicTheme": MessageLookupByLibrary.simpleMessage("经典主题"),
+    "classicThemeDesc": MessageLookupByLibrary.simpleMessage(
+      "使用更加经典质朴的Flutter主题",
+    ),
     "clearCacheDesc": MessageLookupByLibrary.simpleMessage(
       "是否需要清理FakeIP&DNS缓存？",
     ),
@@ -228,7 +232,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "deleteTip": m2,
     "deleteTunnel": MessageLookupByLibrary.simpleMessage("删除转发"),
     "desc": MessageLookupByLibrary.simpleMessage(
-      "Bettbox基于强大灵活的Mihomo(Clash.Meta)代理内核，致力于更好的体验，Forked form FlClash，Better Experience, Out of the box",
+      "Bettbox基于强大灵活的Mihomo(Clash.Meta)代理内核，致力于更好的体验，Forked from FlClash，Better Experience, Out of the box",
     ),
     "destination": MessageLookupByLibrary.simpleMessage("目标地址"),
     "destinationGeoIP": MessageLookupByLibrary.simpleMessage("目标地理定位"),
