@@ -33,6 +33,17 @@ Future<void> main(List<String> args) async {
     exit(0);
   }
 
+  if (system.isDesktop) {
+    final acquire = await singleInstanceLock.acquire();
+    if (!acquire) {
+      commonPrint.log(
+        'SingleInstanceLock: another instance detected or lock failed, exiting',
+      );
+      await Future.delayed(const Duration(milliseconds: 100));
+      exit(0);
+    }
+  }
+
   PaintingBinding.instance.imageCache.maximumSizeBytes = 50 * 1024 * 1024;
 
   final version = await system.version;
