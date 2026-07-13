@@ -1,7 +1,7 @@
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/app.dart';
 import 'package:bett_box/state.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 
 class BaseNavigator {
   static Future<T?> push<T>(BuildContext context, Widget child) async {
@@ -12,7 +12,7 @@ class BaseNavigator {
     }
     return await Navigator.of(
       context,
-    ).push<T>(MaterialPageRoute(builder: (context) => child));
+    ).push<T>(CupertinoPageRoute(builder: (context) => child));
   }
 }
 

@@ -176,7 +176,7 @@ class AboutView extends StatelessWidget {
       ..._buildMoreSection(context),
     ];
     return Padding(
-      padding: kMaterialListPadding.copyWith(top: 16, bottom: 16),
+      padding: kMaterialListPadding.copyWith(top: 0, bottom: 16),
       child: generateListView(items),
     );
   }

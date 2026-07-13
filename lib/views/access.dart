@@ -972,6 +972,7 @@ class _AccessControlPanelState extends ConsumerState<AccessControlPanel> {
 
   List<Widget> _buildModeSetting() {
     return generateSection(
+      plain: true,
       title: appLocalizations.mode,
       items: [
         SingleChildScrollView(
@@ -1012,6 +1013,7 @@ class _AccessControlPanelState extends ConsumerState<AccessControlPanel> {
 
   List<Widget> _buildSortSetting() {
     return generateSection(
+      plain: true,
       title: appLocalizations.sort,
       items: [
         SingleChildScrollView(
@@ -1052,6 +1054,7 @@ class _AccessControlPanelState extends ConsumerState<AccessControlPanel> {
 
   List<Widget> _buildSourceSetting() {
     return generateSection(
+      plain: true,
       title: appLocalizations.source,
       items: [
         SingleChildScrollView(
@@ -1152,6 +1155,7 @@ class _AccessControlPanelState extends ConsumerState<AccessControlPanel> {
 
   List<Widget> _buildActionSetting() {
     return generateSection(
+      plain: true,
       title: appLocalizations.action,
       items: [
         Padding(

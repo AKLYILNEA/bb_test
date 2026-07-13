@@ -43,7 +43,8 @@ class CheckboxDelegate<T> extends Delegate {
 }
 
 class OpenDelegate extends Delegate {
-  final Widget widget;
+  final Widget? widget;
+  final WidgetBuilder? builder;
   final String title;
   final double? maxWidth;
   final List<Widget> actions;
@@ -53,31 +54,36 @@ class OpenDelegate extends Delegate {
 
   const OpenDelegate({
     required this.title,
-    required this.widget,
+    this.widget,
+    this.builder,
     this.maxWidth,
     this.actions = const [],
     this.blur = false,
     this.wrap = true,
     this.forceFull = true,
-  });
+  }) : assert(widget != null || builder != null);
 }
 
 class NextDelegate extends Delegate {
-  final Widget widget;
+  final Widget? widget;
+  final WidgetBuilder? builder;
   final String title;
   final double? maxWidth;
   final List<Widget> actions;
   final bool blur;
   final bool wrap;
+  final bool forceFull;
 
   const NextDelegate({
     required this.title,
-    required this.widget,
+    this.widget,
+    this.builder,
     this.maxWidth,
     this.actions = const [],
     this.blur = false,
     this.wrap = true,
-  });
+    this.forceFull = true,
+  }) : assert(widget != null || builder != null);
 }
 
 class OptionsDelegate<T> extends Delegate {
@@ -279,7 +285,10 @@ class ListItem<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     if (delegate is OpenDelegate) {
       final openDelegate = delegate as OpenDelegate;
-      final child = openDelegate.widget;
+      Widget buildChild(BuildContext context) {
+        return openDelegate.builder?.call(context) ?? openDelegate.widget!;
+      }
+
       return OpenContainer(
         closedBuilder: (_, action) {
           openAction() {
@@ -293,6 +302,7 @@ class ListItem<T> extends StatelessWidget {
                   forceFull: openDelegate.forceFull,
                 ),
                 builder: (_, type) {
+                  final child = buildChild(context);
                   return openDelegate.wrap
                       ? AdaptiveSheetScaffold(
                           actions: openDelegate.actions,
@@ -310,7 +320,8 @@ class ListItem<T> extends StatelessWidget {
 
           return _buildListTile(onTap: openAction);
         },
-        openBuilder: (_, action) {
+        openBuilder: (context, action) {
+          final child = buildChild(context);
           return openDelegate.wrap
               ? CommonScaffold(
                   key: Key(openDelegate.title),
@@ -324,7 +335,9 @@ class ListItem<T> extends StatelessWidget {
     }
     if (delegate is NextDelegate) {
       final nextDelegate = delegate as NextDelegate;
-      final child = nextDelegate.widget;
+      Widget buildChild(BuildContext context) {
+        return nextDelegate.builder?.call(context) ?? nextDelegate.widget!;
+      }
 
       return _buildListTile(
         onTap: () {
@@ -333,8 +346,10 @@ class ListItem<T> extends StatelessWidget {
             props: ExtendProps(
               blur: nextDelegate.blur,
               maxWidth: nextDelegate.maxWidth,
+              forceFull: nextDelegate.forceFull,
             ),
             builder: (_, type) {
+              final child = buildChild(context);
               return nextDelegate.wrap
                   ? AdaptiveSheetScaffold(
                       actions: nextDelegate.actions,

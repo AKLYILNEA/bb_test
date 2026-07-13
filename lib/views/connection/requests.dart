@@ -24,8 +24,10 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
   void initState() {
     super.initState();
     final requests = globalState.appState.requests.list;
+    final classicTheme = (ref.read(themeSettingProvider).classicTheme as dynamic) == true;
+    final itemHeight = classicTheme ? TrackerInfoItem.height : TrackerInfoItem.height + 8;
     _scrollController = ScrollController(
-      initialScrollOffset: requests.length * TrackerInfoItem.height,
+      initialScrollOffset: requests.length * itemHeight,
     );
   }
 
@@ -148,14 +150,15 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
                         );
                       }
                     },
-                    itemExtentBuilder: classicTheme
-                        ? (index, _) {
-                            if (index.isOdd) {
-                              return 0;
-                            }
-                            return TrackerInfoItem.height;
-                          }
-                        : null,
+                    itemExtentBuilder: (index, _) {
+                      if (classicTheme) {
+                        if (index.isOdd) {
+                          return 0;
+                        }
+                        return TrackerInfoItem.height;
+                      }
+                      return TrackerInfoItem.height + 8;
+                    },
                     itemCount: classicTheme ? requests.length * 2 - 1 : requests.length,
                   ),
                 ),

@@ -289,14 +289,15 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
                   );
                 }
               },
-              itemExtentBuilder: classicTheme
-                  ? (index, _) {
-                      if (index.isOdd) {
-                        return 0;
-                      }
-                      return TrackerInfoItem.height;
-                    }
-                  : null,
+              itemExtentBuilder: (index, _) {
+                if (classicTheme) {
+                  if (index.isOdd) {
+                    return 0;
+                  }
+                  return TrackerInfoItem.height;
+                }
+                return TrackerInfoItem.height + 8;
+              },
               itemCount: classicTheme ? connections.length * 2 - 1 : connections.length,
             ),
           );

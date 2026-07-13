@@ -51,6 +51,7 @@ const repository = 'appshubcc/Bettbox';
 const defaultExternalController = '127.0.0.1:9090';
 const maxMobileWidth = 600;
 const maxLaptopWidth = 840;
+const kFloatingBottomBarReserveHeight = 84.0;
 const defaultTestUrl = 'https://www.apple.com/library/test/success.html';
 
 // Preset test URLs

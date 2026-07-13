@@ -39,15 +39,15 @@ class _ToolViewState extends ConsumerState<ToolsView> {
   }
 
   Widget _buildNavigationMenuItem(NavigationItem navigationItem) {
-    return ListItem.open(
+    return ListItem.next(
       leading: navigationItem.icon,
       title: Text(Intl.message(navigationItem.label.name)),
       subtitle: navigationItem.description != null
           ? Text(Intl.message(navigationItem.description!))
           : null,
-      delegate: OpenDelegate(
+      delegate: NextDelegate(
         title: Intl.message(navigationItem.label.name),
-        widget: _buildNavigationPage(navigationItem),
+        builder: (_) => _buildNavigationPage(navigationItem),
         wrap: false,
       ),
     );
@@ -143,6 +143,7 @@ class _ToolViewState extends ConsumerState<ToolsView> {
     final classicTheme = ref.watch(
       themeSettingProvider.select((state) => (state.classicTheme as dynamic) == true),
     );
+    final isMobileView = ref.watch(isMobileViewProvider);
 
     final List<Widget> items;
     if (classicTheme) {
@@ -215,7 +216,11 @@ class _ToolViewState extends ConsumerState<ToolsView> {
         itemCount: items.length,
         itemBuilder: (_, index) => items[index],
         padding: EdgeInsets.only(
-          bottom: classicTheme ? 20 : 32,
+          bottom:
+              classicTheme
+                  ? 20
+                  : 32 +
+                      (isMobileView ? kFloatingBottomBarReserveHeight : 0),
           top: classicTheme ? 0 : 8,
         ),
       ),
@@ -267,13 +272,13 @@ class _ThemeItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListItem.open(
+    return ListItem.next(
       leading: const Icon(Icons.style),
       title: Text(appLocalizations.theme),
       subtitle: Text(appLocalizations.themeDesc),
-      delegate: OpenDelegate(
+      delegate: NextDelegate(
         title: appLocalizations.theme,
-        widget: const ThemeView(),
+        builder: (_) => const ThemeView(),
       ),
     );
   }
@@ -284,13 +289,13 @@ class _BackupItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListItem.open(
+    return ListItem.next(
       leading: const Icon(Icons.cloud_sync),
       title: Text(appLocalizations.backupAndRecovery),
       subtitle: Text(appLocalizations.backupAndRecoveryDesc),
-      delegate: OpenDelegate(
+      delegate: NextDelegate(
         title: appLocalizations.backupAndRecovery,
-        widget: const BackupAndRecovery(),
+        builder: (_) => const BackupAndRecovery(),
       ),
     );
   }
@@ -301,13 +306,13 @@ class _HotkeyItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListItem.open(
+    return ListItem.next(
       leading: const Icon(Icons.keyboard),
       title: Text(appLocalizations.hotkeyManagement),
       subtitle: Text(appLocalizations.hotkeyManagementDesc),
-      delegate: OpenDelegate(
+      delegate: NextDelegate(
         title: appLocalizations.hotkeyManagement,
-        widget: const HotKeyView(),
+        builder: (_) => const HotKeyView(),
       ),
     );
   }
@@ -338,13 +343,13 @@ class _AccessItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListItem.open(
+    return ListItem.next(
       leading: const Icon(Icons.view_list),
       title: Text(appLocalizations.accessControl),
       subtitle: Text(appLocalizations.accessControlDesc),
-      delegate: OpenDelegate(
+      delegate: NextDelegate(
         title: appLocalizations.appAccessControl,
-        widget: const AccessView(),
+        builder: (_) => const AccessView(),
       ),
     );
   }
@@ -355,13 +360,13 @@ class _ConfigItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListItem.open(
+    return ListItem.next(
       leading: const Icon(Icons.edit),
       title: Text(appLocalizations.basicConfig),
       subtitle: Text(appLocalizations.basicConfigDesc),
-      delegate: OpenDelegate(
+      delegate: NextDelegate(
         title: appLocalizations.basicConfig,
-        widget: const ConfigView(),
+        builder: (_) => const ConfigView(),
       ),
     );
   }
@@ -372,13 +377,13 @@ class _OtherSettingItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListItem.open(
+    return ListItem.next(
       leading: const Icon(Icons.settings_suggest_outlined),
       title: Text(appLocalizations.otherSettings),
       subtitle: Text(appLocalizations.otherSettingsDesc),
-      delegate: OpenDelegate(
+      delegate: NextDelegate(
         title: appLocalizations.otherSettings,
-        widget: const OtherSettingView(),
+        builder: (_) => const OtherSettingView(),
       ),
     );
   }
@@ -389,13 +394,13 @@ class _SettingItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListItem.open(
+    return ListItem.next(
       leading: const Icon(Icons.settings),
       title: Text(appLocalizations.application),
       subtitle: Text(appLocalizations.applicationDesc),
-      delegate: OpenDelegate(
+      delegate: NextDelegate(
         title: appLocalizations.application,
-        widget: const ApplicationSettingView(),
+        builder: (_) => const ApplicationSettingView(),
       ),
     );
   }
@@ -425,12 +430,12 @@ class _InfoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListItem.open(
+    return ListItem.next(
       leading: const Icon(Icons.info),
       title: Text(appLocalizations.about),
-      delegate: OpenDelegate(
+      delegate: NextDelegate(
         title: appLocalizations.about,
-        widget: const AboutView(),
+        builder: (_) => const AboutView(),
       ),
     );
   }
@@ -441,12 +446,12 @@ class _DeveloperItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListItem.open(
+    return ListItem.next(
       leading: const Icon(Icons.developer_board),
       title: Text(appLocalizations.developerMode),
-      delegate: OpenDelegate(
+      delegate: NextDelegate(
         title: appLocalizations.developerMode,
-        widget: const DeveloperView(),
+        builder: (_) => const DeveloperView(),
       ),
     );
   }

@@ -23,8 +23,10 @@ class _LogsViewState extends ConsumerState<LogsView> {
   void initState() {
     super.initState();
     final logs = globalState.appState.logs.list;
+    final classicTheme = (ref.read(themeSettingProvider).classicTheme as dynamic) == true;
+    final itemHeight = classicTheme ? LogItem.height : LogItem.height + 8;
     _scrollController = ScrollController(
-      initialScrollOffset: logs.length * LogItem.height,
+      initialScrollOffset: logs.length * itemHeight,
     );
   }
 
@@ -192,14 +194,15 @@ class _LogsViewState extends ConsumerState<LogsView> {
                           );
                         }
                       },
-                      itemExtentBuilder: classicTheme
-                          ? (index, _) {
-                              if (index.isOdd) {
-                                return 0;
-                              }
-                              return LogItem.height;
-                            }
-                          : null,
+                      itemExtentBuilder: (index, _) {
+                        if (classicTheme) {
+                          if (index.isOdd) {
+                            return 0;
+                          }
+                          return LogItem.height;
+                        }
+                        return LogItem.height + 8;
+                      },
                       itemCount: classicTheme ? logs.length * 2 - 1 : logs.length,
                     ),
                   ),

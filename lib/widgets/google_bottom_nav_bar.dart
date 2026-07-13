@@ -90,7 +90,8 @@ class GoogleBottomNavBar extends ConsumerWidget {
     }
 
     return RepaintBoundary(
-      child: Padding(
+      child: Container(
+        color: Colors.transparent,
         padding: EdgeInsets.only(
           left: 16,
           right: 16,

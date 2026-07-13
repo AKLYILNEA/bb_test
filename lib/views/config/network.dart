@@ -474,10 +474,10 @@ class BypassDomainItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListItem.open(
+    return ListItem.next(
       title: Text(appLocalizations.bypassDomain),
       subtitle: Text(appLocalizations.bypassDomainDesc),
-      delegate: OpenDelegate(
+      delegate: NextDelegate(
         blur: false,
         actions: [
           Consumer(

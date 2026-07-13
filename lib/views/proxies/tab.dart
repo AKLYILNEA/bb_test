@@ -365,6 +365,10 @@ class _ProxyGroupViewState extends ConsumerState<ProxyGroupView> {
   @override
   Widget build(BuildContext context) {
     ref.watch(themeSettingProvider.select((state) => state.textScale));
+    final isMobileView = ref.watch(isMobileViewProvider);
+    final classicTheme = ref.watch(
+      themeSettingProvider.select((state) => state.classicTheme),
+    );
     final group = widget.group;
     final proxies = group.all;
     final sortedProxies = globalState.appController.getSortProxies(
@@ -383,11 +387,15 @@ class _ProxyGroupViewState extends ConsumerState<ProxyGroupView> {
           key: _getPageStorageKey(),
           controller: _controller,
           scrollCacheExtent: const ScrollCacheExtent.pixels(500),
-          padding: const EdgeInsets.only(
+          padding: EdgeInsets.only(
             top: 16,
             left: 16,
             right: 16,
-            bottom: 96,
+            bottom:
+                16 +
+                (isMobileView && !classicTheme
+                    ? kFloatingBottomBarReserveHeight
+                    : 0),
           ),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: widget.columns,

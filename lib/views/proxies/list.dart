@@ -179,6 +179,10 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobileView = ref.watch(isMobileViewProvider);
+    final classicTheme = ref.watch(
+      themeSettingProvider.select((state) => state.classicTheme),
+    );
     final flatItems = _buildFlatItems();
     final headerHeight = _getHeaderHeight();
     final itemHeight = getItemHeight(widget.cardType);
@@ -189,7 +193,13 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
       trackVisibility: true,
       child: ListView.builder(
         controller: _scrollController,
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16).copyWith(
+          bottom:
+              16 +
+              (isMobileView && !classicTheme
+                  ? kFloatingBottomBarReserveHeight
+                  : 0),
+        ),
         itemCount: flatItems.length,
         itemExtentBuilder: (index, _) {
           return flatItems[index].getHeight(headerHeight, itemHeight);

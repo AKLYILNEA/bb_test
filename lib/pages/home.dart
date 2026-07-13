@@ -66,31 +66,61 @@ class _HomePageState extends State<HomePage> {
                     },
                   );
             if (isMobile) {
-              return AnnotatedRegion<SystemUiOverlayStyle>(
-                value: globalState.appState.systemUiOverlayStyle.copyWith(
-                  systemNavigationBarColor:
-                      context.colorScheme.surfaceContainer,
+              final classicTheme = ref.watch(
+                themeSettingProvider.select(
+                  (state) => (state.classicTheme as dynamic) == true,
                 ),
-                child: Column(
+              );
+              final systemUiStyle =
+                  globalState.appState.systemUiOverlayStyle.copyWith(
+                systemNavigationBarColor:
+                    classicTheme
+                        ? context.colorScheme.surfaceContainer
+                        : context.colorScheme.surface,
+              );
+              final pageContent = MediaQuery.removePadding(
+                removeTop: false,
+                removeBottom: true,
+                removeLeft: true,
+                removeRight: true,
+                context: context,
+                child: child!,
+              );
+              final navBar = MediaQuery.removePadding(
+                removeTop: true,
+                removeBottom: false,
+                removeLeft: true,
+                removeRight: true,
+                context: context,
+                child: bottomNavigationBar,
+              );
+              if (classicTheme) {
+                return AnnotatedRegion<SystemUiOverlayStyle>(
+                  value: systemUiStyle,
+                  child: Column(
+                    children: [Flexible(flex: 1, child: pageContent), navBar],
+                  ),
+                );
+              }
+              return AnnotatedRegion<SystemUiOverlayStyle>(
+                value: systemUiStyle,
+                child: Stack(
                   children: [
-                    Flexible(
-                      flex: 1,
+                    Positioned.fill(
                       child: MediaQuery.removePadding(
                         removeTop: false,
                         removeBottom: true,
                         removeLeft: true,
                         removeRight: true,
                         context: context,
-                        child: child!,
+                        child: child,
                       ),
                     ),
-                    MediaQuery.removePadding(
-                      removeTop: true,
-                      removeBottom: false,
-                      removeLeft: true,
-                      removeRight: true,
-                      context: context,
-                      child: bottomNavigationBar,
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: navBar,
                     ),
                   ],
                 ),
