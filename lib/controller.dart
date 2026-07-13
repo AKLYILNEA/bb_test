@@ -192,6 +192,7 @@ class AppController {
             return;
           }
           await globalState.handleStart([updateRunTime, updateTraffic]);
+          await updateProviders();
           if (!res.isError) {
             Future.microtask(() async {
               try {
@@ -207,6 +208,7 @@ class AppController {
         } catch (e) {
           commonPrint.log('FastStart macOS auth error: $e');
           await globalState.handleStart([updateRunTime, updateTraffic]);
+          await updateProviders();
           _backgroundLoad();
         }
         _scheduleCheckIpRefresh();
@@ -214,6 +216,7 @@ class AppController {
       }
 
       await globalState.handleStart([updateRunTime, updateTraffic]);
+      await updateProviders();
 
       Future.microtask(() async {
         try {
@@ -244,6 +247,7 @@ class AppController {
 
     _scheduleCheckIpRefresh();
 
+    await updateProviders();
     _backgroundLoad();
   }
 
@@ -261,11 +265,7 @@ class AppController {
         final groups = await clashCore.getProxiesGroups();
         if (version != _backgroundLoadVersion) return;
 
-        final providers = await clashCore.getExternalProviders();
-        if (version != _backgroundLoadVersion) return;
-
         _ref.read(groupsProvider.notifier).value = groups;
-        _ref.read(providersProvider.notifier).value = providers;
 
         await Future.delayed(const Duration(seconds: 2));
         if (version != _backgroundLoadVersion) return;
