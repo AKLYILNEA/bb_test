@@ -22,12 +22,14 @@ class _LogsViewState extends ConsumerState<LogsView> {
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
     final logs = globalState.appState.logs.list;
-    final classicTheme = (ref.read(themeSettingProvider).classicTheme as dynamic) == true;
-    final itemHeight = classicTheme ? LogItem.height : LogItem.height + 8;
-    _scrollController = ScrollController(
-      initialScrollOffset: logs.length * itemHeight,
-    );
+    if (logs.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || !_scrollController.hasClients) return;
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      });
+    }
   }
 
   @override
@@ -104,7 +106,9 @@ class _LogsViewState extends ConsumerState<LogsView> {
     final logs = ref.watch(filteredLogsProvider);
     final hasLogs = logs.isNotEmpty;
     final classicTheme = ref.watch(
-      themeSettingProvider.select((state) => (state.classicTheme as dynamic) == true),
+      themeSettingProvider.select(
+        (state) => (state.classicTheme as dynamic) == true,
+      ),
     );
 
     return CommonScaffold(
@@ -139,9 +143,7 @@ class _LogsViewState extends ConsumerState<LogsView> {
       searchState: AppBarSearchState(onSearch: _onSearch),
       title: appLocalizations.logs,
       body: !hasLogs
-          ? NullStatus(
-              label: appLocalizations.nullTip(appLocalizations.logs),
-            )
+          ? NullStatus(label: appLocalizations.nullTip(appLocalizations.logs))
           : Align(
               alignment: Alignment.topCenter,
               child: ScrollToEndBox(
@@ -149,63 +151,57 @@ class _LogsViewState extends ConsumerState<LogsView> {
                 controller: _scrollController,
                 enable: _autoScrollToEnd,
                 dataSource: logs,
-                  child: CommonScrollBar(
+                child: CommonScrollBar(
+                  controller: _scrollController,
+                  child: ListView.builder(
+                    physics: const NextClampingScrollPhysics(),
+                    reverse: true,
+                    shrinkWrap: true,
                     controller: _scrollController,
-                    child: ListView.builder(
-                      physics: const NextClampingScrollPhysics(),
-                      reverse: true,
-                      shrinkWrap: true,
-                      controller: _scrollController,
-                      padding: EdgeInsets.only(
-                        bottom: classicTheme ? 0 : 16,
-                        top: classicTheme ? 0 : 8,
-                      ),
-                      itemBuilder: (_, index) {
-                        if (classicTheme) {
-                          if (index.isOdd) {
-                            return const Divider(height: 0);
-                          }
-                          final itemIndex = index ~/ 2;
-                          if (itemIndex >= logs.length) {
-                            return const SizedBox.shrink();
-                          }
-                          final log = logs[itemIndex];
-                          return LogItem(
-                            key: ValueKey(log.dateTime),
-                            log: log,
-                            onClick: (value) {
-                              context.commonScaffoldState?.addKeyword(value);
-                            },
-                          );
-                        } else {
-                          final log = logs[index];
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                            child: CommonCard(
-                              type: CommonCardType.filled,
-                              child: LogItem(
-                                key: ValueKey(log.dateTime),
-                                log: log,
-                                onClick: (value) {
-                                  context.commonScaffoldState?.addKeyword(value);
-                                },
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                      itemExtentBuilder: (index, _) {
-                        if (classicTheme) {
-                          if (index.isOdd) {
-                            return 0;
-                          }
-                          return LogItem.height;
-                        }
-                        return LogItem.height + 8;
-                      },
-                      itemCount: classicTheme ? logs.length * 2 - 1 : logs.length,
+                    padding: EdgeInsets.only(
+                      bottom: classicTheme ? 0 : 16,
+                      top: classicTheme ? 0 : 8,
                     ),
+                    itemBuilder: (_, index) {
+                      if (classicTheme) {
+                        if (index.isOdd) {
+                          return const Divider(height: 0);
+                        }
+                        final itemIndex = index ~/ 2;
+                        if (itemIndex >= logs.length) {
+                          return const SizedBox.shrink();
+                        }
+                        final log = logs[itemIndex];
+                        return LogItem(
+                          key: ValueKey(log.dateTime),
+                          log: log,
+                          onClick: (value) {
+                            context.commonScaffoldState?.addKeyword(value);
+                          },
+                        );
+                      } else {
+                        final log = logs[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 4,
+                          ),
+                          child: CommonCard(
+                            type: CommonCardType.filled,
+                            child: LogItem(
+                              key: ValueKey(log.dateTime),
+                              log: log,
+                              onClick: (value) {
+                                context.commonScaffoldState?.addKeyword(value);
+                              },
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    itemCount: classicTheme ? logs.length * 2 - 1 : logs.length,
                   ),
+                ),
               ),
             ),
     );
@@ -215,16 +211,6 @@ class _LogsViewState extends ConsumerState<LogsView> {
 class LogItem extends StatelessWidget {
   final Log log;
   final Function(String)? onClick;
-
-  static double get height {
-    final measure = globalState.measure;
-    return measure.bodyLargeHeight * 2 +
-        8 +
-        24 +
-        globalState.measure.labelMediumHeight +
-        16 +
-        16;
-  }
 
   const LogItem({super.key, required this.log, this.onClick});
 
@@ -244,27 +230,25 @@ class LogItem extends StatelessWidget {
             color: log.logLevel.color,
           ),
         ),
-        subtitle: Column(
-          children: [
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CommonChip(
-                  onPressed: () {
-                    onClick?.call(log.logLevel.name);
-                  },
-                  label: log.logLevel.name,
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              CommonChip(
+                onPressed: () {
+                  onClick?.call(log.logLevel.name);
+                },
+                label: log.logLevel.name,
+              ),
+              Text(
+                log.dateTime,
+                style: context.textTheme.bodySmall?.copyWith(
+                  color: context.colorScheme.onSurface.opacity80,
                 ),
-                Text(
-                  log.dateTime,
-                  style: context.textTheme.bodySmall?.copyWith(
-                    color: context.colorScheme.onSurface.opacity80,
-                  ),
-                ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );

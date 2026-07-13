@@ -581,6 +581,7 @@ class SectionContainer extends ConsumerWidget {
           child: CommonCard(
             type: CommonCardType.filled,
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 for (var i = 0; i < cleanItems.length; i++) ...[
                   cleanItems[i],
@@ -662,12 +663,13 @@ Widget generateListView(List<Widget> items) {
       final classicTheme = ref.watch(
         themeSettingProvider.select((state) => (state.classicTheme as dynamic) == true),
       );
+      final bottomPadding = MediaQuery.of(context).padding.bottom;
 
       if (classicTheme) {
         return ListView.builder(
           itemCount: items.length,
           itemBuilder: (_, index) => items[index],
-          padding: const EdgeInsets.only(bottom: 16),
+          padding: EdgeInsets.only(bottom: 16 + bottomPadding),
         );
       }
 
@@ -675,7 +677,7 @@ Widget generateListView(List<Widget> items) {
       if (cleanItems.isEmpty) return const SizedBox.shrink();
 
       return ListView.builder(
-        padding: const EdgeInsets.only(bottom: 24, top: 12),
+        padding: EdgeInsets.only(bottom: 24 + bottomPadding, top: 12),
         itemCount: cleanItems.length,
         itemBuilder: (context, index) {
           final item = cleanItems[index];

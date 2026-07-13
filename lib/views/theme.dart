@@ -55,7 +55,6 @@ class ThemeView extends ConsumerWidget {
       _LightIconItem(),
       if (system.isWindows) _TrayIconInvertItem(),
       _TextScaleFactorItem(),
-      const SizedBox(height: 64),
     ];
     return generateListView(items);
   }

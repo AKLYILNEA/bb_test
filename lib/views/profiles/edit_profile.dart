@@ -293,6 +293,9 @@ class EditProfileViewState extends State<EditProfileView> {
               border: const OutlineInputBorder(),
               labelText: appLocalizations.url,
             ),
+            onEditingComplete: widget.isNew
+                ? () => FocusManager.instance.primaryFocus?.unfocus()
+                : null,
             validator: (String? value) {
               if (value == null || value.isEmpty) {
                 return appLocalizations.profileUrlNullValidationDesc;
@@ -408,6 +411,11 @@ class EditProfileViewState extends State<EditProfileView> {
     ];
     return CommonPopScope(
       onPop: () {
+        final primaryFocus = FocusManager.instance.primaryFocus;
+        if (primaryFocus != null && primaryFocus.context?.widget is EditableText) {
+          primaryFocus.unfocus();
+          return false;
+        }
         if (fileData == null) {
           return true;
         }

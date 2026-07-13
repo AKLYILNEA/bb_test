@@ -219,7 +219,7 @@ class _ToolViewState extends ConsumerState<ToolsView> {
           bottom:
               classicTheme
                   ? 20
-                  : 32 +
+                  : 20 +
                       (isMobileView ? kFloatingBottomBarReserveHeight : 0),
           top: classicTheme ? 0 : 8,
         ),

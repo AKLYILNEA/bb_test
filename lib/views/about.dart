@@ -53,14 +53,14 @@ class AboutView extends StatelessWidget {
         ListItem(
           title: const Text('Telegram Group'),
           onTap: () {
-            globalState.openUrl('https://t.me/appshub_chat');
+            globalState.openUrl('https://telegram.me/appshub_chat');
           },
           trailing: const Icon(Icons.launch),
         ),
         ListItem(
           title: const Text('Telegram Channel'),
           onTap: () {
-            globalState.openUrl('https://t.me/appshub_channel');
+            globalState.openUrl('https://telegram.me/appshub_channel');
           },
           trailing: const Icon(Icons.launch),
         ),
@@ -89,9 +89,18 @@ class AboutView extends StatelessWidget {
       Contributor(avatar: 'assets/images/avatars/dabaozi.jpg', name: '大包子'),
       Contributor(avatar: 'assets/images/avatars/xiaolou.jpg', name: '小楼'),
       Contributor(avatar: 'assets/images/avatars/www.jpg', name: 'Www'),
-      Contributor(avatar: 'assets/images/avatars/AIsouler.jpg', name: 'AIsouler'),
-      Contributor(avatar: 'assets/images/avatars/songchenwen.jpg', name: 'songchenwen'),
-      Contributor(avatar: 'assets/images/avatars/EriDeLee.jpg', name: 'EriDeLee'),
+      Contributor(
+        avatar: 'assets/images/avatars/AIsouler.jpg',
+        name: 'AIsouler',
+      ),
+      Contributor(
+        avatar: 'assets/images/avatars/songchenwen.jpg',
+        name: 'songchenwen',
+      ),
+      Contributor(
+        avatar: 'assets/images/avatars/EriDeLee.jpg',
+        name: 'EriDeLee',
+      ),
     ];
     return generateSection(
       separated: false,
@@ -175,10 +184,7 @@ class AboutView extends StatelessWidget {
       ..._buildContributorsSection(),
       ..._buildMoreSection(context),
     ];
-    return Padding(
-      padding: kMaterialListPadding.copyWith(top: 0, bottom: 16),
-      child: generateListView(items),
-    );
+    return generateListView(items);
   }
 }
 

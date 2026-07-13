@@ -167,6 +167,7 @@ class CommonCard extends StatelessWidget {
           childWidget = Stack(children: children);
         }
 
+        final isInteractive = onPressed != null || onLongPress != null;
         final card = OutlinedButton(
           onLongPress: onLongPress,
           clipBehavior: Clip.antiAlias,
@@ -183,6 +184,11 @@ class CommonCard extends StatelessWidget {
             side: WidgetStateProperty.resolveWith(
               (states) => getBorderSide(context, states),
             ),
+            minimumSize: WidgetStatePropertyAll(
+              isInteractive ? null : Size.zero,
+            ),
+            tapTargetSize:
+                isInteractive ? null : MaterialTapTargetSize.shrinkWrap,
           ),
           onPressed: onPressed,
           child: childWidget,
