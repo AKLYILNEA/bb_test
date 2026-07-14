@@ -1152,6 +1152,11 @@ class AppController {
 
     await _handlePreference();
     await _handlerDisclaimer();
+    if (system.isWindows) {
+      unawaited(setProcessPriority(_ref.read(appSettingProvider).enableHighPriority).catchError((e) {
+        commonPrint.log('Failed to set initial process priority: $e');
+      }));
+    }
     _ref.read(initProvider.notifier).value = true;
   }
 

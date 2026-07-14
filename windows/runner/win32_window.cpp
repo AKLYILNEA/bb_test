@@ -291,6 +291,35 @@ Win32Window::MessageHandler(HWND hwnd,
     UpdateTheme(hwnd);
     return 0;
 
+  case WM_POWERBROADCAST:
+    if (wparam == PBT_APMRESUMESUSPEND ||
+        wparam == PBT_APMRESUMEAUTOMATIC ||
+        wparam == PBT_APMRESUMECRITICAL)
+    {
+      SetTimer(hwnd, kResumeTimerId, 1000, nullptr);
+    }
+    else if (wparam == PBT_APMSUSPEND)
+    {
+      KillTimer(hwnd, kResumeTimerId);
+    }
+    return TRUE;
+
+  case WM_TIMER:
+    if (wparam == kResumeTimerId)
+    {
+      KillTimer(hwnd, kResumeTimerId);
+      if (IsWindowVisible(hwnd) && !IsIconic(hwnd))
+      {
+        if (child_content_ != nullptr && IsWindow(child_content_))
+        {
+          InvalidateRect(child_content_, nullptr, TRUE);
+          UpdateWindow(child_content_);
+        }
+      }
+      return 0;
+    }
+    break;
+
   }
 
   return DefWindowProc(hwnd, message, wparam, lparam);
