@@ -8,31 +8,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 Future<void> _handleNetworkConfigChange(WidgetRef ref) async {
-  final bool isVpnOrTunEnabled;
   if (system.isAndroid) {
-    isVpnOrTunEnabled = ref.read(vpnSettingProvider).enable;
-  } else {
-    isVpnOrTunEnabled = ref.read(patchClashConfigProvider).tun.enable;
+    final isVpnEnabled = ref.read(vpnSettingProvider).enable;
+    final isCoreRunning = ref.read(runTimeProvider) != null;
+    if (isVpnEnabled && isCoreRunning) {
+      globalState.showNotifier(
+        appLocalizations.vpnTip,
+        actionLabel: appLocalizations.restart,
+        showCountdown: true,
+        onAction: () async {
+          await globalState.appController.restartCore();
+          globalState.showNotifier(appLocalizations.success);
+        },
+      );
+      return;
+    }
   }
-  
-  final isCoreRunning = ref.read(runTimeProvider) != null;
-
-  if (isVpnOrTunEnabled && isCoreRunning) {
-    final tipMessage = system.isAndroid
-        ? appLocalizations.vpnTip
-        : appLocalizations.restartTip;
-    globalState.showNotifier(
-      tipMessage,
-      actionLabel: appLocalizations.restart,
-      showCountdown: true,
-      onAction: () async {
-        await globalState.appController.restartCore();
-        globalState.showNotifier(appLocalizations.success);
-      },
-    );
-  } else {
-    globalState.appController.updateClashConfig();
-  }
+  globalState.appController.updateClashConfig();
 }
 
 class VPNItem extends ConsumerWidget {

@@ -177,8 +177,8 @@ class ClashCore {
     clashInterface.closeConnection(id);
   }
 
-  void closeConnections() {
-    clashInterface.closeConnections();
+  Future<void> closeConnections() async {
+    await clashInterface.closeConnections();
   }
 
   void resetConnections() {

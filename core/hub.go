@@ -66,10 +66,6 @@ func handleStopListener() bool {
 	defer runLock.Unlock()
 	isRunning = false
 	listener.StopListener()
-	go func() {
-		runtime.GC()
-		debug.FreeOSMemory()
-	}()
 	return true
 }
 

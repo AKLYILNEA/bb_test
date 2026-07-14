@@ -20,6 +20,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:tray_manager/tray_manager.dart';
 
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:yaml/yaml.dart';
@@ -127,13 +128,16 @@ class AppController {
     _invalidateCoreReads();
 
     final wasRunning = _ref.read(runTimeProvider.notifier).isStart;
+    final keepVpnService = system.isAndroid;
     if (wasRunning) {
-      await globalState.handleStop();
+      await globalState.handleStop(!keepVpnService);
       _ref.read(runTimeProvider.notifier).value = null;
     }
     if (system.isAndroid) {
-      clashCore.closeConnections();
-      await Future.delayed(const Duration(milliseconds: 500));
+      await clashCore.closeConnections();
+      await clashCore.flushFakeIP();
+      await clashCore.flushDnsCache();
+      await clashCore.requestGc(forceFreeOSMemory: true);
     }
     if (system.isDesktop) {
       lastProfileModified = null;
@@ -148,7 +152,10 @@ class AppController {
     }
 
     if (wasRunning) {
-      await globalState.handleStart([updateRunTime, updateTraffic]);
+      await globalState.handleStart(
+        [updateRunTime, updateTraffic],
+        !keepVpnService,
+      );
       _scheduleCheckIpRefresh();
       _backgroundLoad();
     }
@@ -238,12 +245,12 @@ class AppController {
       return;
     }
 
+    await globalState.handleStart([updateRunTime, updateTraffic]);
+
     final needReapply = await _needsSetupConfig();
     if (needReapply) {
       await _quickSetupConfig();
     }
-
-    await globalState.handleStart([updateRunTime, updateTraffic]);
 
     _scheduleCheckIpRefresh();
 
@@ -899,6 +906,13 @@ class AppController {
     globalState.isExiting = true;
 
     try {
+      if (system.isDesktop) {
+        try {
+          await trayManager.destroy();
+        } catch (e) {
+          commonPrint.log('Failed to destroy tray icon on exit: $e');
+        }
+      }
       stopWakelockAutoRecovery();
       await globalState.handleBackground();
       if (system.isDesktop) {

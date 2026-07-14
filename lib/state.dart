@@ -304,14 +304,19 @@ class GlobalState {
     await clashCore.requestGc();
   }
 
-  Future<void> handleStart([UpdateTasks? tasks]) async {
+  Future<void> handleStart([
+    UpdateTasks? tasks,
+    bool includeVpnService = true,
+  ]) async {
     startTime ??= DateTime.now();
     if (system.isAndroid && isService) {
       await clashLibHandler?.startListener();
     } else {
       await clashCore.startListener();
     }
-    await service?.startVpn();
+    if (includeVpnService) {
+      await service?.startVpn();
+    }
     final prefs = await preferences.sharedPreferencesCompleter.future;
     await prefs?.setBool('is_vpn_running', true);
 
@@ -343,12 +348,16 @@ class GlobalState {
     }
   }
 
-  Future handleStop() async {
+  Future handleStop([bool includeVpnService = true]) async {
     startTime = null;
     if (system.isAndroid && isService) {
       await clashLibHandler?.stopListener();
     } else {
       await clashCore.stopListener();
+    }
+    if (!includeVpnService) {
+      stopUpdateTasks();
+      return;
     }
     await service?.stopVpn();
     final prefs = await preferences.sharedPreferencesCompleter.future;
