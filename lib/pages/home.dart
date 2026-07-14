@@ -5,7 +5,6 @@ import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 typedef OnSelected = void Function(int index);
@@ -71,13 +70,6 @@ class _HomePageState extends State<HomePage> {
                   (state) => (state.classicTheme as dynamic) == true,
                 ),
               );
-              final systemUiStyle =
-                  globalState.appState.systemUiOverlayStyle.copyWith(
-                systemNavigationBarColor:
-                    classicTheme
-                        ? context.colorScheme.surfaceContainer
-                        : context.colorScheme.surface,
-              );
               final pageContent = MediaQuery.removePadding(
                 removeTop: false,
                 removeBottom: true,
@@ -95,35 +87,22 @@ class _HomePageState extends State<HomePage> {
                 child: bottomNavigationBar,
               );
               if (classicTheme) {
-                return AnnotatedRegion<SystemUiOverlayStyle>(
-                  value: systemUiStyle,
-                  child: Column(
-                    children: [Flexible(flex: 1, child: pageContent), navBar],
-                  ),
+                return Column(
+                  children: [Flexible(flex: 1, child: pageContent), navBar],
                 );
               }
-              return AnnotatedRegion<SystemUiOverlayStyle>(
-                value: systemUiStyle,
-                child: Stack(
-                  children: [
-                    Positioned.fill(
-                      child: MediaQuery.removePadding(
-                        removeTop: false,
-                        removeBottom: true,
-                        removeLeft: true,
-                        removeRight: true,
-                        context: context,
-                        child: child,
-                      ),
-                    ),
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: navBar,
-                    ),
-                  ],
-                ),
+              return Stack(
+                children: [
+                  Positioned.fill(
+                    child: pageContent,
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: navBar,
+                  ),
+                ],
               );
             } else {
               return child!;

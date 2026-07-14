@@ -289,6 +289,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
     assert(widget.appBar != null || widget.title != null);
     final body = SafeArea(
       top: false,
+      bottom: false,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
