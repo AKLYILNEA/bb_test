@@ -850,6 +850,14 @@ class GlobalState {
             proxy['client-fingerprint'] = globalClientFingerprint;
           }
         }
+
+        final realityOpts = proxy['reality-opts'];
+        if (realityOpts is Map) {
+          final shortId = realityOpts['short-id'];
+          if (shortId is num) {
+            realityOpts['short-id'] = shortId.toString();
+          }
+        }
       }
     }
 
