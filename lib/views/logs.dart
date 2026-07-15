@@ -144,19 +144,19 @@ class _LogsViewState extends ConsumerState<LogsView> {
       title: appLocalizations.logs,
       body: !hasLogs
           ? NullStatus(label: appLocalizations.nullTip(appLocalizations.logs))
-          : Align(
-              alignment: Alignment.topCenter,
-              child: ScrollToEndBox(
-                onCancelToEnd: _cancelAutoScroll,
+          : ScrollToEndBox(
+              onCancelToEnd: _cancelAutoScroll,
+              controller: _scrollController,
+              enable: _autoScrollToEnd,
+              dataSource: logs,
+              child: CommonScrollBar(
                 controller: _scrollController,
-                enable: _autoScrollToEnd,
-                dataSource: logs,
-                child: CommonScrollBar(
-                  controller: _scrollController,
+                child: Align(
+                  alignment: Alignment.topCenter,
                   child: ListView.builder(
                     physics: const NextClampingScrollPhysics(),
                     reverse: true,
-                    shrinkWrap: true,
+                    shrinkWrap: logs.length < 20,
                     controller: _scrollController,
                     padding: EdgeInsets.only(
                       bottom: classicTheme ? 0 : 16,

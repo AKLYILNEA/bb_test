@@ -51,7 +51,10 @@ const repository = 'appshubcc/Bettbox';
 const defaultExternalController = '127.0.0.1:9090';
 const maxMobileWidth = 600;
 const maxLaptopWidth = 840;
-const kFloatingBottomBarReserveHeight = 84.0;
+double getFloatingBottomBarReserveHeight(BuildContext context) {
+  final viewBottom = MediaQuery.of(context).viewPadding.bottom;
+  return 84.0 + (viewBottom > 12 ? viewBottom - 12 : 0);
+}
 const defaultTestUrl = 'https://www.apple.com/library/test/success.html';
 
 // Preset test URLs

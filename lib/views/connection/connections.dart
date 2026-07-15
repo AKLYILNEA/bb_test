@@ -124,19 +124,25 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
     }
     final oldConnections = ref.read(connectionsProvider);
     final oldMap = {for (final e in oldConnections) e.id: e};
+    var hasChanges = oldConnections.length != connections.length;
     final newConnections = connections.map((item) {
       final oldItem = oldMap[item.id];
       if (oldItem != null) {
         final upSpeed = item.upload - oldItem.upload;
         final downSpeed = item.download - oldItem.download;
-        return item.copyWith(
+        final newItem = item.copyWith(
           uploadSpeed: upSpeed > 0 ? upSpeed : 0,
           downloadSpeed: downSpeed > 0 ? downSpeed : 0,
         );
+        if (newItem != oldItem) hasChanges = true;
+        return newItem;
       }
+      hasChanges = true;
       return item.copyWith(uploadSpeed: 0, downloadSpeed: 0);
     }).toList();
-    ref.read(connectionsProvider.notifier).state = newConnections;
+    if (hasChanges) {
+      ref.read(connectionsProvider.notifier).state = newConnections;
+    }
   }
 
   void _handleBackgroundModeChanged() {

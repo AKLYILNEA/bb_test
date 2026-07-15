@@ -95,20 +95,20 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
           ? NullStatus(
               label: appLocalizations.nullTip(appLocalizations.requests),
             )
-          : Align(
-              alignment: Alignment.topCenter,
-              child: CommonScrollBar(
-                trackVisibility: false,
+          : CommonScrollBar(
+              trackVisibility: false,
+              controller: _scrollController,
+              child: ScrollToEndBox(
                 controller: _scrollController,
-                child: ScrollToEndBox(
-                  controller: _scrollController,
-                  dataSource: requests,
-                  enable: _autoScrollToEnd,
-                  onCancelToEnd: _cancelAutoScroll,
+                dataSource: requests,
+                enable: _autoScrollToEnd,
+                onCancelToEnd: _cancelAutoScroll,
+                child: Align(
+                  alignment: Alignment.topCenter,
                   child: ListView.builder(
                     reverse: true,
+                    shrinkWrap: requests.length < 20,
                     physics: const NextClampingScrollPhysics(),
-                    shrinkWrap: true,
                     controller: _scrollController,
                     padding: EdgeInsets.only(
                       bottom: classicTheme ? 0 : 16,

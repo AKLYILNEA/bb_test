@@ -122,7 +122,7 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
     return Padding(
       padding: EdgeInsets.only(
         bottom:
-            isMobileView && !classicTheme ? kFloatingBottomBarReserveHeight : 0,
+            isMobileView && !classicTheme ? getFloatingBottomBarReserveHeight(context) : 0,
       ),
       child: FloatingActionButton.extended(
         heroTag: null,
@@ -152,6 +152,12 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
           if (profilesSelectorState.profiles.isEmpty) {
             return NullStatus(label: appLocalizations.nullProfileDesc);
           }
+          final columns = system.isAndroid
+              ? 1
+              : profilesSelectorState.profiles.length <
+                    profilesSelectorState.columns
+              ? profilesSelectorState.profiles.length
+              : profilesSelectorState.columns;
           return Align(
             alignment: Alignment.topCenter,
             child: SingleChildScrollView(
@@ -161,20 +167,16 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
                 right: 16,
                 top: 16,
                 bottom:
-                    16 +
+                    (profilesSelectorState.profiles.isNotEmpty &&
+                     profilesSelectorState.profiles.length % columns == 0 ? 88 : 16) +
                     (isMobileView && !classicTheme
-                        ? kFloatingBottomBarReserveHeight
+                        ? getFloatingBottomBarReserveHeight(context)
                         : 0),
               ),
               child: Grid(
                 mainAxisSpacing: 16,
                 crossAxisSpacing: 16,
-                crossAxisCount: system.isAndroid
-                    ? 1
-                    : profilesSelectorState.profiles.length <
-                          profilesSelectorState.columns
-                    ? profilesSelectorState.profiles.length
-                    : profilesSelectorState.columns,
+                crossAxisCount: columns,
                 children: [
                   for (
                     int i = 0;

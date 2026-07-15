@@ -392,9 +392,9 @@ class _ProxyGroupViewState extends ConsumerState<ProxyGroupView> {
             left: 16,
             right: 16,
             bottom:
-                16 +
+                (sortedProxies.isNotEmpty && sortedProxies.length % widget.columns == 0 ? 88 : 16) +
                 (isMobileView && !classicTheme
-                    ? kFloatingBottomBarReserveHeight
+                    ? getFloatingBottomBarReserveHeight(context)
                     : 0),
           ),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

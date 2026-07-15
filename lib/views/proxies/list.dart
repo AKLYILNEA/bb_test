@@ -197,7 +197,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
           bottom:
               16 +
               (isMobileView && !classicTheme
-                  ? kFloatingBottomBarReserveHeight
+                  ? getFloatingBottomBarReserveHeight(context)
                   : 0),
         ),
         itemCount: flatItems.length,

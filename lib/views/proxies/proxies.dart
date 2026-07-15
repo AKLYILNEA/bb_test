@@ -123,7 +123,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
     return Padding(
       padding: EdgeInsets.only(
         bottom:
-            isMobileView && !classicTheme ? kFloatingBottomBarReserveHeight : 0,
+            isMobileView && !classicTheme ? getFloatingBottomBarReserveHeight(context) : 0,
       ),
       child: DelayTestButton(
         onClick: () async {

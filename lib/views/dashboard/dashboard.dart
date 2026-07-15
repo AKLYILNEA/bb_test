@@ -207,7 +207,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
             bottom:
                 16 +
                 (isMobileView && !classicTheme
-                    ? kFloatingBottomBarReserveHeight
+                    ? getFloatingBottomBarReserveHeight(context)
                     : 0),
           ),
           child: _buildIsEdit((isEdit) {
