@@ -87,6 +87,7 @@ class ClashService extends ClashHandlerInterface {
                   handleResult(ActionResult.fromJson(json.decode(data)));
                 },
                 onError: (error) {
+                  if (_isDestroying || globalState.isExiting) return;
                   commonPrint.log('Frame decode error: $error');
                 },
                 onDone: () {
@@ -96,6 +97,7 @@ class ClashService extends ClashHandlerInterface {
         }
       },
       (error, stack) {
+        if (_isDestroying || globalState.isExiting) return;
         commonPrint.log(error.toString());
         if (error is SocketException &&
             !_isDestroying &&

@@ -1460,6 +1460,11 @@ class AppController {
     _ref
         .read(patchClashConfigProvider.notifier)
         .updateState((state) => state.copyWith.tun(enable: !state.tun.enable));
+    if (system.isLinux && globalState.backgroundMode.value) {
+      unawaited(updateClashConfig());
+    } else {
+      updateClashConfigDebounce();
+    }
   }
 
   void updateSystemProxy() {
@@ -1512,6 +1517,11 @@ class AppController {
         .updateState((state) => state.copyWith(mode: mode));
     if (mode == Mode.global) {
       updateCurrentGroupName(GroupName.GLOBAL.name);
+    }
+    if (system.isLinux && globalState.backgroundMode.value) {
+      unawaited(updateClashConfig());
+    } else {
+      updateClashConfigDebounce();
     }
     updateGroupsDebounce();
     addCheckIpNumDebounce();
@@ -1693,9 +1703,9 @@ class AppController {
     });
   }
 
-  Future<void> updateTray([bool focus = false, bool silent = false]) async {
+  Future<void> updateTray([bool focus = false, bool silent = false, bool force = false]) async {
     final trayState = _ref.read(trayStateProvider);
-    await tray.update(trayState: trayState, focus: focus, silent: silent);
+    await tray.update(trayState: trayState, focus: focus, silent: silent, force: force);
   }
 
   Future<void> _processRecoveryArchive(

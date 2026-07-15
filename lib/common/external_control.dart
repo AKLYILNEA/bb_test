@@ -124,8 +124,12 @@ class ExternalControl {
     try {
       socket.write('$command\n');
       await socket.flush();
+    } on SocketException catch (e) {
+      if (!_isConnectionReset(e)) rethrow;
     } finally {
-      await socket.close();
+      try {
+        await socket.close();
+      } catch (_) {}
     }
   }
 
@@ -137,9 +141,26 @@ class ExternalControl {
     try {
       socket.write('$command\n');
       await socket.flush();
+    } on SocketException catch (e) {
+      if (!_isConnectionReset(e)) rethrow;
     } finally {
-      await socket.close();
+      try {
+        await socket.close();
+      } catch (_) {}
     }
+  }
+
+  static bool _isConnectionReset(SocketException e) {
+    final osError = e.osError;
+    if (osError == null) return false;
+    const resetMessages = [
+      'Connection reset by peer',
+      'Connection refused',
+      '远程主机强迫关闭了一个现有的连接',
+      'An existing connection was forcibly closed',
+    ];
+    return osError.errorCode == 10054 ||
+        resetMessages.any((m) => osError.message.contains(m));
   }
 
   static void _handleCommand(String command) {
