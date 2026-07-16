@@ -27,7 +27,7 @@ dependencies:
   launch_at_startup: ^0.5.1
   json_annotation: ^4.9.0
   file_picker: ^8.3.7
-  mobile_scanner: ^7.2.0
+  mobile_scanner: ^7.2.1
   app_links: ^6.3.3
   win32_registry: ^2.0.0
   collection: ^1.18.0
