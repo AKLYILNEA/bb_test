@@ -1344,24 +1344,24 @@ class AppController {
   }
 
   Future<void> addProfileFormURL(String url, {String? ageSecretKey}) async {
-    if (globalState.navigatorKey.currentState?.canPop() ?? false) {
-      globalState.navigatorKey.currentState?.popUntil((route) => route.isFirst);
-    }
-    toProfiles();
-
-    final profile = await safeRun(
-      () async {
-        return await Profile.normal(
-          url: url,
-          ageSecretKey: ageSecretKey,
-        ).update();
-      },
-      needLoading: true,
-      silence: false,
-      title: appLocalizations.add,
-    );
-    if (profile != null) {
+    _ref.read(loadingProvider.notifier).value = true;
+    try {
+      final profile = await Profile.normal(
+        url: url,
+        ageSecretKey: ageSecretKey,
+      ).update();
+      if (globalState.navigatorKey.currentState?.canPop() ?? false) {
+        globalState.navigatorKey.currentState?.popUntil((route) => route.isFirst);
+      }
+      toProfiles();
       await addProfile(profile);
+    } on Object catch (e) {
+      await globalState.showMessage(
+        title: appLocalizations.add,
+        message: TextSpan(text: _formatErrorMessage(e)),
+      );
+    } finally {
+      _ref.read(loadingProvider.notifier).value = false;
     }
   }
 
@@ -1372,20 +1372,21 @@ class AppController {
       return;
     }
     if (!context.mounted) return;
-    globalState.navigatorKey.currentState?.popUntil((route) => route.isFirst);
-    toProfiles();
 
-    final profile = await safeRun(
-      () async {
-        await Future.delayed(const Duration(milliseconds: 500));
-        return await Profile.normal(label: platformFile?.name).saveFile(bytes);
-      },
-      needLoading: true,
-      silence: false,
-      title: appLocalizations.add,
-    );
-    if (profile != null) {
+    _ref.read(loadingProvider.notifier).value = true;
+    try {
+      await Future.delayed(const Duration(milliseconds: 500));
+      final profile = await Profile.normal(label: platformFile?.name).saveFile(bytes);
+      globalState.navigatorKey.currentState?.popUntil((route) => route.isFirst);
+      toProfiles();
       await addProfile(profile);
+    } on Object catch (e) {
+      await globalState.showMessage(
+        title: appLocalizations.add,
+        message: TextSpan(text: _formatErrorMessage(e)),
+      );
+    } finally {
+      _ref.read(loadingProvider.notifier).value = false;
     }
   }
 
@@ -2267,10 +2268,14 @@ class AppController {
       if (silence) {
         globalState.showNotifier(errorMessage);
       } else {
-        await globalState.showMessage(
-          title: title ?? appLocalizations.tip,
-          message: TextSpan(text: errorMessage),
-        );
+        try {
+          await globalState.showMessage(
+            title: title ?? appLocalizations.tip,
+            message: TextSpan(text: errorMessage),
+          );
+        } catch (_) {
+          globalState.showNotifier(errorMessage);
+        }
       }
       return null;
     } finally {

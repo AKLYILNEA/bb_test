@@ -417,7 +417,9 @@ class GlobalState {
     required Widget child,
     bool dismissible = true,
   }) async {
-    final context = navigatorKey.currentState!.context;
+    final state = navigatorKey.currentState;
+    if (state == null) return null;
+    final context = state.context;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return await showModal<T>(
       context: context,

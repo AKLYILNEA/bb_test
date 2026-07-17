@@ -6,6 +6,7 @@ import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/pages/editor.dart';
+import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -96,14 +97,22 @@ class EditProfileViewState extends State<EditProfileView> {
       ),
     );
     if (widget.isNew) {
-      await appController.safeRun(
-        () async {
-          final updatedProfile = await profile.update();
-          await appController.addProfile(updatedProfile);
-        },
-        silence: false,
-        needLoading: true,
-      );
+      final ref = appController.ref;
+      ref.read(loadingProvider.notifier).value = true;
+      try {
+        final updatedProfile = await profile.update();
+        await appController.addProfile(updatedProfile);
+      } on Object catch (e) {
+        if (mounted) {
+          await globalState.showMessage(
+            title: appLocalizations.tip,
+            message: TextSpan(text: e.formatError),
+          );
+        }
+        return;
+      } finally {
+        ref.read(loadingProvider.notifier).value = false;
+      }
     } else {
       final hasUpdate = widget.profile.url != profile.url;
       if (fileData != null) {
