@@ -44,6 +44,14 @@ class _LogsViewState extends ConsumerState<LogsView> {
 
   void _onKeywordsUpdate(List<String> keywords) {
     ref.read(logsKeywordsProvider.notifier).state = keywords;
+    _scrollToTop();
+  }
+
+  void _scrollToTop() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scrollController.hasClients) return;
+      _scrollController.jumpTo(0);
+    });
   }
 
   void _toggleAutoScroll() {
@@ -162,7 +170,7 @@ class _LogsViewState extends ConsumerState<LogsView> {
                       bottom: classicTheme ? 0 : 16,
                       top: classicTheme ? 0 : 8,
                     ),
-                    itemBuilder: (_, index) {
+                    itemBuilder: (context, index) {
                       if (classicTheme) {
                         if (index.isOdd) {
                           return const Divider(height: 0);

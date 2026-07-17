@@ -60,10 +60,7 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
       globalState.showMessage(
         title: appLocalizations.tip,
         message: TextSpan(
-          children: [
-            for (final message in messages)
-              TextSpan(text: message),
-          ],
+          children: [for (final message in messages) TextSpan(text: message)],
         ),
       );
     }
@@ -121,8 +118,9 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
     );
     return Padding(
       padding: EdgeInsets.only(
-        bottom:
-            isMobileView && !classicTheme ? getFloatingBottomBarReserveHeight(context) : 0,
+        bottom: isMobileView && !classicTheme
+            ? getFloatingBottomBarFABReserveHeight(context)
+            : 0,
       ),
       child: FloatingActionButton.extended(
         heroTag: null,
@@ -168,7 +166,9 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
                 top: 16,
                 bottom:
                     (profilesSelectorState.profiles.isNotEmpty &&
-                     profilesSelectorState.profiles.length % columns == 0 ? 88 : 16) +
+                            profilesSelectorState.profiles.length % columns == 0
+                        ? 88
+                        : 16) +
                     (isMobileView && !classicTheme
                         ? getFloatingBottomBarReserveHeight(context)
                         : 0),

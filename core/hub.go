@@ -75,7 +75,7 @@ func handleGetIsInit() bool {
 
 func handleForceGc(forceFreeOSMemory bool) {
 	go func() {
-		log.Infoln("[APP] Request force GC", forceFreeOSMemory)
+		log.Infoln("[APP] Request force GC, forceFreeOSMemory=%t", forceFreeOSMemory)
 		runtime.GC()
 		if forceFreeOSMemory {
 			debug.FreeOSMemory()

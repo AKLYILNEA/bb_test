@@ -61,7 +61,9 @@ class _HomePageState extends State<HomePage> {
                     navigationItems: navigationItems,
                     selectedIndex: currentIndex,
                     onTabChange: (index) {
-                      globalState.appController.toPage(navigationItems[index].label);
+                      globalState.appController.toPage(
+                        navigationItems[index].label,
+                      );
                     },
                   );
             if (isMobile) {
@@ -72,7 +74,7 @@ class _HomePageState extends State<HomePage> {
               );
               final pageContent = MediaQuery.removePadding(
                 removeTop: false,
-                removeBottom: true,
+                removeBottom: classicTheme,
                 removeLeft: true,
                 removeRight: true,
                 context: context,
@@ -88,20 +90,16 @@ class _HomePageState extends State<HomePage> {
               );
               if (classicTheme) {
                 return Column(
-                  children: [Flexible(flex: 1, child: pageContent), navBar],
+                  children: [
+                    Flexible(flex: 1, child: pageContent),
+                    navBar,
+                  ],
                 );
               }
               return Stack(
                 children: [
-                  Positioned.fill(
-                    child: pageContent,
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: navBar,
-                  ),
+                  Positioned.fill(child: pageContent),
+                  Positioned(left: 0, right: 0, bottom: 0, child: navBar),
                 ],
               );
             } else {
@@ -147,7 +145,7 @@ class _HomePageState extends State<HomePage> {
       _currentNavIndex = currentIndex;
       _requestNavFocus(currentIndex);
     }
-    
+
     return Container(
       decoration: BoxDecoration(
         color: context.colorScheme.surfaceContainer,
@@ -174,74 +172,76 @@ class _HomePageState extends State<HomePage> {
                   animation: focusNode,
                   builder: (context, child) {
                     final isFocused = focusNode.hasFocus;
-                      return InkWell(
-                        focusNode: focusNode,
-                        onFocusChange: (hasFocus) {
-                          if (hasFocus) {
-                            if (!_isNavFocused) {
-                              _isNavFocused = true;
-                              if (index != currentIndex) {
-                                _requestNavFocus(currentIndex);
-                                return;
-                              }
+                    return InkWell(
+                      focusNode: focusNode,
+                      onFocusChange: (hasFocus) {
+                        if (hasFocus) {
+                          if (!_isNavFocused) {
+                            _isNavFocused = true;
+                            if (index != currentIndex) {
+                              _requestNavFocus(currentIndex);
+                              return;
                             }
-                          } else {
-                            Future.microtask(() {
-                              final currentFocus = FocusManager.instance.primaryFocus;
-                              if (currentFocus == null || !_navFocusNodes.values.contains(currentFocus)) {
-                                _isNavFocused = false;
-                              }
-                            });
                           }
-                        },
-                        onTap: () {
-                          globalState.appController.toPage(item.label);
-                        },
-                        child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? context.colorScheme.secondaryContainer
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(12),
-                              border: isFocused
-                                  ? Border.all(
-                                      color: context.colorScheme.primary,
-                                      width: 2,
-                                    )
-                                  : Border.all(
-                                      color: Colors.transparent,
-                                      width: 2,
-                                    ),
+                        } else {
+                          Future.microtask(() {
+                            final currentFocus =
+                                FocusManager.instance.primaryFocus;
+                            if (currentFocus == null ||
+                                !_navFocusNodes.values.contains(currentFocus)) {
+                              _isNavFocused = false;
+                            }
+                          });
+                        }
+                      },
+                      onTap: () {
+                        globalState.appController.toPage(item.label);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? context.colorScheme.secondaryContainer
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                          border: isFocused
+                              ? Border.all(
+                                  color: context.colorScheme.primary,
+                                  width: 2,
+                                )
+                              : Border.all(color: Colors.transparent, width: 2),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconTheme(
+                              data: IconThemeData(
+                                color: isSelected
+                                    ? context.colorScheme.onSecondaryContainer
+                                    : context.colorScheme.onSurfaceVariant,
+                                size: 24,
+                              ),
+                              child: item.icon,
                             ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconTheme(
-                                  data: IconThemeData(
-                                    color: isSelected
-                                        ? context.colorScheme.onSecondaryContainer
-                                        : context.colorScheme.onSurfaceVariant,
-                                    size: 24,
-                                  ),
-                                  child: item.icon,
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  item.label.localizedName,
-                                  style: TextStyle(
-                                    color: isSelected
-                                        ? context.colorScheme.onSecondaryContainer
-                                        : context.colorScheme.onSurfaceVariant,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
+                            const SizedBox(height: 4),
+                            Text(
+                              item.label.localizedName,
+                              style: TextStyle(
+                                color: isSelected
+                                    ? context.colorScheme.onSecondaryContainer
+                                    : context.colorScheme.onSurfaceVariant,
+                                fontSize: 12,
+                              ),
                             ),
-                          ),
-                      );
-                    },
-                  ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
               );
             }).toList(),
           ),
@@ -309,12 +309,13 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
     if (index == -1) {
       return;
     }
-    
+
     if (!globalState.isAndroidTV) {
       FocusManager.instance.primaryFocus?.unfocus();
     }
-    
-    final isAnimateToPage = system.isDesktop || ref.read(appSettingProvider).isAnimateToPage;
+
+    final isAnimateToPage =
+        system.isDesktop || ref.read(appSettingProvider).isAnimateToPage;
     final isMobile = ref.read(isMobileViewProvider);
     if (isAnimateToPage && isMobile && !ignoreAnimateTo) {
       await _pageController.animateToPage(
