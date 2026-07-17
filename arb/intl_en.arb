@@ -634,7 +634,7 @@
   "custom": "Custom",
   "wakelock": "Wakelock",
   "wakelockDescription": "Keeps the screen on and app active in the background without requiring special CPU wakelock permissions.",
-  "tunEnableRequireAdmin": "TUN requires admin privileges. Please run as Administrator.",
+  "tunEnableRequireAdmin": "Enabling the TUN virtual network adapter requires Administrator or ROOT privileges.",
   "restartTip": "Restart TUN for changes to take effect",
   "restart": "Restart",
   "restartCoreTitle": "Restart Core",

@@ -1127,7 +1127,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Use TUN to take over device traffic",
     ),
     "tunEnableRequireAdmin": MessageLookupByLibrary.simpleMessage(
-      "TUN requires admin privileges. Please run as Administrator.",
+      "Enabling the TUN virtual network adapter requires Administrator or ROOT privileges.",
     ),
     "tunnel": MessageLookupByLibrary.simpleMessage("Tunnel"),
     "tunnelAddress": MessageLookupByLibrary.simpleMessage("Listen Address"),

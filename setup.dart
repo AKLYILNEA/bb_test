@@ -415,6 +415,14 @@ class BuildCommand extends Command {
     }
   }
 
+  Future<void> _setLinuxCoreSetuid() async {
+    final coreFile = File('libclash/linux/BettboxCore');
+    if (!coreFile.existsSync()) return;
+    try {
+      await Process.run('chmod', ['+sx', coreFile.path]);
+    } catch (_) {}
+  }
+
   Future<void> _getMacosDependencies() async {
     await Build.exec(Build.getExecutable('npm install -g appdmg'));
   }
@@ -697,6 +705,7 @@ class BuildCommand extends Command {
         ];
         final defaultTarget = targetMap[arch];
         await _getLinuxDependencies(arch!);
+        await _setLinuxCoreSetuid();
         for (final t in targets) {
           final ext = t == 'appimage' ? 'AppImage' : t;
           final currentSuffix = 'linux-$desc.$ext';

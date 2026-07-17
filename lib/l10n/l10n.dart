@@ -5179,10 +5179,10 @@ class AppLocalizations {
     );
   }
 
-  /// `TUN requires admin privileges. Please run as Administrator.`
+  /// `Enabling the TUN virtual network adapter requires Administrator or ROOT privileges.`
   String get tunEnableRequireAdmin {
     return Intl.message(
-      'TUN requires admin privileges. Please run as Administrator.',
+      'Enabling the TUN virtual network adapter requires Administrator or ROOT privileges.',
       name: 'tunEnableRequireAdmin',
       desc: '',
       args: [],

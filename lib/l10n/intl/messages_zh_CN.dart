@@ -784,7 +784,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "tun": MessageLookupByLibrary.simpleMessage("虚拟网卡"),
     "tunDesc": MessageLookupByLibrary.simpleMessage("使用TUN接管设备流量"),
     "tunEnableRequireAdmin": MessageLookupByLibrary.simpleMessage(
-      "启用虚拟网卡需要管理员权限，请以管理员身份运行程序",
+      "启用TUN虚拟网卡功能需要管理员或ROOT权限",
     ),
     "tunnel": MessageLookupByLibrary.simpleMessage("Tunnel"),
     "tunnelAddress": MessageLookupByLibrary.simpleMessage("监听地址"),

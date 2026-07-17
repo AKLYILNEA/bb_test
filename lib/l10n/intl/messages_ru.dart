@@ -1152,7 +1152,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Использовать TUN для перехвата трафика устройства",
     ),
     "tunEnableRequireAdmin": MessageLookupByLibrary.simpleMessage(
-      "Для включения виртуального адаптера требуются права администратора. Запустите программу от имени администратора.",
+      "Для включения виртуального адаптера TUN требуются права администратора или ROOT.",
     ),
     "tunnel": MessageLookupByLibrary.simpleMessage("Туннель"),
     "tunnelAddress": MessageLookupByLibrary.simpleMessage(
