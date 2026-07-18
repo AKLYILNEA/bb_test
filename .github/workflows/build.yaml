@@ -166,7 +166,7 @@ jobs:
         if: matrix.platform == 'windows'
         shell: pwsh
         run: |
-          $slug = if ('${{ env.IS_STABLE }}' -eq 'true') { "release-signing" } else { "test-signing" }
+          $slug = "test-signing"
           Write-Host "Setting SIGNING_POLICY_SLUG to $slug"
           "SIGNING_POLICY_SLUG=$slug" | Out-File -FilePath $env:GITHUB_ENV -Append
 
