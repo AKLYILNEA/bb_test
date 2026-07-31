@@ -5393,6 +5393,16 @@ class AppLocalizations {
   String get lineWrap {
     return Intl.message('Wrap Lines', name: 'lineWrap', desc: '', args: []);
   }
+
+  /// `Show Hidden Items`
+  String get showHiddenItems {
+    return Intl.message(
+      'Show Hidden Items',
+      name: 'showHiddenItems',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

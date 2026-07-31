@@ -661,6 +661,7 @@
   "generateFromPrivateKey": "Создать из закрытого ключа",
   "ageKeyPairGeneratedSuccess": "Пара ключей X25519 создана, сохраните её в надёжном месте",
   "agePrivateKeyRequired": "Пожалуйста, сначала введите корректный закрытый ключ Age",
-  "lineWrap": "Перенос строк"
+  "lineWrap": "Перенос строк",
+  "showHiddenItems": "Показать скрытые"
 }
 

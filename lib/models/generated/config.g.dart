@@ -262,6 +262,7 @@ _ProxiesStyle _$ProxiesStyleFromJson(Map<String, dynamic> json) =>
           ) ??
           const {},
       concurrencyLimit: (json['concurrencyLimit'] as num?)?.toInt() ?? 250,
+      showHiddenItems: json['showHiddenItems'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$ProxiesStyleToJson(_ProxiesStyle instance) =>
@@ -274,6 +275,7 @@ Map<String, dynamic> _$ProxiesStyleToJson(_ProxiesStyle instance) =>
       'delayAnimation': _$DelayAnimationTypeEnumMap[instance.delayAnimation]!,
       'iconMap': instance.iconMap,
       'concurrencyLimit': instance.concurrencyLimit,
+      'showHiddenItems': instance.showHiddenItems,
     };
 
 const _$ProxiesTypeEnumMap = {ProxiesType.tab: 'tab', ProxiesType.list: 'list'};

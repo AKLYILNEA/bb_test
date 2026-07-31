@@ -29,6 +29,9 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
   bool _isTab = false;
 
   List<Widget> _buildActions() {
+    final showHiddenItems = ref.watch(
+      proxiesStyleSettingProvider.select((state) => state.showHiddenItems),
+    );
     final (scriptOn, compatible) = ref.watch(
       scriptStateProvider.select(
         (s) => (s.currentId != null, s.currentScript?.isCompatibleWithBettbox ?? false),
@@ -129,6 +132,20 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
                   );
                 },
               ),
+            PopupMenuItemData(
+              icon: showHiddenItems
+                  ? Icons.radio_button_checked
+                  : Icons.radio_button_unchecked,
+              label: appLocalizations.showHiddenItems,
+              onPressed: () {
+                ref
+                    .read(proxiesStyleSettingProvider.notifier)
+                    .updateState(
+                      (state) =>
+                          state.copyWith(showHiddenItems: !showHiddenItems),
+                    );
+              },
+            ),
           ],
         ),
       ),

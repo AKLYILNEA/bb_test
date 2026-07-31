@@ -92,7 +92,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "agePrivateKeyLabel": MessageLookupByLibrary.simpleMessage("Age 秘密鍵"),
     "agePrivateKeyRequired": MessageLookupByLibrary.simpleMessage(
-      "正しい Age 秘密鍵を先に入力してください",
+      "正しいAge秘密鍵を先に入力してください",
     ),
     "agePublicKeyLabel": MessageLookupByLibrary.simpleMessage("Age 公開鍵"),
     "ageSecretKeyInvalidValidationDesc": MessageLookupByLibrary.simpleMessage(
@@ -479,7 +479,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "lightIconDesc": MessageLookupByLibrary.simpleMessage(
       "デスクトップアプリのアイコンをライト系に切り替え",
     ),
-    "lineWrap": MessageLookupByLibrary.simpleMessage("自動折り返し"),
+    "lineWrap": MessageLookupByLibrary.simpleMessage("折り返し"),
     "list": MessageLookupByLibrary.simpleMessage("リスト"),
     "listen": MessageLookupByLibrary.simpleMessage("リスニング"),
     "local": MessageLookupByLibrary.simpleMessage("ローカル"),
@@ -793,6 +793,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "serviceRunning": MessageLookupByLibrary.simpleMessage("サービス稼働中"),
     "settings": MessageLookupByLibrary.simpleMessage("設定"),
     "show": MessageLookupByLibrary.simpleMessage("表示"),
+    "showHiddenItems": MessageLookupByLibrary.simpleMessage("非表示項目を表示"),
     "showStartSwitch": MessageLookupByLibrary.simpleMessage("単独スイッチ表示"),
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage(
       "ホーム画面に独立したON/OFFボタンを表示",
