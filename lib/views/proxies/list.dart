@@ -414,6 +414,6 @@ class _GroupHeader extends ConsumerWidget {
   }
 
   Future<void> _delayTest(BuildContext context) async {
-    await delayTest(group.all, group.testUrl);
+    await delayTest(group.all, testUrl: group.testUrl, groupName: group.name);
   }
 }

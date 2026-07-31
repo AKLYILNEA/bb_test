@@ -26,10 +26,19 @@ class Tray {
   int _loadingFrame = 0;
   final List<String> _loadingFrames = ['.', '..', '...'];
 
-  bool _isTesting = false;
-  String? _testingGroupId;
+
+
+  Tray() {
+    delayTestCoordinator.addListener(_handleDelayTestStateChanged);
+  }
+
+  void _handleDelayTestStateChanged() {
+    if (system.isAndroid) return;
+    unawaited(globalState.appController.updateTray(false, true));
+  }
 
   void dispose() {
+    delayTestCoordinator.removeListener(_handleDelayTestStateChanged);
     _debounceTimer?.cancel();
     _loadingTimer?.cancel();
   }
@@ -141,14 +150,16 @@ class Tray {
       for (final group in trayState.groups) {
         List<MenuItem> subMenuItems = [];
 
-        final isTestingThisGroup = _isTesting && _testingGroupId == group.name;
+        final isTestingThisGroup =
+            delayTestCoordinator.isTestingGroup(group.name);
 
         subMenuItems.add(
           MenuItem(
+            key: 'persistent-delay-test',
             label: isTestingThisGroup
                 ? '⚡ ${appLocalizations.startTest}...'
                 : '⚡ ${appLocalizations.startTest}',
-            disabled: _isTesting,
+            disabled: delayTestCoordinator.isTesting,
             onClick: (_) => _testGroupDelay(group),
           ),
         );
@@ -400,13 +411,13 @@ class Tray {
     _loadingTimer?.cancel();
     _loadingFrame = 0;
     Future.delayed(const Duration(milliseconds: 300), () {
-      if (!_isTesting) return;
+      if (!delayTestCoordinator.isTesting) return;
       _scheduleLoadingUpdate();
     });
   }
 
   void _scheduleLoadingUpdate() {
-    if (!_isTesting || !system.isMacOS) return;
+    if (!delayTestCoordinator.isTesting || !system.isMacOS) return;
     _loadingTimer = Timer(const Duration(milliseconds: 300), () async {
       if (trayManager.isMenuOpen) {
         _loadingFrame = (_loadingFrame + 1) % _loadingFrames.length;
@@ -423,7 +434,7 @@ class Tray {
   }
 
   Future<void> _testGroupDelay(Group group) async {
-    if (_isTesting) return;
+    if (delayTestCoordinator.isTesting) return;
 
     final appController = globalState.appController;
     final testableProxies = group.all.where((p) {
@@ -434,68 +445,26 @@ class Tray {
           p.type.toUpperCase() != 'REMATCH';
     }).toList();
 
-    _isTesting = true;
-    _testingGroupId = group.name;
-
     try {
-      final testingEntries = <String>{};
-
-      for (final proxy in testableProxies) {
-        final state = appController.getProxyCardState(proxy.name);
-        final name = state.proxyName;
-        if (name.isEmpty || _isNonTestableProxyName(name)) continue;
-        final url = appController.getRealTestUrl(
-          state.testUrl.getSafeValue(group.testUrl ?? ''),
-        );
-        final entryKey = '$url\n$name';
-        if (!testingEntries.add(entryKey)) continue;
-        appController.setDelay(Delay(url: url, name: name, value: 0));
+      if (system.isMacOS) {
+        _startLoadingAnimation();
       }
-
-      _startLoadingAnimation();
-
-      await appController.updateTray(false, true);
-
       await delayTest(
         testableProxies,
-        group.testUrl,
-        system.isMacOS ? () => appController.updateTray(false, true) : null,
+        testUrl: group.testUrl,
+        groupName: group.name,
+        onDelayUpdated: system.isMacOS
+            ? () => appController.updateTray(false, true)
+            : null,
       );
     } catch (e) {
       commonPrint.log('Delay test error: $e');
-      for (final proxy in testableProxies) {
-        final state = appController.getProxyCardState(proxy.name);
-        final name = state.proxyName;
-        if (name.isEmpty || _isNonTestableProxyName(name)) continue;
-        final url = appController.getRealTestUrl(
-          state.testUrl.getSafeValue(group.testUrl ?? ''),
-        );
-        appController.setDelay(Delay(url: url, name: name, value: -1));
-      }
     } finally {
-      _stopLoadingAnimation();
-
-      _isTesting = false;
-      _testingGroupId = null;
-
+      if (system.isMacOS) {
+        _stopLoadingAnimation();
+      }
       await appController.updateTray(false, true);
     }
-  }
-
-  bool _isNonTestableProxyName(String proxyName) {
-    final name = proxyName.toUpperCase();
-    if (name == 'REJECT' || name == 'REJECT-DROP' || name == 'PASS') {
-      return true;
-    }
-    final groups = globalState.appController.getCurrentGroups();
-    for (final group in groups) {
-      for (final proxy in group.all) {
-        if (proxy.name == proxyName) {
-          return proxy.type.toUpperCase() == 'REMATCH';
-        }
-      }
-    }
-    return false;
   }
 }
 
