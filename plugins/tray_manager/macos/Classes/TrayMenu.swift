@@ -262,13 +262,11 @@ public class TrayMenu: NSMenu, NSMenuDelegate {
     }
     
     public func menuWillOpen(_ menu: NSMenu) {
-        let channel = TrayManagerPlugin.instance.channel
-        channel.invokeMethod("onMenuOpen", arguments: nil)
+        TrayManagerPlugin.instance.channel?.invokeMethod("onMenuOpen", arguments: nil)
     }
 
     public func menuDidClose(_ menu: NSMenu) {
-        let channel = TrayManagerPlugin.instance.channel
-        channel.invokeMethod("onMenuClose", arguments: nil)
+        TrayManagerPlugin.instance.channel?.invokeMethod("onMenuClose", arguments: nil)
     }
     
     @objc func statusItemMenuButtonClicked(_ sender: NSMenuItem) {

@@ -164,6 +164,10 @@ jobs:
           cd android
           flutter clean
 
+      - name: Disable Swift Package Manager (macOS)
+        if: matrix.platform == 'macos'
+        run: flutter config --no-enable-swift-package-manager
+
       - name: Patch for Windows
         if: matrix.platform == 'windows'
         shell: bash

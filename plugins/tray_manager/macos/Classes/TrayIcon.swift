@@ -5,6 +5,8 @@
 //  Created by Lijy91 on 2022/5/15.
 //
 
+import Cocoa
+
 public class TrayIcon: NSView {
     public var onTrayIconMouseDown:(() -> Void)?
     public var onTrayIconMouseUp:(() -> Void)?
