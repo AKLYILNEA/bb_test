@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
@@ -165,8 +166,20 @@ class SyntaxHighlighter {
       _lineSemanticSpans
         ..clear()
         ..addAll(shiftedSemanticSpans);
-      _grammarCache.removeWhere((line, _) => line >= editLine);
-      _mergedCache.removeWhere((line, _) => line >= editLine);
+
+      final affectedLines = math.max(insertedLineBreaks, deletedLineBreaks);
+      final invalidateEnd = editLine + affectedLines;
+      _grammarCache.removeWhere(
+        (line, _) => line >= editLine && line <= invalidateEnd,
+      );
+      _mergedCache.removeWhere(
+        (line, _) => line >= editLine && line <= invalidateEnd,
+      );
+
+      final shiftStart = invalidateEnd + 1;
+      _shiftHighlightedCache(_grammarCache, shiftStart, lineBreakDelta);
+      _shiftHighlightedCache(_mergedCache, shiftStart, lineBreakDelta);
+
       _isEditing = false;
     } else if (insertedText.isNotEmpty || deletedText.isNotEmpty) {
       final lineSemanticSpans = _lineSemanticSpans[editLine];
@@ -238,12 +251,31 @@ class SyntaxHighlighter {
         _lineSemanticSpans[editLine] = updatedLineSemanticSpans;
       }
 
+      _grammarCache.remove(editLine);
+      _mergedCache.remove(editLine);
+
       _isEditing = false;
     } else {
       _isEditing = true;
     }
+  }
 
-    _version++;
+  void _shiftHighlightedCache(
+    Map<int, HighlightedLine> cache,
+    int shiftStart,
+    int delta,
+  ) {
+    if (delta == 0) return;
+    final entries = cache.entries.toList();
+    cache.clear();
+    for (final entry in entries) {
+      if (entry.key >= shiftStart) {
+        final newKey = entry.key + delta;
+        if (newKey >= 0) cache[newKey] = entry.value;
+      } else {
+        cache[entry.key] = entry.value;
+      }
+    }
   }
 
   void invalidateAll() {
@@ -916,8 +948,9 @@ class SyntaxHighlighter {
   Future<void> preHighlightLines(
     int startLine,
     int endLine,
-    String Function(int) getLineText,
-  ) async {
+    String Function(int) getLineText, {
+    bool forceIsolate = false,
+  }) async {
     if (_preHighlightInFlight != null &&
         _preHighlightInFlightVersion == _version) {
       return _preHighlightInFlight;
@@ -930,6 +963,7 @@ class SyntaxHighlighter {
       endLine,
       getLineText,
       requestVersion,
+      forceIsolate: forceIsolate,
     );
     _preHighlightInFlight = future;
 
@@ -947,8 +981,9 @@ class SyntaxHighlighter {
     int startLine,
     int endLine,
     String Function(int) getLineText,
-    int requestVersion,
-  ) async {
+    int requestVersion, {
+    bool forceIsolate = false,
+  }) async {
     _pruneCachesForViewport(startLine, endLine);
 
     final linesToProcess = <int, String>{};
@@ -965,7 +1000,7 @@ class SyntaxHighlighter {
 
     if (linesToProcess.isEmpty) return;
 
-    if (linesToProcess.length < 50) {
+    if (!forceIsolate && linesToProcess.length < 50) {
       if (requestVersion != _version) return;
       for (final entry in linesToProcess.entries) {
         if (requestVersion != _version) return;

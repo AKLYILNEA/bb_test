@@ -2012,7 +2012,9 @@ class CodeForgeController implements DeltaTextInputClient {
 
   /// Moves the cursor to the beginning of the current line.
   ///
-  /// If [isShiftPressed] is true, extends the selection to the line start.
+  /// If the cursor is not at the first non-whitespace character, moves it
+  /// there. If it is already there, moves it to column 0 (Smart Home).
+  /// If [isShiftPressed] is true, extends the selection instead of collapsing.
   void pressHomeKey({bool isShiftPressed = false}) {
     if (suggestionsNotifier.value != null) {
       suggestionsNotifier.value = null;
@@ -2020,16 +2022,25 @@ class CodeForgeController implements DeltaTextInputClient {
 
     final currentLine = getLineAtOffset(selection.extentOffset);
     final lineStart = getLineStartOffset(currentLine);
+    final lineText = getLineText(currentLine);
+    final leadingWhitespace =
+        RegExp(r'^\s*').firstMatch(lineText)?.group(0)?.length ?? 0;
+    final firstNonWhitespace = lineStart + leadingWhitespace;
+
+    final targetOffset =
+        selection.extentOffset == firstNonWhitespace
+            ? lineStart
+            : firstNonWhitespace;
 
     if (isShiftPressed) {
       setSelectionSilently(
         TextSelection(
           baseOffset: selection.baseOffset,
-          extentOffset: lineStart,
+          extentOffset: targetOffset,
         ),
       );
     } else {
-      setSelectionSilently(TextSelection.collapsed(offset: lineStart));
+      setSelectionSilently(TextSelection.collapsed(offset: targetOffset));
     }
   }
 
@@ -2088,26 +2099,50 @@ class CodeForgeController implements DeltaTextInputClient {
 
   /// Copies the currently selected text to the clipboard.
   ///
-  /// If no text is selected, does nothing.
+  /// If no text is selected, copies the entire current line, including its
+  /// trailing newline when present.
   void copy() {
     final sel = selection;
-    if (sel.start == sel.end) return;
     _flushBuffer();
-    final selectedText = _rope.substring(sel.start, sel.end);
+    late final String selectedText;
+    if (sel.start == sel.end) {
+      final currentLine = getLineAtOffset(sel.extentOffset);
+      final lineStart = getLineStartOffset(currentLine);
+      final lineEnd = currentLine + 1 < lineCount
+          ? getLineStartOffset(currentLine + 1)
+          : length;
+      selectedText = _rope.substring(lineStart, lineEnd);
+    } else {
+      selectedText = _rope.substring(sel.start, sel.end);
+    }
     Clipboard.setData(ClipboardData(text: selectedText));
   }
 
   /// Cuts the currently selected text to the clipboard.
   ///
-  /// If no text is selected, does nothing.
+  /// If no text is selected, cuts the entire current line, including its
+  /// trailing newline when present.
   void cut() {
     if (readOnly) return;
     final sel = selection;
-    if (sel.start == sel.end) return;
     _flushBuffer();
-    final selectedText = _rope.substring(sel.start, sel.end);
+    late final String selectedText;
+    late final int deleteStart;
+    late final int deleteEnd;
+    if (sel.start == sel.end) {
+      final currentLine = getLineAtOffset(sel.extentOffset);
+      deleteStart = getLineStartOffset(currentLine);
+      deleteEnd = currentLine + 1 < lineCount
+          ? getLineStartOffset(currentLine + 1)
+          : length;
+      selectedText = _rope.substring(deleteStart, deleteEnd);
+    } else {
+      deleteStart = sel.start;
+      deleteEnd = sel.end;
+      selectedText = _rope.substring(deleteStart, deleteEnd);
+    }
     Clipboard.setData(ClipboardData(text: selectedText));
-    replaceRange(sel.start, sel.end, '');
+    replaceRange(deleteStart, deleteEnd, '');
   }
 
   /// Pastes text from the clipboard at the current cursor position.
@@ -4224,7 +4259,11 @@ class CodeForgeController implements DeltaTextInputClient {
       replaceRange(lineStart, lineEnd, indentedBlock);
       setSelectionSilently(newSelection);
     } else {
-      insertAtCurrentCursor(tabSpace);
+      final caret = selection.start;
+      final lineStart = _rope.findLineStart(caret);
+      final column = caret - lineStart;
+      final spacesToInsert = tabSize - (column % tabSize);
+      insertAtCurrentCursor(' ' * spacesToInsert);
     }
   }
 
@@ -4959,6 +4998,8 @@ class CodeForgeController implements DeltaTextInputClient {
           start: safeOffset,
           end: safeOffset + text.length,
         );
+        lastInsertedText = text;
+        lastDeletedText = '';
         break;
 
       case DeleteOperation(:final offset, :final text, :final selectionAfter):
@@ -4974,6 +5015,8 @@ class CodeForgeController implements DeltaTextInputClient {
           lineStructureChanged = true;
         }
         dirtyRegion = TextRange(start: safeStart, end: safeStart);
+        lastInsertedText = '';
+        lastDeletedText = text;
         break;
 
       case ReplaceOperation(
@@ -5003,6 +5046,8 @@ class CodeForgeController implements DeltaTextInputClient {
           start: safeStart,
           end: safeStart + insertedText.length,
         );
+        lastInsertedText = insertedText;
+        lastDeletedText = deletedText;
         break;
       case CompoundOperation(:final operations):
         for (final op in operations) {

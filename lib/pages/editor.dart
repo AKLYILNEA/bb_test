@@ -86,6 +86,8 @@ class _EditorPageState extends ConsumerState<EditorPage> {
     _lineCount = widget.content.split('\n').length;
     _lineWrap = !widget.readOnly && !_isLineWrapDisabled;
     _controller = CodeForgeController();
+    _controller.useSpaceAsTab = true;
+    _controller.tabSize = 2;
     _controller.text = widget.content;
     _findController = _EditorFindController(_controller);
     _undoController = UndoRedoController();
