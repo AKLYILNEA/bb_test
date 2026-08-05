@@ -8,79 +8,41 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <sys/file.h>
-#include <errno.h>
 
 #include "flutter/generated_plugin_registrant.h"
 
-static int _lock_fd = -1;
-
-static gchar* _get_lock_file_path() {
-  const gchar* user_data_dir = g_get_user_data_dir();
-  return g_build_filename(user_data_dir, "com.appshub.bettbox", "Bettbox.lock", nullptr);
+static gboolean _is_dev_build() {
+  return g_str_has_suffix(APPLICATION_ID, ".dev");
 }
 
-static gchar* _get_control_socket_path(gboolean dev) {
+static gchar* _get_control_socket_path() {
   const gchar* user_data_dir = g_get_user_data_dir();
-  const gchar* name = dev ? "BettboxDev.control.sock" : "Bettbox.control.sock";
-  return g_build_filename(user_data_dir, "com.appshub.bettbox", name, nullptr);
-}
-
-static gboolean _try_acquire_instance_lock() {
-  g_autofree gchar* lock_path = _get_lock_file_path();
-  g_autofree gchar* lock_dir = g_path_get_dirname(lock_path);
-  g_mkdir_with_parents(lock_dir, 0755);
-
-  int fd = open(lock_path, O_CREAT | O_RDWR, 0644);
-  if (fd < 0) {
-    g_warning("Failed to open lock file: %s", g_strerror(errno));
-    return FALSE;
-  }
-
-  int flags = fcntl(fd, F_GETFD);
-  if (flags >= 0) {
-    fcntl(fd, F_SETFD, flags | FD_CLOEXEC);
-  }
-
-  if (flock(fd, LOCK_EX | LOCK_NB) == 0) {
-    _lock_fd = fd;
-    return TRUE;
-  }
-
-  close(fd);
-  if (errno == EWOULDBLOCK || errno == EAGAIN) {
-    return FALSE;
-  }
-  g_warning("Failed to lock instance file: %s", g_strerror(errno));
-  return FALSE;
+  const gchar* name = _is_dev_build() ? "BettboxDev.control.sock" : "Bettbox.control.sock";
+  return g_build_filename(user_data_dir, APPLICATION_ID, name, nullptr);
 }
 
 static void _send_control_command(const char* command) {
-  const gboolean dev_modes[] = {TRUE, FALSE};
-  for (size_t i = 0; i < G_N_ELEMENTS(dev_modes); i++) {
-    g_autofree gchar* socket_path = _get_control_socket_path(dev_modes[i]);
+  g_autofree gchar* socket_path = _get_control_socket_path();
 
-    int client_fd = socket(AF_UNIX, SOCK_STREAM, 0);
-    if (client_fd < 0) {
-      continue;
-    }
-
-    struct sockaddr_un addr;
-    memset(&addr, 0, sizeof(addr));
-    addr.sun_family = AF_UNIX;
-    strncpy(addr.sun_path, socket_path, sizeof(addr.sun_path) - 1);
-
-    if (connect(client_fd, (struct sockaddr*)&addr, sizeof(addr)) == 0) {
-      gchar* payload = g_strdup_printf("%s\n", command);
-      ssize_t bytes_written = write(client_fd, payload, strlen(payload));
-      (void)bytes_written; // Suppress unused result warning
-      g_free(payload);
-      close(client_fd);
-      return;
-    }
-    close(client_fd);
+  int client_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+  if (client_fd < 0) {
+    return;
   }
+
+  struct sockaddr_un addr;
+  memset(&addr, 0, sizeof(addr));
+  addr.sun_family = AF_UNIX;
+  strncpy(addr.sun_path, socket_path, sizeof(addr.sun_path) - 1);
+
+  if (connect(client_fd, (struct sockaddr*)&addr, sizeof(addr)) == 0) {
+    gchar* payload = g_strdup_printf("%s\n", command);
+    ssize_t bytes_written = write(client_fd, payload, strlen(payload));
+    (void)bytes_written; // Suppress unused result warning
+    g_free(payload);
+    close(client_fd);
+    return;
+  }
+  close(client_fd);
 }
 
 // App method channel related
@@ -184,16 +146,9 @@ static gboolean my_application_local_command_line(GApplication* application, gch
   }
 
 
-  if (!_try_acquire_instance_lock()) {
-    _send_control_command("show");
-    *exit_status = 0;
-    return TRUE;
-  }
-
   g_autoptr(GError) error = nullptr;
   if (!g_application_register(application, nullptr, &error)) {
     g_warning("Failed to register: %s", error->message);
-    _send_control_command("show");
     *exit_status = 0;
     return TRUE;
   }
