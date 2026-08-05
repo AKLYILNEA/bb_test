@@ -245,9 +245,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "creationTime": MessageLookupByLibrary.simpleMessage("생성 시간"),
     "custom": MessageLookupByLibrary.simpleMessage("사용자 지정"),
     "customDashboardTitle": MessageLookupByLibrary.simpleMessage("사용자 지정 제목"),
-    "customScriptOptions": MessageLookupByLibrary.simpleMessage(
-      "사용자 지정 분할 스위치",
-    ),
+    "customScriptOptions": MessageLookupByLibrary.simpleMessage("커스텀 규칙"),
     "customUrl": MessageLookupByLibrary.simpleMessage("사용자 지정 URL"),
     "cut": MessageLookupByLibrary.simpleMessage("잘라내기"),
     "dark": MessageLookupByLibrary.simpleMessage("다크"),

@@ -233,7 +233,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "creationTime": MessageLookupByLibrary.simpleMessage("作成日時"),
     "custom": MessageLookupByLibrary.simpleMessage("カスタム"),
     "customDashboardTitle": MessageLookupByLibrary.simpleMessage("カスタムタイトル"),
-    "customScriptOptions": MessageLookupByLibrary.simpleMessage("カスタム分流スイッチ"),
+    "customScriptOptions": MessageLookupByLibrary.simpleMessage("カスタムルール"),
     "customUrl": MessageLookupByLibrary.simpleMessage("カスタムURL"),
     "cut": MessageLookupByLibrary.simpleMessage("切り取り"),
     "dark": MessageLookupByLibrary.simpleMessage("ダーク"),

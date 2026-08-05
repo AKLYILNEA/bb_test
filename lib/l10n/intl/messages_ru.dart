@@ -301,9 +301,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "customDashboardTitle": MessageLookupByLibrary.simpleMessage(
       "Пользовательский заголовок",
     ),
-    "customScriptOptions": MessageLookupByLibrary.simpleMessage(
-      "Переключатель маршрутизации",
-    ),
+    "customScriptOptions": MessageLookupByLibrary.simpleMessage("Свои правила"),
     "customUrl": MessageLookupByLibrary.simpleMessage("Пользовательский URL"),
     "cut": MessageLookupByLibrary.simpleMessage("Вырезать"),
     "dark": MessageLookupByLibrary.simpleMessage("Тёмная"),

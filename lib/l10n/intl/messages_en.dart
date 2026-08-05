@@ -301,7 +301,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Custom Dashboard Title",
     ),
     "customScriptOptions": MessageLookupByLibrary.simpleMessage(
-      "Custom Routing Switch",
+      "Custom Rule Switch",
     ),
     "customUrl": MessageLookupByLibrary.simpleMessage("Custom URL"),
     "cut": MessageLookupByLibrary.simpleMessage("Cut"),

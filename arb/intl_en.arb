@@ -629,7 +629,7 @@
   "onlinePanel": "Online Panel",
   "openDashboard": "Open Zashboard",
   "custom": "Custom",
-  "customScriptOptions": "Custom Routing Switch",
+  "customScriptOptions": "Custom Rule Switch",
   "wakelock": "Wakelock",
   "wakelockDescription": "Keeps the screen on and app active in the background without requiring special CPU wakelock permissions.",
   "tunEnableRequireAdmin": "Enabling the TUN virtual network adapter requires Administrator or ROOT privileges.",

@@ -211,7 +211,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "creationTime": MessageLookupByLibrary.simpleMessage("创建时间"),
     "custom": MessageLookupByLibrary.simpleMessage("自定义"),
     "customDashboardTitle": MessageLookupByLibrary.simpleMessage("个性化标题"),
-    "customScriptOptions": MessageLookupByLibrary.simpleMessage("自定义分流开关"),
+    "customScriptOptions": MessageLookupByLibrary.simpleMessage("自定义规则开关"),
     "customUrl": MessageLookupByLibrary.simpleMessage("自定义URL"),
     "cut": MessageLookupByLibrary.simpleMessage("剪切"),
     "dark": MessageLookupByLibrary.simpleMessage("深色"),

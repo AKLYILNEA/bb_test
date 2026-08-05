@@ -297,7 +297,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "عنوان سفارشی",
     ),
     "customScriptOptions": MessageLookupByLibrary.simpleMessage(
-      "کلید مسیریابی سفارشی",
+      "قوانین سفارشی",
     ),
     "customUrl": MessageLookupByLibrary.simpleMessage("آدرس URL سفارشی"),
     "cut": MessageLookupByLibrary.simpleMessage("برش"),

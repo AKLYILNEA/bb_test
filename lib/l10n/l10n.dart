@@ -5139,10 +5139,10 @@ class AppLocalizations {
     return Intl.message('Custom', name: 'custom', desc: '', args: []);
   }
 
-  /// `Custom Routing Switch`
+  /// `Custom Rule Switch`
   String get customScriptOptions {
     return Intl.message(
-      'Custom Routing Switch',
+      'Custom Rule Switch',
       name: 'customScriptOptions',
       desc: '',
       args: [],
