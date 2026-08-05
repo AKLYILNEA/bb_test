@@ -287,19 +287,13 @@ class _GroupHeader extends ConsumerWidget {
     final iconStyle = ref.watch(
       proxiesStyleSettingProvider.select((s) => s.iconStyle),
     );
-    final iconMap = ref.watch(
-      proxiesStyleSettingProvider.select((s) => s.iconMap),
-    );
-    final icon = _getIcon(iconStyle, iconMap);
+    final icon = ref.watch(proxyIconProvider(group.name));
     final selectedProxyName = ref
         .watch(getSelectedProxyNameProvider(group.name))
         .getSafeValue('');
 
     final selectedProxyIcon = ref.watch(
-      groupsProvider.select((groups) {
-        if (selectedProxyName.isEmpty) return '';
-        return groups.getGroup(selectedProxyName)?.icon ?? '';
-      }),
+      proxyIconProvider(selectedProxyName),
     );
 
     return CommonCard(
@@ -386,18 +380,6 @@ class _GroupHeader extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  String _getIcon(ProxiesIconStyle style, Map<String, String> iconMap) {
-    if (style == ProxiesIconStyle.none) return '';
-    for (final entry in iconMap.entries) {
-      try {
-        if (RegExp(entry.key).hasMatch(group.name)) {
-          return entry.value;
-        }
-      } catch (_) {}
-    }
-    return group.icon;
   }
 
   Widget _buildIcon(BuildContext context, ProxiesIconStyle style, String icon) {
