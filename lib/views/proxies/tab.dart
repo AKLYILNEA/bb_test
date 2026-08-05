@@ -197,8 +197,19 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
   @override
   Widget build(BuildContext context) {
     ref.watch(themeSettingProvider.select((state) => state.textScale));
-    final state = ref.watch(proxiesTabStateProvider);
-    final groups = state.groups;
+    final groups =
+        ref.watch(proxiesTabStateProvider.select((state) => state.groups));
+    final columns =
+        ref.watch(proxiesTabStateProvider.select((state) => state.columns));
+    final cardType = ref.watch(
+      proxiesTabStateProvider.select((state) => state.proxyCardType),
+    );
+    final sortType = ref.watch(
+      proxiesTabStateProvider.select((state) => state.proxiesSortType),
+    );
+    final sortNum =
+        ref.watch(proxiesTabStateProvider.select((state) => state.sortNum));
+
     if (groups.isEmpty) {
       return NullStatus(
         label: appLocalizations.nullTip(appLocalizations.proxies),
@@ -223,10 +234,10 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
         child: ProxyGroupView(
           key: key,
           group: group,
-          columns: state.columns,
-          cardType: state.proxyCardType,
-          sortType: state.proxiesSortType,
-          sortNum: state.sortNum,
+          columns: columns,
+          cardType: cardType,
+          sortType: sortType,
+          sortNum: sortNum,
         ),
       );
     }).toList();
