@@ -59,6 +59,8 @@
   "alwaysShowTitleBarDesc": "Always show the title bar buttons in the top-right corner",
   "trayEnhancement": "Tray Enhancement",
   "trayEnhancementDesc": "Control proxy groups in the system tray context menu",
+  "enableTraySpeed": "Network Speed",
+  "enableTraySpeedDesc": "Display upload and download rates in the menu bar",
   "excludeChina": "Exclude China",
   "excludeChinaDesc": "Allow China QUIC traffic instead of blocking all",
   "fcmOptimization": "FCM Optimization",
@@ -654,4 +656,3 @@
   "lineWrap": "Wrap Lines",
   "showHiddenItems": "Show Hidden Items"
 }
-

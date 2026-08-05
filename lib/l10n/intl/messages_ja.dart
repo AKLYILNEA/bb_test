@@ -315,6 +315,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "必要に応じてクラッシュログを送信",
     ),
     "enableOverride": MessageLookupByLibrary.simpleMessage("オーバーライド有効化"),
+    "enableTraySpeed": MessageLookupByLibrary.simpleMessage("通信速度の表示"),
+    "enableTraySpeedDesc": MessageLookupByLibrary.simpleMessage(
+      "メニューバーにアップロード/ダウンロード速度を表示",
+    ),
     "endpointIndependentNat": MessageLookupByLibrary.simpleMessage("NAT強化"),
     "endpointIndependentNatConfirmDesc": MessageLookupByLibrary.simpleMessage(
       "Endpoint-Independent NATを有効にするとパフォーマンスがわずかに低下する場合があります。必要な場合のみ設定してください",

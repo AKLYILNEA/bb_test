@@ -327,6 +327,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "필요 시 앱 크래시 로그 전송",
     ),
     "enableOverride": MessageLookupByLibrary.simpleMessage("오버라이드 활성화"),
+    "enableTraySpeed": MessageLookupByLibrary.simpleMessage("네트워크 속도"),
+    "enableTraySpeedDesc": MessageLookupByLibrary.simpleMessage(
+      "메뉴 막대에 업로드 및 다운로드 속도 표시",
+    ),
     "endpointIndependentNat": MessageLookupByLibrary.simpleMessage("NAT 향상"),
     "endpointIndependentNatConfirmDesc": MessageLookupByLibrary.simpleMessage(
       "Endpoint-Independent NAT를 활성화하면 성능이 약간 저하될 수 있습니다. 필요한 경우에만 설정하세요",

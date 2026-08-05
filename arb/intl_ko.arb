@@ -59,6 +59,8 @@
   "alwaysShowTitleBarDesc": "상단 오른쪽 제목 표시줄 버튼 항상 표시",
   "trayEnhancement": "트레이 기능 향상",
   "trayEnhancementDesc": "시스템 트레이 우클릭 메뉴에서 프록시 그룹 제어",
+  "enableTraySpeed": "네트워크 속도",
+  "enableTraySpeedDesc": "메뉴 막대에 업로드 및 다운로드 속도 표시",
   "excludeChina": "중국 트래픽 제외",
   "excludeChinaDesc": "전면 차단 대신 중국 QUIC 트래픽 허용",
   "fcmOptimization": "FCM 최적화",

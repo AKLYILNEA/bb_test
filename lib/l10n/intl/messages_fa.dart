@@ -390,6 +390,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "ارسال گزارش خرابی در صورت لزوم",
     ),
     "enableOverride": MessageLookupByLibrary.simpleMessage("فعالسازی اورراید"),
+    "enableTraySpeed": MessageLookupByLibrary.simpleMessage("نمایش سرعت شبکه"),
+    "enableTraySpeedDesc": MessageLookupByLibrary.simpleMessage(
+      "نمایش سرعت آپلود و دانلود در نوار منو",
+    ),
     "endpointIndependentNat": MessageLookupByLibrary.simpleMessage(
       "ارتقای NAT",
     ),
