@@ -4576,6 +4576,8 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
   Timer? _foldComputeTimer;
   Timer? _semanticTokenTimer;
   bool _selectionActive = false, _isDragging = false;
+  bool _shiftClickActive = false;
+  int? _shiftBaseOffset;
   bool _longPressSelected = false;
   bool _draggingStartHandle = false, _draggingEndHandle = false;
   bool _showBubble = false, _draggingCHandle = false, _readOnly;
@@ -11803,12 +11805,16 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
           controller.clearMultiCursors();
           final isShiftPressed = HardwareKeyboard.instance.isShiftPressed;
           if (isShiftPressed) {
+            _shiftBaseOffset ??= controller.selection.baseOffset;
             controller.selection = TextSelection(
-              baseOffset: controller.selection.baseOffset,
+              baseOffset: _shiftBaseOffset!,
               extentOffset: textOffset,
             );
+            _shiftClickActive = true;
           } else {
+            _shiftBaseOffset = null;
             controller.selection = TextSelection.collapsed(offset: textOffset);
+            _shiftClickActive = false;
           }
         }
         _dtap.addPointer(event);
@@ -11843,12 +11849,23 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
               HardwareKeyboard.instance.isAltPressed &&
               !HardwareKeyboard.instance.isControlPressed &&
               !HardwareKeyboard.instance.isMetaPressed;
+          final isShiftClickNow =
+              HardwareKeyboard.instance.isShiftPressed || _shiftClickActive;
           if (isAltClickNow) {
             final line = controller.getLineAtOffset(textOffset);
             final lineStart = controller.getLineStartOffset(line);
             final character = textOffset - lineStart;
             controller.addMultiCursor(line, character);
+          } else if (isShiftClickNow) {
+            controller.clearMultiCursors();
+            final base = _shiftBaseOffset ?? controller.selection.baseOffset;
+            controller.selection = TextSelection(
+              baseOffset: base,
+              extentOffset: textOffset,
+            );
           } else {
+            _shiftBaseOffset = null;
+            _shiftClickActive = false;
             controller.clearMultiCursors();
             controller.selection = TextSelection.collapsed(offset: textOffset);
           }
@@ -11939,6 +11956,9 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
           markNeedsPaint();
         }
       } else {
+        if (_shiftClickActive) {
+          return;
+        }
         final delta = localPosition - (_pointerDownPosition ?? localPosition);
         if (!_isDragging && delta.distance > 2) {
           _isDragging = true;
@@ -12007,7 +12027,7 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
       markNeedsPaint();
 
       if (readOnly) return;
-      if (!wasDragging) {
+      if (!wasDragging && !_shiftClickActive) {
         controller.notifyListeners();
       }
 
