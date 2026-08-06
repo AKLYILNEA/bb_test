@@ -4546,10 +4546,14 @@ class CodeForgeController implements DeltaTextInputClient {
     _isDisposed = true;
     _debounceTimer?.cancel();
     _flushTimer?.cancel();
+    _syncTimer?.cancel();
     _codeActionTimer?.cancel();
     _documentColorTimer?.cancel();
     _foldRangesTimer?.cancel();
     _documentHighlightTimer?.cancel();
+    _cclsRefreshTimer?.cancel();
+    _lspTypingTimer?.cancel();
+    _lspDocumentSyncTimer?.cancel();
     _lspResponsesSubscription?.cancel();
     _listeners.clear();
     connection?.close();
@@ -5232,6 +5236,58 @@ class CodeForgeController implements DeltaTextInputClient {
       return;
     }
 
+    const wrapPairs = {
+      '(': ('(', ')'),
+      ')': ('(', ')'),
+      '[': ('[', ']'),
+      ']': ('[', ']'),
+      '{': ('{', '}'),
+      '}': ('{', '}'),
+      '<': ('<', '>'),
+      '>': ('<', '>'),
+      '"': ('"', '"'),
+      "'": ("'", "'"),
+      '`': ('`', '`'),
+    };
+
+    if (selectionBefore.start < selectionBefore.end &&
+        insertedText.length == 1 &&
+        wrapPairs.containsKey(insertedText)) {
+      final pair = wrapPairs[insertedText]!;
+      final openChar = pair.$1;
+      final closeChar = pair.$2;
+      final start = selectionBefore.start;
+      final end = selectionBefore.end;
+      final selectedText = _rope.substring(start, end);
+      final wrappedText = '$openChar$selectedText$closeChar';
+      final wrappedSelection = TextSelection(
+        baseOffset: start + 1,
+        extentOffset: start + 1 + selectedText.length,
+      );
+
+      _flushBuffer();
+      _rope.delete(start, end);
+      _rope.insert(start, wrappedText);
+      _currentVersion++;
+      _selection = wrappedSelection;
+      dirtyLine = _rope.getLineAtOffset(start);
+      dirtyRegion = TextRange(
+        start: start,
+        end: start + wrappedText.length,
+      );
+
+      _recordReplacement(
+        start,
+        selectedText,
+        wrappedText,
+        selectionBefore,
+        wrappedSelection,
+      );
+      _invalidateImeSnapshotAndScheduleSync();
+      notifyListeners();
+      return;
+    }
+
     String actualInsertedText = insertedText;
     TextSelection actualSelection = newSelection;
 
@@ -5611,6 +5667,57 @@ class CodeForgeController implements DeltaTextInputClient {
 
     final selectionBefore = _selection;
     _flushBuffer();
+
+    const wrapPairs = {
+      '(': ('(', ')'),
+      ')': ('(', ')'),
+      '[': ('[', ']'),
+      ']': ('[', ']'),
+      '{': ('{', '}'),
+      '}': ('{', '}'),
+      '<': ('<', '>'),
+      '>': ('<', '>'),
+      '"': ('"', '"'),
+      "'": ("'", "'"),
+      '`': ('`', '`'),
+    };
+
+    if (range.start < range.end &&
+        text.length == 1 &&
+        wrapPairs.containsKey(text)) {
+      final pair = wrapPairs[text]!;
+      final openChar = pair.$1;
+      final closeChar = pair.$2;
+      final selectedText = _rope.substring(range.start, range.end);
+      final wrappedText = '$openChar$selectedText$closeChar';
+      final wrappedSelection = TextSelection(
+        baseOffset: range.start + 1,
+        extentOffset: range.start + 1 + selectedText.length,
+      );
+
+      final deletedText = selectedText;
+
+      _rope.delete(range.start, range.end);
+      _rope.insert(range.start, wrappedText);
+      _currentVersion++;
+      _selection = wrappedSelection;
+      dirtyLine = _rope.getLineAtOffset(range.start);
+      dirtyRegion = TextRange(
+        start: range.start,
+        end: range.start + wrappedText.length,
+      );
+
+      _recordReplacement(
+        range.start,
+        deletedText,
+        wrappedText,
+        selectionBefore,
+        wrappedSelection,
+      );
+      _imeSelectionNeedsResync = true;
+      _invalidateImeSnapshotAndScheduleSync();
+      return;
+    }
 
     final deletedText = range.start < range.end
         ? _rope.substring(range.start, range.end)
