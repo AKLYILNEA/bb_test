@@ -354,7 +354,7 @@ class _EditorPageState extends ConsumerState<EditorPage> {
                     enableGutterDivider: false,
                     enableLocalSuggestions: false,
                     enableKeyboardSuggestions: false,
-                    enableMagnifier: false,
+                    enableMagnifier: true,
                     language: _languageMode(),
                     editorTheme: brightness == Brightness.dark
                         ? atomOneDarkTheme

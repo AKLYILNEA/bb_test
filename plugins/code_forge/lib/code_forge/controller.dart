@@ -2027,10 +2027,9 @@ class CodeForgeController implements DeltaTextInputClient {
         RegExp(r'^\s*').firstMatch(lineText)?.group(0)?.length ?? 0;
     final firstNonWhitespace = lineStart + leadingWhitespace;
 
-    final targetOffset =
-        selection.extentOffset == firstNonWhitespace
-            ? lineStart
-            : firstNonWhitespace;
+    final targetOffset = selection.extentOffset == firstNonWhitespace
+        ? lineStart
+        : firstNonWhitespace;
 
     if (isShiftPressed) {
       setSelectionSilently(
@@ -2296,14 +2295,15 @@ class CodeForgeController implements DeltaTextInputClient {
   int getLineAtOffset(int charOffset) {
     if (_bufferLineIndex != null && _bufferDirty) {
       final bufferStart = _bufferLineRopeStart;
-      final bufferEnd = bufferStart + _bufferLineText!.length;
+      final bufferScalarLength = _bufferLineText!.runes.length;
+      final bufferEnd = bufferStart + bufferScalarLength;
       if (charOffset >= bufferStart && charOffset <= bufferEnd) {
         final localOffset = charOffset - bufferStart;
         final utf16Local = scalarToStringIndex(_bufferLineText!, localOffset);
         final sub = _bufferLineText!.substring(0, utf16Local);
         return _bufferLineIndex! + '\n'.allMatches(sub).length;
       } else if (charOffset > bufferEnd) {
-        final delta = _bufferLineText!.length - _bufferLineOriginalLength;
+        final delta = bufferScalarLength - _bufferLineOriginalLength;
         final newLines = '\n'.allMatches(_bufferLineText!).length;
         return _rope.getLineAtOffset(charOffset - delta) + newLines;
       }
@@ -2326,17 +2326,19 @@ class CodeForgeController implements DeltaTextInputClient {
           final lines = _bufferLineText!.split('\n');
           int offset = _bufferLineRopeStart;
           for (int i = 0; i < lineIndex - _bufferLineIndex!; i++) {
-            offset += lines[i].length + 1;
+            offset += lines[i].runes.length + 1;
           }
           return offset;
         } else if (lineIndex > _bufferLineIndex! + newLines) {
-          final delta = _bufferLineText!.length - _bufferLineOriginalLength;
+          final delta =
+              _bufferLineText!.runes.length - _bufferLineOriginalLength;
           return _rope.getLineStartOffset(lineIndex - newLines) + delta;
         }
       } else {
         if (lineIndex == _bufferLineIndex!) return _bufferLineRopeStart;
         if (lineIndex > _bufferLineIndex!) {
-          final delta = _bufferLineText!.length - _bufferLineOriginalLength;
+          final delta =
+              _bufferLineText!.runes.length - _bufferLineOriginalLength;
           return _rope.getLineStartOffset(lineIndex) + delta;
         }
       }
@@ -5271,10 +5273,7 @@ class CodeForgeController implements DeltaTextInputClient {
       _currentVersion++;
       _selection = wrappedSelection;
       dirtyLine = _rope.getLineAtOffset(start);
-      dirtyRegion = TextRange(
-        start: start,
-        end: start + wrappedText.length,
-      );
+      dirtyRegion = TextRange(start: start, end: start + wrappedText.length);
 
       _recordReplacement(
         start,
@@ -5761,12 +5760,18 @@ class CodeForgeController implements DeltaTextInputClient {
   }
 
   static int utf16ToScalarOffset(String text, int utf16Offset) {
+    if (utf16Offset <= 0) return 0;
     int utf16 = 0;
     int scalar = 0;
     for (final rune in text.runes) {
-      if (utf16 >= utf16Offset) break;
-      utf16 += rune > 0xFFFF ? 2 : 1;
+      final nextUtf16 = utf16 + (rune > 0xFFFF ? 2 : 1);
+      // A UTF-16 offset between the two code units of a surrogate pair has no
+      // corresponding Rope position. Snap it to the preceding scalar rather
+      // than letting it split an emoji or drift one scalar to the right.
+      if (utf16Offset < nextUtf16) return scalar;
+      utf16 = nextUtf16;
       scalar++;
+      if (utf16 == utf16Offset) return scalar;
     }
     return scalar;
   }
