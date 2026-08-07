@@ -372,8 +372,12 @@ class _ToolViewState extends ConsumerState<ToolsView> {
             _pushPage(context, appLocalizations.theme, const ThemeView()),
       ),
       _SearchItem(
-        title: appLocalizations.lightIcon,
-        subtitle: appLocalizations.lightIconDesc,
+        title: (system.isWindows || system.isLinux)
+            ? appLocalizations.lightIcon
+            : appLocalizations.darkIcon,
+        subtitle: (system.isWindows || system.isLinux)
+            ? appLocalizations.lightIconDesc
+            : appLocalizations.darkIconDesc,
         category: themeCategory,
         onTap: (context, _) =>
             _pushPage(context, appLocalizations.theme, const ThemeView()),

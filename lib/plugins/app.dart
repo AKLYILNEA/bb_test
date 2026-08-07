@@ -140,9 +140,9 @@ class App {
     await methodChannel.invokeMethod<void>('requestIgnoreBatteryOptimizations');
   }
 
-  Future<bool> setLauncherIcon(bool useLightIcon) async {
+  Future<bool> setLauncherIcon(bool useDarkIcon) async {
     final result = await methodChannel.invokeMethod<bool>('setLauncherIcon', {
-      'useLightIcon': useLightIcon,
+      'useDarkIcon': useDarkIcon,
     });
     return result ?? false;
   }

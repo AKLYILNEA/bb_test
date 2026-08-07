@@ -248,7 +248,7 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
                 result.success(true)
             }
             "setLauncherIcon" -> {
-                setLauncherIcon(call.argument<Boolean>("useLightIcon") ?: false)
+                setLauncherIcon(call.argument<Boolean>("useDarkIcon") ?: false)
                 result.success(true)
             }
             "hasPackageListPermission" -> {
@@ -549,18 +549,21 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
             }
     }
 
-    private fun setLauncherIcon(useLightIcon: Boolean) {
+    private fun setLauncherIcon(useDarkIcon: Boolean) {
         val context = BettboxApplication.getAppContext()
         val pm = context.packageManager
         val packageName = context.packageName
         val defaultComponent = android.content.ComponentName(packageName, "com.appshub.bettbox.MainActivity")
         val lightComponent = android.content.ComponentName(packageName, "com.appshub.bettbox.MainActivityLight")
+        val darkComponent = android.content.ComponentName(packageName, "com.appshub.bettbox.MainActivityDark")
 
-        if (useLightIcon) {
-            pm.setComponentEnabledSetting(lightComponent, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
+        if (useDarkIcon) {
+            pm.setComponentEnabledSetting(darkComponent, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
             pm.setComponentEnabledSetting(defaultComponent, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
+            pm.setComponentEnabledSetting(lightComponent, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
         } else {
             pm.setComponentEnabledSetting(defaultComponent, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
+            pm.setComponentEnabledSetting(darkComponent, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
             pm.setComponentEnabledSetting(lightComponent, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
         }
         com.appshub.bettbox.services.NotificationComponentCache.invalidate()
