@@ -11,7 +11,7 @@ _AppSettingProps _$AppSettingPropsFromJson(Map<String, dynamic> json) =>
       locale: json['locale'] as String?,
       dashboardWidgets: json['dashboardWidgets'] == null
           ? defaultDashboardWidgets
-          : dashboardWidgetsSafeFormJson(json['dashboardWidgets'] as List?),
+          : dashboardWidgetsSafeFromJson(json['dashboardWidgets'] as List?),
       mobileDashboardWidgets: json['mobileDashboardWidgets'] == null
           ? defaultAndroidDashboardWidgets
           : mobileDashboardWidgetsSafeFromJson(

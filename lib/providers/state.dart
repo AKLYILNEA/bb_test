@@ -186,7 +186,7 @@ ProxyState proxyState(Ref ref) {
   return ProxyState(
     isStart: isStart,
     systemProxy: vm2.a,
-    bassDomain: vm2.b,
+    bypassDomain: vm2.b,
     port: mixedPort,
   );
 }
