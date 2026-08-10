@@ -97,7 +97,7 @@ final coreStateProvider = AutoDisposeProvider<CoreState>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CoreStateRef = AutoDisposeProviderRef<CoreState>;
-String _$updateParamsHash() => r'aef760656c0e937600e2b8e34d5286123d0ce121';
+String _$updateParamsHash() => r'b607bf8aa980b305f0db271b1fac36b9b9c98f61';
 
 /// See also [updateParams].
 @ProviderFor(updateParams)

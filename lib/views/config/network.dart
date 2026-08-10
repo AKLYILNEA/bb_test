@@ -645,15 +645,17 @@ class BypassPrivateRouteItem extends ConsumerWidget {
                 ],
               ),
             ),
+            const SizedBox(width: 16),
             Container(
               width: 1,
-              height: 24,
+              height: 32,
               color: context.colorScheme.outlineVariant.withValues(
                 alpha: context.colorScheme.brightness == Brightness.light
-                    ? 0.3
-                    : 0.2,
+                    ? 0.6
+                    : 0.4,
               ),
             ),
+            const SizedBox(width: 16),
             Switch(
               value: bypassPrivateRoute,
               onChanged: (value) async {

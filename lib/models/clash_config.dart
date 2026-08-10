@@ -285,7 +285,7 @@ abstract class Tun with _$Tun {
     @Default(false) bool enable,
     @Default(tunDeviceName) String device,
     @JsonKey(name: 'auto-route') @Default(false) bool autoRoute,
-    @Default(TunStack.system) TunStack stack,
+    @Default(TunStack.mixed) TunStack stack,
     @JsonKey(name: 'dns-hijack') @Default(['any:53']) List<String> dnsHijack,
     @JsonKey(name: 'route-address') @Default([]) List<String> routeAddress,
     @JsonKey(name: 'route-exclude-address')
@@ -295,7 +295,7 @@ abstract class Tun with _$Tun {
     @JsonKey(name: 'disable-icmp-forwarding')
     @Default(true)
     bool disableIcmpForwarding,
-    @Default(4064) int mtu,
+    @Default(9000) int mtu,
     @JsonKey(name: 'endpoint-independent-nat')
     @Default(false)
     bool endpointIndependentNat,
@@ -327,7 +327,8 @@ extension TunExt on Tun {
         return copyWith(
           autoRoute: true,
           routeAddress: [],
-          routeExcludeAddress: bypassPrivateRouteAddress ??
+          routeExcludeAddress:
+              bypassPrivateRouteAddress ??
               defaultDesktopBypassPrivateRouteAddress,
         );
       }
@@ -551,11 +552,7 @@ abstract class ParsedRule with _$ParsedRule {
         (item) => item.value == raw,
         orElse: () => RuleAction.MATCH,
       );
-      return ParsedRule(
-        ruleAction: action,
-        noResolve: noResolve,
-        src: src,
-      );
+      return ParsedRule(ruleAction: action, noResolve: noResolve, src: src);
     }
 
     final actionStr = raw.substring(0, firstComma).trim();
@@ -620,9 +617,10 @@ abstract class ParsedRule with _$ParsedRule {
 extension ParsedRuleExt on ParsedRule {
   String get value {
     if (ruleAction == RuleAction.MATCH) {
-      return [ruleAction.value, ruleTarget]
-          .where((e) => e != null && e.isNotEmpty)
-          .join(',');
+      return [
+        ruleAction.value,
+        ruleTarget,
+      ].where((e) => e != null && e.isNotEmpty).join(',');
     }
     final target = ruleAction == RuleAction.SUB_RULE ? subRule : ruleTarget;
     final main = ruleAction == RuleAction.RULE_SET ? ruleProvider : content;
