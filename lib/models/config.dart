@@ -255,11 +255,21 @@ abstract class NetworkProps with _$NetworkProps {
     @Default(false) bool systemProxy,
     @Default(defaultBypassDomain) List<String> bypassDomain,
     @Default(true) bool bypassPrivateRoute,
+    @Default([]) List<String> bypassPrivateRouteAddress,
     @Default(true) bool autoSetSystemDns,
   }) = _NetworkProps;
 
   factory NetworkProps.fromJson(Map<String, Object?>? json) =>
       json == null ? const NetworkProps() : _$NetworkPropsFromJson(json);
+}
+
+extension NetworkPropsExt on NetworkProps {
+  List<String> get realBypassPrivateRouteAddress {
+    if (bypassPrivateRouteAddress.isNotEmpty) return bypassPrivateRouteAddress;
+    return system.isDesktop
+        ? defaultDesktopBypassPrivateRouteAddress
+        : defaultBypassPrivateRouteAddress;
+  }
 }
 
 @freezed

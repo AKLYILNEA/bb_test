@@ -73,6 +73,17 @@ const defaultBypassPrivateRouteAddress = [
   '2000::/3',
 ];
 
+const defaultDesktopBypassPrivateRouteAddress = [
+  '127.0.0.0/8',
+  '::1/128',
+  '10.0.0.0/8',
+  '172.16.0.0/12',
+  '192.168.0.0/16',
+  '169.254.0.0/16',
+  'fd00::/8',
+  'fe80::/10',
+];
+
 int? _parseInt(dynamic value) {
   if (value == null) return null;
   if (value is num) return value.toInt();
@@ -309,22 +320,15 @@ extension TunExt on Tun {
     bool bypassPrivateRoute, {
     String? fakeIpRange,
     String? fakeIpRangeV6,
+    List<String>? bypassPrivateRouteAddress,
   }) {
     if (system.isDesktop) {
       if (bypassPrivateRoute) {
         return copyWith(
           autoRoute: true,
           routeAddress: [],
-          routeExcludeAddress: [
-            '127.0.0.0/8',
-            '::1/128',
-            '10.0.0.0/8',
-            '172.16.0.0/12',
-            '192.168.0.0/16',
-            '169.254.0.0/16',
-            'fd00::/8',
-            'fe80::/10',
-          ],
+          routeExcludeAddress: bypassPrivateRouteAddress ??
+              defaultDesktopBypassPrivateRouteAddress,
         );
       }
       return copyWith(
@@ -337,7 +341,9 @@ extension TunExt on Tun {
     if (bypassPrivateRoute) {
       return copyWith(
         autoRoute: true,
-        routeAddress: List<String>.from(defaultBypassPrivateRouteAddress),
+        routeAddress: List<String>.from(
+          bypassPrivateRouteAddress ?? defaultBypassPrivateRouteAddress,
+        ),
       );
     }
 
