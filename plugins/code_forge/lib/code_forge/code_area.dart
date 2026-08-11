@@ -22,12 +22,14 @@ const int kSemanticTokenViewportPaddingLines = 5800;
 const double kFlingVelocityMultiplier = 0.5;
 const int kExactWrappedHeightThreshold = 5800;
 const int kWrappedHeightSampleSize = 64;
-const List<String> kEmojiFontFallback = [
-  'Segoe UI Emoji',
-  'Apple Color Emoji',
-  'Noto Color Emoji',
-  'Roboto',
-];
+final List<String> kEmojiFontFallback =
+    defaultTargetPlatform == TargetPlatform.windows
+    ? const ['Twemoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Roboto']
+    : defaultTargetPlatform == TargetPlatform.linux
+    ? const ['Twemoji', 'Noto Color Emoji', 'Roboto']
+    : defaultTargetPlatform == TargetPlatform.android
+    ? const ['Noto Color Emoji', 'Twemoji', 'Roboto']
+    : const ['Apple Color Emoji', 'Twemoji', 'Roboto'];
 const double _kSelectionHandleHitPadding = 20.0;
 const double _kCaretHandleHitPadding = 24.0;
 const double _kMobileHandleDragSlop = 8.0;
@@ -5007,7 +5009,6 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
 
     _paragraphStyle = ui.ParagraphStyle(
       fontFamily: fontFamily,
-      fontFamilyFallback: kEmojiFontFallback,
       fontSize: fontSize,
       height: lineHeightMultiplier,
       textDirection: _textDirection,
@@ -5017,6 +5018,7 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
       color: color,
       fontSize: fontSize,
       fontFamily: fontFamily,
+      fontFamilyFallback: kEmojiFontFallback,
     );
 
     vscrollController.addListener(() {
@@ -5196,7 +5198,6 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
     final lineHeightMultiplier = _textStyle?.height ?? 1.2;
     _paragraphStyle = ui.ParagraphStyle(
       fontFamily: fontFamily,
-      fontFamilyFallback: kEmojiFontFallback,
       fontSize: fontSize,
       height: lineHeightMultiplier,
       textDirection: _textDirection,
@@ -5278,7 +5279,6 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
     _lineHeight = fontSize * lineHeightMultiplier;
     _paragraphStyle = ui.ParagraphStyle(
       fontFamily: fontFamily,
-      fontFamilyFallback: kEmojiFontFallback,
       fontSize: fontSize,
       height: lineHeightMultiplier,
       textDirection: _textDirection,
@@ -5288,6 +5288,7 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
       color: color,
       fontSize: fontSize,
       fontFamily: fontFamily,
+      fontFamilyFallback: kEmojiFontFallback,
     );
 
     _gutterPadding = fontSize;

@@ -7,6 +7,15 @@ import 'package:re_highlight/re_highlight.dart';
 
 import '../LSP/lsp.dart';
 
+final List<String> _kEmojiFontFallback =
+    defaultTargetPlatform == TargetPlatform.windows
+        ? const ['Twemoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Roboto']
+        : defaultTargetPlatform == TargetPlatform.linux
+            ? const ['Twemoji', 'Noto Color Emoji', 'Roboto']
+            : defaultTargetPlatform == TargetPlatform.android
+                ? const ['Noto Color Emoji', 'Twemoji', 'Roboto']
+                : const ['Apple Color Emoji', 'Twemoji', 'Roboto'];
+
 class SemanticWordSpan {
   final int startChar;
   final int endChar;
@@ -931,6 +940,7 @@ class SyntaxHighlighter {
       color: baseStyle?.color ?? editorTheme['root']?.color ?? Colors.black,
       fontSize: fontSize,
       fontFamily: fontFamily,
+      fontFamilyFallback: _kEmojiFontFallback,
       fontWeight: baseStyle?.fontWeight,
       fontStyle: baseStyle?.fontStyle,
     );
@@ -948,6 +958,7 @@ class SyntaxHighlighter {
       color: baseStyle?.color ?? editorTheme['root']?.color ?? Colors.black,
       fontSize: fontSize,
       fontFamily: fontFamily,
+      fontFamilyFallback: _kEmojiFontFallback,
       fontWeight: baseStyle?.fontWeight,
       fontStyle: baseStyle?.fontStyle,
     );
