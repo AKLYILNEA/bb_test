@@ -18,10 +18,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:vector_math/vector_math_64.dart' show Vector3;
 
-const int kSemanticTokenViewportPaddingLines = 2000;
+const int kSemanticTokenViewportPaddingLines = 5800;
 const double kFlingVelocityMultiplier = 0.5;
-const int kExactWrappedHeightThreshold = 100000;
+const int kExactWrappedHeightThreshold = 5800;
 const int kWrappedHeightSampleSize = 64;
+const List<String> kEmojiFontFallback = [
+  'Segoe UI Emoji',
+  'Apple Color Emoji',
+  'Noto Color Emoji',
+  'Roboto',
+];
 const double _kSelectionHandleHitPadding = 20.0;
 const double _kCaretHandleHitPadding = 24.0;
 const double _kMobileHandleDragSlop = 8.0;
@@ -2217,7 +2223,9 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
                                                     final newColumn = column
                                                         .clamp(
                                                           0,
-                                                          nextLineText.length,
+                                                          nextLineText
+                                                              .runes
+                                                              .length,
                                                         );
                                                     _controller.addMultiCursor(
                                                       targetLine,
@@ -2289,7 +2297,9 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
                                                   final newColumn = column
                                                       .clamp(
                                                         0,
-                                                        prevLineText.length,
+                                                        prevLineText
+                                                            .runes
+                                                            .length,
                                                       );
                                                   _controller.addMultiCursor(
                                                     targetLine,
@@ -4997,6 +5007,7 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
 
     _paragraphStyle = ui.ParagraphStyle(
       fontFamily: fontFamily,
+      fontFamilyFallback: kEmojiFontFallback,
       fontSize: fontSize,
       height: lineHeightMultiplier,
       textDirection: _textDirection,
@@ -5185,6 +5196,7 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
     final lineHeightMultiplier = _textStyle?.height ?? 1.2;
     _paragraphStyle = ui.ParagraphStyle(
       fontFamily: fontFamily,
+      fontFamilyFallback: kEmojiFontFallback,
       fontSize: fontSize,
       height: lineHeightMultiplier,
       textDirection: _textDirection,
@@ -5266,6 +5278,7 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
     _lineHeight = fontSize * lineHeightMultiplier;
     _paragraphStyle = ui.ParagraphStyle(
       fontFamily: fontFamily,
+      fontFamilyFallback: kEmojiFontFallback,
       fontSize: fontSize,
       height: lineHeightMultiplier,
       textDirection: _textDirection,
@@ -7590,15 +7603,16 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
 
     final lineText = controller.getLineText(lineIndex);
 
-    final para = _buildHighlightedParagraph(
-      lineIndex,
-      lineText,
-      width: _wrapWidth,
-    );
+    final builder = ui.ParagraphBuilder(_paragraphStyle);
+    builder.pushStyle(_uiTextStyle);
+    final textToMeasure = lineText.isEmpty ? ' ' : lineText;
+    builder.addText(textToMeasure);
+
+    final para = builder.build();
+    para.layout(ui.ParagraphConstraints(width: _wrapWidth));
     final height = para.height;
 
     _lineHeightCache[lineIndex] = height;
-    _paragraphCache[lineIndex] = para;
     _lineTextCache[lineIndex] = lineText;
 
     return height;
@@ -7621,12 +7635,22 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
     );
     double sampledHeight = 0.0;
     int measured = 0;
+    final sampledLines = <int>{};
 
     for (
       int i = 0;
       i < controller.lineCount && measured < sampleCount;
       i += step
     ) {
+      if (_hasActiveFolds && _isLineFolded(i)) continue;
+      sampledHeight += _getWrappedLineHeight(i);
+      sampledLines.add(i);
+      measured++;
+    }
+
+    final tailStart = controller.lineCount - 10;
+    for (int i = tailStart < 0 ? 0 : tailStart; i < controller.lineCount; i++) {
+      if (sampledLines.contains(i)) continue;
       if (_hasActiveFolds && _isLineFolded(i)) continue;
       sampledHeight += _getWrappedLineHeight(i);
       measured++;
@@ -11569,12 +11593,18 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
             final endLine = editRange['end']['line'] as int;
             final endChar = editRange['end']['character'] as int;
 
-            final startOffset = controller.getLineStartOffset(startLine) +
+            final startOffset =
+                controller.getLineStartOffset(startLine) +
                 CodeForgeController.utf16ToScalarOffset(
-                    controller.getLineText(startLine), startChar);
-            final endOffset = controller.getLineStartOffset(endLine) +
+                  controller.getLineText(startLine),
+                  startChar,
+                );
+            final endOffset =
+                controller.getLineStartOffset(endLine) +
                 CodeForgeController.utf16ToScalarOffset(
-                    controller.getLineText(endLine), endChar);
+                  controller.getLineText(endLine),
+                  endChar,
+                );
 
             controller.replaceRange(startOffset, endOffset, newText);
           }
@@ -11585,11 +11615,15 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
             final startOffset =
                 controller.getLineStartOffset(docColor.line) +
                 CodeForgeController.utf16ToScalarOffset(
-                    lineText, docColor.startColumn);
+                  lineText,
+                  docColor.startColumn,
+                );
             final endOffset =
                 controller.getLineStartOffset(docColor.line) +
                 CodeForgeController.utf16ToScalarOffset(
-                    lineText, docColor.endColumn);
+                  lineText,
+                  docColor.endColumn,
+                );
 
             controller.replaceRange(startOffset, endOffset, label);
           }
@@ -12223,8 +12257,7 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
     final colScalar = (offset - startOffset).clamp(0, lineText.runes.length);
     return {
       'line': line,
-      'character':
-          CodeForgeController.scalarToStringIndex(lineText, colScalar),
+      'character': CodeForgeController.scalarToStringIndex(lineText, colScalar),
     };
   }
 

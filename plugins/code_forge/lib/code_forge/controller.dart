@@ -882,7 +882,7 @@ class CodeForgeController implements DeltaTextInputClient {
       final cursorLine = cursor.line.clamp(0, lineCount - 1);
       if (cursorLine >= lineCount - 1) {
         final lastLineText = getLineText(lineCount - 1);
-        updated.add((line: lineCount - 1, character: lastLineText.length));
+        updated.add((line: lineCount - 1, character: lastLineText.runes.length));
         continue;
       }
       final foldAtCurrent = getFoldRangeAtCurrentLine(cursorLine);
@@ -903,7 +903,7 @@ class CodeForgeController implements DeltaTextInputClient {
       }
       if (targetLine >= lineCount) {
         final lastLineText = getLineText(lineCount - 1);
-        updated.add((line: lineCount - 1, character: lastLineText.length));
+        updated.add((line: lineCount - 1, character: lastLineText.runes.length));
         continue;
       }
       final nextLineText = getLineText(targetLine);
@@ -951,12 +951,15 @@ class CodeForgeController implements DeltaTextInputClient {
     final uniqueOffsets = offsets.toSet().toList()
       ..sort((a, b) => a.compareTo(b));
 
+    final deletedLengths = List<int>.filled(uniqueOffsets.length, 0);
     final compound = _undoController?.beginCompoundOperation();
 
-    for (final offset in uniqueOffsets.reversed) {
+    for (int k = uniqueOffsets.length - 1; k >= 0; k--) {
+      final offset = uniqueOffsets[k];
       if (offset > 0) {
         final deleteStart = (offset - 1).clamp(0, _rope.length);
         final deletedChar = _rope.substring(deleteStart, offset);
+        deletedLengths[k] = deletedChar.runes.length;
         _rope.delete(deleteStart, offset);
         _currentVersion++;
 
@@ -971,19 +974,23 @@ class CodeForgeController implements DeltaTextInputClient {
 
     compound?.end();
 
+    int cumulativeDeleted = 0;
+    final newOffsets = List<int>.filled(uniqueOffsets.length, 0);
+    for (int k = 0; k < uniqueOffsets.length; k++) {
+      cumulativeDeleted += deletedLengths[k];
+      newOffsets[k] = (uniqueOffsets[k] - cumulativeDeleted).clamp(
+        0,
+        _rope.length,
+      );
+    }
+
     final primaryIndex = uniqueOffsets.indexOf(primaryOffset);
-    final primaryShift = primaryOffset > 0 ? primaryIndex + 1 : 0;
-    final primaryNewOffset = (primaryOffset - primaryShift).clamp(
-      0,
-      _rope.length,
-    );
+    final primaryNewOffset = newOffsets[primaryIndex];
     _selection = TextSelection.collapsed(offset: primaryNewOffset);
 
     _multiCursors.clear();
     for (int k = 0; k < uniqueOffsets.length; k++) {
-      final origOffset = uniqueOffsets[k];
-      if (origOffset <= 0) continue;
-      final newOffset = (origOffset - (k + 1)).clamp(0, _rope.length);
+      final newOffset = newOffsets[k];
       if (newOffset == primaryNewOffset) continue;
       final newLine = _rope.getLineAtOffset(newOffset);
       final newLineStart = _rope.getLineStartOffset(newLine);
@@ -1019,11 +1026,14 @@ class CodeForgeController implements DeltaTextInputClient {
     final uniqueOffsets = offsets.toSet().toList()
       ..sort((a, b) => a.compareTo(b));
 
+    final deletedLengths = List<int>.filled(uniqueOffsets.length, 0);
     final compound = _undoController?.beginCompoundOperation();
 
-    for (final offset in uniqueOffsets.reversed) {
+    for (int k = uniqueOffsets.length - 1; k >= 0; k--) {
+      final offset = uniqueOffsets[k];
       if (offset < _rope.length) {
         final deletedChar = _rope.substring(offset, offset + 1);
+        deletedLengths[k] = deletedChar.runes.length;
         _rope.delete(offset, offset + 1);
         _currentVersion++;
 
@@ -1033,25 +1043,30 @@ class CodeForgeController implements DeltaTextInputClient {
           selectionBefore,
           TextSelection.collapsed(offset: offset),
         );
+      } else {
+        deletedLengths[k] = 0;
       }
     }
 
     compound?.end();
 
+    int cumulativeDeleted = 0;
+    final newOffsets = List<int>.filled(uniqueOffsets.length, 0);
+    for (int k = 0; k < uniqueOffsets.length; k++) {
+      newOffsets[k] = (uniqueOffsets[k] - cumulativeDeleted).clamp(
+        0,
+        _rope.length,
+      );
+      cumulativeDeleted += deletedLengths[k];
+    }
+
     final primaryIndex = uniqueOffsets.indexOf(primaryOffset);
-    final primaryShift = primaryOffset < _rope.length + primaryIndex
-        ? primaryIndex
-        : 0;
-    final primaryNewOffset = (primaryOffset - primaryShift).clamp(
-      0,
-      _rope.length,
-    );
+    final primaryNewOffset = newOffsets[primaryIndex];
     _selection = TextSelection.collapsed(offset: primaryNewOffset);
 
     _multiCursors.clear();
     for (int k = 0; k < uniqueOffsets.length; k++) {
-      final origOffset = uniqueOffsets[k];
-      final newOffset = (origOffset - k).clamp(0, _rope.length);
+      final newOffset = newOffsets[k];
       if (newOffset == primaryNewOffset) continue;
       final newLine = _rope.getLineAtOffset(newOffset);
       final newLineStart = _rope.getLineStartOffset(newLine);
@@ -1094,35 +1109,57 @@ class CodeForgeController implements DeltaTextInputClient {
     final uniqueOffsets = offsets.toSet().toList()
       ..sort((a, b) => a.compareTo(b));
 
+    final insertedLengths = List<int>.filled(uniqueOffsets.length, 0);
     final compound = _undoController?.beginCompoundOperation();
 
-    for (final offset in uniqueOffsets.reversed) {
+    for (int k = uniqueOffsets.length - 1; k >= 0; k--) {
+      final offset = uniqueOffsets[k];
       final safeOffset = offset.clamp(0, _rope.length);
-      _rope.insert(safeOffset, textToInsert);
+
+      String toInsert = textToInsert;
+      if (textToInsert.contains('\n')) {
+        final lineIndex = _rope.getLineAtOffset(safeOffset);
+        final lineStart = _rope.getLineStartOffset(lineIndex);
+        final lineText = _rope.substring(lineStart, safeOffset);
+        final indentMatch = RegExp(r'^\s*').firstMatch(lineText);
+        final currentIndent = indentMatch?.group(0) ?? '';
+        final shouldIncreaseIndent = RegExp(r'[:{[(]\s*$').hasMatch(lineText);
+        final tabStr = useSpaceAsTab ? ' ' * tabSize : '\t';
+        final extraIndent = shouldIncreaseIndent ? tabStr : '';
+        toInsert = '\n$currentIndent$extraIndent';
+      }
+
+      insertedLengths[k] = toInsert.runes.length;
+      _rope.insert(safeOffset, toInsert);
       _currentVersion++;
 
       _recordInsertion(
         safeOffset,
-        textToInsert,
+        toInsert,
         selectionBefore,
-        TextSelection.collapsed(offset: safeOffset + textToInsert.length),
+        TextSelection.collapsed(offset: safeOffset + toInsert.runes.length),
       );
     }
 
     compound?.end();
 
+    int cumulativeInserted = 0;
+    final newOffsets = List<int>.filled(uniqueOffsets.length, 0);
+    for (int k = 0; k < uniqueOffsets.length; k++) {
+      cumulativeInserted += insertedLengths[k];
+      newOffsets[k] = (uniqueOffsets[k] + cumulativeInserted).clamp(
+        0,
+        _rope.length,
+      );
+    }
+
     final primaryIndex = uniqueOffsets.indexOf(primaryOffset);
-    final primaryNewOffset =
-        (primaryOffset + (primaryIndex + 1) * textToInsert.length).clamp(
-          0,
-          _rope.length,
-        );
+    final primaryNewOffset = newOffsets[primaryIndex];
     _selection = TextSelection.collapsed(offset: primaryNewOffset);
 
     _multiCursors.clear();
     for (int k = 0; k < uniqueOffsets.length; k++) {
-      final newOffset = (uniqueOffsets[k] + (k + 1) * textToInsert.length)
-          .clamp(0, _rope.length);
+      final newOffset = newOffsets[k];
       if (newOffset == primaryNewOffset) continue;
       final newLine = _rope.getLineAtOffset(newOffset);
       final newLineStart = _rope.getLineStartOffset(newLine);
@@ -5253,12 +5290,8 @@ class CodeForgeController implements DeltaTextInputClient {
     if (_undoController?.isUndoRedoInProgress ?? false) return;
 
     if (hasMultiCursors && insertedText.isNotEmpty) {
-      if (!insertedText.contains('\n')) {
-        insertAtAllCursors(insertedText);
-        return;
-      }
-      _multiCursors.clear();
-      multiCursorsChanged = true;
+      insertAtAllCursors(insertedText);
+      return;
     }
 
     final selectionBefore = _selection;
@@ -5809,11 +5842,20 @@ class CodeForgeController implements DeltaTextInputClient {
   }
 
   static int scalarToUtf16Offset(String text, int scalarOffset) {
+    if (scalarOffset <= 0) return 0;
+    final codeUnits = text.codeUnits;
+    final len = codeUnits.length;
+    if (scalarOffset >= len) return len;
     int utf16 = 0;
     int scalar = 0;
-    for (final rune in text.runes) {
-      if (scalar >= scalarOffset) break;
-      utf16 += rune > 0xFFFF ? 2 : 1;
+    while (utf16 < len && scalar < scalarOffset) {
+      final u = codeUnits[utf16];
+      if (u >= 0xD800 && u < 0xDC00 && utf16 + 1 < len) {
+        final u2 = codeUnits[utf16 + 1];
+        utf16 += (u2 >= 0xDC00 && u2 < 0xE000) ? 2 : 1;
+      } else {
+        utf16 += 1;
+      }
       scalar++;
     }
     return utf16;
@@ -5821,10 +5863,20 @@ class CodeForgeController implements DeltaTextInputClient {
 
   static int utf16ToScalarOffset(String text, int utf16Offset) {
     if (utf16Offset <= 0) return 0;
+    final codeUnits = text.codeUnits;
+    final len = codeUnits.length;
     int utf16 = 0;
     int scalar = 0;
-    for (final rune in text.runes) {
-      final nextUtf16 = utf16 + (rune > 0xFFFF ? 2 : 1);
+    while (utf16 < len) {
+      final u = codeUnits[utf16];
+      int step;
+      if (u >= 0xD800 && u < 0xDC00 && utf16 + 1 < len) {
+        final u2 = codeUnits[utf16 + 1];
+        step = (u2 >= 0xDC00 && u2 < 0xE000) ? 2 : 1;
+      } else {
+        step = 1;
+      }
+      final nextUtf16 = utf16 + step;
       // A UTF-16 offset between the two code units of a surrogate pair has no
       // corresponding Rope position. Snap it to the preceding scalar rather
       // than letting it split an emoji or drift one scalar to the right.
@@ -5838,11 +5890,19 @@ class CodeForgeController implements DeltaTextInputClient {
 
   static int scalarToStringIndex(String text, int scalarOffset) {
     if (scalarOffset <= 0) return 0;
+    final codeUnits = text.codeUnits;
+    final len = codeUnits.length;
+    if (scalarOffset >= len) return len;
     int utf16 = 0;
     int scalar = 0;
-    for (final rune in text.runes) {
-      if (scalar >= scalarOffset) break;
-      utf16 += rune > 0xFFFF ? 2 : 1;
+    while (utf16 < len && scalar < scalarOffset) {
+      final u = codeUnits[utf16];
+      if (u >= 0xD800 && u < 0xDC00 && utf16 + 1 < len) {
+        final u2 = codeUnits[utf16 + 1];
+        utf16 += (u2 >= 0xDC00 && u2 < 0xE000) ? 2 : 1;
+      } else {
+        utf16 += 1;
+      }
       scalar++;
     }
     return utf16;

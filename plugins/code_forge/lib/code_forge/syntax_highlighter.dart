@@ -54,7 +54,7 @@ class SyntaxHighlighter {
   late final Map<String, List<String>> _semanticMapping;
   static const int isolateThreshold = 500;
   static const int _cacheKeepMargin = 500;
-  static const int _maxLineCacheEntries = 6000;
+  static const int _maxLineCacheEntries = 5800;
   static const int _maxSpanCacheEntries = 8000;
   static const int _blockCommentLookbackLimit = 200;
   int get documentVersion => _documentVersion;
@@ -308,7 +308,9 @@ class SyntaxHighlighter {
 
   TextSpan? getLineSpan(int lineIndex, String lineText) {
     final getLineTextFn = getLineText;
-    final isSubstring = getLineTextFn != null && getLineTextFn(lineIndex).length != lineText.length;
+    final isSubstring =
+        getLineTextFn != null &&
+        getLineTextFn(lineIndex).length != lineText.length;
     if (isSubstring) {
       return _highlightLine(lineText);
     }
