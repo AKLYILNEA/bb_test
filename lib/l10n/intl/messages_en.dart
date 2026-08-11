@@ -1008,6 +1008,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "showHiddenItems": MessageLookupByLibrary.simpleMessage(
       "Show Hidden Items",
     ),
+    "blockComment": MessageLookupByLibrary.simpleMessage("Comment"),
     "showStartSwitch": MessageLookupByLibrary.simpleMessage("Linkage Switch"),
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage(
       "Display independent switch button on the homepage",

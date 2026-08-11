@@ -1019,6 +1019,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "settings": MessageLookupByLibrary.simpleMessage("Настройки"),
     "show": MessageLookupByLibrary.simpleMessage("Показать"),
     "showHiddenItems": MessageLookupByLibrary.simpleMessage("Показать скрытые"),
+    "blockComment": MessageLookupByLibrary.simpleMessage("Комментарий"),
     "showStartSwitch": MessageLookupByLibrary.simpleMessage(
       "Связанный переключатель",
     ),

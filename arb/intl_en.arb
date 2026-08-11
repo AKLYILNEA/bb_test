@@ -656,5 +656,6 @@
   "ageKeyPairGeneratedSuccess": "X25519 Key pair generated, please keep it safe",
   "agePrivateKeyRequired": "Please enter a correct Age private key first",
   "lineWrap": "Wrap Lines",
-  "showHiddenItems": "Show Hidden Items"
+  "showHiddenItems": "Show Hidden Items",
+  "blockComment": "Comment"
 }

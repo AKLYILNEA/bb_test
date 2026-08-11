@@ -92,6 +92,10 @@ class CodeForge extends StatefulWidget {
   /// by default if not specified.
   final Mode? language;
 
+  final String? languageId;
+
+  final String? blockCommentLabel;
+
   /// Additional language modes registered in the same highlighter instance.
   ///
   /// Useful for languages that embed other grammars (for example, TSX using
@@ -298,6 +302,8 @@ class CodeForge extends StatefulWidget {
     this.undoController,
     this.editorTheme,
     this.language,
+    this.languageId,
+    this.blockCommentLabel,
     this.filePath,
     this.initialText,
     this.focusNode,
@@ -407,6 +413,7 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
     super.initState();
     _ownsController = widget.controller == null;
     _controller = widget.controller ?? CodeForgeController();
+    _controller.languageId = widget.languageId;
 
     _controller.getFloatingCursorStartPosition = () {
       final renderObject = _codeFieldKey.currentContext?.findRenderObject();
@@ -1362,6 +1369,32 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
                   ],
                 ),
               ),
+              if (widget.blockCommentLabel != null && !_controller.readOnly)
+                TextSelectionToolbarTextButton(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  onPressed: () {
+                    _controller.toggleComment();
+                    _contextMenuOffsetNotifier.value = const Offset(-1, -1);
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.code,
+                        size: 16,
+                        color: _editorTheme['root']?.color,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        widget.blockCommentLabel!,
+                        style: TextStyle(
+                          color: _editorTheme['root']?.color,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               TextSelectionToolbarTextButton(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 onPressed: () {
@@ -1389,14 +1422,14 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
             ],
           );
         } else {
-          return Positioned(
-            left: offset.dx,
-            top: offset.dy,
-            child: Card(
-              elevation: 8,
-              color: _editorTheme['root']?.backgroundColor ?? Colors.grey[900],
-              shape: _suggestionStyle.shape,
-              child: IntrinsicWidth(
+          return Positioned.fill(
+            child: CustomSingleChildLayout(
+              delegate: _ContextMenuLayoutDelegate(position: offset),
+              child: Card(
+                elevation: 8,
+                color: _editorTheme['root']?.backgroundColor ?? Colors.grey[900],
+                shape: _suggestionStyle.shape,
+                child: IntrinsicWidth(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1425,6 +1458,13 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
                       'Ctrl+F',
                       () => _triggerSearchWithSelection(),
                     ),
+                    if (widget.blockCommentLabel != null &&
+                        !_controller.readOnly)
+                      _buildDesktopContextMenuItem(
+                        widget.blockCommentLabel!,
+                        'Ctrl+/',
+                        () => _controller.toggleComment(),
+                      ),
                     _buildDesktopContextMenuItem(
                       MaterialLocalizations.of(context).selectAllButtonLabel,
                       'Ctrl+A',
@@ -1441,6 +1481,7 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
                   ],
                 ),
               ),
+            ),
             ),
           );
         }
@@ -1852,6 +1893,57 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
                                                 )) {
                                                   if (!_readOnly) {
                                                     _controller.duplicateLine();
+                                                    _commonKeyFunctions();
+                                                  }
+                                                  return KeyEventResult.handled;
+                                                }
+
+                                                final isCmdOrCtrl =
+                                                    HardwareKeyboard
+                                                        .instance
+                                                        .isControlPressed ||
+                                                    HardwareKeyboard
+                                                        .instance
+                                                        .isMetaPressed;
+                                                final isShiftPressed =
+                                                    HardwareKeyboard
+                                                        .instance
+                                                        .isShiftPressed;
+
+                                                if (shrtCt.toggleComment
+                                                        .accepts(
+                                                          event,
+                                                          HardwareKeyboard
+                                                              .instance,
+                                                        ) ||
+                                                    (event is KeyDownEvent &&
+                                                        isCmdOrCtrl &&
+                                                        !isShiftPressed &&
+                                                        event.logicalKey ==
+                                                            LogicalKeyboardKey
+                                                                .slash)) {
+                                                  if (!_readOnly) {
+                                                    _controller.toggleComment();
+                                                    _commonKeyFunctions();
+                                                  }
+                                                  return KeyEventResult.handled;
+                                                }
+
+                                                if (shrtCt.toggleBlockComment
+                                                        .accepts(
+                                                          event,
+                                                          HardwareKeyboard
+                                                              .instance,
+                                                        ) ||
+                                                    (event is KeyDownEvent &&
+                                                        isCmdOrCtrl &&
+                                                        isShiftPressed &&
+                                                        event.logicalKey ==
+                                                            LogicalKeyboardKey
+                                                                .slash)) {
+                                                  if (!_readOnly) {
+                                                    _controller
+                                                        .toggleBlockComment();
                                                     _commonKeyFunctions();
                                                   }
                                                   return KeyEventResult.handled;
@@ -12032,7 +12124,6 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
             _lastHandleHapticOffset = adjustedTextOffset;
             unawaited(_hapticHandleMove());
           }
-          markNeedsLayout();
           markNeedsPaint();
           return;
         }
@@ -12077,7 +12168,6 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
             _lastHandleHapticOffset = adjustedTextOffset;
             unawaited(_hapticHandleMove());
           }
-          markNeedsLayout();
           markNeedsPaint();
           return;
         }
@@ -12343,4 +12433,38 @@ class _SnippetSuggestion {
     required this.value,
     this.cursorLocations = const {},
   });
+}
+
+class _ContextMenuLayoutDelegate extends SingleChildLayoutDelegate {
+  final Offset position;
+
+  _ContextMenuLayoutDelegate({required this.position});
+
+  @override
+  BoxConstraints getConstraintsForChild(BoxConstraints constraints) {
+    return BoxConstraints.loose(constraints.biggest);
+  }
+
+  @override
+  Offset getPositionForChild(Size size, Size childSize) {
+    double dx = position.dx;
+    double dy = position.dy;
+
+    if (dx + childSize.width > size.width) {
+      dx = size.width - childSize.width;
+    }
+    if (dx < 0) dx = 0;
+
+    if (dy + childSize.height > size.height) {
+      dy = size.height - childSize.height;
+    }
+    if (dy < 0) dy = 0;
+
+    return Offset(dx, dy);
+  }
+
+  @override
+  bool shouldRelayout(_ContextMenuLayoutDelegate oldDelegate) {
+    return position != oldDelegate.position;
+  }
 }

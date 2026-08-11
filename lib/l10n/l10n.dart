@@ -5393,6 +5393,16 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Comment`
+  String get blockComment {
+    return Intl.message(
+      'Comment',
+      name: 'blockComment',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

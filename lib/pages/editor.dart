@@ -378,6 +378,12 @@ class _EditorPageState extends ConsumerState<EditorPage> {
                       enableKeyboardSuggestions: false,
                       enableMagnifier: true,
                       language: _languageMode(),
+                      languageId: switch (widget.languages.firstOrNull) {
+                        Language.yaml => 'yaml',
+                        Language.javaScript => 'javascript',
+                        _ => null,
+                      },
+                      blockCommentLabel: appLocalizations.blockComment,
                       editorTheme: brightness == Brightness.dark
                           ? atomOneDarkTheme
                           : atomOneLightTheme,

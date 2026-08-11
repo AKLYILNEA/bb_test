@@ -659,5 +659,6 @@
   "ageKeyPairGeneratedSuccess": "Пара ключей X25519 создана, сохраните её в надёжном месте",
   "agePrivateKeyRequired": "Пожалуйста, сначала введите корректный закрытый ключ Age",
   "lineWrap": "Перенос строк",
-  "showHiddenItems": "Показать скрытые"
+  "showHiddenItems": "Показать скрытые",
+  "blockComment": "Комментарий"
 }

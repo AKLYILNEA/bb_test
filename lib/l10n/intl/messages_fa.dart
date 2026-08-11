@@ -1036,6 +1036,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "showHiddenItems": MessageLookupByLibrary.simpleMessage(
       "نمایش موارد پنهان",
     ),
+    "blockComment": MessageLookupByLibrary.simpleMessage("کامنت"),
     "showStartSwitch": MessageLookupByLibrary.simpleMessage("دکمه کلید سوئیچ"),
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage(
       "نمایش دکمه مستقل روشن/خاموش در صفحه اصلی",
