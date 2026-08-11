@@ -652,6 +652,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         suspendModule?.uninstall()
         suspendModule = null
         Core.stopTun()
+        Core.suspended(true)
         scope.launch {
             startForeground()
         }
@@ -675,6 +676,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             }
             if (!startAllowed) return@launch
 
+            Core.suspended(false)
             performStartCore(options, retry = false, notifyOnFailure = false)
         }
         return true
