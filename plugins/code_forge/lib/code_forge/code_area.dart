@@ -36,7 +36,7 @@ const double _kMobileHandleDragSlop = 8.0;
 const MethodChannel _hapticsChannel = MethodChannel('code_forge/haptics');
 const String _wordCharPattern =
     r'[\w\u0600-\u06FF\u08A0-\u08FF\u0590-\u05FF'
-    r'\u3040-\u309F\u30A0-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uAC00-\uD7AF\uF900-\uFAFF]';
+    r'\u3040-\u309F\u30A0-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uAC00-\uD7AF\uF900-\uFAFF\-]';
 
 /// A highly customizable code editor widget for Flutter.
 ///
@@ -748,33 +748,11 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
       _selectedSuggestionListener,
     );
 
-    _snippetSuggestionsListener = () {
-      if (_isInjectingSnippets) return;
-      final snippets = widget.customCodeSnippets;
-      if (snippets == null || snippets.isEmpty) return;
-
-      final currentLength = _controller.length;
-      final grew = currentLength == _prevSnippetTextLength + 1;
-      _prevSnippetTextLength = currentLength;
-
-      if (!grew) return;
-
-      final lastChar = _controller.lastTypedCharacter;
-      final isAlpha =
-          lastChar.isNotEmpty && RegExp(_wordCharPattern).hasMatch(lastChar);
-      _snippetsActive = isAlpha;
-    };
-    _controller.addListener(_snippetSuggestionsListener);
-
-    _snippetNotifierListener = () {
-      if (_isInjectingSnippets) return;
-      if (!_snippetsActive) return;
-      final snippets = widget.customCodeSnippets;
-      if (snippets == null || snippets.isEmpty) return;
-
+    void injectSnippets(List<CustomCodeSnippet> snippets) {
       final current = _suggestionNotifier.value;
-      if (current == null) return;
-      if (current.any((e) => e is _SnippetSuggestion)) return;
+      if (current != null && current.any((e) => e is _SnippetSuggestion)) {
+        return;
+      }
 
       final cursor = _controller.selection.extentOffset;
       final prefix = _controller.getCurrentWordPrefixAt(cursor);
@@ -796,8 +774,35 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
       if (matching.isEmpty) return;
 
       _isInjectingSnippets = true;
-      _suggestionNotifier.value = [...matching, ...current];
+      _suggestionNotifier.value = [...matching, ...?current];
       _isInjectingSnippets = false;
+    }
+
+    _snippetSuggestionsListener = () {
+      if (_isInjectingSnippets) return;
+      final snippets = widget.customCodeSnippets;
+      if (snippets == null || snippets.isEmpty) return;
+
+      final currentLength = _controller.length;
+      final grew = currentLength == _prevSnippetTextLength + 1;
+      _prevSnippetTextLength = currentLength;
+
+      if (!grew) return;
+
+      final lastChar = _controller.lastTypedCharacter;
+      final isAlpha =
+          lastChar.isNotEmpty && RegExp(_wordCharPattern).hasMatch(lastChar);
+      _snippetsActive = isAlpha;
+      if (isAlpha) injectSnippets(snippets);
+    };
+    _controller.addListener(_snippetSuggestionsListener);
+
+    _snippetNotifierListener = () {
+      if (_isInjectingSnippets) return;
+      if (!_snippetsActive) return;
+      final snippets = widget.customCodeSnippets;
+      if (snippets == null || snippets.isEmpty) return;
+      injectSnippets(snippets);
     };
     _suggestionNotifier.addListener(_snippetNotifierListener);
 
@@ -7289,7 +7294,8 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
     final anchorCol = comp.anchor - lineStartOffset;
     final lineText =
         _lineTextCache[anchorLine] ?? controller.getLineText(anchorLine);
-    final clampedCol = anchorCol.clamp(0, lineText.length);
+    final scalarCol = anchorCol.clamp(0, lineText.runes.length);
+    final utf16Col = CodeForgeController.scalarToUtf16Offset(lineText, scalarCol);
 
     final paragraphWidth = lineWrap ? _wrapWidth : null;
     final linePara =
@@ -7298,14 +7304,10 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
 
     double anchorX = 0;
     double rowTop = 0;
-    if (lineText.isNotEmpty && clampedCol > 0) {
-      final utf16AnchorCol = CodeForgeController.scalarToUtf16Offset(
-        lineText,
-        anchorCol,
-      );
+    if (lineText.isNotEmpty && scalarCol > 0) {
       final boxes = linePara.getBoxesForRange(
         0,
-        utf16AnchorCol,
+        utf16Col,
         boxHeightStyle: ui.BoxHeightStyle.max,
       );
       if (boxes.isNotEmpty) {
@@ -7366,8 +7368,8 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
 
     canvas.drawParagraph(composingPara, Offset(screenX, screenY));
 
-    if (clampedCol < lineText.length) {
-      final remainingText = lineText.substring(clampedCol);
+    if (scalarCol < lineText.runes.length) {
+      final remainingText = lineText.substring(utf16Col);
       final remainingStyle = ui.TextStyle(
         color: baseColor,
         fontSize: fontSize,
