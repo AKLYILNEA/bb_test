@@ -150,6 +150,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "bind": MessageLookupByLibrary.simpleMessage("連携"),
     "blacklist": MessageLookupByLibrary.simpleMessage("ブラックリスト"),
     "blacklistMode": MessageLookupByLibrary.simpleMessage("ブラックリストモード"),
+    "blockComment": MessageLookupByLibrary.simpleMessage("コメント"),
     "bypassDomain": MessageLookupByLibrary.simpleMessage("バイパスドメイン"),
     "bypassDomainDesc": MessageLookupByLibrary.simpleMessage("システムプロキシ有効時のみ適用"),
     "bypassPrivateRoute": MessageLookupByLibrary.simpleMessage(
@@ -797,7 +798,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "settings": MessageLookupByLibrary.simpleMessage("設定"),
     "show": MessageLookupByLibrary.simpleMessage("表示"),
     "showHiddenItems": MessageLookupByLibrary.simpleMessage("非表示項目を表示"),
-    "blockComment": MessageLookupByLibrary.simpleMessage("コメント"),
     "showStartSwitch": MessageLookupByLibrary.simpleMessage("単独スイッチ表示"),
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage(
       "ホーム画面に独立したON/OFFボタンを表示",

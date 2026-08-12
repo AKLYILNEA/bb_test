@@ -198,6 +198,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "blacklistMode": MessageLookupByLibrary.simpleMessage(
       "Режим чёрного списка",
     ),
+    "blockComment": MessageLookupByLibrary.simpleMessage("Комментарий"),
     "bypassDomain": MessageLookupByLibrary.simpleMessage("Исключить домены"),
     "bypassDomainDesc": MessageLookupByLibrary.simpleMessage(
       "Работает только при включённом системном прокси",
@@ -699,7 +700,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Скорость в уведомлениях",
     ),
     "networkSpeedNotificationDesc": MessageLookupByLibrary.simpleMessage(
-      "Показывать текущую скорость в панели уведомлений",
+      "Показывать скорость и подписку в панели уведомлений",
     ),
     "networkType": MessageLookupByLibrary.simpleMessage("Тип сети"),
     "neutralScheme": MessageLookupByLibrary.simpleMessage("Нейтральный"),
@@ -1019,7 +1020,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "settings": MessageLookupByLibrary.simpleMessage("Настройки"),
     "show": MessageLookupByLibrary.simpleMessage("Показать"),
     "showHiddenItems": MessageLookupByLibrary.simpleMessage("Показать скрытые"),
-    "blockComment": MessageLookupByLibrary.simpleMessage("Комментарий"),
     "showStartSwitch": MessageLookupByLibrary.simpleMessage(
       "Связанный переключатель",
     ),

@@ -191,6 +191,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "bind": MessageLookupByLibrary.simpleMessage("اتصال"),
     "blacklist": MessageLookupByLibrary.simpleMessage("لیست سیاه"),
     "blacklistMode": MessageLookupByLibrary.simpleMessage("حالت لیست سیاه"),
+    "blockComment": MessageLookupByLibrary.simpleMessage("کامنت"),
     "bypassDomain": MessageLookupByLibrary.simpleMessage("دامنه‌های استثنا"),
     "bypassDomainDesc": MessageLookupByLibrary.simpleMessage(
       "اعمال تنها در صورت فعال بودن پروکسی سیستم",
@@ -1036,7 +1037,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "showHiddenItems": MessageLookupByLibrary.simpleMessage(
       "نمایش موارد پنهان",
     ),
-    "blockComment": MessageLookupByLibrary.simpleMessage("کامنت"),
     "showStartSwitch": MessageLookupByLibrary.simpleMessage("دکمه کلید سوئیچ"),
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage(
       "نمایش دکمه مستقل روشن/خاموش در صفحه اصلی",

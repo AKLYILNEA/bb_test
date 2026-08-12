@@ -156,6 +156,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "bind": MessageLookupByLibrary.simpleMessage("연결"),
     "blacklist": MessageLookupByLibrary.simpleMessage("블랙리스트"),
     "blacklistMode": MessageLookupByLibrary.simpleMessage("블랙리스트 모드"),
+    "blockComment": MessageLookupByLibrary.simpleMessage("주석"),
     "bypassDomain": MessageLookupByLibrary.simpleMessage("우회 도메인"),
     "bypassDomainDesc": MessageLookupByLibrary.simpleMessage(
       "시스템 프록시 활성화 시에만 적용",
@@ -557,7 +558,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "networkSpeed": MessageLookupByLibrary.simpleMessage("네트워크 속도"),
     "networkSpeedNotification": MessageLookupByLibrary.simpleMessage("속도 알림"),
     "networkSpeedNotificationDesc": MessageLookupByLibrary.simpleMessage(
-      "알림 표시줄에 현재 속도 및 구독 정보 표시",
+      "알림 표시줄에 속도 및 구독 정보 표시",
     ),
     "networkType": MessageLookupByLibrary.simpleMessage("네트워크 유형"),
     "neutralScheme": MessageLookupByLibrary.simpleMessage("뉴트럴"),
@@ -809,7 +810,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "settings": MessageLookupByLibrary.simpleMessage("설정"),
     "show": MessageLookupByLibrary.simpleMessage("표시"),
     "showHiddenItems": MessageLookupByLibrary.simpleMessage("숨겨진 항목 표시"),
-    "blockComment": MessageLookupByLibrary.simpleMessage("주석"),
     "showStartSwitch": MessageLookupByLibrary.simpleMessage("스위치 버튼 표시"),
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage(
       "홈 화면에 독립된 시작/정지 스위치 표시",
