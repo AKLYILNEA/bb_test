@@ -5,6 +5,7 @@ import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 typedef OnSelected = void Function(int index);
@@ -32,6 +33,13 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  bool get isNavFocused => _isNavFocused;
+
+  void focusNav() {
+    if (!globalState.isAndroidTV || !mounted) return;
+    _requestNavFocus(_currentNavIndex);
+  }
+
   @override
   void dispose() {
     for (final node in _navFocusNodes.values) {
@@ -43,6 +51,21 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return HomeBackScope(
+      onTvBack: () {
+        if (isNavFocused) return false;
+        if (globalState.appState.pageLabel == PageLabel.dashboard) {
+          if (globalState.isDashboardStartSwitchFocused) {
+            return false;
+          }
+          final focus = globalState.focusDashboardStartSwitch;
+          if (focus != null) {
+            focus();
+            return true;
+          }
+        }
+        focusNav();
+        return true;
+      },
       child: Material(
         color: context.colorScheme.surface,
         child: Consumer(
@@ -143,9 +166,17 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       child: SafeArea(
-        child: FocusTraversalGroup(
-          policy: WidgetOrderTraversalPolicy(),
-          child: Row(
+        child: Focus(
+          onKeyEvent: (node, event) {
+            if (event is KeyDownEvent &&
+                event.logicalKey == LogicalKeyboardKey.arrowDown) {
+              return KeyEventResult.handled;
+            }
+            return KeyEventResult.ignored;
+          },
+          child: FocusTraversalGroup(
+            policy: WidgetOrderTraversalPolicy(),
+            child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: navigationItems.asMap().entries.map((entry) {
               final index = entry.key;
@@ -233,6 +264,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
+    ),
     );
   }
 }
@@ -355,8 +387,9 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
 
 class HomeBackScope extends ConsumerWidget {
   final Widget child;
+  final bool Function()? onTvBack;
 
-  const HomeBackScope({super.key, required this.child});
+  const HomeBackScope({super.key, required this.child, this.onTvBack});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -376,6 +409,12 @@ class HomeBackScope extends ConsumerWidget {
           if (didPop || backBlock) return;
           final navigatorState = globalState.navigatorKey.currentState;
           if (navigatorState?.userGestureInProgress == true) return;
+
+          if (globalState.isAndroidTV) {
+            final tvBack = onTvBack;
+            if (tvBack != null && tvBack()) return;
+          }
+
           if (!isCurrentRootPage) {
             globalState.appController.toPage(PageLabel.dashboard);
             return;
