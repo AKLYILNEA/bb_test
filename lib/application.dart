@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:bett_box/clash/clash.dart';
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/common/external_control.dart';
-import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/l10n/l10n.dart';
 import 'package:bett_box/manager/hotkey_manager.dart';
 import 'package:bett_box/manager/manager.dart';
@@ -198,27 +197,6 @@ class ApplicationState extends ConsumerState<Application>
             final fontFamily = themeProps.useHarmonyFont
                 ? 'HarmonyOS_Sans'
                 : null;
-            final fontFamilyFallback = themeProps.useHarmonyFont
-                ? [FontFamily.twEmoji.value]
-                : null;
-
-            final lightColorScheme = _getAppColorScheme(
-              brightness: Brightness.light,
-              primaryColor: themeProps.primaryColor,
-            );
-            final darkColorScheme = _getAppColorScheme(
-              brightness: Brightness.dark,
-              primaryColor: themeProps.primaryColor,
-            ).toPureBlack(themeProps.pureBlack);
-
-            final baseLightTheme = ThemeData(
-              useMaterial3: true,
-              colorScheme: lightColorScheme,
-            );
-            final baseDarkTheme = ThemeData(
-              useMaterial3: true,
-              colorScheme: darkColorScheme,
-            );
 
             return MaterialApp(
               debugShowCheckedModeBanner: false,
@@ -250,19 +228,23 @@ class ApplicationState extends ConsumerState<Application>
                   utils.getLocaleForString(locale) ?? utils.getSystemLocale(),
               supportedLocales: AppLocalizations.delegate.supportedLocales,
               themeMode: themeProps.themeMode,
-              theme: baseLightTheme.copyWith(
+              theme: ThemeData(
+                useMaterial3: true,
                 pageTransitionsTheme: _pageTransitionsTheme,
-                textTheme: baseLightTheme.textTheme.apply(
-                  fontFamily: fontFamily,
-                  fontFamilyFallback: fontFamilyFallback,
+                colorScheme: _getAppColorScheme(
+                  brightness: Brightness.light,
+                  primaryColor: themeProps.primaryColor,
                 ),
+                fontFamily: fontFamily,
               ),
-              darkTheme: baseDarkTheme.copyWith(
+              darkTheme: ThemeData(
+                useMaterial3: true,
                 pageTransitionsTheme: _pageTransitionsTheme,
-                textTheme: baseDarkTheme.textTheme.apply(
-                  fontFamily: fontFamily,
-                  fontFamilyFallback: fontFamilyFallback,
-                ),
+                colorScheme: _getAppColorScheme(
+                  brightness: Brightness.dark,
+                  primaryColor: themeProps.primaryColor,
+                ).toPureBlack(themeProps.pureBlack),
+                fontFamily: fontFamily,
               ),
               home: child!,
             );
