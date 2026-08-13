@@ -2506,8 +2506,6 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
                                                         return KeyEventResult
                                                             .handled;
                                                       case LogicalKeyboardKey
-                                                          .enter:
-                                                      case LogicalKeyboardKey
                                                           .tab:
                                                         _acceptSuggestion();
                                                         if (_extraText

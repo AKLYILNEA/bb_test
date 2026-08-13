@@ -297,8 +297,10 @@ class CodeForgeController implements DeltaTextInputClient {
             String currentWord = '';
             if (text.isNotEmpty) {
               final match = RegExp(
-                r'[\w\u0600-\u06FF\u08A0-\u08FF\u0590-\u05FF]+$',
-              ).firstMatch(text.substring(0, cursorPosition));
+                r'[\w\u0600-\u06FF\u08A0-\u08FF\u0590-\u05FF\-]+$',
+              ).firstMatch(
+                text.substring(0, scalarToUtf16Offset(text, cursorPosition)),
+              );
               if (match != null) {
                 currentWord = match.group(0)!;
               }
@@ -2996,19 +2998,6 @@ class CodeForgeController implements DeltaTextInputClient {
             staleMappedOffset;
         if (isBufferActive) useCurrentSelection = true;
         _imeSelectionNeedsResync = false;
-
-        if (delta.textInserted == '\n' &&
-            suggestionsNotifier.value != null &&
-            _isMobile &&
-            currentlySelectedSuggestion != null) {
-          final sugg = suggestionsNotifier.value![currentlySelectedSuggestion!];
-          final text = _extractSuggestionText(sugg);
-          insertAtCurrentCursor(text, replaceTypedChar: true);
-          suggestionsNotifier.value = null;
-          currentlySelectedSuggestion = null;
-          callSignatureHelp();
-          continue;
-        }
 
         if (delta.textInserted.length == 1) {
           _lastTypedCharacter = delta.textInserted;
@@ -5723,13 +5712,15 @@ class CodeForgeController implements DeltaTextInputClient {
                 _bufferLineText!.substring(utf16Local) + ropeAfterLine;
           } else {
             final currentText = text;
-            textBeforeCursor = currentText.substring(0, offset);
-            textAfterCursor = currentText.substring(offset);
+            final utf16Offset = scalarToUtf16Offset(currentText, offset);
+            textBeforeCursor = currentText.substring(0, utf16Offset);
+            textAfterCursor = currentText.substring(utf16Offset);
           }
         } else {
           final currentText = text;
-          textBeforeCursor = currentText.substring(0, offset);
-          textAfterCursor = currentText.substring(offset);
+          final utf16Offset = scalarToUtf16Offset(currentText, offset);
+          textBeforeCursor = currentText.substring(0, utf16Offset);
+          textAfterCursor = currentText.substring(utf16Offset);
         }
         final lines = textBeforeCursor.split('\n');
 
