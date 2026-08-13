@@ -41,8 +41,6 @@ dependencies:
   win32: ^5.15.0
   ffi: ^2.2.0
   re_highlight: ^0.0.3
-  code_forge:
-    path: plugins/code_forge
   archive: ^4.0.7
   lpinyin: ^2.0.3
   emoji_regex: ^0.0.5
@@ -52,14 +50,12 @@ dependencies:
   sqflite: ^2.4.3
   sqflite_common_ffi: ^2.4.2
   yaml: ^3.1.2
-  connectivity_plus: 7.0.0
+  connectivity_plus: ^7.3.1
   screen_retriever: ^0.2.0
   defer_pointer: ^0.0.2
   flutter_riverpod: ^2.6.1
   riverpod_annotation: ^2.6.1
   riverpod: ^2.6.1
-  flutter_qjs:
-    path: plugins/flutter_qjs
   flutter_svg: ^2.2.4
   xml: ^6.6.1
   flutter_cache_manager: ^3.4.1
@@ -70,6 +66,10 @@ dependencies:
   synchronized: ^3.4.0
   flutter_displaymode: ^0.7.0
   restart_app: ^1.8.3
+  code_forge:
+    path: plugins/code_forge
+  flutter_qjs:
+    path: plugins/flutter_qjs
 dependency_overrides:
   # Fix compile failure: https://github.com/leanflutter/hotkey_manager/pull/66
   hotkey_manager_linux:
