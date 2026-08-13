@@ -164,7 +164,7 @@ UpdateParams updateParams(Ref ref) {
         tun: state.tun.getRealTun(
           bypassPrivateRoute,
           fakeIpRange: state.dns.fakeIpRange,
-          fakeIpRangeV6: state.dns.fakeIpRangeV6,
+          fakeIpRangeV6: state.dns.effectiveFakeIpRangeV6,
           bypassPrivateRouteAddress: realBypassPrivateRouteAddress,
         ),
         allowLan: state.allowLan,

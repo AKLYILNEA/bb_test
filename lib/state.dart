@@ -571,10 +571,13 @@ class GlobalState {
     final originalProxyGroups = rawConfig['proxy-groups'];
 
     final realPatchConfig = patchConfig.copyWith(
+      dns: patchConfig.dns.copyWith(
+        fakeIpRangeV6: patchConfig.dns.effectiveFakeIpRangeV6,
+      ),
       tun: patchConfig.tun.getRealTun(
         config.networkProps.bypassPrivateRoute,
         fakeIpRange: patchConfig.dns.fakeIpRange,
-        fakeIpRangeV6: patchConfig.dns.fakeIpRangeV6,
+        fakeIpRangeV6: patchConfig.dns.effectiveFakeIpRangeV6,
         bypassPrivateRouteAddress:
             config.networkProps.realBypassPrivateRouteAddress,
       ),

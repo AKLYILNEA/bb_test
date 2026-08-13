@@ -438,6 +438,14 @@ abstract class Dns with _$Dns {
   }
 }
 
+extension DnsExt on Dns {
+  String get effectiveFakeIpRangeV6 {
+    if (fakeIpRangeV6.isNotEmpty) return fakeIpRangeV6;
+    if (ipv6) return '2001:2::1/48';
+    return '';
+  }
+}
+
 @freezed
 abstract class Ntp with _$Ntp {
   const factory Ntp({
