@@ -572,12 +572,14 @@ class GlobalState {
 
     final realPatchConfig = patchConfig.copyWith(
       dns: patchConfig.dns.copyWith(
-        fakeIpRangeV6: patchConfig.dns.effectiveFakeIpRangeV6,
+        fakeIpRangeV6:
+            patchConfig.dns.effectiveFakeIpRangeV6(ipv6Enabled: patchConfig.ipv6),
       ),
       tun: patchConfig.tun.getRealTun(
         config.networkProps.bypassPrivateRoute,
         fakeIpRange: patchConfig.dns.fakeIpRange,
-        fakeIpRangeV6: patchConfig.dns.effectiveFakeIpRangeV6,
+        fakeIpRangeV6:
+            patchConfig.dns.effectiveFakeIpRangeV6(ipv6Enabled: patchConfig.ipv6),
         bypassPrivateRouteAddress:
             config.networkProps.realBypassPrivateRouteAddress,
       ),
@@ -707,6 +709,13 @@ class GlobalState {
     final isEnableDns = rawConfig['dns']['enable'] == true;
     final overrideDns = globalState.config.overrideDns;
     if (overrideDns || !isEnableDns) {
+      // 快照覆写前的订阅 DNS 与 hosts，供覆写后合并节点解析相关配置
+      final originalDns = rawConfig['dns'] is Map
+          ? (rawConfig['dns'] as Map).cast<String, dynamic>()
+          : null;
+      final originalHosts = rawConfig['hosts'] is Map
+          ? (rawConfig['hosts'] as Map).cast<String, dynamic>()
+          : null;
       final dns = switch (!isEnableDns) {
         true => realPatchConfig.dns.copyWith(
           nameserver: [...realPatchConfig.dns.nameserver, 'system://'],
@@ -719,6 +728,12 @@ class GlobalState {
         rawConfig['dns']['nameserver-policy'][entry.key] =
             entry.value.splitByMultipleSeparators;
       }
+      // 合并订阅中的私有 DNS、节点域名解析策略与 hosts 映射，保证节点域名可解析
+      applyDnsNodeOverride(
+        rawConfig,
+        originalDns: originalDns,
+        originalHosts: originalHosts,
+      );
     }
 
     if (rawConfig['dns'] != null &&

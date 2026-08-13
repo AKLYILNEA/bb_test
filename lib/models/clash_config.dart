@@ -439,9 +439,9 @@ abstract class Dns with _$Dns {
 }
 
 extension DnsExt on Dns {
-  String get effectiveFakeIpRangeV6 {
+  String effectiveFakeIpRangeV6({required bool ipv6Enabled}) {
     if (fakeIpRangeV6.isNotEmpty) return fakeIpRangeV6;
-    if (ipv6) return '2001:2::1/48';
+    if (ipv6Enabled) return '2001:2::1/48';
     return '';
   }
 }

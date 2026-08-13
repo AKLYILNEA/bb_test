@@ -216,16 +216,13 @@ class FakeIpRangeV6Item extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    final dns = ref.watch(
-      patchClashConfigProvider.select((state) => state.dns),
+    final (dns, ipv6) = ref.watch(
+      patchClashConfigProvider.select((state) => (state.dns, state.ipv6)),
     );
     final fakeIpRangeV6 = dns.fakeIpRangeV6;
-    final effectiveValue = dns.effectiveFakeIpRangeV6;
     final displaySubtitle = fakeIpRangeV6.isNotEmpty
         ? fakeIpRangeV6
-        : (dns.ipv6
-            ? effectiveValue
-            : appLocalizations.emptyTip(appLocalizations.fakeipRangeV6));
+        : dns.effectiveFakeIpRangeV6(ipv6Enabled: ipv6);
 
     return ListItem.input(
       title: Text(appLocalizations.fakeipRangeV6),
