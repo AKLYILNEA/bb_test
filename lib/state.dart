@@ -599,6 +599,9 @@ class GlobalState {
       }
     }
     rawConfig['external-ui'] = await appPath.uiPath;
+    rawConfig['external-ui-url'] =
+        'https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip';
+    rawConfig.remove('external-ui-name');
     if (rawConfig['interface-name'] == null) {
       rawConfig['interface-name'] = '';
     }
@@ -711,7 +714,6 @@ class GlobalState {
     final isEnableDns = rawConfig['dns']['enable'] == true;
     final overrideDns = globalState.config.overrideDns;
     if (overrideDns || !isEnableDns) {
-      // 快照覆写前的订阅 DNS 与 hosts，供覆写后合并节点解析相关配置
       final originalDns = rawConfig['dns'] is Map
           ? (rawConfig['dns'] as Map).cast<String, dynamic>()
           : null;
@@ -730,7 +732,6 @@ class GlobalState {
         rawConfig['dns']['nameserver-policy'][entry.key] =
             entry.value.splitByMultipleSeparators;
       }
-      // 合并订阅中的私有 DNS、节点域名解析策略与 hosts 映射，保证节点域名可解析
       applyDnsNodeOverride(
         rawConfig,
         originalDns: originalDns,

@@ -1,6 +1,4 @@
-/// 常见的公共 DNS，用于过滤订阅中的公共 DNS
 const commonDnsList = [
-  // IP（国内）
   '223.5.5.5',
   '223.6.6.6',
   '119.29.29.29',
@@ -15,7 +13,6 @@ const commonDnsList = [
   '180.184.1.1',
   '180.184.2.2',
 
-  // IP（国外）
   '1.1.1.1',
   '1.0.0.1',
   '8.8.8.8',
@@ -35,7 +32,6 @@ const commonDnsList = [
   '156.154.70.1',
   '156.154.71.1',
 
-  // 关键词（国内）
   'alidns',
   'doh.pub',
   'dot.pub',
@@ -43,7 +39,6 @@ const commonDnsList = [
   'dnspod',
   'dns.baidu',
 
-  // 关键词（国外）
   'dns.google',
   'cloudflare',
   'quad9',
@@ -51,11 +46,9 @@ const commonDnsList = [
   'nextdns',
   'adguard',
 
-  // 系统
   'system',
 ];
 
-/// hosts 匹配优先级：精确 > +. > . > *（同级按出现顺序）
 int hostSpecificity(String pattern) {
   if (pattern.startsWith('+.')) return 2;
   if (pattern.startsWith('.')) return 1;
@@ -63,30 +56,25 @@ int hostSpecificity(String pattern) {
   return 3;
 }
 
-/// 判断域名规则（精确/通配）是否匹配节点域名集合，忽略大小写
 bool matchDomainPattern(String pattern, Iterable<String> domains) {
   pattern = pattern.toLowerCase();
 
-  // 精确匹配
   if (!pattern.contains('*') && !pattern.startsWith('+.') && !pattern.startsWith('.')) {
     return domains.any((d) => d.toLowerCase() == pattern);
   }
 
   final domainList = domains.map((d) => d.toLowerCase()).toList();
 
-  // +.example.com
   if (pattern.startsWith('+.')) {
     final suffix = pattern.substring(2);
     return domainList.any((domain) => domain == suffix || domain.endsWith('.$suffix'));
   }
 
-  // .example.com
   if (pattern.startsWith('.')) {
     final suffix = pattern.substring(1);
     return domainList.any((domain) => domain != suffix && domain.endsWith('.$suffix'));
   }
 
-  // *.example.com、example.*.com 等
   final patternParts = pattern.split('.');
   return domainList.any((domain) {
     final domainParts = domain.split('.');
@@ -97,7 +85,6 @@ bool matchDomainPattern(String pattern, Iterable<String> domains) {
   });
 }
 
-/// 剥离 DNS 地址的 # 策略组后缀；# 后为 direct（忽略大小写，可带 & 参数）时整条保留
 String stripDnsSuffix(String dns) {
   final hashIndex = dns.indexOf('#');
   if (hashIndex == -1) return dns;
@@ -106,11 +93,9 @@ String stripDnsSuffix(String dns) {
   return dns.substring(0, hashIndex);
 }
 
-/// 根据订阅 hosts 映射改写节点 server（链式解析 + 回环防御 + 缓存）
 List<dynamic> applyHostsToProxies(List<dynamic> proxies, Map<String, dynamic>? hosts) {
   if (hosts == null || hosts.isEmpty) return proxies;
 
-  // 全部有效条目按匹配优先级排序（链式解析需保留中继条目，故不按节点域名预过滤）
   final hostEntries = hosts.entries
       .where((entry) =>
           (entry.value is String && (entry.value as String).isNotEmpty) ||
@@ -119,7 +104,6 @@ List<dynamic> applyHostsToProxies(List<dynamic> proxies, Map<String, dynamic>? h
     ..sort((a, b) => hostSpecificity(b.key) - hostSpecificity(a.key));
   if (hostEntries.isEmpty) return proxies;
 
-  // 取映射目标（数组取首个非空字符串），无有效目标时返回 null
   String? targetOf(dynamic value) {
     if (value is List) {
       for (final item in value) {
@@ -130,10 +114,8 @@ List<dynamic> applyHostsToProxies(List<dynamic> proxies, Map<String, dynamic>? h
     return value is String && value.isNotEmpty ? value : null;
   }
 
-  // 解析结果缓存：相同节点域名只解析一次，后续直接复用
   final resolveCache = <String, String>{};
 
-  // 解析单个节点域名：沿链式映射逐级改写至最终目标，无匹配时原样返回
   String resolve(String server) {
     final cached = resolveCache[server];
     if (cached != null) return cached;
@@ -167,8 +149,6 @@ List<dynamic> applyHostsToProxies(List<dynamic> proxies, Map<String, dynamic>? h
   }).toList();
 }
 
-/// 将订阅中的私有 DNS、节点域名解析策略与 hosts 映射合并进覆写后的 DNS 配置。
-/// 需在 DNS 覆写（rawConfig['dns'] 被覆盖）之前快照 [originalDns] 与 [originalHosts]。
 void applyDnsNodeOverride(
   Map<String, dynamic> rawConfig, {
   Map<String, dynamic>? originalDns,
@@ -176,8 +156,6 @@ void applyDnsNodeOverride(
 }) {
   originalDns ??= {};
 
-  // 仅当原配置 proxy-server-nameserver 有且仅有一个 DNS，且该 DNS 包含非空的 listen 时，
-  // 才根据订阅 hosts 改写节点 server，否则跳过改写
   final proxyServerNameservers =
       (originalDns['proxy-server-nameserver'] as List?)?.cast<String>() ?? [];
   final listenValue = originalDns['listen'];
@@ -190,14 +168,12 @@ void applyDnsNodeOverride(
 
   final proxies = (rawConfig['proxies'] as List?) ?? const [];
 
-  // 根据订阅 hosts 改写节点 server 为映射后的地址（域名或 IP），并回写
   final mappedProxies =
       shouldRewriteByHosts ? applyHostsToProxies(proxies, originalHosts) : proxies;
   if (!identical(mappedProxies, proxies)) {
     rawConfig['proxies'] = mappedProxies;
   }
 
-  // 节点域名集合：合并改写前/后的 server（未触发 hosts 改写时两者一致）
   final proxyDomains = <String>{};
   void collectServers(List<dynamic> list) {
     for (final proxy in list) {
@@ -213,8 +189,6 @@ void applyDnsNodeOverride(
     collectServers(mappedProxies);
   }
 
-  // 命中 hosts 改写时，将 listen 值加入公共 DNS 列表，
-  // 使其在私有 DNS 提取时被当作公共 DNS 过滤，避免 listen 地址被误留为私有 DNS
   final commonDnsSet = commonDnsList.toSet();
   if (shouldRewriteByHosts) {
     commonDnsSet.add(listenValue);
@@ -225,7 +199,6 @@ void applyDnsNodeOverride(
   );
   bool isCommonDns(String dns) => commonDnsRegex.hasMatch(dns);
 
-  // 提取私有 DNS（先剥离 # 策略组后缀，再判断是否为公共 DNS）
   final privateDNS = <String>{};
   for (final dns in [...(originalDns['nameserver'] as List? ?? const []), ...proxyServerNameservers]) {
     final stripped = stripDnsSuffix(dns.toString());
@@ -234,7 +207,6 @@ void applyDnsNodeOverride(
     }
   }
 
-  // 提取节点域名对应的 DNS 配置（剥离 # 策略组后缀）
   final originalPolicy = <String, dynamic>{
     ...?((originalDns['nameserver-policy'] as Map?)?.cast<String, dynamic>()),
     ...?((originalDns['proxy-server-nameserver-policy'] as Map?)?.cast<String, dynamic>()),
@@ -252,8 +224,6 @@ void applyDnsNodeOverride(
     proxyServerPolicy[entry.key] = strippedValue;
   }
 
-  // 遍历原配置中的 fake-ip-filter，保留与节点域名匹配的条目
-  // 部分机场的节点域名需走真实 IP 解析，避免 fake-ip 导致节点无法连接
   final originalFakeIpFilter = (originalDns['fake-ip-filter'] as List?) ?? const [];
   final proxyFakeIpFilter = originalFakeIpFilter
       .where((pattern) => matchDomainPattern(pattern.toString(), proxyDomains))
@@ -263,7 +233,6 @@ void applyDnsNodeOverride(
   final dns = (rawConfig['dns'] as Map?)?.cast<String, dynamic>();
   if (dns == null) return;
 
-  // 写入覆写后的 DNS：私有 DNS / 节点域名 policy / fake-ip-filter 节点域名条目
   if (privateDNS.isNotEmpty) {
     dns['proxy-server-nameserver'] = privateDNS.toList();
   }
