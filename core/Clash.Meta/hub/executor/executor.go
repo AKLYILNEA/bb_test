@@ -328,16 +328,12 @@ func loadProvider[T P.Provider](providers map[string]T) {
 			switch pv.Type() {
 			case P.Proxy:
 				{
-					log.Warnln("initial proxy provider %s error: %v", name, err)
+					log.Errorln("initial proxy provider %s error: %v", name, err)
 				}
 			case P.Rule:
 				{
-					log.Warnln("initial rule provider %s error: %v", name, err)
+					log.Errorln("initial rule provider %s error: %v", name, err)
 				}
-			}
-		} else {
-			if DefaultProviderLoadedHook != nil {
-				DefaultProviderLoadedHook(name)
 			}
 		}
 	}
