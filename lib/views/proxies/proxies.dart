@@ -156,7 +156,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
   Widget? _buildFAB() {
     if (!_isTab || globalState.isAndroidTV) return null;
     return Consumer(
-      builder: (context, ref, _) {
+      builder: (_, ref, _) {
         final isMobileView = ref.watch(isMobileViewProvider);
         final currentGroupName = ref.watch(
           proxiesTabControllerStateProvider.select((state) => state.b),
