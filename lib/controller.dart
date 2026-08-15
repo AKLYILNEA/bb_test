@@ -775,6 +775,7 @@ class AppController {
             '[MissedUpdate] Updating external provider: ${provider.name}',
           );
           await clashCore.updateExternalProvider(providerName: provider.name);
+          setProvider(await clashCore.getExternalProvider(provider.name));
         }
       }
     } catch (e) {
