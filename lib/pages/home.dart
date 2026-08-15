@@ -361,6 +361,7 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
   @override
   Widget build(BuildContext context) {
     if (ref.watch(isMobileViewProvider)) {
+      final index = _pageIndex < 0 ? 0 : _pageIndex;
       return AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         switchInCurve: Curves.easeOutCubic,
@@ -369,8 +370,8 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
           return FadeTransition(opacity: animation, child: child);
         },
         child: KeyedSubtree(
-          key: ValueKey(widget.navigationItems[_currentPageIndex].label),
-          child: widget.pageBuilder(context, _currentPageIndex),
+          key: ValueKey(widget.navigationItems[index].label),
+          child: widget.pageBuilder(context, index),
         ),
       );
     }
