@@ -4635,6 +4635,10 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
   final Map<Rect, DocumentColor> _colorBoxHitAreas = {};
   final Map<int, ui.Paragraph> _paragraphCache = {};
   final Map<int, double> _lineHeightCache = {};
+  ui.Paragraph? _bufferParagraph;
+  int? _bufferParagraphLine;
+  int _bufferParagraphTextHash = 0;
+  double? _bufferParagraphWidth;
   final Map<int, FoldRange?> _foldRanges = {};
   final Map<int, int?> _bracketCache = {};
   final Map<
@@ -6759,6 +6763,27 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
       return (x: isRTL ? contentWidth : 0.0, yInLine: 0.0);
     }
 
+    ui.GlyphInfo? glyphInfo;
+    if (clampedCol < lineText.length) {
+      glyphInfo = para.getGlyphInfoAt(clampedCol);
+    } else if (clampedCol > 0) {
+      glyphInfo = para.getGlyphInfoAt(clampedCol - 1);
+    }
+
+    if (glyphInfo != null) {
+      final range = glyphInfo.graphemeClusterCodeUnitRange;
+      final start = range.start.clamp(0, lineText.length).toInt();
+      final end = range.end.clamp(start, lineText.length).toInt();
+      final useTrailingEdge =
+          clampedCol >= end ||
+          (clampedCol > start && (clampedCol - start) * 2 >= end - start);
+      final bounds = glyphInfo.graphemeClusterLayoutBounds;
+      final x = glyphInfo.writingDirection == TextDirection.rtl
+          ? (useTrailingEdge ? bounds.left : bounds.right)
+          : (useTrailingEdge ? bounds.right : bounds.left);
+      return (x: x + paragraphOffset, yInLine: bounds.top);
+    }
+
     if (isRTL) {
       if (clampedCol < lineText.length) {
         final boxes = para.getBoxesForRange(clampedCol, clampedCol + 1);
@@ -6789,25 +6814,6 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
       if (boxes.isNotEmpty) {
         return (x: boxes.last.right, yInLine: _rowTopForBox(boxes.last));
       }
-    }
-
-    ui.GlyphInfo? glyphInfo;
-    if (clampedCol < lineText.length) {
-      glyphInfo = para.getGlyphInfoAt(clampedCol);
-    }
-    glyphInfo ??= clampedCol > 0 ? para.getGlyphInfoAt(clampedCol - 1) : null;
-    if (glyphInfo != null) {
-      final range = glyphInfo.graphemeClusterCodeUnitRange;
-      final start = range.start.clamp(0, lineText.length).toInt();
-      final end = range.end.clamp(start, lineText.length).toInt();
-      final useTrailingEdge =
-          clampedCol >= end ||
-          (clampedCol > start && (clampedCol - start) * 2 >= end - start);
-      final bounds = glyphInfo.graphemeClusterLayoutBounds;
-      final x = glyphInfo.writingDirection == TextDirection.rtl
-          ? (useTrailingEdge ? bounds.left : bounds.right)
-          : (useTrailingEdge ? bounds.right : bounds.left);
-      return (x: x + paragraphOffset, yInLine: bounds.top);
     }
 
     return (x: 0.0, yInLine: 0.0);
@@ -6864,6 +6870,16 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
     return useTrailingEdge ? end : start;
   }
 
+  String _effectiveLineText(int line) {
+    final buffered = controller.bufferLineText;
+    if (controller.isBufferActive &&
+        line == controller.bufferLineIndex &&
+        buffered != null) {
+      return buffered;
+    }
+    return controller.getLineText(line);
+  }
+
   ({int lineIndex, int columnIndex, Offset offset, double height})
   _getCaretInfo() {
     final cursorOffset = controller.selection.extentOffset;
@@ -6915,7 +6931,7 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
 
     final columnIndex = cursorOffset - lineStartOffset;
     final lineY = _getLineYOffset(lineIndex, hasActiveFolds);
-    final lineText = controller.getLineText(lineIndex);
+    final lineText = _effectiveLineText(lineIndex);
     final contentWidth =
         size.width - _gutterWidth - (innerPadding?.horizontal ?? 0);
     final paragraphWidth = lineWrap
@@ -6923,7 +6939,11 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
         : (isRTL ? max(contentWidth * 3, 10000.0) : null);
 
     ui.Paragraph para;
-    if (_paragraphCache.containsKey(lineIndex) &&
+    if (_bufferParagraphLine == lineIndex &&
+        _bufferParagraphTextHash == lineText.hashCode &&
+        _bufferParagraphWidth == paragraphWidth) {
+      para = _bufferParagraph!;
+    } else if (_paragraphCache.containsKey(lineIndex) &&
         _lineTextCache[lineIndex] == lineText &&
         !isRTL) {
       para = _paragraphCache[lineIndex]!;
@@ -7004,7 +7024,7 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
     }
     final columnIndex = cursorOffset - lineStartOffset;
     final lineY = _getLineYOffset(lineIndex, hasActiveFolds);
-    final lineText = controller.getLineText(lineIndex);
+    final lineText = _effectiveLineText(lineIndex);
     final contentWidth =
         size.width - _gutterWidth - (innerPadding?.horizontal ?? 0);
     final paragraphWidth = lineWrap
@@ -7012,7 +7032,11 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
         : (isRTL ? max(contentWidth * 3, 10000.0) : null);
 
     ui.Paragraph para;
-    if (_paragraphCache.containsKey(lineIndex) &&
+    if (_bufferParagraphLine == lineIndex &&
+        _bufferParagraphTextHash == lineText.hashCode &&
+        _bufferParagraphWidth == paragraphWidth) {
+      para = _bufferParagraph!;
+    } else if (_paragraphCache.containsKey(lineIndex) &&
         _lineTextCache[lineIndex] == lineText &&
         !isRTL) {
       para = _paragraphCache[lineIndex]!;
@@ -8108,11 +8132,22 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
 
       if (bufferActive && i == bufferLineIndex && bufferLineText != null) {
         lineText = bufferLineText;
-        paragraph = _buildHighlightedParagraph(
-          i,
-          bufferLineText,
-          width: paragraphWidth,
-        );
+        final textHash = bufferLineText.hashCode;
+        final pw = paragraphWidth;
+        if (_bufferParagraphLine != i ||
+            _bufferParagraphTextHash != textHash ||
+            _bufferParagraphWidth != pw) {
+          _bufferParagraph?.dispose();
+          _bufferParagraph = _buildHighlightedParagraph(
+            i,
+            bufferLineText,
+            width: pw,
+          );
+          _bufferParagraphLine = i;
+          _bufferParagraphTextHash = textHash;
+          _bufferParagraphWidth = pw;
+        }
+        paragraph = _bufferParagraph!;
         if (isRTL && lineWrap) {
           lineHeight = paragraph.height;
         }
@@ -8135,7 +8170,10 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
           _paragraphCache[i] = paragraph;
 
           if (lineWrap) {
-            _lineHeightCache[i] = paragraph.height;
+            if (_lineHeightCache[i] != paragraph.height) {
+              _lineHeightCache[i] = paragraph.height;
+              _invalidateWrappedLayoutCache();
+            }
             if (isRTL) {
               lineHeight = paragraph.height;
             }
@@ -8423,9 +8461,7 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
             final caretLineIndex = controller.getLineAtOffset(
               controller.selection.baseOffset,
             );
-            final lineText =
-                _lineTextCache[caretLineIndex] ??
-                controller.getLineText(caretLineIndex);
+            final lineText = _effectiveLineText(caretLineIndex);
             final lineStartOffset = controller.getLineStartOffset(
               caretLineIndex,
             );
@@ -8487,22 +8523,55 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
             );
 
             double caretDx = 0.0;
-            if (localCaretIndex < previewText.length) {
-              final boxes = zoomParagraph.getBoxesForRange(
-                localCaretIndex,
-                localCaretIndex + 1,
-              );
-              if (boxes.isNotEmpty) {
-                caretDx = boxes.first.left;
+            if (previewText.isNotEmpty) {
+              if (localCaretIndex < previewText.length) {
+                final glyphInfo = zoomParagraph.getGlyphInfoAt(localCaretIndex);
+                if (glyphInfo != null) {
+                  final range = glyphInfo.graphemeClusterCodeUnitRange;
+                  final start =
+                      range.start.clamp(0, previewText.length).toInt();
+                  final end = range.end.clamp(start, previewText.length).toInt();
+                  final useTrailing =
+                      localCaretIndex >= end ||
+                      (localCaretIndex > start &&
+                          (localCaretIndex - start) * 2 >= (end - start));
+                  final bounds = glyphInfo.graphemeClusterLayoutBounds;
+                  caretDx = isRTL
+                      ? (useTrailing ? bounds.left : bounds.right)
+                      : (useTrailing ? bounds.right : bounds.left);
+                } else {
+                  final boxes = zoomParagraph.getBoxesForRange(
+                    localCaretIndex,
+                    localCaretIndex + 1,
+                  );
+                  if (boxes.isNotEmpty) {
+                    caretDx = isRTL ? boxes.first.right : boxes.first.left;
+                  }
+                }
+              } else if (localCaretIndex > 0) {
+                final glyphInfo =
+                    zoomParagraph.getGlyphInfoAt(localCaretIndex - 1);
+                if (glyphInfo != null) {
+                  final bounds = glyphInfo.graphemeClusterLayoutBounds;
+                  caretDx = isRTL ? bounds.left : bounds.right;
+                } else {
+                  final boxes = zoomParagraph.getBoxesForRange(
+                    localCaretIndex - 1,
+                    localCaretIndex,
+                  );
+                  if (boxes.isNotEmpty) {
+                    caretDx = isRTL ? boxes.last.left : boxes.last.right;
+                  }
+                }
               }
-            }
-            if (caretDx == 0.0 && localCaretIndex > 0) {
-              final prevBoxes = zoomParagraph.getBoxesForRange(
-                localCaretIndex - 1,
-                localCaretIndex,
-              );
-              if (prevBoxes.isNotEmpty) {
-                caretDx = prevBoxes.last.right;
+              if (caretDx == 0.0 && localCaretIndex > 0) {
+                final prevBoxes = zoomParagraph.getBoxesForRange(
+                  localCaretIndex - 1,
+                  localCaretIndex,
+                );
+                if (prevBoxes.isNotEmpty) {
+                  caretDx = isRTL ? prevBoxes.last.left : prevBoxes.last.right;
+                }
               }
             }
 
@@ -11737,6 +11806,7 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
     _resizeTimer?.cancel();
     _layoutDebounceTimer?.cancel();
     _bracketHighlightResumeTimer?.cancel();
+    _bufferParagraph?.dispose();
     controller.removeListener(_onControllerChange);
     controller.setScrollCallback(null);
     _syntaxHighlighter?.dispose();
@@ -11883,18 +11953,11 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
       }
       _isGutterPointer = false;
 
-      if (controller.connection == null ||
-          !controller.connection!.attached ||
-          !focusNode.hasFocus) {
+      if (!focusNode.hasFocus) {
         focusNode.requestFocus();
-        if (focusNode.hasFocus) {
-          controller.connection!.setEditingState(
-            TextEditingValue(
-              text: controller.text,
-              selection: controller.selection,
-            ),
-          );
-        }
+      } else if (controller.connection == null ||
+          !controller.connection!.attached) {
+        controller.requestImeReset?.call();
       }
       _openedLspActionFromBulbTap = false;
       _onetap.addPointer(event);
@@ -12251,6 +12314,21 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
         controller.selection = TextSelection.collapsed(offset: textOffset);
         if (controller.connection?.attached ?? false) {
           controller.connection?.show();
+        }
+      }
+
+      if (event is PointerUpEvent &&
+          _draggingCHandle &&
+          !_isDragging &&
+          isMobile &&
+          !readOnly) {
+        if (!focusNode.hasFocus) {
+          focusNode.requestFocus();
+        } else if (controller.connection == null ||
+            !controller.connection!.attached) {
+          controller.requestImeReset?.call();
+        } else {
+          controller.connection!.show();
         }
       }
 
