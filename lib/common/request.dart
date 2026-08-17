@@ -103,9 +103,7 @@ class Request {
       }
     }
 
-    final headers = <String, dynamic>{
-      'Connection': 'close',
-    };
+    final headers = <String, dynamic>{'Connection': 'close'};
     if (userInfo != null && userInfo.isNotEmpty) {
       final auth = base64Encode(utf8.encode(userInfo));
       headers['Authorization'] = 'Basic $auth';
@@ -113,10 +111,7 @@ class Request {
 
     final response = await _clashDio.get(
       requestUrl,
-      options: Options(
-        responseType: ResponseType.bytes,
-        headers: headers,
-      ),
+      options: Options(responseType: ResponseType.bytes, headers: headers),
     );
 
     final rawBytes = _bytesFromResponse(response);
@@ -205,13 +200,13 @@ class Request {
   }
 
   final List<String> _ipInfoSources = [
-    'https://cp.cloudflare.com/cdn-cgi/trace',
-    'https://api.cloudflare.com/cdn-cgi/trace',
+    'https://ip.sb/cdn-cgi/trace',
+    'https://api.ip.sb/cdn-cgi/trace',
   ];
 
   final List<String> _domesticIpSources = [
     'https://www.qualcomm.cn/cdn-cgi/trace',
-    'https://www.cloudflare-cn.com/cdn-cgi/trace',
+    'https://www.teamviewer.cn/cdn-cgi/trace',
   ];
 
   Future<Result<IpInfo?>> _checkIpFromSources(

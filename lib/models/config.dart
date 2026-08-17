@@ -238,14 +238,7 @@ abstract class VpnProps with _$VpnProps {
       _$VpnPropsFromJson(json);
 
   factory VpnProps.safeFromJson(Map<String, Object?>? json) {
-    final props = json == null ? defaultVpnProps : VpnProps.fromJson(json);
-    var safeProps = props;
-
-    if (safeProps.smartAutoStop && safeProps.quickResponse) {
-      safeProps = safeProps.copyWith(quickResponse: false);
-    }
-
-    return safeProps;
+    return json == null ? defaultVpnProps : VpnProps.fromJson(json);
   }
 }
 

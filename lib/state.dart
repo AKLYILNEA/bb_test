@@ -307,9 +307,7 @@ class GlobalState {
     await prefs?.setBool('is_vpn_running', true);
 
     if (system.isAndroid) {
-      final conflictFreeQuickResponse =
-          config.vpnProps.quickResponse && !config.vpnProps.smartAutoStop;
-      await service?.setQuickResponse(conflictFreeQuickResponse);
+      await service?.setQuickResponse(config.vpnProps.quickResponse);
     }
     await startUpdateTasks(tasks);
   }
