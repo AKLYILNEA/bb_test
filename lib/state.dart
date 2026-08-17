@@ -749,6 +749,21 @@ class GlobalState {
       if (listen.endsWith(':53')) {
         rawConfig['dns']['listen'] = listen.replaceAll(':53', ':10053');
       }
+      final noProviders = rawConfig['proxy-providers'] == null &&
+          rawConfig['rule-providers'] == null;
+      final proxyServerNameserver =
+          rawConfig['dns']['proxy-server-nameserver'];
+      final hasLocalProxyServerNameserver = switch (proxyServerNameserver) {
+        List list => list.any((e) => e.toString().startsWith('127.0.0.1')),
+        String str => str.startsWith('127.0.0.1'),
+        _ => false,
+      };
+      if (noProviders &&
+          hasLocalProxyServerNameserver &&
+          listen.startsWith('0.0.0.0')) {
+        rawConfig['dns']['listen'] =
+            '127.0.0.1${listen.substring('0.0.0.0'.length)}';
+      }
     }
 
     if (rawConfig['ntp'] == null) {
