@@ -332,7 +332,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "필요 시 앱 크래시 로그 전송",
     ),
     "enableOverride": MessageLookupByLibrary.simpleMessage("오버라이드 활성화"),
-    "enableTraySpeed": MessageLookupByLibrary.simpleMessage("네트워크 속도"),
+    "enableTraySpeed": MessageLookupByLibrary.simpleMessage("속도 표시"),
     "enableTraySpeedDesc": MessageLookupByLibrary.simpleMessage(
       "메뉴 막대에 업로드 및 다운로드 속도 표시",
     ),
@@ -493,6 +493,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "key": MessageLookupByLibrary.simpleMessage("키"),
     "language": MessageLookupByLibrary.simpleMessage("언어"),
     "layout": MessageLookupByLibrary.simpleMessage("레이아웃"),
+    "leftClickBehavior": MessageLookupByLibrary.simpleMessage("좌클릭"),
     "light": MessageLookupByLibrary.simpleMessage("라이트"),
     "lightIcon": MessageLookupByLibrary.simpleMessage("라이트 아이콘"),
     "lightIconDesc": MessageLookupByLibrary.simpleMessage(
@@ -787,6 +788,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "restartCoreTitle": MessageLookupByLibrary.simpleMessage("코어 재시작"),
     "restartTip": MessageLookupByLibrary.simpleMessage("TUN 재시작 후 적용됩니다"),
     "retry": MessageLookupByLibrary.simpleMessage("재시도"),
+    "rightClickBehavior": MessageLookupByLibrary.simpleMessage("우클릭"),
     "rotatingCircle": MessageLookupByLibrary.simpleMessage("단일 회전"),
     "rule": MessageLookupByLibrary.simpleMessage("규칙"),
     "ruleName": MessageLookupByLibrary.simpleMessage("규칙 이름"),
@@ -810,6 +812,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "settings": MessageLookupByLibrary.simpleMessage("설정"),
     "show": MessageLookupByLibrary.simpleMessage("표시"),
     "showHiddenItems": MessageLookupByLibrary.simpleMessage("숨겨진 항목 표시"),
+    "showMenu": MessageLookupByLibrary.simpleMessage("메뉴 열기"),
+    "showPanel": MessageLookupByLibrary.simpleMessage("창 표시"),
     "showStartSwitch": MessageLookupByLibrary.simpleMessage("스위치 버튼 표시"),
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage(
       "홈 화면에 독립된 시작/정지 스위치 표시",
@@ -908,9 +912,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "totalTraffic": MessageLookupByLibrary.simpleMessage("전체 전송량"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("Tproxy 포트"),
     "trafficUsage": MessageLookupByLibrary.simpleMessage("트래픽 사용량"),
+    "trayClickBehavior": MessageLookupByLibrary.simpleMessage("트레이 클릭 동작"),
     "trayEnhancement": MessageLookupByLibrary.simpleMessage("트레이 기능 향상"),
     "trayEnhancementDesc": MessageLookupByLibrary.simpleMessage(
-      "시스템 트레이 우클릭 메뉴에서 프록시 그룹 제어",
+      "시스템 트레이 메뉴에서 프록시 그룹 제어",
     ),
     "trayIconInvert": MessageLookupByLibrary.simpleMessage("트레이 아이콘 반전"),
     "trayIconInvertDesc": MessageLookupByLibrary.simpleMessage(

@@ -320,7 +320,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "必要に応じてクラッシュログを送信",
     ),
     "enableOverride": MessageLookupByLibrary.simpleMessage("オーバーライド有効化"),
-    "enableTraySpeed": MessageLookupByLibrary.simpleMessage("通信速度の表示"),
+    "enableTraySpeed": MessageLookupByLibrary.simpleMessage("速度表示"),
     "enableTraySpeedDesc": MessageLookupByLibrary.simpleMessage(
       "メニューバーにアップロード/ダウンロード速度を表示",
     ),
@@ -479,6 +479,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "key": MessageLookupByLibrary.simpleMessage("キー"),
     "language": MessageLookupByLibrary.simpleMessage("言語"),
     "layout": MessageLookupByLibrary.simpleMessage("レイアウト"),
+    "leftClickBehavior": MessageLookupByLibrary.simpleMessage("左クリック"),
     "light": MessageLookupByLibrary.simpleMessage("ライト"),
     "lightIcon": MessageLookupByLibrary.simpleMessage("ライトアイコン"),
     "lightIconDesc": MessageLookupByLibrary.simpleMessage(
@@ -773,6 +774,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "restartCoreTitle": MessageLookupByLibrary.simpleMessage("カーネル再起動"),
     "restartTip": MessageLookupByLibrary.simpleMessage("TUNの再起動後に有効化されます"),
     "retry": MessageLookupByLibrary.simpleMessage("再試行"),
+    "rightClickBehavior": MessageLookupByLibrary.simpleMessage("右クリック"),
     "rotatingCircle": MessageLookupByLibrary.simpleMessage("ローテーション"),
     "rule": MessageLookupByLibrary.simpleMessage("ルール"),
     "ruleName": MessageLookupByLibrary.simpleMessage("ルール名"),
@@ -798,6 +800,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "settings": MessageLookupByLibrary.simpleMessage("設定"),
     "show": MessageLookupByLibrary.simpleMessage("表示"),
     "showHiddenItems": MessageLookupByLibrary.simpleMessage("非表示項目を表示"),
+    "showMenu": MessageLookupByLibrary.simpleMessage("メニューを開く"),
+    "showPanel": MessageLookupByLibrary.simpleMessage("ウィンドウを表示"),
     "showStartSwitch": MessageLookupByLibrary.simpleMessage("単独スイッチ表示"),
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage(
       "ホーム画面に独立したON/OFFボタンを表示",
@@ -896,9 +900,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "totalTraffic": MessageLookupByLibrary.simpleMessage("総通信量"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("Tproxyポート"),
     "trafficUsage": MessageLookupByLibrary.simpleMessage("通信量統計"),
+    "trayClickBehavior": MessageLookupByLibrary.simpleMessage("トレイクリック動作"),
     "trayEnhancement": MessageLookupByLibrary.simpleMessage("トレイ拡張"),
     "trayEnhancementDesc": MessageLookupByLibrary.simpleMessage(
-      "トレイ右クリックメニューでプロキシグループを操作",
+      "システムトレイメニューでプロキシグループを操作",
     ),
     "trayIconInvert": MessageLookupByLibrary.simpleMessage("トレイアイコン反転"),
     "trayIconInvertDesc": MessageLookupByLibrary.simpleMessage(

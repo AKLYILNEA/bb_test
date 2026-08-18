@@ -167,7 +167,8 @@ class WindowHeader extends ConsumerStatefulWidget {
   ConsumerState<WindowHeader> createState() => _WindowHeaderState();
 }
 
-class _WindowHeaderState extends ConsumerState<WindowHeader> {
+class _WindowHeaderState extends ConsumerState<WindowHeader>
+    with WindowListener {
   final isMaximizedNotifier = ValueNotifier<bool>(false);
   final isPinNotifier = ValueNotifier<bool>(false);
   final isHoveringNotifier = ValueNotifier<bool>(false);
@@ -175,7 +176,26 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
   @override
   void initState() {
     super.initState();
+    windowManager.addListener(this);
     _initNotifier();
+  }
+
+  @override
+  void onWindowRestore() {
+    isHoveringNotifier.value = false;
+    super.onWindowRestore();
+  }
+
+  @override
+  void onWindowFocus() {
+    isHoveringNotifier.value = false;
+    super.onWindowFocus();
+  }
+
+  @override
+  void onWindowBlur() {
+    isHoveringNotifier.value = false;
+    super.onWindowBlur();
   }
 
   Future<void> _initNotifier() async {
@@ -190,6 +210,7 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
 
   @override
   void dispose() {
+    windowManager.removeListener(this);
     isMaximizedNotifier.dispose();
     isPinNotifier.dispose();
     isHoveringNotifier.dispose();
@@ -262,6 +283,7 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
                   ),
                   IconButton(
                     onPressed: () {
+                      isHoveringNotifier.value = false;
                       windowManager.minimize();
                     },
                     icon: const Icon(Icons.remove),
@@ -283,7 +305,7 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
                     onPressed: () {
                       FocusManager.instance.primaryFocus?.unfocus();
                       globalState.appController.unBackBlock();
-                      isHoveringNotifier.value = true;
+                      isHoveringNotifier.value = false;
                       globalState.appController.handleBackOrExit();
                     },
                     icon: const Icon(Icons.close),

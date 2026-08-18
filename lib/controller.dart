@@ -386,15 +386,17 @@ class AppController {
   }
 
   Future<bool> _shouldUpdateDashboardTick() async {
-    final lifecycleState = WidgetsBinding.instance.lifecycleState;
-    final isPinned = system.isDesktop &&
-        _ref.read(windowSettingProvider.select((s) => s.isPinned));
-    if (!isPinned && lifecycleState != AppLifecycleState.resumed) return false;
-
     if (system.isDesktop) {
+      final isPinned =
+          _ref.read(windowSettingProvider.select((s) => s.isPinned));
+      if (isPinned) return true;
       if (await window?.isVisible == false) return false;
       if (await window?.isMinimized == true) return false;
+      return true;
     }
+
+    final lifecycleState = WidgetsBinding.instance.lifecycleState;
+    if (lifecycleState != AppLifecycleState.resumed) return false;
 
     return true;
   }
@@ -1261,7 +1263,7 @@ class AppController {
       }
     }
     await syncDesktopRuntimeState(preferCurrentState: true);
-    await updateTray(true);
+    await updateTray(true, false, true);
 
     await _handlePreference();
     await _handlerDisclaimer();

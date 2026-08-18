@@ -519,20 +519,60 @@ class AppLocalizations {
     );
   }
 
-  /// `Control proxy groups in the system tray context menu`
+  /// `Control proxy groups in system tray menu`
   String get trayEnhancementDesc {
     return Intl.message(
-      'Control proxy groups in the system tray context menu',
+      'Control proxy groups in system tray menu',
       name: 'trayEnhancementDesc',
       desc: '',
       args: [],
     );
   }
 
-  /// `Network Speed`
+  /// `Tray Click Behavior`
+  String get trayClickBehavior {
+    return Intl.message(
+      'Tray Click Behavior',
+      name: 'trayClickBehavior',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Left Click`
+  String get leftClickBehavior {
+    return Intl.message(
+      'Left Click',
+      name: 'leftClickBehavior',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Right Click`
+  String get rightClickBehavior {
+    return Intl.message(
+      'Right Click',
+      name: 'rightClickBehavior',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Show Window`
+  String get showPanel {
+    return Intl.message('Show Window', name: 'showPanel', desc: '', args: []);
+  }
+
+  /// `Open Menu`
+  String get showMenu {
+    return Intl.message('Open Menu', name: 'showMenu', desc: '', args: []);
+  }
+
+  /// `Tray Speed`
   String get enableTraySpeed {
     return Intl.message(
-      'Network Speed',
+      'Tray Speed',
       name: 'enableTraySpeed',
       desc: '',
       args: [],

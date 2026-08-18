@@ -261,7 +261,11 @@ class GlobalState {
     }
 
     await appController.updateRunTime();
-    await startUpdateTasks([appController.updateTraffic]);
+    await appController.updateTraffic();
+    await startUpdateTasks([
+      appController.updateRunTime,
+      appController.updateTraffic,
+    ]);
   }
 
   void _scheduleBackgroundCleanup() {
@@ -1044,15 +1048,9 @@ class DashboardRefreshManager {
   bool get isRunning => _isRunning;
 
   Future<bool> _isActive() async {
-    final lifecycleState = WidgetsBinding.instance.lifecycleState;
-    final isPinned =
-        system.isDesktop && globalState.config.windowProps.isPinned;
-    if (!isPinned &&
-        lifecycleState != null &&
-        lifecycleState != AppLifecycleState.resumed) {
-      return false;
-    }
     if (system.isDesktop) {
+      final isPinned = globalState.config.windowProps.isPinned;
+      if (isPinned) return true;
       final visible = await window?.isVisible;
       if (visible == false) {
         return false;
@@ -1061,6 +1059,13 @@ class DashboardRefreshManager {
       if (minimized) {
         return false;
       }
+      return true;
+    }
+
+    final lifecycleState = WidgetsBinding.instance.lifecycleState;
+    if (lifecycleState != null &&
+        lifecycleState != AppLifecycleState.resumed) {
+      return false;
     }
     return true;
   }

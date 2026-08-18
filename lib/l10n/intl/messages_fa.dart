@@ -604,6 +604,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "key": MessageLookupByLibrary.simpleMessage("کلید"),
     "language": MessageLookupByLibrary.simpleMessage("زبان"),
     "layout": MessageLookupByLibrary.simpleMessage("چیدمان"),
+    "leftClickBehavior": MessageLookupByLibrary.simpleMessage("کلیک چپ"),
     "light": MessageLookupByLibrary.simpleMessage("روشن"),
     "lightIcon": MessageLookupByLibrary.simpleMessage("آیکون روشن"),
     "lightIconDesc": MessageLookupByLibrary.simpleMessage(
@@ -1000,6 +1001,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "تغییرات پس از راه‌اندازی مجدد TUN اعمال می‌شود",
     ),
     "retry": MessageLookupByLibrary.simpleMessage("تلاش مجدد"),
+    "rightClickBehavior": MessageLookupByLibrary.simpleMessage("کلیک راست"),
     "rotatingCircle": MessageLookupByLibrary.simpleMessage("چرخش تک‌دایره"),
     "rule": MessageLookupByLibrary.simpleMessage("قوانین"),
     "ruleName": MessageLookupByLibrary.simpleMessage("نام قانون"),
@@ -1037,6 +1039,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "showHiddenItems": MessageLookupByLibrary.simpleMessage(
       "نمایش موارد پنهان",
     ),
+    "showMenu": MessageLookupByLibrary.simpleMessage("باز کردن منو"),
+    "showPanel": MessageLookupByLibrary.simpleMessage("نمایش پنجره"),
     "showStartSwitch": MessageLookupByLibrary.simpleMessage("دکمه کلید سوئیچ"),
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage(
       "نمایش دکمه مستقل روشن/خاموش در صفحه اصلی",
@@ -1155,9 +1159,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "totalTraffic": MessageLookupByLibrary.simpleMessage("مجموع ترافیک"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("پورت Tproxy"),
     "trafficUsage": MessageLookupByLibrary.simpleMessage("مصرف ترافیک"),
+    "trayClickBehavior": MessageLookupByLibrary.simpleMessage(
+      "رفتار کلیک روی سینی",
+    ),
     "trayEnhancement": MessageLookupByLibrary.simpleMessage("ارتقای منوی سینی"),
     "trayEnhancementDesc": MessageLookupByLibrary.simpleMessage(
-      "مدیریت گروه‌ها از منوی راست‌کلیک تسک‌بار",
+      "کنترل گروه‌های پروکسی در منوی سینی سیستم",
     ),
     "trayIconInvert": MessageLookupByLibrary.simpleMessage(
       "معکوس‌سازی آیکون تسک‌بار",
