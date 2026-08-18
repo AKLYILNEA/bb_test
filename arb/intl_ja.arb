@@ -663,5 +663,18 @@
   "agePrivateKeyRequired": "正しいAge秘密鍵を先に入力してください",
   "lineWrap": "折り返し",
   "showHiddenItems": "非表示項目を表示",
-  "blockComment": "コメント"
+  "blockComment": "コメント",
+  "locate": "位置",
+  "minimize": "最小化",
+  "maximize": "最大化",
+  "restore": "元に戻す",
+  "pin": "固定",
+  "unpin": "固定解除",
+  "close": "閉じる",
+  "autoScroll": "自動スクロール",
+  "export": "エクスポート",
+  "clear": "消去",
+  "back": "戻る",
+  "closeAll": "すべて閉じる",
+  "script": "スクリプト"
 }

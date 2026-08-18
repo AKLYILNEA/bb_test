@@ -119,6 +119,7 @@ class _ProvidersViewState extends ConsumerState<ProvidersView> {
         actions: [
           IconButton(
             onPressed: _updateProviders,
+            tooltip: appLocalizations.update,
             icon: const Icon(Icons.sync),
           ),
         ],
@@ -150,6 +151,7 @@ class _ProvidersViewState extends ConsumerState<ProvidersView> {
                       actions: [
                         IconButton(
                           onPressed: section.onSync,
+                          tooltip: appLocalizations.update,
                           icon: const Icon(Icons.sync),
                           iconSize: 20,
                           splashRadius: 20,

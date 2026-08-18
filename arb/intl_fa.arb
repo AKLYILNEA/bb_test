@@ -663,5 +663,18 @@
   "agePrivateKeyRequired": "لطفا ابتدا کلید خصوصی Age صحیح را وارد کنید",
   "lineWrap": "شکستن خطوط",
   "showHiddenItems": "نمایش موارد پنهان",
-  "blockComment": "کامنت"
+  "blockComment": "کامنت",
+  "locate": "موقعیت",
+  "minimize": "کوچک کردن",
+  "maximize": "بزرگ کردن",
+  "restore": "بازیابی",
+  "pin": "پین",
+  "unpin": "برداشتن پین",
+  "close": "بستن",
+  "autoScroll": "پیمایش خودکار",
+  "export": "خروجی",
+  "clear": "پاک کردن",
+  "back": "بازگشت",
+  "closeAll": "بستن همه",
+  "script": "اسکریپت"
 }

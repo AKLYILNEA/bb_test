@@ -663,5 +663,18 @@
   "agePrivateKeyRequired": "請先輸入正確的 Age 私鑰",
   "lineWrap": "自動換行",
   "showHiddenItems": "顯示隱藏項",
-  "blockComment": "註解"
+  "blockComment": "註解",
+  "locate": "定位",
+  "minimize": "最小化",
+  "maximize": "最大化",
+  "restore": "還原",
+  "pin": "置頂",
+  "unpin": "取消置頂",
+  "close": "關閉",
+  "autoScroll": "自動滾動",
+  "export": "匯出",
+  "clear": "清空",
+  "back": "返回",
+  "closeAll": "關閉全部",
+  "script": "指令碼"
 }

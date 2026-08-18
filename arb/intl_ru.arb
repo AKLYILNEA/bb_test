@@ -665,5 +665,18 @@
   "agePrivateKeyRequired": "Пожалуйста, сначала введите корректный закрытый ключ Age",
   "lineWrap": "Перенос строк",
   "showHiddenItems": "Показать скрытые",
-  "blockComment": "Комментарий"
+  "blockComment": "Комментарий",
+  "locate": "Найти",
+  "minimize": "Свернуть",
+  "maximize": "Развернуть",
+  "restore": "Восстановить",
+  "pin": "Закрепить",
+  "unpin": "Открепить",
+  "close": "Закрыть",
+  "autoScroll": "Автопрокрутка",
+  "export": "Экспорт",
+  "clear": "Очистить",
+  "back": "Назад",
+  "closeAll": "Закрыть все",
+  "script": "Скрипт"
 }
