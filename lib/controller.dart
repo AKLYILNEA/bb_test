@@ -912,6 +912,21 @@ class AppController {
         }
       }
 
+      final proxiesStyle = _ref.read(proxiesStyleSettingProvider);
+      if (!proxiesStyle.hasCustomizedStyle) {
+        final hasGroupIcons = newGroups.any((g) => g.icon.trim().isNotEmpty);
+        if (hasGroupIcons &&
+            (proxiesStyle.type != ProxiesType.list ||
+                proxiesStyle.iconStyle != ProxiesIconStyle.icon)) {
+          _ref.read(proxiesStyleSettingProvider.notifier).updateState((state) {
+            return state.copyWith(
+              type: ProxiesType.list,
+              iconStyle: ProxiesIconStyle.icon,
+            );
+          });
+        }
+      }
+
       _ref.read(groupsProvider.notifier).value = newGroups;
       _updateGroupsRetryCount = 0;
       _updateGroupsRetryTimer?.cancel();
