@@ -1112,7 +1112,7 @@ class DetectionState {
   int _requestId = 0;
   CancelToken? _cancelToken;
   bool _isIpMasked = false;
-  IpInfo? _originalIpInfo;
+  IpInfo? _rawIpInfo;
   bool _isFirstLaunch = true;
 
   final state = ValueNotifier<NetworkDetectionState>(
@@ -1132,36 +1132,32 @@ class DetectionState {
 
   bool get isIpMasked => _isIpMasked;
 
+  IpInfo? _maskIpInfo(IpInfo? ipInfo) {
+    if (ipInfo == null) return null;
+    return _isIpMasked ? ipInfo.copyWith(ip: '*** *** *** ***') : ipInfo;
+  }
+
   void toggleIpPrivacy() {
     _isIpMasked = !_isIpMasked;
-    final currentIpInfo = state.value.ipInfo;
-    if (currentIpInfo != null) {
-      if (_isIpMasked) {
-        _originalIpInfo = currentIpInfo;
-        state.value = state.value.copyWith(
-          ipInfo: currentIpInfo.copyWith(ip: '*** *** *** ***'),
-        );
-      } else if (_originalIpInfo != null) {
-        state.value = state.value.copyWith(ipInfo: _originalIpInfo);
-        _originalIpInfo = null;
-      }
+    if (_rawIpInfo != null) {
+      state.value = state.value.copyWith(
+        ipInfo: _maskIpInfo(_rawIpInfo),
+      );
     }
   }
 
   void manualRefresh() {
-    _isIpMasked = false;
-    _originalIpInfo = null;
+    _rawIpInfo = null;
     state.value = state.value.copyWith(
       isLoading: true,
       ipInfo: null,
       errorMessage: null,
     );
-    startCheck();
+    startCheck(immediate: true);
   }
 
   Future<void> switchToDomesticIp() async {
-    _isIpMasked = false;
-    _originalIpInfo = null;
+    _rawIpInfo = null;
 
     _cancelPreviousRequest();
     _cancelToken = CancelToken();
@@ -1214,6 +1210,7 @@ class DetectionState {
         );
         return;
       }
+      _rawIpInfo = null;
       state.value = state.value.copyWith(
         isLoading: false,
         ipInfo: null,
@@ -1222,11 +1219,12 @@ class DetectionState {
       return;
     }
 
-    final ipInfo = res.data;
+    _rawIpInfo = res.data;
     state.value = state.value.copyWith(
       isLoading: false,
-      ipInfo: ipInfo,
-      errorMessage: ipInfo != null ? null : appLocalizations.tryManualRefresh,
+      ipInfo: _maskIpInfo(_rawIpInfo),
+      errorMessage:
+          _rawIpInfo != null ? null : appLocalizations.tryManualRefresh,
     );
   }
 
@@ -1241,7 +1239,7 @@ class DetectionState {
     _preIsStart = isStart;
 
     if (!isStart &&
-        state.value.ipInfo != null &&
+        _rawIpInfo != null &&
         !state.value.isLoading &&
         !isStateChanged) {
       return;
@@ -1254,7 +1252,7 @@ class DetectionState {
     state.value = state.value.copyWith(
       isLoading: true,
       errorMessage: null,
-      ipInfo: isStateChanged ? null : state.value.ipInfo,
+      ipInfo: isStateChanged ? null : _maskIpInfo(_rawIpInfo),
     );
 
     final timeout = const Duration(seconds: 5);
