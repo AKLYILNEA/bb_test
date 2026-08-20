@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -26,25 +25,12 @@ class ProvidersView extends ConsumerStatefulWidget {
 }
 
 class _ProvidersViewState extends ConsumerState<ProvidersView> {
-  Timer? _timer;
-
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 30), (_) {
-      if (mounted) setState(() {});
-    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (ref.read(providersProvider).isEmpty) {
-        globalState.appController.updateProviders();
-      }
+      globalState.appController.updateProviders();
     });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
   }
 
   Future<void> _updateProviders({String? type}) async {

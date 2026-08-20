@@ -47,6 +47,7 @@ class AppController {
   Timer? _updateGroupsRetryTimer;
   int _coreGeneration = 0;
   int _setupGeneration = 0;
+  final Set<String> _updatingProfileIds = {};
 
   AppController(this.context, WidgetRef ref) : _ref = ref;
 
@@ -477,12 +478,23 @@ class AppController {
   }
 
   Future<void> updateProfile(Profile profile, {bool validate = true}) async {
-    final newProfile = await profile.update(validate: validate);
-    _ref
-        .read(profilesProvider.notifier)
-        .setProfile(newProfile.copyWith(isUpdating: false));
-    if (profile.id == _ref.read(currentProfileIdProvider)) {
-      applyProfileDebounce(silence: true);
+    if (_updatingProfileIds.contains(profile.id)) {
+      _ref
+          .read(profilesProvider.notifier)
+          .setProfile(profile.copyWith(isUpdating: false));
+      return;
+    }
+    _updatingProfileIds.add(profile.id);
+    try {
+      final newProfile = await profile.update(validate: validate);
+      _ref.read(profilesProvider.notifier).setProfile(
+            newProfile.copyWith(isUpdating: false),
+          );
+      if (profile.id == _ref.read(currentProfileIdProvider)) {
+        applyProfileDebounce(silence: true);
+      }
+    } finally {
+      _updatingProfileIds.remove(profile.id);
     }
   }
 
@@ -706,15 +718,20 @@ class AppController {
         WidgetsBinding.instance.platformDispatcher.platformBrightness;
   }
 
+  bool _isProfileUpdateNeeded(Profile profile) {
+    if (!profile.autoUpdate) return false;
+    if (profile.type == ProfileType.file) return false;
+    if (profile.isUpdating) return false;
+    final lastUpdate = profile.lastUpdateDate;
+    if (lastUpdate == null) return true;
+    final expectedNextUpdate = lastUpdate.add(profile.autoUpdateDuration);
+    return DateTime.now().difference(expectedNextUpdate) >
+        const Duration(minutes: 1);
+  }
+
   Future<void> autoUpdateProfiles() async {
     for (final profile in _ref.read(profilesProvider)) {
-      if (!profile.autoUpdate) continue;
-      final isNotNeedUpdate = profile.lastUpdateDate
-          ?.add(profile.autoUpdateDuration)
-          .isBeforeNow;
-      if (isNotNeedUpdate == false || profile.type == ProfileType.file) {
-        continue;
-      }
+      if (!_isProfileUpdateNeeded(profile)) continue;
       try {
         await updateProfile(profile, validate: false);
       } catch (e) {
@@ -726,28 +743,17 @@ class AppController {
   }
 
   Future<void> checkAndUpdateMissedProfiles() async {
-    final now = DateTime.now();
     final profilesToUpdate = <Profile>[];
     for (final profile in _ref.read(profilesProvider)) {
-      if (!profile.autoUpdate) continue;
-      if (profile.type == ProfileType.file) continue;
-      if (profile.isUpdating) continue;
-      final lastUpdate = profile.lastUpdateDate;
-      if (lastUpdate == null) continue;
-      final expectedNextUpdate = lastUpdate.add(profile.autoUpdateDuration);
-      final isOverdue =
-          now.difference(expectedNextUpdate) > const Duration(minutes: 1);
-      if (isOverdue) {
-        profilesToUpdate.add(profile);
-      }
+      if (!_isProfileUpdateNeeded(profile)) continue;
+      profilesToUpdate.add(profile);
     }
     if (profilesToUpdate.isNotEmpty) {
+      var updated = false;
       for (final profile in profilesToUpdate) {
         try {
-          commonPrint.log(
-            '[MissedUpdate] Updating profile: ${profile.label ?? profile.id}',
-          );
           await updateProfile(profile, validate: false);
+          updated = true;
         } catch (e) {
           commonPrint.log(
             '[MissedUpdate] Failed to update ${profile.label ?? profile.id}: ${e.formatError}',
@@ -757,31 +763,21 @@ class AppController {
           await Future.delayed(const Duration(seconds: 2));
         }
       }
+      if (updated) {
+        commonPrint.log('Updating external providers');
+      }
     }
 
-    await _checkAndUpdateMissedExternalProviders();
+    await _syncExternalProviders();
   }
 
-  Future<void> _checkAndUpdateMissedExternalProviders() async {
+  Future<void> _syncExternalProviders() async {
     try {
       final providers = await clashCore.getExternalProviders();
       if (providers.isEmpty) return;
-      final now = DateTime.now();
-      for (final provider in providers) {
-        if (provider.vehicleType.toUpperCase() != 'HTTP') continue;
-        if (provider.isUpdating) continue;
-        final isOverdue =
-            now.difference(provider.updateAt) > const Duration(hours: 1);
-        if (isOverdue) {
-          commonPrint.log(
-            '[MissedUpdate] Updating external provider: ${provider.name}',
-          );
-          await clashCore.updateExternalProvider(providerName: provider.name);
-          setProvider(await clashCore.getExternalProvider(provider.name));
-        }
-      }
+      _ref.read(providersProvider.notifier).value = providers;
     } catch (e) {
-      commonPrint.log('[MissedUpdate] Failed to update external providers: $e');
+      commonPrint.log('[Sync] Failed to sync external providers: $e');
     }
   }
 
