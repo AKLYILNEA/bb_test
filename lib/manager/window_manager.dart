@@ -167,8 +167,7 @@ class WindowHeader extends ConsumerStatefulWidget {
   ConsumerState<WindowHeader> createState() => _WindowHeaderState();
 }
 
-class _WindowHeaderState extends ConsumerState<WindowHeader>
-    with WindowListener {
+class _WindowHeaderState extends ConsumerState<WindowHeader> {
   final isMaximizedNotifier = ValueNotifier<bool>(false);
   final isPinNotifier = ValueNotifier<bool>(false);
   final isHoveringNotifier = ValueNotifier<bool>(false);
@@ -176,26 +175,7 @@ class _WindowHeaderState extends ConsumerState<WindowHeader>
   @override
   void initState() {
     super.initState();
-    windowManager.addListener(this);
     _initNotifier();
-  }
-
-  @override
-  void onWindowRestore() {
-    isHoveringNotifier.value = false;
-    super.onWindowRestore();
-  }
-
-  @override
-  void onWindowFocus() {
-    isHoveringNotifier.value = false;
-    super.onWindowFocus();
-  }
-
-  @override
-  void onWindowBlur() {
-    isHoveringNotifier.value = false;
-    super.onWindowBlur();
   }
 
   Future<void> _initNotifier() async {
@@ -210,7 +190,6 @@ class _WindowHeaderState extends ConsumerState<WindowHeader>
 
   @override
   void dispose() {
-    windowManager.removeListener(this);
     isMaximizedNotifier.dispose();
     isPinNotifier.dispose();
     isHoveringNotifier.dispose();
@@ -275,9 +254,6 @@ class _WindowHeaderState extends ConsumerState<WindowHeader>
                     builder: (_, value, _) {
                       return IconButton(
                         onPressed: _updatePin,
-                        tooltip: value
-                            ? appLocalizations.unpin
-                            : appLocalizations.pin,
                         icon: value
                             ? const Icon(Icons.push_pin)
                             : const Icon(Icons.push_pin_outlined),
@@ -286,10 +262,8 @@ class _WindowHeaderState extends ConsumerState<WindowHeader>
                   ),
                   IconButton(
                     onPressed: () {
-                      isHoveringNotifier.value = false;
                       windowManager.minimize();
                     },
-                    tooltip: appLocalizations.minimize,
                     icon: const Icon(Icons.remove),
                   ),
                   ValueListenableBuilder(
@@ -299,9 +273,6 @@ class _WindowHeaderState extends ConsumerState<WindowHeader>
                         onPressed: () async {
                           _updateMaximized();
                         },
-                        tooltip: value
-                            ? appLocalizations.restore
-                            : appLocalizations.maximize,
                         icon: value
                             ? const Icon(Icons.filter_none, size: 20)
                             : const Icon(Icons.crop_square),
@@ -312,10 +283,8 @@ class _WindowHeaderState extends ConsumerState<WindowHeader>
                     onPressed: () {
                       FocusManager.instance.primaryFocus?.unfocus();
                       globalState.appController.unBackBlock();
-                      isHoveringNotifier.value = false;
                       globalState.appController.handleBackOrExit();
                     },
-                    tooltip: appLocalizations.close,
                     icon: const Icon(Icons.close),
                   ),
                 ],
