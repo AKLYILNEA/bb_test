@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:bett_box/providers/app.dart';
+import 'package:bett_box/widgets/pop_scope.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -25,18 +26,26 @@ class CommonDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, ref) {
     final size = ref.watch(viewSizeProvider);
-    return AlertDialog(
-      title: Text(title),
-      actions: actions,
-      contentPadding: padding,
-      backgroundColor: backgroundColor,
-      content: Container(
-        constraints: BoxConstraints(
-          maxHeight: min(size.height - 40, 500),
-          maxWidth: 300,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (dismissTvInputFocus()) return;
+        Navigator.of(context).pop();
+      },
+      child: AlertDialog(
+        title: Text(title),
+        actions: actions,
+        contentPadding: padding,
+        backgroundColor: backgroundColor,
+        content: Container(
+          constraints: BoxConstraints(
+            maxHeight: min(size.height - 40, 500),
+            maxWidth: 300,
+          ),
+          width: size.width - 40,
+          child: !overrideScroll ? SingleChildScrollView(child: child) : child,
         ),
-        width: size.width - 40,
-        child: !overrideScroll ? SingleChildScrollView(child: child) : child,
       ),
     );
   }

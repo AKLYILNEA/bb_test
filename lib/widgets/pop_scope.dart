@@ -1,7 +1,23 @@
 import 'dart:async';
 
 import 'package:bett_box/state.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+
+bool dismissTvInputFocus() {
+  if (!globalState.isAndroidTV) return false;
+  final node = FocusManager.instance.primaryFocus;
+  if (node == null) return false;
+  final context = node.context;
+  if (context == null) return false;
+  final isInput =
+      context.widget is EditableText ||
+      context.findAncestorWidgetOfExactType<EditableText>() != null ||
+      context.widget is Slider ||
+      context.findAncestorWidgetOfExactType<Slider>() != null;
+  if (!isInput) return false;
+  node.enclosingScope?.requestScopeFocus();
+  return true;
+}
 
 class CommonPopScope extends StatelessWidget {
   final Widget child;
