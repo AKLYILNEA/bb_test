@@ -406,7 +406,7 @@ class TrackerInfoDetailView extends ConsumerWidget {
                 ),
             ],
           ),
-          Flexible(child: Text(desc, textAlign: TextAlign.end)),
+          Flexible(child: EmojiText(desc, textAlign: TextAlign.end)),
         ],
       ),
     );

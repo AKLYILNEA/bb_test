@@ -5,6 +5,8 @@ import 'package:bett_box/widgets/pop_scope.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'text.dart';
+
 class CommonDialog extends ConsumerWidget {
   final String title;
   final Widget? child;
@@ -34,7 +36,7 @@ class CommonDialog extends ConsumerWidget {
         Navigator.of(context).pop();
       },
       child: AlertDialog(
-        title: Text(title),
+        title: EmojiText(title),
         actions: actions,
         contentPadding: padding,
         backgroundColor: backgroundColor,
