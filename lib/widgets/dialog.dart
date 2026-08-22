@@ -5,6 +5,7 @@ import 'package:bett_box/widgets/pop_scope.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:bett_box/state.dart';
 import 'text.dart';
 
 class CommonDialog extends ConsumerWidget {
@@ -28,13 +29,17 @@ class CommonDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, ref) {
     final size = ref.watch(viewSizeProvider);
+    final isTv = globalState.isAndroidTV;
     return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
-        if (dismissTvInputFocus()) return;
-        Navigator.of(context).pop();
-      },
+      canPop: !isTv,
+      onPopInvokedWithResult: !isTv
+          ? null
+          : (didPop, result) {
+              if (didPop) return;
+              if (dismissTvInputFocus()) return;
+              if (ModalRoute.of(context)?.isCurrent != true) return;
+              Navigator.of(context).pop();
+            },
       child: AlertDialog(
         title: EmojiText(title),
         actions: actions,

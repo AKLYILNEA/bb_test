@@ -164,13 +164,17 @@ class AdaptiveSheetScaffold extends StatelessWidget {
             body: body,
           );
 
+    final isTv = globalState.isAndroidTV;
     return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
-        if (dismissTvInputFocus()) return;
-        Navigator.of(context).pop();
-      },
+      canPop: !isTv,
+      onPopInvokedWithResult: !isTv
+          ? null
+          : (didPop, result) {
+              if (didPop) return;
+              if (dismissTvInputFocus()) return;
+              if (ModalRoute.of(context)?.isCurrent != true) return;
+              Navigator.of(context).pop();
+            },
       child: content,
     );
   }

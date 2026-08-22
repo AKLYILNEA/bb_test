@@ -27,21 +27,23 @@ class CommonPopScope extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isTv = globalState.isAndroidTV;
+    final intercept = onPop != null || isTv;
     return PopScope(
-      canPop: onPop == null ? true : false,
-      onPopInvokedWithResult: onPop == null
+      canPop: !intercept,
+      onPopInvokedWithResult: !intercept
           ? null
           : (didPop, _) async {
-              if (didPop) {
-                return;
+              if (didPop) return;
+              if (dismissTvInputFocus()) return;
+
+              if (onPop != null) {
+                final res = await onPop!();
+                if (!context.mounted) return;
+                if (!res) return;
               }
-              final res = await onPop!();
-              if (!context.mounted) {
-                return;
-              }
-              if (!res) {
-                return;
-              }
+
+              if (ModalRoute.of(context)?.isCurrent != true) return;
               Navigator.of(context).pop();
             },
       child: child,
