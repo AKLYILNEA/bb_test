@@ -555,7 +555,7 @@ class TraySection extends ConsumerWidget {
                     child: Icon(
                       Icons.settings_outlined,
                       size: 18,
-                      color: context.colorScheme.primary,
+                      color: context.colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
