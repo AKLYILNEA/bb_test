@@ -101,6 +101,10 @@ class ApplicationState extends ConsumerState<Application>
     if (!shouldRun) {
       _autoUpdateGroupTaskTimer?.cancel();
       _autoUpdateGroupTaskTimer = null;
+      if (!system.isDesktop) {
+        _autoUpdateProfilesTaskTimer?.cancel();
+        _autoUpdateProfilesTaskTimer = null;
+      }
       return;
     }
     if (_autoUpdateGroupTaskTimer == null) {
