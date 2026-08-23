@@ -175,6 +175,10 @@ class Utils {
       return 'assets/images/icon.png';
     }
 
+    if (system.isMacOS && isStart) {
+      return 'assets/images/icon_black.png';
+    }
+
     final suffix = system.isWindows ? 'ico' : 'png';
 
     final darkPath = !isStart

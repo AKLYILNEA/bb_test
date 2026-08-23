@@ -256,9 +256,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "cut": MessageLookupByLibrary.simpleMessage("잘라내기"),
     "dark": MessageLookupByLibrary.simpleMessage("다크"),
     "darkIcon": MessageLookupByLibrary.simpleMessage("다크 아이콘"),
-    "darkIconDesc": MessageLookupByLibrary.simpleMessage(
-      "데스크톱 앱 아이콘을 어두운 색계열로 전환",
-    ),
+    "darkIconDesc": MessageLookupByLibrary.simpleMessage("앱 아이콘을 어두운 색계열로 전환"),
     "dashboard": MessageLookupByLibrary.simpleMessage("홈"),
     "days": m0,
     "defaultNameserver": MessageLookupByLibrary.simpleMessage("기본 네임서버"),
@@ -501,10 +499,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "layout": MessageLookupByLibrary.simpleMessage("레이아웃"),
     "leftClickBehavior": MessageLookupByLibrary.simpleMessage("좌클릭"),
     "light": MessageLookupByLibrary.simpleMessage("라이트"),
-    "lightIcon": MessageLookupByLibrary.simpleMessage("라이트 아이콘"),
-    "lightIconDesc": MessageLookupByLibrary.simpleMessage(
-      "데스크톱 앱 아이콘을 밝은 색계열로 전환",
-    ),
     "lineWrap": MessageLookupByLibrary.simpleMessage("자동 줄바꿈"),
     "list": MessageLookupByLibrary.simpleMessage("목록"),
     "listen": MessageLookupByLibrary.simpleMessage("수신"),

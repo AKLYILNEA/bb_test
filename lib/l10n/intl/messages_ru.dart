@@ -313,7 +313,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "dark": MessageLookupByLibrary.simpleMessage("Тёмная"),
     "darkIcon": MessageLookupByLibrary.simpleMessage("Тёмная иконка"),
     "darkIconDesc": MessageLookupByLibrary.simpleMessage(
-      "Переключить на тёмный стиль рабочего стола вручную",
+      "Вручную переключить иконку приложения на тёмную",
     ),
     "dashboard": MessageLookupByLibrary.simpleMessage("Обзор"),
     "days": m0,
@@ -625,10 +625,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "layout": MessageLookupByLibrary.simpleMessage("Ширина"),
     "leftClickBehavior": MessageLookupByLibrary.simpleMessage("Левая кнопка"),
     "light": MessageLookupByLibrary.simpleMessage("Светлая"),
-    "lightIcon": MessageLookupByLibrary.simpleMessage("Светлая иконка"),
-    "lightIconDesc": MessageLookupByLibrary.simpleMessage(
-      "Переключить на светлый стиль рабочего стола вручную",
-    ),
     "lineWrap": MessageLookupByLibrary.simpleMessage("Перенос строк"),
     "list": MessageLookupByLibrary.simpleMessage("Список"),
     "listen": MessageLookupByLibrary.simpleMessage("Прослушивание"),

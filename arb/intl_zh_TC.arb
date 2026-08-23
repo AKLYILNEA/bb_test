@@ -1,4 +1,4 @@
-{
+﻿{
   "rule": "規則",
   "global": "全域",
   "direct": "直連",
@@ -581,8 +581,6 @@
   "trayIconInvertDesc": "針對目前托盤圖示顏色取反設定",
   "darkIcon": "深色圖示",
   "darkIconDesc": "手動切換深色系桌面應用程式圖示",
-  "lightIcon": "淺色圖示",
-  "lightIconDesc": "手動切換淺色系桌面應用程式圖示",
   "harmonyFont": "字體修復",
   "harmonyFontDesc": "使用內建字體解決顯示異常問題",
   "internet": "網際網路",

@@ -244,9 +244,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "cut": MessageLookupByLibrary.simpleMessage("切り取り"),
     "dark": MessageLookupByLibrary.simpleMessage("ダーク"),
     "darkIcon": MessageLookupByLibrary.simpleMessage("ダークアイコン"),
-    "darkIconDesc": MessageLookupByLibrary.simpleMessage(
-      "デスクトップアプリのアイコンをダーク系に切り替え",
-    ),
+    "darkIconDesc": MessageLookupByLibrary.simpleMessage("アプリアイコンをダーク系に切り替え"),
     "dashboard": MessageLookupByLibrary.simpleMessage("ホーム"),
     "days": m0,
     "defaultNameserver": MessageLookupByLibrary.simpleMessage("デフォルトDNSサーバー"),
@@ -487,10 +485,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "layout": MessageLookupByLibrary.simpleMessage("レイアウト"),
     "leftClickBehavior": MessageLookupByLibrary.simpleMessage("左クリック"),
     "light": MessageLookupByLibrary.simpleMessage("ライト"),
-    "lightIcon": MessageLookupByLibrary.simpleMessage("ライトアイコン"),
-    "lightIconDesc": MessageLookupByLibrary.simpleMessage(
-      "デスクトップアプリのアイコンをライト系に切り替え",
-    ),
     "lineWrap": MessageLookupByLibrary.simpleMessage("折り返し"),
     "list": MessageLookupByLibrary.simpleMessage("リスト"),
     "listen": MessageLookupByLibrary.simpleMessage("リスニング"),

@@ -371,17 +371,14 @@ class _ToolViewState extends ConsumerState<ToolsView> {
         onTap: (context, _) =>
             _pushPage(context, appLocalizations.theme, const ThemeView()),
       ),
-      _SearchItem(
-        title: (system.isWindows || system.isLinux)
-            ? appLocalizations.lightIcon
-            : appLocalizations.darkIcon,
-        subtitle: (system.isWindows || system.isLinux)
-            ? appLocalizations.lightIconDesc
-            : appLocalizations.darkIconDesc,
-        category: themeCategory,
-        onTap: (context, _) =>
-            _pushPage(context, appLocalizations.theme, const ThemeView()),
-      ),
+      if (system.isAndroid)
+        _SearchItem(
+          title: appLocalizations.darkIcon,
+          subtitle: appLocalizations.darkIconDesc,
+          category: themeCategory,
+          onTap: (context, _) =>
+              _pushPage(context, appLocalizations.theme, const ThemeView()),
+        ),
       if (system.isWindows)
         _SearchItem(
           title: appLocalizations.trayIconInvert,

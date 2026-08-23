@@ -1,4 +1,4 @@
-{
+﻿{
   "rule": "Rule",
   "global": "Global",
   "direct": "Direct",
@@ -579,9 +579,7 @@
   "trayIconInvert": "Invert Tray Icon",
   "trayIconInvertDesc": "Invert the current tray icon color",
   "darkIcon": "Dark Icon",
-  "darkIconDesc": "Manually switch dark desktop app icon",
-  "lightIcon": "Light Icon",
-  "lightIconDesc": "Manually switch light desktop app icon",
+  "darkIconDesc": "Manually switch dark app icon",
   "harmonyFont": "Font Fix",
   "harmonyFontDesc": "Use built-in font to fix display issues",
   "internet": "Internet",

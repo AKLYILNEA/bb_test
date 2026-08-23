@@ -612,10 +612,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "layout": MessageLookupByLibrary.simpleMessage("چیدمان"),
     "leftClickBehavior": MessageLookupByLibrary.simpleMessage("کلیک چپ"),
     "light": MessageLookupByLibrary.simpleMessage("روشن"),
-    "lightIcon": MessageLookupByLibrary.simpleMessage("آیکون روشن"),
-    "lightIconDesc": MessageLookupByLibrary.simpleMessage(
-      "تغییر آیکون برنامه به تم روشن",
-    ),
     "lineWrap": MessageLookupByLibrary.simpleMessage("شکستن خطوط"),
     "list": MessageLookupByLibrary.simpleMessage("فهرست"),
     "listen": MessageLookupByLibrary.simpleMessage("شنود"),

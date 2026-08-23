@@ -1,4 +1,4 @@
-{
+﻿{
   "rule": "规则",
   "global": "全局",
   "direct": "直连",
@@ -581,8 +581,6 @@
   "trayIconInvertDesc": "针对当前托盘图标颜色取反设置",
   "darkIcon": "深色图标",
   "darkIconDesc": "手动切换深色系桌面 APP 图标",
-  "lightIcon": "浅色图标",
-  "lightIconDesc": "手动切换浅色系桌面 APP 图标",
   "harmonyFont": "字体修复",
   "harmonyFontDesc": "使用内置字体解决显示异常问题",
   "internet": "互联网",
