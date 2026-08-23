@@ -8,15 +8,12 @@
 import Cocoa
 
 public class TrayIcon: NSView {
-    private static let inactiveColor = NSColor(
-        srgbRed: 202.0 / 255.0,
-        green: 202.0 / 255.0,
-        blue: 202.0 / 255.0,
-        alpha: 1
-    )
+    private static var inactiveColor: NSColor {
+        NSColor.secondaryLabelColor
+    }
     private static let speedFontSize: CGFloat = 9.5
     private static let speedLineHeight: CGFloat = 10
-    private static let speedExtraWidth: CGFloat = 30
+    private static let speedPadding: CGFloat = 8
     private static let speedMinimumWidth: CGFloat = 58
     private static let speedDisplayThreshold = 1000.0
     private static let speedUnits = ["B/s", "K/s", "M/s", "G/s", "T/s"]
@@ -148,11 +145,15 @@ public class TrayIcon: NSView {
             )
         }
 
+        let textWidth = ceil(attributedTitle.size().width)
+        let imageWidth = button.image?.size.width ?? 0
         statusItem.length = max(
-            ceil(attributedTitle.size().width) + Self.speedExtraWidth,
+            textWidth + imageWidth + Self.speedPadding,
             Self.speedMinimumWidth
         )
+        button.title = ""
         button.attributedTitle = attributedTitle
+        button.needsDisplay = true
         syncClickTargetFrame(button)
         lastSpeedTitle = title
         lastSpeedActive = active
@@ -163,7 +164,9 @@ public class TrayIcon: NSView {
         lastSpeedActive = nil
         statusItem?.length = NSStatusItem.variableLength
         if let button = statusItem?.button {
+            button.title = ""
             button.attributedTitle = NSAttributedString(string: "")
+            button.needsDisplay = true
             syncClickTargetFrame(button)
         }
     }
