@@ -17,6 +17,15 @@ import kotlinx.coroutines.launch
 @RequiresApi(Build.VERSION_CODES.N)
 class BettboxTileService : TileService() {
 
+    companion object {
+        @Volatile
+        private var activeInstance: BettboxTileService? = null
+
+        fun refreshActive() {
+            activeInstance?.updateTile(GlobalState.currentRunState)
+        }
+    }
+
     private var scope: CoroutineScope? = null
 
     private fun updateTile(runState: RunState) {
@@ -37,6 +46,7 @@ class BettboxTileService : TileService() {
 
     override fun onStartListening() {
         super.onStartListening()
+        activeInstance = this
         scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
         GlobalState.syncStatus()
         updateTile(GlobalState.currentRunState)
@@ -48,6 +58,9 @@ class BettboxTileService : TileService() {
     override fun onStopListening() {
         if (GlobalState.currentRunState == RunState.PENDING) {
             GlobalState.syncStatus()
+        }
+        if (activeInstance === this) {
+            activeInstance = null
         }
         scope?.cancel()
         scope = null
@@ -64,6 +77,9 @@ class BettboxTileService : TileService() {
     }
 
     override fun onDestroy() {
+        if (activeInstance === this) {
+            activeInstance = null
+        }
         scope?.cancel()
         scope = null
         super.onDestroy()
