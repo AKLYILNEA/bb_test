@@ -7,10 +7,18 @@ Future<String> encodeYamlTask<T>(T data) async {
   return await compute<T, String>(_encodeYaml, data);
 }
 
+Future<String> encodeCompactYamlTask<T>(T data) async {
+  return await compute<T, String>(_encodeCompactYaml, data);
+}
+
 /// Internal function to encode YAML (runs in isolate)
 /// Uses JSON encoding as it's a valid YAML subset and more readable for config preview
 Future<String> _encodeYaml<T>(T content) async {
   // Use pretty-printed JSON which is valid YAML and more readable
   const encoder = JsonEncoder.withIndent('  ');
   return encoder.convert(content);
+}
+
+Future<String> _encodeCompactYaml<T>(T content) async {
+  return jsonEncode(content);
 }
