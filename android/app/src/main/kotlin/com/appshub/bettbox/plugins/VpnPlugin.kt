@@ -525,21 +525,23 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         
         scope.launch {
             try {
-                val prepareIntent = try {
-                    android.net.VpnService.prepare(BettboxApplication.getAppContext())
-                } catch (e: Exception) {
-                    null
-                }
-
-                if (prepareIntent != null) {
-                    android.util.Log.w("VpnPlugin", "VPN permission required before start")
-                    GlobalState.updateRunState(RunState.STOP)
-                    withContext(Dispatchers.Main) {
-                        GlobalState.getCurrentAppPlugin()?.requestVpnPermission {
-                            handleStartService()
-                        }
+                if (options?.enable == true) {
+                    val prepareIntent = try {
+                        android.net.VpnService.prepare(BettboxApplication.getAppContext())
+                    } catch (e: Exception) {
+                        null
                     }
-                    return@launch
+
+                    if (prepareIntent != null) {
+                        android.util.Log.w("VpnPlugin", "VPN permission required before start")
+                        GlobalState.updateRunState(RunState.STOP)
+                        withContext(Dispatchers.Main) {
+                            GlobalState.getCurrentAppPlugin()?.requestVpnPermission {
+                                handleStartService()
+                            }
+                        }
+                        return@launch
+                    }
                 }
 
                 val currentOptions = options
