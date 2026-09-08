@@ -421,12 +421,40 @@ jobs:
             fi
           fi
 
-      - name: Upload Artifacts
+      - name: Upload Artifacts (Non-Linux)
+        if: matrix.platform != 'linux'
         uses: actions/upload-artifact@v7
         with:
           name: Bettbox-${{ matrix.platform }}-${{ matrix.arch }}${{ matrix.compatible == true && '-compatible' || '' }}
-          path: ./dist
-          compression-level: 9
+          path: ./dist/*
+          archive: false
+          overwrite: true
+
+      - name: Upload DEB Artifact
+        if: matrix.platform == 'linux'
+        uses: actions/upload-artifact@v7
+        with:
+          name: Bettbox-${{ matrix.platform }}-${{ matrix.arch }}${{ matrix.compatible == true && '-compatible' || '' }}-deb
+          path: ./dist/*.deb
+          archive: false
+          overwrite: true
+
+      - name: Upload AppImage Artifact
+        if: matrix.platform == 'linux' && matrix.arch == 'amd64'
+        uses: actions/upload-artifact@v7
+        with:
+          name: Bettbox-${{ matrix.platform }}-${{ matrix.arch }}${{ matrix.compatible == true && '-compatible' || '' }}-AppImage
+          path: ./dist/*.AppImage
+          archive: false
+          overwrite: true
+
+      - name: Upload RPM Artifact
+        if: matrix.platform == 'linux' && matrix.arch == 'amd64'
+        uses: actions/upload-artifact@v7
+        with:
+          name: Bettbox-${{ matrix.platform }}-${{ matrix.arch }}${{ matrix.compatible == true && '-compatible' || '' }}-rpm
+          path: ./dist/*.rpm
+          archive: false
           overwrite: true
 
   upload:
