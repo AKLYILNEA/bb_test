@@ -316,7 +316,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "experimental": MessageLookupByLibrary.simpleMessage("Experimental"),
     "experimentalDesc": MessageLookupByLibrary.simpleMessage("实验性配置请谨慎使用"),
     "expirationTime": MessageLookupByLibrary.simpleMessage("到期时间"),
-    "expired": MessageLookupByLibrary.simpleMessage("已到期"),
+    "expired": MessageLookupByLibrary.simpleMessage("已过期"),
     "export": MessageLookupByLibrary.simpleMessage("导出"),
     "exportFile": MessageLookupByLibrary.simpleMessage("导出文件"),
     "exportLogs": MessageLookupByLibrary.simpleMessage("导出日志"),
