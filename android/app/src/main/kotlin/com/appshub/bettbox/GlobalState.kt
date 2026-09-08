@@ -192,8 +192,10 @@ object GlobalState {
 
     fun handleToggle() {
         if (!acquireToggleSlot()) return
-        if (!handleStart(skipDebounce = true)) {
-            handleStop(skipDebounce = true)
+        when (currentRunState) {
+            RunState.START -> handleStop(skipDebounce = true)
+            RunState.STOP -> handleStart(skipDebounce = true)
+            RunState.PENDING -> Unit
         }
     }
 
@@ -216,7 +218,12 @@ object GlobalState {
         updateRunState(RunState.PENDING)
         startPendingTimeout()
         runLock.withLock {
-            getCurrentTilePlugin()?.handleStop()
+            val tilePlugin = getCurrentTilePlugin()
+            if (tilePlugin != null) {
+                tilePlugin.handleStop()
+            } else {
+                VpnPlugin.handleStop(force = true)
+            }
         }
     }
 
