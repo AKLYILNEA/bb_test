@@ -711,7 +711,7 @@ class AppController {
 
   void _reportCoreRestartFailure(Object error) {
     final message = error.formatError;
-    commonPrint.log('[Core] Restart failed: $message');
+    commonPrint.log('[Core] Restart failed: ${error.formatErrorLog}');
     globalState.showNotifier('${appLocalizations.restartCoreTitle}: $message');
   }
 
@@ -738,7 +738,7 @@ class AppController {
         await updateProfile(profile, validate: false);
       } catch (e) {
         commonPrint.log(
-          '[AutoUpdate] Failed to update ${profile.label ?? profile.id}: ${e.formatError}',
+          '[AutoUpdate] Failed to update ${profile.label ?? profile.id}: ${e.formatErrorLog}',
         );
       }
     }
@@ -758,7 +758,7 @@ class AppController {
           updated = true;
         } catch (e) {
           commonPrint.log(
-            '[MissedUpdate] Failed to update ${profile.label ?? profile.id}: ${e.formatError}',
+            '[MissedUpdate] Failed to update ${profile.label ?? profile.id}: ${e.formatErrorLog}',
           );
         }
         if (profilesToUpdate.length > 1) {
@@ -962,7 +962,7 @@ class AppController {
         await updateProfile(profile);
       } catch (e) {
         commonPrint.log(
-          '[UpdateProfiles] Failed to update ${profile.label ?? profile.id}: ${e.formatError}',
+          '[UpdateProfiles] Failed to update ${profile.label ?? profile.id}: ${e.formatErrorLog}',
         );
       }
     }
@@ -1502,7 +1502,7 @@ class AppController {
     } on Object catch (e) {
       await globalState.showMessage(
         title: appLocalizations.add,
-        message: TextSpan(text: _formatErrorMessage(e)),
+        message: TextSpan(text: e.formatError),
         cancelable: false,
       );
     } finally {
@@ -1548,7 +1548,7 @@ class AppController {
           if (!context.mounted) break;
           await globalState.showMessage(
             title: '${platformFile.name} (${appLocalizations.add})',
-            message: TextSpan(text: _formatErrorMessage(e)),
+            message: TextSpan(text: e.formatError),
             cancelable: false,
           );
         }
@@ -2385,8 +2385,8 @@ class AppController {
       final res = await futureFunction();
       return res;
     } on Object catch (e) {
-      commonPrint.log(e.formatError);
-      final errorMessage = _formatErrorMessage(e);
+      commonPrint.log(e.formatErrorLog);
+      final errorMessage = e.formatError;
       if (needLoading) {
         _ref.read(loadingProvider.notifier).value = false;
       }
@@ -2409,20 +2409,5 @@ class AppController {
         _ref.read(loadingProvider.notifier).value = false;
       }
     }
-  }
-
-  String _formatErrorMessage(dynamic error) {
-    final errorStr = error.toString();
-
-    final statusCodeMatch = RegExp(
-      r'status code of (\d+)',
-    ).firstMatch(errorStr);
-    final statusCode = statusCodeMatch?.group(1);
-
-    if (statusCode != null) {
-      return appLocalizations.profileImportFailed(statusCode);
-    }
-
-    return error.formatError;
   }
 }
