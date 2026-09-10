@@ -181,7 +181,9 @@ class ClashService extends ClashHandlerInterface {
           _coreStartedByHelper = true;
           await _waitForCoreReady();
           isStarting = false;
-          if (system.isWindows && globalState.config.appSetting.enableHighPriority) {
+          if (system.isWindows &&
+              globalState.hasConfig &&
+              globalState.config.appSetting.enableHighPriority) {
             unawaited(
               helperClient
                   .setProcessPriority(
@@ -212,7 +214,9 @@ class ClashService extends ClashHandlerInterface {
     });
     await _waitForCoreReady();
     isStarting = false;
-    if (system.isWindows && globalState.config.appSetting.enableHighPriority) {
+    if (system.isWindows &&
+        globalState.hasConfig &&
+        globalState.config.appSetting.enableHighPriority) {
       unawaited(
         helperClient
             .setProcessPriority('${AppIdentity.coreExecutableName}.exe', true)

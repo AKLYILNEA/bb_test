@@ -36,7 +36,26 @@ class GlobalState {
   bool isScreenOn = true;
   Timer? timer;
   Timer? groupsUpdateTimer;
-  late Config config;
+  Config? _config;
+
+  bool get hasConfig => _config != null;
+
+  Config get config =>
+      _config ??
+      Config(
+        themeProps: defaultThemeProps,
+        patchClashConfig: system.isAndroid
+            ? const ClashConfig(findProcessMode: FindProcessMode.always)
+            : defaultClashConfig,
+        networkProps: defaultNetworkProps.copyWith(
+          systemProxy: system.isDesktop,
+        ),
+        appSetting: defaultAppSettingProps.copyWith(
+          showStartSwitch: _isAndroidTV ?? false,
+        ),
+      );
+
+  set config(Config value) => _config = value;
   late AppState appState;
   bool isPre = true;
   String? coreSHA256;
