@@ -529,7 +529,14 @@ func handleGetCountryCode(ip string, fn func(value string)) {
 
 func handleGetMemory(fn func(value string)) {
 	go func() {
-		fn(strconv.FormatUint(statistic.DefaultManager.Memory(), 10))
+		var m runtime.MemStats
+		runtime.ReadMemStats(&m)
+		var retainedIdle uint64
+		if m.HeapIdle > m.HeapReleased {
+			retainedIdle = m.HeapIdle - m.HeapReleased
+		}
+		mem := m.HeapInuse + retainedIdle + m.StackInuse
+		fn(strconv.FormatUint(mem, 10))
 	}()
 }
 
