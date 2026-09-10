@@ -725,6 +725,9 @@ func handleSetupConfig(bytes []byte) string {
 	}
 	clearSuspendedHealthChecks()
 	clearSuspendedWireGuard()
+	suspendModeLock.Lock()
+	currentSuspendMode = 0
+	suspendModeLock.Unlock()
 	err = setupConfig(params)
 	if err != nil {
 		return err.Error()
@@ -732,11 +735,23 @@ func handleSetupConfig(bytes []byte) string {
 	return ""
 }
 
-func handleSuspend(suspended bool) bool {
+var (
+	currentSuspendMode = 0
+	suspendModeLock    sync.Mutex
+)
+
+func handleSuspend(mode int) bool {
 	if !isInit {
 		return false
 	}
-	if suspended {
+	suspendModeLock.Lock()
+	defer suspendModeLock.Unlock()
+
+	switch mode {
+	case 1:
+		if currentSuspendMode == 1 {
+			return true
+		}
 		log.Infoln("[APP] Suspend mode enabled")
 		tunnel.OnSuspend()
 		pauseHealthChecks()
@@ -750,25 +765,49 @@ func handleSuspend(suspended bool) bool {
 		})
 
 		runtime.GC()
-	} else {
-		log.Infoln("[APP] Resume from suspend")
-		tunnel.OnRunning()
-		resumeHealthChecks()
-		resumeWireGuard()
+		currentSuspendMode = 1
 
-		runLock.Lock()
-		cfg := currentConfig
-		runLock.Unlock()
-		if cfg != nil && cfg.NTP != nil && cfg.NTP.Enable {
-			c := cfg.NTP
-			mihomoNtp.ReCreateNTPService(
-				net.JoinHostPort(c.Server, strconv.Itoa(c.Port)),
-				time.Duration(c.Interval),
-				c.DialerProxy,
-				tunnel.Tunnel,
-				c.WriteToSystem,
-			)
+	case 2:
+		if currentSuspendMode == 1 || currentSuspendMode == 2 {
+			return true
 		}
+		log.Infoln("[APP] Doze suspend mode enabled")
+		pauseHealthChecks()
+		runtime.GC()
+		currentSuspendMode = 2
+
+	case 0:
+		if currentSuspendMode == 0 {
+			return true
+		}
+		log.Infoln("[APP] Resume from suspend")
+		prevMode := currentSuspendMode
+		currentSuspendMode = 0
+
+		if prevMode == 1 {
+			tunnel.OnRunning()
+			resumeHealthChecks()
+			resumeWireGuard()
+
+			runLock.Lock()
+			cfg := currentConfig
+			runLock.Unlock()
+			if cfg != nil && cfg.NTP != nil && cfg.NTP.Enable {
+				c := cfg.NTP
+				mihomoNtp.ReCreateNTPService(
+					net.JoinHostPort(c.Server, strconv.Itoa(c.Port)),
+					time.Duration(c.Interval),
+					c.DialerProxy,
+					tunnel.Tunnel,
+					c.WriteToSystem,
+				)
+			}
+		} else if prevMode == 2 {
+			resumeHealthChecks()
+		}
+
+	default:
+		return false
 	}
 	return true
 }
