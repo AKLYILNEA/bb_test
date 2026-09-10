@@ -698,5 +698,19 @@
   "installTime": "Время установки",
   "updateTime": "Время обновления",
   "lightIcon": "Светлая иконка",
-  "lightIconDesc": "Вручную переключить на светлую иконку приложения"
+  "lightIconDesc": "Вручную переключить на светлую иконку приложения",
+  "coreStatus": "Статус ядра",
+  "memoryAndRuntime": "Память и среда выполнения",
+  "allocatedMemory": "Allocated",
+  "reclaimableMemory": "Reclaimable",
+  "activeGoroutines": "Goroutines",
+  "heapObjects": "Heap Objects",
+  "profileAndRules": "Профиль и правила",
+  "rulesCount": "Rules",
+  "proxiesCount": "Proxies",
+  "proxyGroupsCount": "Proxy Groups",
+  "ruleProvidersCount": "Rule Providers",
+  "proxyProvidersCount": "Proxy Providers",
+  "geodataUse": "Geodata Use",
+  "itemsCount": "{count}"
 }

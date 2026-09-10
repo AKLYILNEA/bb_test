@@ -47,6 +47,19 @@ class AppPath {
   }
 
   String get corePath {
+    final devWorkspacePath = _devWorkspacePath;
+    if (devWorkspacePath != null) {
+      final corePath = join(
+        devWorkspacePath,
+        'libclash',
+        'windows',
+        '${AppIdentity.coreExecutableName}$executableExtension',
+      );
+      if (File(corePath).existsSync()) {
+        return corePath;
+      }
+    }
+
     return join(
       executableDirPath,
       '${AppIdentity.coreExecutableName}$executableExtension',

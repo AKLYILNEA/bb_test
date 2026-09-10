@@ -696,5 +696,19 @@
   "networkErrorRetryLater": "خطای شبکه، لطفاً بعداً دوباره امتحان کنید",
   "tunVirtualAddress": "آدرس کارت شبکه مجازی TUN",
   "installTime": "زمان نصب",
-  "updateTime": "زمان به‌روزرسانی"
+  "updateTime": "زمان به‌روزرسانی",
+  "coreStatus": "وضعیت هسته",
+  "memoryAndRuntime": "حافظه و زمان اجرا",
+  "allocatedMemory": "Allocated",
+  "reclaimableMemory": "Reclaimable",
+  "activeGoroutines": "Goroutines",
+  "heapObjects": "Heap Objects",
+  "profileAndRules": "پروفایل و قوانین",
+  "rulesCount": "Rules",
+  "proxiesCount": "Proxies",
+  "proxyGroupsCount": "Proxy Groups",
+  "ruleProvidersCount": "Rule Providers",
+  "proxyProvidersCount": "Proxy Providers",
+  "geodataUse": "Geodata Use",
+  "itemsCount": "{count}"
 }

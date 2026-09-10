@@ -695,5 +695,19 @@
   "networkErrorRetryLater": "Network error, please try again later",
   "tunVirtualAddress": "TUN Virtual Network Adapter",
   "installTime": "Install Time",
-  "updateTime": "Update Time"
+  "updateTime": "Update Time",
+  "coreStatus": "Core Status",
+  "memoryAndRuntime": "Memory & Runtime",
+  "allocatedMemory": "Allocated",
+  "reclaimableMemory": "Reclaimable",
+  "activeGoroutines": "Goroutines",
+  "heapObjects": "Heap Objects",
+  "profileAndRules": "Profile & Rules",
+  "rulesCount": "Rules",
+  "proxiesCount": "Proxies",
+  "proxyGroupsCount": "Proxy Groups",
+  "ruleProvidersCount": "Rule Providers",
+  "proxyProvidersCount": "Proxy Providers",
+  "geodataUse": "Geodata Use",
+  "itemsCount": "{count}"
 }

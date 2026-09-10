@@ -696,5 +696,19 @@
   "networkErrorRetryLater": "ネットワークエラーが発生しました。後でもう一度お試しください",
   "tunVirtualAddress": "TUN 仮想ネットワークアダプター",
   "installTime": "インストール日時",
-  "updateTime": "更新日時"
+  "updateTime": "更新日時",
+  "coreStatus": "コア負荷詳細",
+  "memoryAndRuntime": "メモリとランタイム",
+  "allocatedMemory": "Allocated",
+  "reclaimableMemory": "Reclaimable",
+  "activeGoroutines": "Goroutines",
+  "heapObjects": "Heap Objects",
+  "profileAndRules": "プロファイルとルール",
+  "rulesCount": "Rules",
+  "proxiesCount": "Proxies",
+  "proxyGroupsCount": "Proxy Groups",
+  "ruleProvidersCount": "Rule Providers",
+  "proxyProvidersCount": "Proxy Providers",
+  "geodataUse": "Geodata Use",
+  "itemsCount": "{count}"
 }

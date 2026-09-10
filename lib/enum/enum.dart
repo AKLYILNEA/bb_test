@@ -258,6 +258,7 @@ enum ActionMethod {
   decryptAgeConfig,
   getMode,
   parseExternalProviderContent,
+  getCoreStatus,
 
   ///Android,
   setState,

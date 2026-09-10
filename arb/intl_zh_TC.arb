@@ -696,5 +696,19 @@
   "networkErrorRetryLater": "網路異常，請稍後再試",
   "tunVirtualAddress": "TUN 虛擬網卡位址",
   "installTime": "安裝時間",
-  "updateTime": "更新時間"
+  "updateTime": "更新時間",
+  "coreStatus": "核心負載詳情",
+  "memoryAndRuntime": "記憶體與執行時",
+  "allocatedMemory": "Allocated",
+  "reclaimableMemory": "Reclaimable",
+  "activeGoroutines": "Goroutines",
+  "heapObjects": "Heap Objects",
+  "profileAndRules": "設定檔規則",
+  "rulesCount": "Rules",
+  "proxiesCount": "Proxies",
+  "proxyGroupsCount": "Proxy Groups",
+  "ruleProvidersCount": "Rule Providers",
+  "proxyProvidersCount": "Proxy Providers",
+  "geodataUse": "Geodata Use",
+  "itemsCount": "{count}"
 }

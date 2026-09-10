@@ -696,5 +696,19 @@
   "networkErrorRetryLater": "网络异常，请稍后再试",
   "tunVirtualAddress": "TUN 虚拟网卡地址",
   "installTime": "安装时间",
-  "updateTime": "更新时间"
+  "updateTime": "更新时间",
+  "coreStatus": "内核负载详情",
+  "memoryAndRuntime": "内存与运行时",
+  "allocatedMemory": "Allocated",
+  "reclaimableMemory": "Reclaimable",
+  "activeGoroutines": "Goroutines",
+  "heapObjects": "Heap Objects",
+  "profileAndRules": "配置文件规则",
+  "rulesCount": "Rules",
+  "proxiesCount": "Proxies",
+  "proxyGroupsCount": "Proxy Groups",
+  "ruleProvidersCount": "Rule Providers",
+  "proxyProvidersCount": "Proxy Providers",
+  "geodataUse": "Geodata Use",
+  "itemsCount": "{count}"
 }
