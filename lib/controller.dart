@@ -49,10 +49,19 @@ class AppController {
   int _coreGeneration = 0;
   int _setupGeneration = 0;
   final Set<String> _updatingProfileIds = {};
+  Timer? _idleGcTimer;
 
   AppController(this.context, WidgetRef ref) : _ref = ref;
 
   DateTime _lastModeChangeTime = DateTime.fromMillisecondsSinceEpoch(0);
+
+  void scheduleIdleGc({Duration delay = const Duration(seconds: 2)}) {
+    _idleGcTimer?.cancel();
+    _idleGcTimer = Timer(delay, () {
+      _idleGcTimer = null;
+      unawaited(clashCore.requestGc(forceFreeOSMemory: true));
+    });
+  }
 
   void setupClashConfigDebounce() {
     debouncer.call(FunctionTag.setupClashConfig, () async {
@@ -154,6 +163,7 @@ class AppController {
     if (refreshData && configured) {
       await updateGroups();
       await updateProviders();
+      scheduleIdleGc();
     }
 
     if (wasRunning) {
@@ -301,7 +311,7 @@ class AppController {
 
         await Future.delayed(const Duration(seconds: 2));
         if (version != _backgroundLoadVersion) return;
-        await clashCore.requestGc();
+        await clashCore.requestGc(forceFreeOSMemory: true);
       } catch (e) {
         commonPrint.log('Background load error: $e');
       }
@@ -614,6 +624,7 @@ class AppController {
       final prefs = await preferences.sharedPreferencesCompleter.future;
       await prefs?.setBool('is_tun_running', realTunEnable);
     }
+    scheduleIdleGc();
   }
 
   Future<Result<bool>> _requestAdmin(bool enableTun) async {
@@ -641,7 +652,10 @@ class AppController {
   Future<void> setupClashConfig() {
     return _coreLifecycleLock.synchronized(() async {
       await safeRun(() async {
-        await _setupCoreConfig();
+        final configured = await _setupCoreConfig();
+        if (configured) {
+          scheduleIdleGc();
+        }
       }, needLoading: false);
     });
   }
@@ -655,6 +669,7 @@ class AppController {
     final providers = await clashCore.getExternalProviders();
     _ref.read(providersProvider.notifier).value = providers;
     await updateGroups(preloadedProviders: providers);
+    scheduleIdleGc();
   }
 
   Future<void> applyProfile({bool silence = false}) {
