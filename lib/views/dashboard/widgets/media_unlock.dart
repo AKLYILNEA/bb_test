@@ -101,11 +101,14 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
         fit: BoxFit.contain,
       );
     } else {
-      icon = SvgPicture.asset(
-        'assets/images/platforms/${platform.name}.svg',
-        width: iconSize,
-        height: iconSize,
-        fit: BoxFit.contain,
+      icon = ColorFiltered(
+        colorFilter: monochromeColorFilter,
+        child: SvgPicture.asset(
+          'assets/images/platforms/${platform.name}.svg',
+          width: iconSize,
+          height: iconSize,
+          fit: BoxFit.contain,
+        ),
       );
     }
 

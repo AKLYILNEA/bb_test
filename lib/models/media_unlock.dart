@@ -196,6 +196,9 @@ extension MediaPlatformExt on MediaPlatform {
         MediaPlatform.tiktok ||
         MediaPlatform.medium ||
         MediaPlatform.grok ||
+        // 品牌本身是黑/白单色素材：跟随主题着色，浅色模式黑、深色模式白
+        MediaPlatform.okx ||
+        MediaPlatform.ubisoft ||
         MediaPlatform.epic =>
           true,
         _ => false,
