@@ -92,8 +92,9 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
           ),
           SizedBox(width: 8.ap),
           SizedBox(
-            width: 12.ap,
-            height: 12.ap,
+            // 与表头右侧检测按钮同一 24 槽位，圆点才会和按钮严格对齐（原来 12 槽位会偏右 6px）
+            width: 24.ap,
+            height: 24.ap,
             child: Center(
               child: status == MediaUnlockStatus.testing
                   ? SizedBox(
