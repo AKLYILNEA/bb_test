@@ -471,7 +471,9 @@ class TrackerInfoDetailView extends ConsumerWidget {
       title: Row(
         spacing: 16,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        // 值可能换行（如主机域名）：标题竖向居中，与右侧多行内容保持同一视觉中线，
+        // 与代理链一行（Wrap 多行标签）的排版一致
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Row(
             spacing: 4,
