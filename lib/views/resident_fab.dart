@@ -1,23 +1,26 @@
-import 'dart:ui' show FontVariation;
-
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/views/dashboard/widgets/start_fab.dart';
 import 'package:bett_box/views/profiles/add_profile.dart';
-import 'package:bett_box/views/proxies/tab.dart';
+import 'package:bett_box/views/proxies/common.dart';
 import 'package:bett_box/widgets/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 /// 移动视图（竖屏）下与底栏伴生的常驻悬浮按钮。
 ///
 /// - 只在这三个根页面出现对应操作：首页 = 启动/停止、代理 = 测速、配置 = 添加配置；
 /// - 「更多」页以及代理页切到列表模式（`ProxiesType.list`）时不显示；
 /// - 其它页面（脚本、隧道、日志、请求、连接、资源）完全不参与，它们各自的悬浮按钮保持原样；
-/// - 切换页面时**只做顺序淡出 → 换内容 → 淡入**（绝不叠两个按钮），
-///   宽度交给 [AnimatedSize] 平滑过渡且不裁剪，因此不会出现变亮、阴影闪烁或直角。
+/// - 页面之间切换时，**外壳（底色 / 圆角 / 阴影 / FAB 本体）全程只存在一个实例、完全不淡出**，
+///   只做「内部内容淡出 → 替换 → label 宽度连续变宽 + 内容淡入」，
+///   与首页启动/停止按钮（`start_fab.dart` 的 `AnimatedContainer` 200ms easeOut）
+///   使用同一时长与同一套测量方式，因此既不会两块按钮叠加变亮，也不会出现直角或闪现位移；
+/// - 出现 / 消失（例如切到「更多」页）时才是整体弱隐。
 class ResidentFab extends ConsumerStatefulWidget {
   const ResidentFab({super.key});
 
@@ -26,54 +29,124 @@ class ResidentFab extends ConsumerStatefulWidget {
 }
 
 class _ResidentFabState extends ConsumerState<ResidentFab>
-    with SingleTickerProviderStateMixin {
-  static const _fadeIn = Duration(milliseconds: 180);
-  static const _fadeOut = Duration(milliseconds: 110);
+    with TickerProviderStateMixin {
+  /// 页面之间切换：只让内部图标与文字忽隐忽现（外壳不动）
+  static const _contentFadeIn = Duration(milliseconds: 180);
+  static const _contentFadeOut = Duration(milliseconds: 110);
 
-  late final AnimationController _fade = AnimationController(
+  /// 出现 / 消失：整体弱隐
+  static const _shellFadeIn = Duration(milliseconds: 180);
+  static const _shellFadeOut = Duration(milliseconds: 130);
+
+  late final AnimationController _contentFade = AnimationController(
     vsync: this,
-    duration: _fadeIn,
-    reverseDuration: _fadeOut,
+    duration: _contentFadeIn,
+    reverseDuration: _contentFadeOut,
+    value: 1.0,
   );
 
-  /// 当前真正渲染的页面（切换过程中保持旧值，等淡出结束再换）
+  late final AnimationController _shellFade = AnimationController(
+    vsync: this,
+    duration: _shellFadeIn,
+    reverseDuration: _shellFadeOut,
+  );
+
+  /// 代理页测速时的内容缩放，沿用 DelayTestButton 的实现（1 → 0）
+  late final AnimationController _testScaleController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 200),
+  );
+
+  late final Animation<double> _testScale = Tween<double>(
+    begin: 1.0,
+    end: 0.0,
+  ).animate(
+    CurvedAnimation(parent: _testScaleController, curve: const Interval(0, 1)),
+  );
+
+  /// 当前真正渲染的根页面（过渡期间保持旧值，等内容淡出结束再替换；
+  /// 非常驻页面不会覆盖它，这样回到常驻页面时内容还是对的那一个）
   PageLabel? _renderedPage;
   bool _renderedVisible = false;
-  bool _transitioning = false;
+
+  /// 已经登记过的目标，用来避免同一目标被反复调度
+  PageLabel? _pendingPage;
+  bool? _pendingVisible;
+
+  /// 换页序号：新目标到来时让上一轮过渡自行退出，避免排队等待
+  int _switchGeneration = 0;
+
+  /// 代理页当前策略组名（测速按钮据此判断是否正在测速）
+  String _groupName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    delayTestCoordinator.addListener(_handleTestingChanged);
+    _handleTestingChanged();
+  }
+
+  void _handleTestingChanged() {
+    if (!mounted) return;
+    if (delayTestCoordinator.isTestingGroup(_groupName)) {
+      _testScaleController.forward();
+    } else {
+      _testScaleController.reverse();
+    }
+    setState(() {});
+  }
 
   @override
   void dispose() {
-    _fade.dispose();
+    delayTestCoordinator.removeListener(_handleTestingChanged);
+    _contentFade.dispose();
+    _shellFade.dispose();
+    _testScaleController.dispose();
     super.dispose();
   }
 
-  /// 顺序执行：先淡出旧内容，再替换、淡入新内容。
-  /// 期间再来新目标就记下来，等这一轮结束再执行，避免两段动画叠加。
-  Future<void> _switch(
-    PageLabel page,
-    bool visible, {
-    PageLabel? pendingPage,
-    bool? pendingVisible,
-  }) async {
-    if (_transitioning) {
-      return;
+  void _handleProxyTest(VoidCallback? action) {
+    if (delayTestCoordinator.isTesting) return;
+    action?.call();
+  }
+
+  /// 顺序执行，绝不让两段动画叠加：
+  /// 同一页面可见性下换页 = 只淡出内容；出现 / 消失 = 只淡入淡出外壳。
+  Future<void> _switch(PageLabel? page, bool visible) async {
+    final generation = ++_switchGeneration;
+    final wasVisible = _renderedVisible;
+
+    if (wasVisible && visible) {
+      await _contentFade.reverse();
+      if (!mounted || generation != _switchGeneration) return;
     }
-    _transitioning = true;
-    if (_fade.value > 0) {
-      await _fade.reverse();
-    }
-    if (!mounted) {
-      _transitioning = false;
-      return;
-    }
+
+    if (!mounted || generation != _switchGeneration) return;
+
     setState(() {
-      _renderedPage = pendingPage ?? page;
-      _renderedVisible = pendingVisible ?? visible;
+      if (page != null) {
+        _renderedPage = page;
+      }
+      _renderedVisible = visible;
     });
-    _transitioning = false;
-    if (_renderedVisible) {
-      _fade.forward();
+
+    if (!visible) {
+      if (wasVisible) {
+        await _shellFade.reverse();
+        if (!mounted || generation != _switchGeneration) return;
+      }
+      // 不可见期间内容直接回到完整状态，下次出现只做整体淡入
+      _contentFade.value = 1.0;
+      return;
     }
+
+    if (wasVisible) {
+      _contentFade.forward();
+      return;
+    }
+
+    _contentFade.value = 1.0;
+    await _shellFade.forward();
   }
 
   @override
@@ -82,102 +155,219 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
     final proxiesType = ref.watch(
       proxiesStyleSettingProvider.select((state) => state.type),
     );
-    final visible = switch (pageLabel) {
-      PageLabel.dashboard || PageLabel.profiles => true,
-      PageLabel.proxies => proxiesType == ProxiesType.tab,
-      _ => false,
+    final residentPage = switch (pageLabel) {
+      PageLabel.dashboard => PageLabel.dashboard,
+      PageLabel.profiles => PageLabel.profiles,
+      PageLabel.proxies => proxiesType == ProxiesType.tab
+          ? PageLabel.proxies
+          : null,
+      _ => null,
     };
-    if (_renderedPage != pageLabel || _renderedVisible != visible) {
-      final nextPage = pageLabel;
-      final nextVisible = visible;
+    final visible = residentPage != null;
+    _groupName =
+        ref.watch(proxiesTabControllerStateProvider.select((state) => state.b)) ??
+        '';
+    final proxyTestAction = ref.watch(residentProxyTestProvider);
+
+    if (_pendingPage != residentPage || _pendingVisible != visible) {
+      _pendingPage = residentPage;
+      _pendingVisible = visible;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) {
-          return;
-        }
-        // 还在过渡中就直接跳到最终状态，避免排队等待带来的卡顿
-        if (_transitioning) {
-          setState(() {
-            _renderedPage = nextPage;
-            _renderedVisible = nextVisible;
-          });
-          return;
-        }
-        _switch(nextPage, nextVisible);
+        if (!mounted) return;
+        _switch(residentPage, visible);
       });
     }
-    final content = _buildContent(_renderedPage);
-    return AnimatedSize(
-      duration: const Duration(milliseconds: 220),
-      curve: Curves.easeOutCubic,
-      alignment: Alignment.centerRight,
-      // 不裁剪：否则宽度变化过程中圆角会被切成直角
-      clipBehavior: Clip.none,
-      child: FadeTransition(
-        opacity: _fade,
-        child: IgnorePointer(
-          ignoring: !_renderedVisible,
-          child: content,
-        ),
+
+    return StartFabDataProvider(
+      builder: (context, startData) => AnimatedBuilder(
+        animation: _testScaleController.view,
+        builder: (context, _) {
+          return _ResidentFabShell(
+            content: _buildContent(context, startData, proxyTestAction),
+            contentFade: _contentFade,
+            shellFade: _shellFade,
+            visible: _renderedVisible,
+            // 只有屏幕上看得见的时候才连续变宽，不可见期间直接到位
+            animateWidth: _shellFade.value > 0,
+          );
+        },
       ),
     );
   }
 
-  Widget _buildContent(PageLabel? pageLabel) {
-    return switch (pageLabel) {
-      PageLabel.dashboard => const StartFab(),
-      PageLabel.profiles => const _AddProfileFab(),
-      PageLabel.proxies => const _ProxyTestFab(),
-      _ => const SizedBox.shrink(),
-    };
+  _FabContent _buildContent(
+    BuildContext context,
+    StartFabData startData,
+    VoidCallback? proxyTestAction,
+  ) {
+    switch (_renderedPage) {
+      case PageLabel.dashboard:
+        return _FabContent(
+          icon: startData.icon,
+          labelText: startData.labelText,
+          labelWidth: startData.labelWidth,
+          onPressed: startData.onPressed,
+          onLongPress: startData.onLongPress,
+          contentOpacity: startData.showLoading ? 0.0 : 1.0,
+          showLoading: startData.showLoading,
+        );
+      case PageLabel.profiles:
+        return _FabContent(
+          icon: Icons.add_rounded,
+          labelText: appLocalizations.addProfile,
+          labelWidth: startFabTextWidth(context, appLocalizations.addProfile),
+          onPressed: showAddProfileExtend,
+        );
+      case PageLabel.proxies:
+        return _FabContent(
+          icon: Icons.network_ping_rounded,
+          labelText: appLocalizations.startTest,
+          labelWidth: startFabTextWidth(context, appLocalizations.startTest),
+          onPressed: (delayTestCoordinator.isTesting || _groupName.isEmpty)
+              ? null
+              : () => _handleProxyTest(proxyTestAction),
+          contentScale: _testScale.value,
+          showLoading:
+              delayTestCoordinator.isTestingGroup(_groupName) &&
+              _testScaleController.isCompleted,
+        );
+      default:
+        // 首帧（还没登记目标）用启动按钮的数据兜底；此时外壳是完全透明的
+        return _FabContent(
+          icon: startData.icon,
+          labelText: startData.labelText,
+          labelWidth: startData.labelWidth,
+          onPressed: startData.onPressed,
+          onLongPress: startData.onLongPress,
+          contentOpacity: startData.showLoading ? 0.0 : 1.0,
+          showLoading: startData.showLoading,
+        );
+    }
   }
 }
 
-/// 配置页状态：添加配置（外观与动作沿用页面原来的实现）
-class _AddProfileFab extends StatelessWidget {
-  const _AddProfileFab();
+/// 常驻悬浮按钮当前要显示的内容
+@immutable
+class _FabContent {
+  const _FabContent({
+    required this.icon,
+    required this.labelText,
+    required this.labelWidth,
+    this.onPressed,
+    this.onLongPress,
+    this.contentOpacity = 1.0,
+    this.contentScale = 1.0,
+    this.showLoading = false,
+  });
+
+  final IconData icon;
+  final String labelText;
+  final double labelWidth;
+  final VoidCallback? onPressed;
+  final VoidCallback? onLongPress;
+  final double contentOpacity;
+  final double contentScale;
+  final bool showLoading;
+}
+
+/// 常驻悬浮按钮的外壳。
+///
+/// 底色、圆角、阴影、FAB 本体全程只渲染这一个实例，页面之间不重建、不淡出；
+/// 变化的只有 label 的宽度（`AnimatedContainer`，与启动/停止按钮同款）
+/// 以及图标 / 文字的透明度。
+class _ResidentFabShell extends StatelessWidget {
+  const _ResidentFabShell({
+    required this.content,
+    required this.contentFade,
+    required this.shellFade,
+    required this.visible,
+    required this.animateWidth,
+  });
+
+  final _FabContent content;
+  final Animation<double> contentFade;
+  final Animation<double> shellFade;
+  final bool visible;
+  final bool animateWidth;
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: getCommonFabDecoration(context),
-      child: FloatingActionButton.extended(
-        elevation: 0,
-        hoverElevation: 0,
-        highlightElevation: 0,
-        focusElevation: 0,
-        clipBehavior: Clip.none,
-        heroTag: null,
-        onPressed: showAddProfileExtend,
-        icon: const Icon(Icons.add_rounded),
-        label: Text(
-          appLocalizations.addProfile,
-          style: TextStyle(
-            fontFamily: Theme.of(context).textTheme.labelLarge?.fontFamily,
-            fontWeight: FontWeight.bold,
-            fontVariations: const [FontVariation('wght', 700)],
+    return FadeTransition(
+      opacity: shellFade,
+      child: IgnorePointer(
+        ignoring: !visible,
+        child: GestureDetector(
+          onLongPress: content.onLongPress,
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.center,
+            children: [
+              DecoratedBox(
+                decoration: getCommonFabDecoration(context),
+                child: FloatingActionButton.extended(
+                  elevation: 0,
+                  hoverElevation: 0,
+                  highlightElevation: 0,
+                  focusElevation: 0,
+                  clipBehavior: Clip.none,
+                  heroTag: null,
+                  onPressed: content.onPressed,
+                  icon: _buildContentChild(Icon(content.icon)),
+                  label: FadeTransition(
+                    opacity: contentFade,
+                    child: AnimatedContainer(
+                      // 看不见的时候宽度直接到位，只有看得见才连续变宽
+                      duration: animateWidth
+                          ? startFabWidthAnimationDuration
+                          : Duration.zero,
+                      curve: Curves.easeOut,
+                      width: content.labelWidth,
+                      alignment: Alignment.center,
+                      child: Text(
+                        content.labelText,
+                        maxLines: 1,
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.visible,
+                        style: startFabLabelStyle(context),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              if (content.showLoading)
+                IgnorePointer(
+                  child: SizedBox(
+                    width: 30,
+                    height: 16,
+                    child: OverflowBox(
+                      maxWidth: 30,
+                      maxHeight: 16,
+                      child: SpinKitThreeBounce(
+                        color:
+                            Theme.of(
+                              context,
+                            ).floatingActionButtonTheme.foregroundColor ??
+                            context.colorScheme.onPrimaryContainer,
+                        size: 16,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
       ),
     );
   }
-}
 
-/// 代理页状态（策略组标签模式）：当前策略组测速。
-/// 动作由代理页在挂载时注册到 [residentProxyTestProvider]。
-class _ProxyTestFab extends ConsumerWidget {
-  const _ProxyTestFab();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentGroupName = ref.watch(
-      proxiesTabControllerStateProvider.select((state) => state.b),
+  Widget _buildContentChild(Widget child) {
+    Widget result = Opacity(
+      opacity: content.contentOpacity,
+      child: child,
     );
-    final action = ref.watch(residentProxyTestProvider);
-    return DelayTestButton(
-      groupName: currentGroupName ?? '',
-      onClick: () async {
-        action?.call();
-      },
-    );
+    if (content.contentScale != 1.0) {
+      result = Transform.scale(scale: content.contentScale, child: result);
+    }
+    return FadeTransition(opacity: contentFade, child: result);
   }
 }
