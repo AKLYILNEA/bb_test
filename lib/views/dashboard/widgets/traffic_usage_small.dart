@@ -142,9 +142,11 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
                                       const TextSpan(text: ' '),
                                       TextSpan(
                                         text: value.showUnit,
+                                        // 单位比数值小一号；因为共享同一条基线，
+                                        // 其底部（基线下沿）与左侧数值严格齐平
                                         style: context.textTheme.bodyMedium
                                             ?.toLighter
-                                            .adjustSize(1),
+                                            .adjustSize(-2),
                                       ),
                                     ],
                                   ),
