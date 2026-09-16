@@ -131,7 +131,9 @@ class _HomePageState extends State<HomePage> {
                   Positioned(
                     right: 16,
                     bottom:
-                        getFloatingBottomBarFABReserveHeight(context) + 16,
+                        getFloatingBottomBarFABReserveHeight(context) +
+                        16 +
+                        MediaQuery.paddingOf(context).bottom,
                     child: RepaintBoundary(child: const ResidentFab()),
                   ),
                 ],
