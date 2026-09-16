@@ -40,7 +40,7 @@ class TUNButton extends StatelessWidget {
           iconData: Icons.stacked_line_chart_rounded,
         ),
         child: Container(
-          padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 12),
+          padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 8),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -118,7 +118,7 @@ class SystemProxyButton extends StatelessWidget {
           iconData: Icons.shuffle_rounded,
         ),
         child: Container(
-          padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 12),
+          padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 8),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -197,7 +197,7 @@ class VpnButton extends StatelessWidget {
         },
         info: Info(label: 'VPN', iconData: Icons.stacked_line_chart_rounded),
         child: Container(
-          padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 12),
+          padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 8),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

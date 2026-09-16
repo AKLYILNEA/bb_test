@@ -47,7 +47,7 @@ class AccessControlSwitch extends ConsumerWidget {
             _openAccessControl(context);
           },
           child: Container(
-            padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 12),
+            padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 8),
             child: Row(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
