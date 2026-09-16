@@ -146,6 +146,8 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
               children: [
                 InfoHeader(
                   padding: baseInfoEdgeInsets.copyWith(bottom: 0),
+                  // 右侧刷新按钮不撑高表头：图标 / 标题 / 按钮同处一行标题高度
+                  actionsHeight: globalState.measure.titleSmallHeight,
                   info: Info(
                     label: appLocalizations.mediaUnlock,
                     iconData: Icons.link_rounded,

@@ -22,10 +22,16 @@ class InfoHeader extends StatelessWidget {
   final List<Widget> actions;
   final EdgeInsetsGeometry? padding;
 
+  /// 右侧操作区（actions）的高度上限。卡片表头传「一行标题」高
+  /// （`globalState.measure.titleSmallHeight`）后，按钮不再撑高整行，
+  /// 图标 / 标题 / 按钮落在同一条线上；不传则完全沿用按钮自身尺寸。
+  final double? actionsHeight;
+
   const InfoHeader({
     super.key,
     required this.info,
     this.padding,
+    this.actionsHeight,
     List<Widget>? actions,
   }) : actions = actions ?? const [];
 
@@ -70,10 +76,13 @@ class InfoHeader extends StatelessWidget {
           ),
           if (actions.isNotEmpty) ...[
             const SizedBox(width: 8),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [...actions],
+            SizedBox(
+              height: actionsHeight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [...actions],
+              ),
             ),
           ],
         ],

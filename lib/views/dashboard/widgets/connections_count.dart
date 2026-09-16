@@ -79,7 +79,7 @@ class _ConnectionsCountState extends State<ConnectionsCount> {
               children: [
                 Text(
                   '$_count',
-                  style: context.textTheme.bodyLarge?.toLight.adjustSize(2),
+                  style: context.textTheme.bodyMedium?.toLight.adjustSize(1),
                 ),
                 const SizedBox(width: 4),
                 Text(

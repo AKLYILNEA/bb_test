@@ -112,8 +112,8 @@ class _FcmStatusState extends State<FcmStatus> {
                           children: [
                             Text(
                               '${status.minutes}',
-                              style: context.textTheme.bodyLarge?.toLight
-                                  .adjustSize(2),
+                              style: context.textTheme.bodyMedium?.toLight
+                                  .adjustSize(1),
                             ),
                             const SizedBox(width: 4),
                             Text(
