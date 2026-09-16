@@ -80,23 +80,6 @@ class _FcmStatusState extends State<FcmStatus> {
     }
   }
 
-  Future<void> _showFcmInfoDialog(BuildContext context) async {
-    await globalState.showCommonDialog<void>(
-      child: CommonDialog(
-        title: 'FCM',
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context, rootNavigator: true).pop();
-            },
-            child: Text(appLocalizations.confirm),
-          ),
-        ],
-        child: Text(appLocalizations.fcmTip),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return RepaintBoundary(
@@ -113,21 +96,6 @@ class _FcmStatusState extends State<FcmStatus> {
                   label: 'FCM',
                   iconData: Icons.cloud_outlined,
                 ),
-                actions: [
-                  SizedBox(
-                    width: 24.ap,
-                    height: 24.ap,
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () => _showFcmInfoDialog(context),
-                      icon: Icon(
-                        size: 18.ap,
-                        Icons.info_outline_rounded,
-                        color: context.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                ],
               ),
               Container(
                 padding: baseInfoEdgeInsets.copyWith(top: 0),
