@@ -66,7 +66,7 @@ class DnsOverride extends StatelessWidget {
           await _handleClearCache(context);
         },
         child: Container(
-          padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 8),
+          padding: baseInfoEdgeInsets.copyWith(top: 0, bottom: 8, right: 8),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

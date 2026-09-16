@@ -66,15 +66,10 @@ class OutboundMode extends StatelessWidget {
                                   ),
                                   child: Row(
                                     children: [
-                                      Icon(
-                                        item == mode
-                                            ? Icons.check_circle_rounded
-                                            : Icons.circle_outlined,
-                                        size: 21,
-                                        color: item == mode
-                                            ? context.colorScheme.primary
-                                            : context.colorScheme.onSurfaceVariant
-                                                  .withValues(alpha: 0.6),
+                                      // FlClash 出站模式同款单选圆点（圆环 + 选中实心），
+                                      // 占位与原来的 Icon 一致（21×21），不改动任何布局
+                                      _OutboundModeRadioIcon(
+                                        selected: item == mode,
                                       ),
                                       SizedBox(width: 12.ap),
                                       Expanded(
@@ -104,9 +99,51 @@ class OutboundMode extends StatelessWidget {
   }
 }
 
+/// FlClash 出站模式左侧的单选圆点（圆环 + 选中时实心圆点）。
+///
+/// 外框 21×21，与原来 `Icon(size: 21)` 完全等大，因此不改变任何布局尺寸；
+/// 圆环 2 宽、选中时中心 9×9 实心，视觉与 FlClash 的 Material Radio 一致。
+class _OutboundModeRadioIcon extends StatelessWidget {
+  final bool selected;
+
+  const _OutboundModeRadioIcon({required this.selected});
+
+  @override
+  Widget build(BuildContext context) {
+    final primary = context.colorScheme.primary;
+    final idle = context.colorScheme.onSurfaceVariant.withValues(alpha: 0.6);
+    return SizedBox(
+      width: 21,
+      height: 21,
+      child: Center(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOut,
+          width: 19,
+          height: 19,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: selected ? primary : idle, width: 2),
+          ),
+          child: selected
+              ? Container(
+                  width: 9,
+                  height: 9,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: primary,
+                  ),
+                )
+              : null,
+        ),
+      ),
+    );
+  }
+}
+
 class OutboundModeV2 extends StatelessWidget {
   const OutboundModeV2({super.key});
-
   Color _getTextColor(BuildContext context, Mode mode) {
     return switch (mode) {
       Mode.rule => context.colorScheme.onSecondaryContainer,
