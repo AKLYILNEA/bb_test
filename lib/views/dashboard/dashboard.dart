@@ -230,15 +230,9 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
       title:
           ref.watch(customDashboardTitleProvider) ?? '⚡️Bettbox',
       actions: _buildActions(),
-      // 竖屏下启动按钮由全局常驻悬浮按钮承担（避免双按钮）
-      floatingActionButton: isMobileView
-          ? null
-          : Padding(
-              padding: EdgeInsets.only(
-                bottom: getFloatingBottomBarFABReserveHeight(context),
-              ),
-              child: const StartFab(),
-            ),
+      // 竖屏下启动按钮由全局常驻悬浮按钮承担（避免双按钮）；
+      // 非移动视图（横屏 / 桌面 / TV）保持官方位置，不要加底栏避让内边距
+      floatingActionButton: isMobileView ? null : const StartFab(),
       body: Align(
         alignment: Alignment.topCenter,
         child: SingleChildScrollView(
