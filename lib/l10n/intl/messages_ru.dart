@@ -779,6 +779,8 @@ class MessageLookup extends MessageLookupByLibrary {
       "Введите IP или CIDR, максимум 2, через запятую",
     ),
     "networkSpeed": MessageLookupByLibrary.simpleMessage("Скорость сети"),
+    "speedTest": MessageLookupByLibrary.simpleMessage("Тест скорости"),
+    "speedTestDesc": MessageLookupByLibrary.simpleMessage("Откроется сайт проверки скорости в браузере"),
     "networkSpeedNotification": MessageLookupByLibrary.simpleMessage(
       "Скорость в уведомлениях",
     ),

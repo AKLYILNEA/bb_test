@@ -230,14 +230,15 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
       title:
           ref.watch(customDashboardTitleProvider) ?? '⚡️Bettbox',
       actions: _buildActions(),
-      floatingActionButton: Padding(
-        padding: EdgeInsets.only(
-          bottom: isMobileView
-              ? getFloatingBottomBarFABReserveHeight(context)
-              : 0,
-        ),
-        child: const StartFab(),
-      ),
+      // 竖屏下启动按钮由全局常驻悬浮按钮承担（避免双按钮）
+      floatingActionButton: isMobileView
+          ? null
+          : Padding(
+              padding: EdgeInsets.only(
+                bottom: getFloatingBottomBarFABReserveHeight(context),
+              ),
+              child: const StartFab(),
+            ),
       body: Align(
         alignment: Alignment.topCenter,
         child: SingleChildScrollView(

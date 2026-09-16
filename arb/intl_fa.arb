@@ -20,6 +20,8 @@
   "trafficUsage": "مصرف ترافیک",
   "coreInfo": "اطلاعات هسته",
   "networkSpeed": "سرعت شبکه",
+  "speedTest": "تست سرعت",
+  "speedTestDesc": "به سایت تست سرعت مرورگر هدایت می‌شوید",
   "realTimeSpeed": "سرعت لحظه‌ای",
   "connectionsSort": "مرتب‌سازی اتصال‌ها",
   "totalTraffic": "مجموع ترافیک",

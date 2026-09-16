@@ -611,6 +611,8 @@ class MessageLookup extends MessageLookupByLibrary {
       "IP, CIDR 또는 Gateway:IP/CIDR 입력",
     ),
     "networkSpeed": MessageLookupByLibrary.simpleMessage("네트워크 속도"),
+    "speedTest": MessageLookupByLibrary.simpleMessage("속도 테스트"),
+    "speedTestDesc": MessageLookupByLibrary.simpleMessage("브라우저 속도 테스트 사이트로 이동합니다"),
     "networkSpeedNotification": MessageLookupByLibrary.simpleMessage("속도 알림"),
     "networkSpeedNotificationDesc": MessageLookupByLibrary.simpleMessage(
       "알림 표시줄에 속도 및 구독 정보 표시",

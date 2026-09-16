@@ -758,6 +758,8 @@ class MessageLookup extends MessageLookupByLibrary {
       "IP یا CIDR یا Gateway:IP/CIDR",
     ),
     "networkSpeed": MessageLookupByLibrary.simpleMessage("سرعت شبکه"),
+    "speedTest": MessageLookupByLibrary.simpleMessage("تست سرعت"),
+    "speedTestDesc": MessageLookupByLibrary.simpleMessage("به سایت تست سرعت مرورگر هدایت می‌شوید"),
     "networkSpeedNotification": MessageLookupByLibrary.simpleMessage(
       "اعلان سرعت",
     ),

@@ -20,6 +20,8 @@
   "trafficUsage": "流量統計",
   "coreInfo": "內核資訊",
   "networkSpeed": "網路速度",
+  "speedTest": "測速",
+  "speedTestDesc": "將前往瀏覽器測速網站進行測速",
   "realTimeSpeed": "實時速度",
   "connectionsSort": "連接排序",
   "totalTraffic": "傳輸總量",

@@ -17,9 +17,9 @@ class TrafficUsageSmall extends ConsumerStatefulWidget {
 }
 
 class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
-  /// 圆环边长：取「初版 60」与「过小版 40」的中间值 50，
-  /// 上下与右侧留白 = (卡片高度 - 圆环边长) / 2 = 17，三者一致即上下居中。
-  static const double _donutSize = 50;
+  /// 圆环边长：45（先是 60、后是 40，取需求指定的中间偏大值），
+  /// 上下与右侧留白 = (卡片高度 - 圆环边长) / 2，三者一致即上下居中。
+  static const double _donutSize = 45;
 
   static double get _donutEdge => (getWidgetHeight(1) - _donutSize) / 2;
 
@@ -82,7 +82,6 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
   Widget build(BuildContext context) {
     final primaryColor = globalState.theme.darken3PrimaryContainer;
     final secondaryColor = globalState.theme.darken2SecondaryContainer;
-    final arrowColor = _showUpload ? primaryColor : secondaryColor;
     return SizedBox(
       height: getWidgetHeight(1),
       child: CommonCard(
@@ -130,19 +129,11 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
                           ],
                         ),
                         // 与其它数值卡同一套行盒与字号（bodyMedium + 1 → 15sp、行盒
-                        // bodyMediumHeight + 2），底部与它们严格同一基线，不再偏下/偏小
+                        // bodyMediumHeight + 2），底部与它们严格同一基线
                         SizedBox(
                           height: globalState.measure.bodyMediumHeight + 2,
                           child: Row(
                             children: [
-                              Icon(
-                                _showUpload
-                                    ? Icons.arrow_upward_rounded
-                                    : Icons.arrow_downward_rounded,
-                                color: arrowColor,
-                                size: 18,
-                              ),
-                              const SizedBox(width: 6),
                               Flexible(
                                 child: Text.rich(
                                   TextSpan(

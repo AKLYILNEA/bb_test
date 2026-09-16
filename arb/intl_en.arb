@@ -20,6 +20,8 @@
   "trafficUsage": "Traffic Usage",
   "coreInfo": "Core Info",
   "networkSpeed": "Network Speed",
+  "speedTest": "Speed Test",
+  "speedTestDesc": "You will be taken to a browser speed test site.",
   "realTimeSpeed": "Real-time Speed",
   "connectionsSort": "Connections Sort",
   "totalTraffic": "Total Traffic",

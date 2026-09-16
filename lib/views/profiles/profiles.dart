@@ -26,20 +26,7 @@ class ProfilesView extends ConsumerStatefulWidget {
 class _ProfilesViewState extends ConsumerState<ProfilesView> {
   Function? applyConfigDebounce;
 
-  void _handleShowAddExtendPage() {
-    showExtend(
-      globalState.navigatorKey.currentState!.context,
-      builder: (_, type) {
-        return AdaptiveSheetScaffold(
-          type: type,
-          body: AddProfileView(
-            context: globalState.navigatorKey.currentState!.context,
-          ),
-          title: appLocalizations.add,
-        );
-      },
-    );
-  }
+  void _handleShowAddExtendPage() => showAddProfileExtend();
 
   Future<void> _updateProfiles() async {
     final profiles = globalState.config.profiles;
@@ -116,8 +103,12 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
     ];
   }
 
-  Widget _buildFAB() {
+  Widget? _buildFAB() {
     final isMobileView = ref.watch(isMobileViewProvider);
+    // 竖屏下改由全局常驻悬浮按钮承担，页面自身不再显示（避免双按钮）
+    if (isMobileView) {
+      return null;
+    }
     return Padding(
       padding: EdgeInsets.only(
         bottom: isMobileView

@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:bett_box/views/resident_fab.dart';
+
 typedef OnSelected = void Function(int index);
 
 class HomePage extends StatefulWidget {
@@ -124,6 +126,13 @@ class _HomePageState extends State<HomePage> {
                     right: 0,
                     bottom: 0,
                     child: RepaintBoundary(child: navBar),
+                  ),
+                  // 与底栏伴生的常驻悬浮按钮：只在首页/代理/配置三个根页面出现
+                  Positioned(
+                    right: 16,
+                    bottom:
+                        getFloatingBottomBarFABReserveHeight(context) + 16,
+                    child: RepaintBoundary(child: const ResidentFab()),
                   ),
                 ],
               );

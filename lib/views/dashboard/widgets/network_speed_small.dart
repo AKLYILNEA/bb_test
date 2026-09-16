@@ -6,6 +6,8 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'network_speed.dart';
+
 class NetworkSpeedSmall extends ConsumerWidget {
   const NetworkSpeedSmall({super.key});
 
@@ -39,7 +41,7 @@ class NetworkSpeedSmall extends ConsumerWidget {
         height: getWidgetHeight(1),
         child: CommonCard(
           onPressed: () {
-            globalState.openUrl('https://ptclspeed.speedtestcustom.com');
+            showSpeedTestConfirm(context);
           },
           info: Info(
             label: appLocalizations.networkSpeed,

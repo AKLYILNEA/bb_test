@@ -194,6 +194,21 @@ class AppLocalizations {
     );
   }
 
+  /// `Speed Test`
+  String get speedTest {
+    return Intl.message('Speed Test', name: 'speedTest', desc: '', args: []);
+  }
+
+  /// `You will be taken to a browser speed test site.`
+  String get speedTestDesc {
+    return Intl.message(
+      'You will be taken to a browser speed test site.',
+      name: 'speedTestDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Real-time Speed`
   String get realTimeSpeed {
     return Intl.message(

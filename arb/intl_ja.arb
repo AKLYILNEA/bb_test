@@ -20,6 +20,8 @@
   "trafficUsage": "通信量統計",
   "coreInfo": "カーネル情報",
   "networkSpeed": "通信速度",
+  "speedTest": "速度テスト",
+  "speedTestDesc": "ブラウザのスピードテストサイトを開きます",
   "realTimeSpeed": "リアルタイム速度",
   "connectionsSort": "接続並び替え",
   "totalTraffic": "総通信量",

@@ -20,6 +20,8 @@
   "trafficUsage": "Трафик",
   "coreInfo": "Информация о ядре",
   "networkSpeed": "Скорость сети",
+  "speedTest": "Тест скорости",
+  "speedTestDesc": "Откроется сайт проверки скорости в браузере",
   "realTimeSpeed": "Текущая скорость",
   "connectionsSort": "Сортировка соединений",
   "totalTraffic": "Общий трафик",

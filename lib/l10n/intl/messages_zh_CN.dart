@@ -543,6 +543,8 @@ class MessageLookup extends MessageLookupByLibrary {
       "输入 IP、CIDR 或 Gateway:IP/CIDR",
     ),
     "networkSpeed": MessageLookupByLibrary.simpleMessage("网络速度"),
+    "speedTest": MessageLookupByLibrary.simpleMessage("测速"),
+    "speedTestDesc": MessageLookupByLibrary.simpleMessage("将前往浏览器测速网站进行测速"),
     "networkSpeedNotification": MessageLookupByLibrary.simpleMessage("网速通知"),
     "networkSpeedNotificationDesc": MessageLookupByLibrary.simpleMessage(
       "在通知栏显示网速和订阅信息",

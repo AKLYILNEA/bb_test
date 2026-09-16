@@ -251,6 +251,8 @@ extension MediaPlatformExt on MediaPlatform {
         MediaPlatform.coinbase ||
         MediaPlatform.phantom ||
         MediaPlatform.kraken => false,
+        // E-Hentai 是深红色单色标记，深色背景下偏暗，单独加入反色
+        MediaPlatform.ehentai => true,
         _ => category == MediaCategory.crypto,
       };
 

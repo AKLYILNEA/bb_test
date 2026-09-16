@@ -20,6 +20,8 @@
   "trafficUsage": "트래픽 사용량",
   "coreInfo": "코어 정보",
   "networkSpeed": "네트워크 속도",
+  "speedTest": "속도 테스트",
+  "speedTestDesc": "브라우저 속도 테스트 사이트로 이동합니다",
   "realTimeSpeed": "실시간 속도",
   "connectionsSort": "연결 정렬",
   "totalTraffic": "전체 전송량",
