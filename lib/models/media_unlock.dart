@@ -10,26 +10,43 @@ const monochromeColorFilter = ColorFilter.matrix(<double>[
 const mediaUnlockGreen = Color(0xFF10B981);
 const mediaUnlockOrange = Color(0xFFF59E0B);
 
-/// 深色模式下的整体反色滤镜，供 [MediaPlatform.invertOnDark] 的黑白双色素材使用
-const invertColorFilter = ColorFilter.matrix(<double>[
-  -1, 0, 0, 0, 255,
-  0, -1, 0, 0, 255,
-  0, 0, -1, 0, 255,
-  0, 0, 0, 1, 0,
-]);
+/// 深色模式下把双色素材映射到主题色系：暗部 → `onSurface`、亮部 → `surface`，
+/// 与其余单色图标同色系，不会出现纯白/纯黑那种突兀感。
+ColorFilter themedInvertFilter(ColorScheme colorScheme) {
+  final fg = colorScheme.onSurface;
+  final bg = colorScheme.surface;
+  const lr = 0.2126, lg = 0.7152, lb = 0.0722;
+  List<double> row(double f, double b) => <double>[
+        lr * (b - f) / 255,
+        lg * (b - f) / 255,
+        lb * (b - f) / 255,
+        0,
+        f,
+      ];
+  return ColorFilter.matrix(<double>[
+    ...row(fg.r * 255, bg.r * 255),
+    ...row(fg.g * 255, bg.g * 255),
+    ...row(fg.b * 255, bg.b * 255),
+    0, 0, 0, 1, 0,
+  ]);
+}
 
-/// 双色素材（如 OKX 黑底白标记徽标）没法靠主题着色适配，
-/// 改为深色模式整体反色：浅色模式保持原样，深色模式黑底变白底、白标记变黑标记。
+/// 双色素材（如 OKX 黑底白标记徽标）没法靠单色着色适配：
+/// 浅色模式保持原样，深色模式按主题色系做一次亮度反色（黑底变主题前景色、
+/// 白标记变卡片底色），与其它图标观感一致。
 Widget themedPlatformIcon(
   BuildContext context,
   MediaPlatform platform,
   Widget icon,
 ) {
-  if (!platform.invertOnDark ||
-      Theme.of(context).brightness != Brightness.dark) {
+  final theme = Theme.of(context);
+  if (!platform.invertOnDark || theme.brightness != Brightness.dark) {
     return icon;
   }
-  return ColorFiltered(colorFilter: invertColorFilter, child: icon);
+  return ColorFiltered(
+    colorFilter: themedInvertFilter(theme.colorScheme),
+    child: icon,
+  );
 }
 
 enum MediaCategory {
