@@ -29,7 +29,7 @@ class Ipv6Switch extends StatelessWidget {
           );
         },
         child: Container(
-          padding: baseInfoEdgeInsets.copyWith(top: 0, bottom: 8, right: 8),
+          padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 12),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -47,21 +47,24 @@ class Ipv6Switch extends StatelessWidget {
                   ),
                 ),
               ),
-              Consumer(
-                builder: (_, ref, _) {
-                  final ipv6 = ref.watch(
-                    patchClashConfigProvider.select((state) => state.ipv6),
-                  );
-                  return Switch(
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    value: ipv6,
-                    onChanged: (value) {
-                      ref
-                          .read(patchClashConfigProvider.notifier)
-                          .updateState((state) => state.copyWith(ipv6: value));
-                    },
-                  );
-                },
+              Transform.translate(
+                offset: const Offset(0, -3),
+                child: Consumer(
+                  builder: (_, ref, _) {
+                    final ipv6 = ref.watch(
+                      patchClashConfigProvider.select((state) => state.ipv6),
+                    );
+                    return Switch(
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      value: ipv6,
+                      onChanged: (value) {
+                        ref
+                            .read(patchClashConfigProvider.notifier)
+                            .updateState((state) => state.copyWith(ipv6: value));
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),

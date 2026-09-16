@@ -54,7 +54,7 @@ class WakelockSwitch extends StatelessWidget {
             );
           },
           child: Container(
-            padding: baseInfoEdgeInsets.copyWith(top: 0, bottom: 8, right: 8),
+            padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 12),
             child: Row(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -72,15 +72,18 @@ class WakelockSwitch extends StatelessWidget {
                     ),
                   ),
                 ),
-                Consumer(
-                  builder: (_, ref, _) {
-                    final wakelockEnabled = ref.watch(wakelockStateProvider);
-                    return Switch(
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      value: wakelockEnabled,
-                      onChanged: (value) => _toggleWakelock(context, value),
-                    );
-                  },
+                Transform.translate(
+                  offset: const Offset(0, -3),
+                  child: Consumer(
+                    builder: (_, ref, _) {
+                      final wakelockEnabled = ref.watch(wakelockStateProvider);
+                      return Switch(
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        value: wakelockEnabled,
+                        onChanged: (value) => _toggleWakelock(context, value),
+                      );
+                    },
+                  ),
                 ),
               ],
             ),

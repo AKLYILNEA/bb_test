@@ -82,7 +82,7 @@ class ScriptOverride extends ConsumerWidget {
           _openScripts(context);
         },
         child: Container(
-          padding: baseInfoEdgeInsets.copyWith(top: 0, bottom: 8, right: 8),
+          padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 12),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -100,14 +100,17 @@ class ScriptOverride extends ConsumerWidget {
                   ),
                 ),
               ),
-              Switch(
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                value: isEnabled,
-                onChanged: hasScripts
-                    ? (value) {
-                        _handleToggle(ref, value);
-                      }
-                    : null,
+              Transform.translate(
+                offset: const Offset(0, -3),
+                child: Switch(
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  value: isEnabled,
+                  onChanged: hasScripts
+                      ? (value) {
+                          _handleToggle(ref, value);
+                        }
+                      : null,
+                ),
               ),
             ],
           ),

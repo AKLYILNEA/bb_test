@@ -29,7 +29,7 @@ class NtpOverride extends StatelessWidget {
           );
         },
         child: Container(
-          padding: baseInfoEdgeInsets.copyWith(top: 0, bottom: 8, right: 8),
+          padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 12),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -47,17 +47,20 @@ class NtpOverride extends StatelessWidget {
                   ),
                 ),
               ),
-              Consumer(
-                builder: (_, ref, _) {
-                  final override = ref.watch(overrideNtpProvider);
-                  return Switch(
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    value: override,
-                    onChanged: (value) {
-                      ref.read(overrideNtpProvider.notifier).value = value;
-                    },
-                  );
-                },
+              Transform.translate(
+                offset: const Offset(0, -3),
+                child: Consumer(
+                  builder: (_, ref, _) {
+                    final override = ref.watch(overrideNtpProvider);
+                    return Switch(
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      value: override,
+                      onChanged: (value) {
+                        ref.read(overrideNtpProvider.notifier).value = value;
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),

@@ -66,7 +66,7 @@ class DnsOverride extends StatelessWidget {
           await _handleClearCache(context);
         },
         child: Container(
-          padding: baseInfoEdgeInsets.copyWith(top: 0, bottom: 8, right: 8),
+          padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 12),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -84,17 +84,20 @@ class DnsOverride extends StatelessWidget {
                   ),
                 ),
               ),
-              Consumer(
-                builder: (_, ref, _) {
-                  final override = ref.watch(overrideDnsProvider);
-                  return Switch(
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    value: override,
-                    onChanged: (value) {
-                      ref.read(overrideDnsProvider.notifier).value = value;
-                    },
-                  );
-                },
+              Transform.translate(
+                offset: const Offset(0, -3),
+                child: Consumer(
+                  builder: (_, ref, _) {
+                    final override = ref.watch(overrideDnsProvider);
+                    return Switch(
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      value: override,
+                      onChanged: (value) {
+                        ref.read(overrideDnsProvider.notifier).value = value;
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),

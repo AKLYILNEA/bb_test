@@ -47,7 +47,7 @@ class AccessControlSwitch extends ConsumerWidget {
             _openAccessControl(context);
           },
           child: Container(
-            padding: baseInfoEdgeInsets.copyWith(top: 0, bottom: 8, right: 8),
+            padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 12),
             child: Row(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -65,17 +65,20 @@ class AccessControlSwitch extends ConsumerWidget {
                     ),
                   ),
                 ),
-                Switch(
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  value: enabled,
-                  onChanged: (value) {
-                    ref
-                        .read(vpnSettingProvider.notifier)
-                        .updateState(
-                          (state) =>
-                              state.copyWith.accessControl(enable: value),
-                        );
-                  },
+                Transform.translate(
+                  offset: const Offset(0, -3),
+                  child: Switch(
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    value: enabled,
+                    onChanged: (value) {
+                      ref
+                          .read(vpnSettingProvider.notifier)
+                          .updateState(
+                            (state) =>
+                                state.copyWith.accessControl(enable: value),
+                          );
+                    },
+                  ),
                 ),
               ],
             ),
