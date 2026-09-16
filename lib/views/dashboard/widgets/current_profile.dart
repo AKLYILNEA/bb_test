@@ -51,7 +51,8 @@ class CurrentProfile extends ConsumerWidget {
                     Flexible(
                       flex: 1,
                       child: TooltipText(
-                        text: Text(
+                        // 配置名可能含 emoji：用 EmojiText 才会走自定义表情字体渲染
+                        text: EmojiText(
                           profile?.label ?? '',
                           style: context.textTheme.bodyMedium?.toLight
                               .adjustSize(1),
