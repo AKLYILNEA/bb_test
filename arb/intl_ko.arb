@@ -8,6 +8,7 @@
   "proxies": "프록시",
   "profile": "프로필",
   "profiles": "프로필",
+  "currentProfile": "현재 프로필",
   "tools": "도구",
   "logs": "로그",
   "logsDesc": "캡처된 로그 기록 보기",

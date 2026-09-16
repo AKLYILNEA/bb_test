@@ -342,7 +342,8 @@ enum DashboardWidget {
   ),
   onlinePanel(GridItem(crossAxisCellCount: 4, child: OnlinePanel())),
   mediaUnlock(GridItem(crossAxisCellCount: 8, child: MediaUnlock())),
-  mediaUnlockSmall(GridItem(crossAxisCellCount: 4, child: MediaUnlockSmall()));
+  mediaUnlockSmall(GridItem(crossAxisCellCount: 4, child: MediaUnlockSmall())),
+  currentProfile(GridItem(crossAxisCellCount: 4, child: CurrentProfile()));
 
   final GridItem widget;
   final List<SupportPlatform> platforms;

@@ -109,6 +109,11 @@ class AppLocalizations {
     return Intl.message('Profiles', name: 'profiles', desc: '', args: []);
   }
 
+  /// `Current Profile`
+  String get currentProfile {
+    return Intl.message('Current Profile', name: 'currentProfile', desc: '', args: []);
+  }
+
   /// `Tools`
   String get tools {
     return Intl.message('Tools', name: 'tools', desc: '', args: []);

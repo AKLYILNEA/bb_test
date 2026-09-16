@@ -234,6 +234,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "crashTest": MessageLookupByLibrary.simpleMessage("崩潰測試"),
     "create": MessageLookupByLibrary.simpleMessage("建立"),
     "creationTime": MessageLookupByLibrary.simpleMessage("建立時間"),
+    "currentProfile": MessageLookupByLibrary.simpleMessage("當前配置"),
     "custom": MessageLookupByLibrary.simpleMessage("自訂"),
     "customDashboardTitle": MessageLookupByLibrary.simpleMessage("個人化標題"),
     "customScriptOptions": MessageLookupByLibrary.simpleMessage("自訂規則開關"),

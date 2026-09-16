@@ -8,6 +8,7 @@
   "proxies": "代理",
   "profile": "配置",
   "profiles": "配置",
+  "currentProfile": "當前配置",
   "tools": "更多",
   "logs": "日誌",
   "logsDesc": "查看日誌擷取記錄",

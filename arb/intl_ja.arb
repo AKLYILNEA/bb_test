@@ -8,6 +8,7 @@
   "proxies": "プロキシ",
   "profile": "プロファイル",
   "profiles": "プロファイル",
+  "currentProfile": "現在のプロファイル",
   "tools": "ツール",
   "logs": "ログ",
   "logsDesc": "キャプチャログの確認",

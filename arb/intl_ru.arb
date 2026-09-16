@@ -8,6 +8,7 @@
   "proxies": "Прокси",
   "profile": "Профиль",
   "profiles": "Профили",
+  "currentProfile": "Текущий профиль",
   "tools": "Инструменты",
   "logs": "Логи",
   "logsDesc": "Просмотр логов",

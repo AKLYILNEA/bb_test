@@ -8,6 +8,7 @@
   "proxies": "Proxies",
   "profile": "Profile",
   "profiles": "Profiles",
+  "currentProfile": "Current Profile",
   "tools": "Tools",
   "logs": "Logs",
   "logsDesc": "View captured logs",

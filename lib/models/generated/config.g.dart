@@ -122,6 +122,7 @@ const _$DashboardWidgetEnumMap = {
   DashboardWidget.onlinePanel: 'onlinePanel',
   DashboardWidget.mediaUnlock: 'mediaUnlock',
   DashboardWidget.mediaUnlockSmall: 'mediaUnlockSmall',
+  DashboardWidget.currentProfile: 'currentProfile',
 };
 
 const _$MediaPlatformEnumMap = {
