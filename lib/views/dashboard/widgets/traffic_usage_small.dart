@@ -86,8 +86,7 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
     return SizedBox(
       height: getWidgetHeight(1),
       child: CommonCard(
-        onPressed: () {},
-        onLongPress: _showDisplaySettings,
+        onPressed: _showDisplaySettings,
         child: ValueListenableBuilder<int>(
           valueListenable: dashboardRefreshManager.tick1s,
           builder: (_, _, _) {
