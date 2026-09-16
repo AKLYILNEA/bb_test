@@ -226,9 +226,16 @@ extension MediaPlatformExt on MediaPlatform {
         _ => false,
       };
 
-  /// 黑白双色素材（含徽标底色）走深色模式反色，见 [themedPlatformIcon]；
-  /// 单色素材请改用 [isMonochrome]
-  bool get invertOnDark => this == MediaPlatform.okx;
+  /// 深色模式下整体反色的素材，见 [themedPlatformIcon]；单色黑素材请用 [isMonochrome]。
+  ///
+  /// crypto 分类默认整体反色（这类标记多为黑/深色，深色背景下要反色才看得清），
+  /// 但彩色品牌徽标例外：反色会破坏品牌色，因此显式排除。
+  bool get invertOnDark => switch (this) {
+        MediaPlatform.coinbase ||
+        MediaPlatform.phantom ||
+        MediaPlatform.kraken => false,
+        _ => category == MediaCategory.crypto,
+      };
 
   bool get pinColoBadge => this == MediaPlatform.telegram;
 }
