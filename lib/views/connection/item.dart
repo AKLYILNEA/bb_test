@@ -411,38 +411,48 @@ class TrackerInfoDetailView extends ConsumerWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Material(
-                  color: context.colorScheme.primary.withValues(alpha: 0.08),
-                  shape: pillShape,
-                  clipBehavior: Clip.antiAlias,
-                  child: InkWell(
-                    customBorder: pillShape,
-                    onTap: () {
-                      showIpDetailDialog(context, ip);
-                    },
-                    child: Padding(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            icon,
-                            size: 14,
-                            color: context.colorScheme.primary,
-                          ),
-                          const SizedBox(width: 4),
-                          Flexible(
-                            child: Text(
-                              ip,
-                              style: context.textTheme.bodyMedium?.copyWith(
-                                color: context.colorScheme.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              overflow: TextOverflow.ellipsis,
+                // 这里必须再套一层 Flexible：RenderFlex 给"非 flex 子级"的主轴约束是无界的
+                // （_constraintsForNonFlexChild → maxWidth = infinity），pill 会按固有宽度排版，
+                // 里面那层 ellipsis 完全失效 —— 长 IPv6（如远程目标）会直接冲出卡片。
+                // 成为 flex 子级后 pill 才拿到有界宽度、省略号才生效；
+                // 端口是非 flex 子级、会先被布局，所以永远完整显示，pill 只取剩余宽度。
+                Flexible(
+                  child: Material(
+                    color: context.colorScheme.primary.withValues(alpha: 0.08),
+                    shape: pillShape,
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                      customBorder: pillShape,
+                      onTap: () {
+                        showIpDetailDialog(context, ip);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              icon,
+                              size: 14,
+                              color: context.colorScheme.primary,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                ip,
+                                maxLines: 1,
+                                style: context.textTheme.bodyMedium?.copyWith(
+                                  color: context.colorScheme.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -451,6 +461,7 @@ class TrackerInfoDetailView extends ConsumerWidget {
                   const SizedBox(width: 4),
                   Text(
                     ':$port',
+                    maxLines: 1,
                     style: context.textTheme.bodyMedium,
                   ),
                 ],
