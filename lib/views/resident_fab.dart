@@ -315,9 +315,11 @@ class _ResidentFabShell extends StatelessWidget {
                   heroTag: null,
                   onPressed: content.onPressed,
                   icon: _buildContentChild(Icon(content.icon)),
-                  label: FadeTransition(
-                    opacity: contentFade,
-                    child: AnimatedContainer(
+                  // 与图标走同一个内容包装：加载中（showLoading）时图标与文字一起隐藏、
+                  // 只留加载点阵（冷启动时内核状态还没初始化，之前文字没跟着隐藏，
+                  // 就出现了文字和加载动画重叠）；代理页测速时两者也一起缩放
+                  label: _buildContentChild(
+                    AnimatedContainer(
                       // 看不见的时候宽度直接到位，只有看得见才连续变宽
                       duration: animateWidth
                           ? startFabWidthAnimationDuration
