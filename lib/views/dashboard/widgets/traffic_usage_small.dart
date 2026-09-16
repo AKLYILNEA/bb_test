@@ -17,9 +17,9 @@ class TrafficUsageSmall extends ConsumerStatefulWidget {
 }
 
 class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
-  /// 圆环边长：约为卡片高度的一半（比初版 60 缩小约 1/3），
-  /// 上下与右侧留白 = (卡片高度 - 圆环边长) / 2，三者一致即上下居中。
-  static const double _donutSize = 40;
+  /// 圆环边长：取「初版 60」与「过小版 40」的中间值 50，
+  /// 上下与右侧留白 = (卡片高度 - 圆环边长) / 2 = 17，三者一致即上下居中。
+  static const double _donutSize = 50;
 
   static double get _donutEdge => (getWidgetHeight(1) - _donutSize) / 2;
 
@@ -129,35 +129,42 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
                             ),
                           ],
                         ),
-                        Row(
-                          children: [
-                            Icon(
-                              _showUpload
-                                  ? Icons.arrow_upward_rounded
-                                  : Icons.arrow_downward_rounded,
-                              color: arrowColor,
-                              size: 14,
-                            ),
-                            const SizedBox(width: 4),
-                            Flexible(
-                              child: Text.rich(
-                                TextSpan(
-                                  children: [
-                                    TextSpan(text: value.showValue),
-                                    const TextSpan(text: ' '),
-                                    TextSpan(
-                                      text: value.showUnit,
-                                      style: context.textTheme.bodySmall
-                                          ?.toLighter,
-                                    ),
-                                  ],
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: context.textTheme.bodySmall,
+                        // 与其它数值卡同一套行盒与字号（bodyMedium + 1 → 15sp、行盒
+                        // bodyMediumHeight + 2），底部与它们严格同一基线，不再偏下/偏小
+                        SizedBox(
+                          height: globalState.measure.bodyMediumHeight + 2,
+                          child: Row(
+                            children: [
+                              Icon(
+                                _showUpload
+                                    ? Icons.arrow_upward_rounded
+                                    : Icons.arrow_downward_rounded,
+                                color: arrowColor,
+                                size: 18,
                               ),
-                            ),
-                          ],
+                              const SizedBox(width: 6),
+                              Flexible(
+                                child: Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      TextSpan(text: value.showValue),
+                                      const TextSpan(text: ' '),
+                                      TextSpan(
+                                        text: value.showUnit,
+                                        style: context.textTheme.bodyMedium
+                                            ?.toLighter
+                                            .adjustSize(1),
+                                      ),
+                                    ],
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: context.textTheme.bodyMedium?.toLight
+                                      .adjustSize(1),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
