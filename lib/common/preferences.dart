@@ -78,6 +78,17 @@ class Preferences {
     await preferences?.setBool(wakelockEnabledKey, value);
   }
 
+  /// 小型流量统计小部件显示上传还是下载数据（默认下载）
+  Future<bool> getTrafficUsageShowUpload() async {
+    final preferences = await sharedPreferencesCompleter.future;
+    return preferences?.getBool(trafficUsageShowUploadKey) ?? false;
+  }
+
+  Future<void> setTrafficUsageShowUpload(bool value) async {
+    final preferences = await sharedPreferencesCompleter.future;
+    await preferences?.setBool(trafficUsageShowUploadKey, value);
+  }
+
   Future<void> clearClashConfig() async {
     final preferences = await sharedPreferencesCompleter.future;
     preferences?.remove(clashConfigKey);
