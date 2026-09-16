@@ -8,6 +8,8 @@ import 'package:bett_box/views/proxies/common.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+// OverflowBoxFit 没有经由 material/widgets 再导出，需要显式从 rendering 取
+import 'package:flutter/rendering.dart' show OverflowBoxFit;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -326,15 +328,18 @@ class _ResidentFabShell extends StatelessWidget {
                       // 文字必须先按自身宽度单行排版，再整体居中：
                       // 宽度动画期间 label 盒子会比新文字窄，若直接放 Text（默认 softWrap），
                       // 中文会在窄盒里折行、只画出前两个字，等盒子变宽才整段显示，
-                      // 表现为「最后一下卡顿展开」。OverflowBox 让文字始终单行、居中溢出。
+                      // 表现为「最后一下卡顿展开」。
+                      // 注意 fit 必须是 deferToChild：OverflowBox 默认的 max 是 sizedByParent，
+                      // 尺寸会取 constraints.biggest，把整个 label 区撑到父级允许的最大宽度，
+                      // 结果图标被顶到最左、文字被挤出屏幕之外。
                       child: OverflowBox(
+                        fit: OverflowBoxFit.deferToChild,
                         alignment: Alignment.center,
                         minWidth: 0,
                         maxWidth: double.infinity,
                         child: Text(
                           content.labelText,
                           maxLines: 1,
-                          softWrap: false,
                           textAlign: TextAlign.center,
                           overflow: TextOverflow.visible,
                           style: startFabLabelStyle(context),
