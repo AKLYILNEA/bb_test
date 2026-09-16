@@ -323,12 +323,22 @@ class _ResidentFabShell extends StatelessWidget {
                       curve: Curves.easeOut,
                       width: content.labelWidth,
                       alignment: Alignment.center,
-                      child: Text(
-                        content.labelText,
-                        maxLines: 1,
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.visible,
-                        style: startFabLabelStyle(context),
+                      // 文字必须先按自身宽度单行排版，再整体居中：
+                      // 宽度动画期间 label 盒子会比新文字窄，若直接放 Text（默认 softWrap），
+                      // 中文会在窄盒里折行、只画出前两个字，等盒子变宽才整段显示，
+                      // 表现为「最后一下卡顿展开」。OverflowBox 让文字始终单行、居中溢出。
+                      child: OverflowBox(
+                        alignment: Alignment.center,
+                        minWidth: 0,
+                        maxWidth: double.infinity,
+                        child: Text(
+                          content.labelText,
+                          maxLines: 1,
+                          softWrap: false,
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.visible,
+                          style: startFabLabelStyle(context),
+                        ),
                       ),
                     ),
                   ),
