@@ -277,11 +277,10 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
 ///
 /// 优化要点（消除「结果出来后闪现再固定」）：
 /// - 底层轨道常驻不变，测试中与出结果之间不再整体替换控件；
-/// - 测试中仅叠加一条流动扫描条，出结果时淡出并平滑过渡；
+/// - 测试中叠加官方 `LinearProgressIndicator` 扫描动画（曲线/时序保持原样），
+///   仅通过 `borderRadius` 让两个扫描分段的左右两端都成为圆润端帽；
 /// - 结果条宽度由 [AnimationController] 从 0（或上一次的值）平滑生长到
-///   目标宽度，而不是瞬间跳到最终宽度，彻底消除闪现感；
-/// - 测试中的扫描条为**自带 3.ap 圆角的自绘胶囊**（不再使用
-///   `LinearProgressIndicator` 的直角分段），首尾圆润一致。
+///   目标宽度，而不是瞬间跳到最终宽度，彻底消除闪现感。
 class _LatencyBar extends StatefulWidget {
   final MediaUnlockStatus status;
   final int? latency;
@@ -293,15 +292,11 @@ class _LatencyBar extends StatefulWidget {
 }
 
 class _LatencyBarState extends State<_LatencyBar>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   static const _fillDuration = Duration(milliseconds: 520);
   static const _fadeDuration = Duration(milliseconds: 200);
-  static const _sweepDuration = Duration(milliseconds: 1150);
-  /// 扫描胶囊占轨道宽度的比例
-  static const _sweepFactor = 0.42;
 
   late final AnimationController _controller;
-  late final AnimationController _sweepController;
   double _from = 0.0;
   double _to = 0.0;
 
@@ -309,13 +304,6 @@ class _LatencyBarState extends State<_LatencyBar>
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this, duration: _fillDuration);
-    _sweepController = AnimationController(
-      vsync: this,
-      duration: _sweepDuration,
-    );
-    if (widget.status == MediaUnlockStatus.testing) {
-      _sweepController.repeat();
-    }
     _syncFill(animate: false);
   }
 
@@ -326,27 +314,12 @@ class _LatencyBarState extends State<_LatencyBar>
         oldWidget.latency != widget.latency) {
       _syncFill(animate: true);
     }
-    if (oldWidget.status != widget.status) {
-      _syncSweep();
-    }
   }
 
   @override
   void dispose() {
     _controller.dispose();
-    _sweepController.dispose();
     super.dispose();
-  }
-
-  /// 仅在测试态运行扫描动画，出结果后立即停止，避免长期空转耗电
-  void _syncSweep() {
-    if (widget.status == MediaUnlockStatus.testing) {
-      if (!_sweepController.isAnimating) {
-        _sweepController.repeat();
-      }
-    } else if (_sweepController.isAnimating) {
-      _sweepController.stop();
-    }
   }
 
   double get _targetFactor {
@@ -376,65 +349,23 @@ class _LatencyBarState extends State<_LatencyBar>
     _controller.forward(from: 0.0);
   }
 
-  /// 测试态的流动扫描条：自绘圆角胶囊在轨道内左右往复扫描。
-  ///
-  /// 相比 `LinearProgressIndicator`（M3 分段为直角矩形，只在轨道首尾被裁剪出
-  /// 圆角），自绘胶囊**全程保持 3.ap 圆角**，两端始终圆润统一；首尾各留一段
-  /// 淡入淡出，避免循环回绕时出现突兀跳变。
-  Widget _buildSweep(Color color) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final trackWidth = constraints.maxWidth;
-        final segmentWidth = trackWidth * _sweepFactor;
-        final travel = trackWidth - segmentWidth;
-        final radius = BorderRadius.circular(3.ap);
-        return AnimatedBuilder(
-          animation: _sweepController,
-          builder: (context, _) {
-            final t = _sweepController.value;
-            final left = travel <= 0 ? 0.0 : t * travel;
-            // 首尾各 1/6 行程做淡入淡出，循环回绕无跳变
-            final fade = t < 0.5
-                ? (t * 6).clamp(0.0, 1.0)
-                : ((1 - t) * 6).clamp(0.0, 1.0);
-            return Stack(
-              children: [
-                Positioned(
-                  left: left,
-                  top: 0,
-                  bottom: 0,
-                  width: segmentWidth,
-                  child: Opacity(
-                    opacity: fade,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: color,
-                        borderRadius: radius,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final isTesting = widget.status == MediaUnlockStatus.testing;
     final trackColor = context.colorScheme.primary.withValues(alpha: 0.12);
     final fillColor = context.colorScheme.primary.withValues(alpha: 0.6);
 
-    // 测试中：流动扫描胶囊；出结果：按延迟平滑生长。
-    // 两者尺寸完全一致（满宽 6.ap 轨道），因此淡入淡出重叠不会产生跳变，
-    // 且扫描动画在退场结束后即停止，不会长期空转。
+    // 测试中：官方扫描动画（曲线/时序完全保持原样，仅显式指定 borderRadius
+    // 让两个扫描分段的左右两端都成为圆润端帽）；出结果：按延迟平滑生长。
+    // 两者尺寸完全一致（满宽 6.ap 轨道），因此淡入淡出重叠不会产生跳变。
     final Widget indicator = RepaintBoundary(
       key: ValueKey<bool>(isTesting),
       child: isTesting
-          ? _buildSweep(fillColor)
+          ? LinearProgressIndicator(
+              backgroundColor: Colors.transparent,
+              valueColor: AlwaysStoppedAnimation<Color>(fillColor),
+              borderRadius: BorderRadius.circular(3.ap),
+            )
           : AnimatedBuilder(
               animation: _controller,
               builder: (context, _) {

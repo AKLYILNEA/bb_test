@@ -343,10 +343,7 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
     );
   }
 
-  Future<void> _toPage(
-    PageLabel pageLabel, [
-    bool ignoreAnimateTo = false,
-  ]) async {
+  Future<void> _toPage(PageLabel pageLabel) async {
     if (!mounted) {
       return;
     }
@@ -365,25 +362,23 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
 
     _currentPageIndex = index;
 
-    // 移动端统一使用标准 PageView 平移动画；桌面端保持 0ms 瞬间直切。
-    if (isMobile && !ignoreAnimateTo) {
-      if (_pageController.hasClients) {
-        await _pageController.animateToPage(
-          index,
-          duration: kTabScrollDuration,
-          curve: Curves.easeOut,
-        );
-      }
-    } else {
+    // 移动端：AnimatedSwitcher 淡入淡出（由 setState 驱动，不涉及 PageView 平移）；
+    // 桌面端：保持原生利落的 0ms 瞬间直切。
+    if (isMobile) {
       if (_pageController.hasClients) {
         _pageController.jumpToPage(index);
       }
+      setState(() {});
+      return;
+    }
+    if (_pageController.hasClients) {
+      _pageController.jumpToPage(index);
     }
   }
 
   void _updatePageController() {
     final pageLabel = ref.read(currentPageLabelProvider);
-    _toPage(pageLabel, true);
+    _toPage(pageLabel);
   }
 
   @override
@@ -395,6 +390,30 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = ref.watch(isMobileViewProvider);
+
+    // 移动端：仅保留淡入淡出的基础切换动效（不再使用 PageView 水平平移动画）
+    if (isMobile) {
+      final targetIndex = (_currentPageIndex >= 0 &&
+              _currentPageIndex < widget.navigationItems.length)
+          ? _currentPageIndex
+          : (_pageIndex < 0 ? 0 : _pageIndex);
+
+      return AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        switchInCurve: Curves.easeOutCubic,
+        switchOutCurve: Curves.easeInCubic,
+        transitionBuilder: (child, animation) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        child: KeyedSubtree(
+          key: ValueKey(widget.navigationItems[targetIndex].label),
+          child: widget.pageBuilder(context, targetIndex),
+        ),
+      );
+    }
+
+    // 桌面端：保持原生利落的 0ms 瞬间直切
     return PageView.builder(
       controller: _pageController,
       physics: const NeverScrollableScrollPhysics(),
