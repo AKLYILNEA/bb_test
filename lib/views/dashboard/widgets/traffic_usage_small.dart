@@ -17,9 +17,9 @@ class TrafficUsageSmall extends ConsumerStatefulWidget {
 }
 
 class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
-  /// 圆环边长：45（先是 60、后是 40，取需求指定的中间偏大值），
-  /// 上下与右侧留白 = (卡片高度 - 圆环边长) / 2，三者一致即上下居中。
-  static const double _donutSize = 45;
+  /// 圆环边长：47（先是 60、后是 40、再是 45，按需求定稿 47），
+  /// 上下与右侧留白 = (卡片高度 - 圆环边长) / 2 = 18.5，三者一致即上下居中。
+  static const double _donutSize = 47;
 
   static double get _donutEdge => (getWidgetHeight(1) - _donutSize) / 2;
 
