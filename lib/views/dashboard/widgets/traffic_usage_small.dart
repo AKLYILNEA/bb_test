@@ -17,8 +17,11 @@ class TrafficUsageSmall extends ConsumerStatefulWidget {
 }
 
 class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
-  /// 圆环上下与右侧留白一致（上下各 12 → 圆环边长 = 卡片高度 - 24）
-  static const double _edge = 12;
+  /// 圆环边长：约为卡片高度的一半（比初版 60 缩小约 1/3），
+  /// 上下与右侧留白 = (卡片高度 - 圆环边长) / 2，三者一致即上下居中。
+  static const double _donutSize = 40;
+
+  static double get _donutEdge => (getWidgetHeight(1) - _donutSize) / 2;
 
   bool _showUpload = false;
 
@@ -90,9 +93,6 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
           builder: (_, _, _) {
             final totalTraffic = ref.read(totalTrafficProvider);
             final value = _showUpload ? totalTraffic.up : totalTraffic.down;
-            final label = _showUpload
-                ? appLocalizations.upload
-                : appLocalizations.download;
             return Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -158,22 +158,6 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
                                 style: context.textTheme.bodySmall,
                               ),
                             ),
-                            // 分割小点
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 6),
-                              child: Text(
-                                '·',
-                                style: context.textTheme.bodySmall?.toLighter,
-                              ),
-                            ),
-                            Flexible(
-                              child: Text(
-                                label,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: context.textTheme.bodySmall?.toLighter,
-                              ),
-                            ),
                           ],
                         ),
                       ],
@@ -181,10 +165,17 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
                   ),
                 ),
                 Padding(
-                  // 上下与右侧留白一致，圆环因此在该部件内上下居中
-                  padding: const EdgeInsets.all(_edge),
-                  child: AspectRatio(
-                    aspectRatio: 1,
+                  // 上下与右侧留白一致（各 (卡片高度 - 圆环边长) / 2），圆环因此上下居中；
+                  // 左侧只留一个贴边间距，把宽度让给标题，避免标题被压成省略号
+                  padding: EdgeInsets.only(
+                    left: 8,
+                    top: _donutEdge,
+                    right: _donutEdge,
+                    bottom: _donutEdge,
+                  ),
+                  child: SizedBox(
+                    width: _donutSize,
+                    height: _donutSize,
                     child: DonutChart(
                       trackColor: context.colorScheme.surfaceContainerHighest
                           .withValues(alpha: 0.35),
