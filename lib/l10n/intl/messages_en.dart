@@ -1104,7 +1104,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "settings": MessageLookupByLibrary.simpleMessage("Settings"),
     "show": MessageLookupByLibrary.simpleMessage("Show"),
     "showHiddenItems": MessageLookupByLibrary.simpleMessage(
-      "Hidden Items",
+      "Show Hidden Items",
     ),
     "showMenu": MessageLookupByLibrary.simpleMessage("Open Menu"),
     "styleSetting": MessageLookupByLibrary.simpleMessage("Style Settings"),

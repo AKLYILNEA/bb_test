@@ -73,7 +73,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "action_start": MessageLookupByLibrary.simpleMessage("開始 / 停止"),
     "action_tun": MessageLookupByLibrary.simpleMessage("仮想NIC (TUN)"),
     "action_view": MessageLookupByLibrary.simpleMessage("表示 / 非表示"),
-    "activeGoroutines": MessageLookupByLibrary.simpleMessage("Goルーチン"),
+    "activeGoroutines": MessageLookupByLibrary.simpleMessage("Goroutines"),
     "add": MessageLookupByLibrary.simpleMessage("追加"),
     "addProfile": MessageLookupByLibrary.simpleMessage("プロファイル追加"),
     "addRule": MessageLookupByLibrary.simpleMessage("ルール追加"),
@@ -451,7 +451,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(
       "ヘルスチェックのタイムアウト時間",
     ),
-    "heapObjects": MessageLookupByLibrary.simpleMessage("ヒープオブジェクト"),
+    "heapObjects": MessageLookupByLibrary.simpleMessage("Objects"),
     "highPriority": MessageLookupByLibrary.simpleMessage("高優先度"),
     "highPriorityDesc": MessageLookupByLibrary.simpleMessage(
       "メインプロセスとカーネルプロセスの優先度を付与",
@@ -876,7 +876,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "serviceRunning": MessageLookupByLibrary.simpleMessage("サービス稼働中"),
     "settings": MessageLookupByLibrary.simpleMessage("設定"),
     "show": MessageLookupByLibrary.simpleMessage("表示"),
-    "showHiddenItems": MessageLookupByLibrary.simpleMessage("非表示項目"),
+    "showHiddenItems": MessageLookupByLibrary.simpleMessage("非表示項目を表示"),
     "showMenu": MessageLookupByLibrary.simpleMessage("メニューを開く"),
     "styleSetting": MessageLookupByLibrary.simpleMessage("スタイル設定"),
     "showPanel": MessageLookupByLibrary.simpleMessage("ウィンドウを表示"),

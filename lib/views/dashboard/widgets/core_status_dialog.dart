@@ -575,6 +575,13 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
     final geodataUseText = status?.geodataUse ?? 'None';
 
     final metricItems = <_MetricItem>[
+      // 顺序与显示条件保持官方逻辑（路由规则在最前，两个「集」类指标按需出现），
+      // 仅保留本地挑选的图标
+      _MetricItem(
+        icon: Icons.rule_rounded,
+        label: appLocalizations.rulesCount,
+        value: rulesText,
+      ),
       _MetricItem(
         icon: Icons.format_list_numbered_rounded,
         label: appLocalizations.proxiesCount,
@@ -585,21 +592,18 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
         label: appLocalizations.proxyGroupsCount,
         value: proxyGroupsText,
       ),
-      _MetricItem(
-        icon: Icons.flight_takeoff_rounded,
-        label: appLocalizations.proxyProvidersCount,
-        value: proxyProvidersText,
-      ),
-      _MetricItem(
-        icon: Icons.article_rounded,
-        label: appLocalizations.ruleProvidersCount,
-        value: ruleProvidersText,
-      ),
-      _MetricItem(
-        icon: Icons.rule_rounded,
-        label: appLocalizations.rulesCount,
-        value: rulesText,
-      ),
+      if ((status?.ruleProviders ?? 0) > 0)
+        _MetricItem(
+          icon: Icons.article_rounded,
+          label: appLocalizations.ruleProvidersCount,
+          value: ruleProvidersText,
+        ),
+      if ((status?.proxyProviders ?? 0) > 0)
+        _MetricItem(
+          icon: Icons.flight_takeoff_rounded,
+          label: appLocalizations.proxyProvidersCount,
+          value: proxyProvidersText,
+        ),
     ];
 
     return CommonDialog(

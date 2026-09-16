@@ -71,7 +71,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "action_start": MessageLookupByLibrary.simpleMessage("啟動 / 停止"),
     "action_tun": MessageLookupByLibrary.simpleMessage("虛擬網卡"),
     "action_view": MessageLookupByLibrary.simpleMessage("顯示 / 隱藏"),
-    "activeGoroutines": MessageLookupByLibrary.simpleMessage("Go協程"),
+    "activeGoroutines": MessageLookupByLibrary.simpleMessage("Goroutines"),
     "add": MessageLookupByLibrary.simpleMessage("新增"),
     "addProfile": MessageLookupByLibrary.simpleMessage("新增配置"),
     "addRule": MessageLookupByLibrary.simpleMessage("新增規則"),
@@ -413,7 +413,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(
       "節點健康檢查超時時間",
     ),
-    "heapObjects": MessageLookupByLibrary.simpleMessage("堆物件"),
+    "heapObjects": MessageLookupByLibrary.simpleMessage("Objects"),
     "highPriority": MessageLookupByLibrary.simpleMessage("高優先級"),
     "highPriorityDesc": MessageLookupByLibrary.simpleMessage(
       "提升主程式和核心處理程序的優先級",
@@ -800,7 +800,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "serviceRunning": MessageLookupByLibrary.simpleMessage("服務正在執行中"),
     "settings": MessageLookupByLibrary.simpleMessage("設定"),
     "show": MessageLookupByLibrary.simpleMessage("顯示"),
-    "showHiddenItems": MessageLookupByLibrary.simpleMessage("隱藏項"),
+    "showHiddenItems": MessageLookupByLibrary.simpleMessage("顯示隱藏項"),
     "showMenu": MessageLookupByLibrary.simpleMessage("打開選單"),
     "styleSetting": MessageLookupByLibrary.simpleMessage("樣式設定"),
     "showPanel": MessageLookupByLibrary.simpleMessage("顯示視窗"),

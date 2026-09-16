@@ -73,7 +73,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "action_start": MessageLookupByLibrary.simpleMessage("시작 / 정지"),
     "action_tun": MessageLookupByLibrary.simpleMessage("가상 어댑터 (TUN)"),
     "action_view": MessageLookupByLibrary.simpleMessage("표시 / 숨기기"),
-    "activeGoroutines": MessageLookupByLibrary.simpleMessage("Go 루틴"),
+    "activeGoroutines": MessageLookupByLibrary.simpleMessage("Goroutines"),
     "add": MessageLookupByLibrary.simpleMessage("추가"),
     "addProfile": MessageLookupByLibrary.simpleMessage("프로필 추가"),
     "addRule": MessageLookupByLibrary.simpleMessage("규칙 추가"),
@@ -461,7 +461,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(
       "노드 상태 점검 타임아웃 시간",
     ),
-    "heapObjects": MessageLookupByLibrary.simpleMessage("힙 객체"),
+    "heapObjects": MessageLookupByLibrary.simpleMessage("Objects"),
     "highPriority": MessageLookupByLibrary.simpleMessage("높은 우선순위"),
     "highPriorityDesc": MessageLookupByLibrary.simpleMessage(
       "메인 프로세스 및 코어 프로세스 우선순위 상향",
@@ -886,7 +886,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "serviceRunning": MessageLookupByLibrary.simpleMessage("서비스 실행 중"),
     "settings": MessageLookupByLibrary.simpleMessage("설정"),
     "show": MessageLookupByLibrary.simpleMessage("표시"),
-    "showHiddenItems": MessageLookupByLibrary.simpleMessage("숨겨진 항목"),
+    "showHiddenItems": MessageLookupByLibrary.simpleMessage("숨겨진 항목 표시"),
     "showMenu": MessageLookupByLibrary.simpleMessage("메뉴 열기"),
     "styleSetting": MessageLookupByLibrary.simpleMessage("스타일 설정"),
     "showPanel": MessageLookupByLibrary.simpleMessage("창 표시"),
