@@ -378,13 +378,17 @@ class _ResidentFabShell extends StatelessWidget {
   }
 
   Widget _buildContentChild(Widget child) {
-    Widget result = Opacity(
-      opacity: content.contentOpacity,
-      child: child,
+    // 结构必须恒定：这里曾经按 `contentScale != 1` 决定要不要包 Transform.scale，
+    // 于是测速进行中切到首页时（scale ≠ 1 → 1）整棵子树换了形状、被重建，
+    // label 里的 AnimatedContainer 拿到的是新初始宽度，宽度动画直接消失
+    // （表现就是「按钮直接变长、没有动画」）。
+    // scale = 1 / opacity = 1 都是无副作用的恒等包装，所以无条件保留。
+    return FadeTransition(
+      opacity: contentFade,
+      child: Opacity(
+        opacity: content.contentOpacity,
+        child: Transform.scale(scale: content.contentScale, child: child),
+      ),
     );
-    if (content.contentScale != 1.0) {
-      result = Transform.scale(scale: content.contentScale, child: result);
-    }
-    return FadeTransition(opacity: contentFade, child: result);
   }
 }
