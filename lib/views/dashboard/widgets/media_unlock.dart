@@ -121,7 +121,7 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
           SizedBox(
             width: 20.ap,
             height: 20.ap,
-            child: Center(child: icon),
+            child: Center(child: themedPlatformIcon(context, platform, icon)),
           ),
           SizedBox(width: 8.ap),
           SizedBox(

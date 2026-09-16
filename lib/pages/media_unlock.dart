@@ -172,7 +172,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
     return SizedBox(
       width: size,
       height: size,
-      child: Center(child: icon),
+      child: Center(child: themedPlatformIcon(context, platform, icon)),
     );
   }
 

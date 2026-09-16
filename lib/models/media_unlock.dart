@@ -10,6 +10,28 @@ const monochromeColorFilter = ColorFilter.matrix(<double>[
 const mediaUnlockGreen = Color(0xFF10B981);
 const mediaUnlockOrange = Color(0xFFF59E0B);
 
+/// 深色模式下的整体反色滤镜，供 [MediaPlatform.invertOnDark] 的黑白双色素材使用
+const invertColorFilter = ColorFilter.matrix(<double>[
+  -1, 0, 0, 0, 255,
+  0, -1, 0, 0, 255,
+  0, 0, -1, 0, 255,
+  0, 0, 0, 1, 0,
+]);
+
+/// 双色素材（如 OKX 黑底白标记徽标）没法靠主题着色适配，
+/// 改为深色模式整体反色：浅色模式保持原样，深色模式黑底变白底、白标记变黑标记。
+Widget themedPlatformIcon(
+  BuildContext context,
+  MediaPlatform platform,
+  Widget icon,
+) {
+  if (!platform.invertOnDark ||
+      Theme.of(context).brightness != Brightness.dark) {
+    return icon;
+  }
+  return ColorFiltered(colorFilter: invertColorFilter, child: icon);
+}
+
 enum MediaCategory {
   ai,
   streaming,
@@ -196,13 +218,17 @@ extension MediaPlatformExt on MediaPlatform {
         MediaPlatform.tiktok ||
         MediaPlatform.medium ||
         MediaPlatform.grok ||
+        MediaPlatform.unpkg ||
         // 品牌本身是黑/白单色素材：跟随主题着色，浅色模式黑、深色模式白
-        MediaPlatform.okx ||
         MediaPlatform.ubisoft ||
         MediaPlatform.epic =>
           true,
         _ => false,
       };
+
+  /// 黑白双色素材（含徽标底色）走深色模式反色，见 [themedPlatformIcon]；
+  /// 单色素材请改用 [isMonochrome]
+  bool get invertOnDark => this == MediaPlatform.okx;
 
   bool get pinColoBadge => this == MediaPlatform.telegram;
 }
