@@ -34,7 +34,6 @@ enum MediaPlatform {
   youtube,
   spotify,
   tiktok,
-  bilibili,
   iqiyi,
   crunchyroll,
   missav,
@@ -43,6 +42,7 @@ enum MediaPlatform {
   alidnsprobe,
   netease,
   bytedance,
+  bilibili,
   cloudflarecn,
   reddit,
   x,
@@ -51,6 +51,7 @@ enum MediaPlatform {
   medium,
   stackoverflow,
   quora,
+  telegram,
   github,
   wikipedia,
   apple,
@@ -58,7 +59,6 @@ enum MediaPlatform {
   cloudflare,
   gitlab,
   npm,
-  jsdelivr,
   cdnjs,
   unpkg,
   nodejs,
@@ -89,7 +89,6 @@ extension MediaPlatformExt on MediaPlatform {
         MediaPlatform.youtube ||
         MediaPlatform.spotify ||
         MediaPlatform.tiktok ||
-        MediaPlatform.bilibili ||
         MediaPlatform.iqiyi ||
         MediaPlatform.crunchyroll ||
         MediaPlatform.missav ||
@@ -99,6 +98,7 @@ extension MediaPlatformExt on MediaPlatform {
         MediaPlatform.alidnsprobe ||
         MediaPlatform.netease ||
         MediaPlatform.bytedance ||
+        MediaPlatform.bilibili ||
         MediaPlatform.cloudflarecn =>
           MediaCategory.china,
         MediaPlatform.reddit ||
@@ -107,7 +107,8 @@ extension MediaPlatformExt on MediaPlatform {
         MediaPlatform.v2ex ||
         MediaPlatform.medium ||
         MediaPlatform.stackoverflow ||
-        MediaPlatform.quora =>
+        MediaPlatform.quora ||
+        MediaPlatform.telegram =>
           MediaCategory.social,
         MediaPlatform.github ||
         MediaPlatform.wikipedia ||
@@ -116,7 +117,6 @@ extension MediaPlatformExt on MediaPlatform {
         MediaPlatform.cloudflare ||
         MediaPlatform.gitlab ||
         MediaPlatform.npm ||
-        MediaPlatform.jsdelivr ||
         MediaPlatform.cdnjs ||
         MediaPlatform.unpkg ||
         MediaPlatform.nodejs =>
@@ -149,7 +149,7 @@ extension MediaPlatformExt on MediaPlatform {
         MediaPlatform.youtube => 'YouTube',
         MediaPlatform.spotify => 'Spotify',
         MediaPlatform.tiktok => 'TikTok',
-        MediaPlatform.bilibili => 'BiliBili',
+        MediaPlatform.bilibili => 'Bilibili(CN)',
         MediaPlatform.iqiyi => 'iQIYI',
         MediaPlatform.crunchyroll => 'Crunchyroll',
         MediaPlatform.missav => 'MissAV',
@@ -166,13 +166,13 @@ extension MediaPlatformExt on MediaPlatform {
         MediaPlatform.medium => 'Medium',
         MediaPlatform.stackoverflow => 'Stack Overflow',
         MediaPlatform.quora => 'Quora',
+        MediaPlatform.telegram => 'Telegram',
         MediaPlatform.github => 'GitHub',
         MediaPlatform.wikipedia => 'Wikipedia',
         MediaPlatform.apple => 'Apple',
         MediaPlatform.onetrust => 'OneTrust',
         MediaPlatform.gitlab => 'GitLab',
         MediaPlatform.npm => 'npm',
-        MediaPlatform.jsdelivr => 'jsDelivr',
         MediaPlatform.cdnjs => 'cdnjs',
         MediaPlatform.unpkg => 'unpkg',
         MediaPlatform.nodejs => 'Node.js',
@@ -200,6 +200,8 @@ extension MediaPlatformExt on MediaPlatform {
           true,
         _ => false,
       };
+
+  bool get pinColoBadge => this == MediaPlatform.telegram;
 }
 
 enum MediaUnlockStatus {

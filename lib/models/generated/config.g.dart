@@ -6,54 +6,57 @@ part of '../config.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_AppSettingProps _$AppSettingPropsFromJson(Map<String, dynamic> json) =>
-    _AppSettingProps(
-      locale: json['locale'] as String?,
-      dashboardWidgets: json['dashboardWidgets'] == null
-          ? defaultDashboardWidgets
-          : dashboardWidgetsSafeFromJson(json['dashboardWidgets'] as List?),
-      mobileDashboardWidgets: json['mobileDashboardWidgets'] == null
-          ? defaultAndroidDashboardWidgets
-          : mobileDashboardWidgetsSafeFromJson(
-              json['mobileDashboardWidgets'] as List?,
-            ),
-      desktopDashboardWidgets: json['desktopDashboardWidgets'] == null
-          ? defaultDashboardWidgets
-          : desktopDashboardWidgetsSafeFromJson(
-              json['desktopDashboardWidgets'] as List?,
-            ),
-      pinnedMediaPlatforms: json['pinnedMediaPlatforms'] == null
-          ? defaultPinnedMediaPlatforms
-          : pinnedMediaPlatformsSafeFromJson(
-              json['pinnedMediaPlatforms'] as List?,
-            ),
-      onlyStatisticsProxy: json['onlyStatisticsProxy'] as bool? ?? true,
-      autoLaunch: json['autoLaunch'] as bool? ?? false,
-      silentLaunch: json['silentLaunch'] as bool? ?? false,
-      smartDelayLaunch: json['smartDelayLaunch'] as bool? ?? false,
-      autoRun: json['autoRun'] as bool? ?? false,
-      openLogs: json['openLogs'] as bool? ?? true,
-      closeConnections: json['closeConnections'] as bool? ?? true,
-      testUrl: json['testUrl'] as String? ?? defaultTestUrl,
-      showStartSwitch: json['showStartSwitch'] as bool? ?? false,
-      enableNavBarHapticFeedback:
-          json['enableNavBarHapticFeedback'] as bool? ?? true,
-      autoCheckUpdate: json['autoCheckUpdate'] as bool? ?? true,
-      showLabel: json['showLabel'] as bool? ?? false,
-      disclaimerAccepted: json['disclaimerAccepted'] as bool? ?? false,
-      minimizeOnExit: json['minimizeOnExit'] as bool? ?? true,
-      hidden: json['hidden'] as bool? ?? false,
-      developerMode: json['developerMode'] as bool? ?? false,
-      enableHighRefreshRate: json['enableHighRefreshRate'] as bool? ?? false,
-      recoveryStrategy:
-          $enumDecodeNullable(
-            _$RecoveryStrategyEnumMap,
-            json['recoveryStrategy'],
-          ) ??
-          RecoveryStrategy.compatible,
-      enableHighPriority: json['enableHighPriority'] as bool? ?? false,
-      isAnimateToPage: json['isAnimateToPage'] as bool? ?? true,
-    );
+_AppSettingProps _$AppSettingPropsFromJson(
+  Map<String, dynamic> json,
+) => _AppSettingProps(
+  locale: json['locale'] as String?,
+  dashboardWidgets: json['dashboardWidgets'] == null
+      ? defaultDashboardWidgets
+      : dashboardWidgetsSafeFromJson(json['dashboardWidgets'] as List?),
+  mobileDashboardWidgets: json['mobileDashboardWidgets'] == null
+      ? defaultAndroidDashboardWidgets
+      : mobileDashboardWidgetsSafeFromJson(
+          json['mobileDashboardWidgets'] as List?,
+        ),
+  desktopDashboardWidgets: json['desktopDashboardWidgets'] == null
+      ? defaultDashboardWidgets
+      : desktopDashboardWidgetsSafeFromJson(
+          json['desktopDashboardWidgets'] as List?,
+        ),
+  pinnedMediaPlatforms: json['pinnedMediaPlatforms'] == null
+      ? defaultPinnedMediaPlatforms
+      : pinnedMediaPlatformsSafeFromJson(json['pinnedMediaPlatforms'] as List?),
+  mediaUnlockExtraDetails: json['mediaUnlockExtraDetails'] as bool? ?? false,
+  mediaUnlockRefreshOnNodeChange:
+      json['mediaUnlockRefreshOnNodeChange'] as bool? ?? true,
+  mediaUnlockColorfulIcons: json['mediaUnlockColorfulIcons'] as bool? ?? true,
+  onlyStatisticsProxy: json['onlyStatisticsProxy'] as bool? ?? true,
+  autoLaunch: json['autoLaunch'] as bool? ?? false,
+  silentLaunch: json['silentLaunch'] as bool? ?? false,
+  smartDelayLaunch: json['smartDelayLaunch'] as bool? ?? false,
+  autoRun: json['autoRun'] as bool? ?? false,
+  openLogs: json['openLogs'] as bool? ?? true,
+  closeConnections: json['closeConnections'] as bool? ?? true,
+  testUrl: json['testUrl'] as String? ?? defaultTestUrl,
+  showStartSwitch: json['showStartSwitch'] as bool? ?? false,
+  enableNavBarHapticFeedback:
+      json['enableNavBarHapticFeedback'] as bool? ?? true,
+  autoCheckUpdate: json['autoCheckUpdate'] as bool? ?? true,
+  showLabel: json['showLabel'] as bool? ?? false,
+  disclaimerAccepted: json['disclaimerAccepted'] as bool? ?? false,
+  minimizeOnExit: json['minimizeOnExit'] as bool? ?? true,
+  hidden: json['hidden'] as bool? ?? false,
+  developerMode: json['developerMode'] as bool? ?? false,
+  enableHighRefreshRate: json['enableHighRefreshRate'] as bool? ?? false,
+  recoveryStrategy:
+      $enumDecodeNullable(
+        _$RecoveryStrategyEnumMap,
+        json['recoveryStrategy'],
+      ) ??
+      RecoveryStrategy.compatible,
+  enableHighPriority: json['enableHighPriority'] as bool? ?? false,
+  isAnimateToPage: json['isAnimateToPage'] as bool? ?? true,
+);
 
 Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>
     <String, dynamic>{
@@ -70,6 +73,9 @@ Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>
       'pinnedMediaPlatforms': instance.pinnedMediaPlatforms
           .map((e) => _$MediaPlatformEnumMap[e]!)
           .toList(),
+      'mediaUnlockExtraDetails': instance.mediaUnlockExtraDetails,
+      'mediaUnlockRefreshOnNodeChange': instance.mediaUnlockRefreshOnNodeChange,
+      'mediaUnlockColorfulIcons': instance.mediaUnlockColorfulIcons,
       'onlyStatisticsProxy': instance.onlyStatisticsProxy,
       'autoLaunch': instance.autoLaunch,
       'silentLaunch': instance.silentLaunch,
@@ -140,7 +146,6 @@ const _$MediaPlatformEnumMap = {
   MediaPlatform.youtube: 'youtube',
   MediaPlatform.spotify: 'spotify',
   MediaPlatform.tiktok: 'tiktok',
-  MediaPlatform.bilibili: 'bilibili',
   MediaPlatform.iqiyi: 'iqiyi',
   MediaPlatform.crunchyroll: 'crunchyroll',
   MediaPlatform.missav: 'missav',
@@ -149,6 +154,7 @@ const _$MediaPlatformEnumMap = {
   MediaPlatform.alidnsprobe: 'alidnsprobe',
   MediaPlatform.netease: 'netease',
   MediaPlatform.bytedance: 'bytedance',
+  MediaPlatform.bilibili: 'bilibili',
   MediaPlatform.cloudflarecn: 'cloudflarecn',
   MediaPlatform.reddit: 'reddit',
   MediaPlatform.x: 'x',
@@ -157,13 +163,13 @@ const _$MediaPlatformEnumMap = {
   MediaPlatform.medium: 'medium',
   MediaPlatform.stackoverflow: 'stackoverflow',
   MediaPlatform.quora: 'quora',
+  MediaPlatform.telegram: 'telegram',
   MediaPlatform.github: 'github',
   MediaPlatform.wikipedia: 'wikipedia',
   MediaPlatform.apple: 'apple',
   MediaPlatform.onetrust: 'onetrust',
   MediaPlatform.gitlab: 'gitlab',
   MediaPlatform.npm: 'npm',
-  MediaPlatform.jsdelivr: 'jsdelivr',
   MediaPlatform.cdnjs: 'cdnjs',
   MediaPlatform.unpkg: 'unpkg',
   MediaPlatform.nodejs: 'nodejs',

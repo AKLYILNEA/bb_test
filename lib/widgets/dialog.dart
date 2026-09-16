@@ -11,6 +11,7 @@ import 'text.dart';
 
 class CommonDialog extends ConsumerWidget {
   final String title;
+  final Widget? titleTrailing;
   final Widget? child;
   final List<Widget>? actions;
   final EdgeInsets? padding;
@@ -20,6 +21,7 @@ class CommonDialog extends ConsumerWidget {
   const CommonDialog({
     super.key,
     required this.title,
+    this.titleTrailing,
     this.actions,
     this.child,
     this.padding,
@@ -46,13 +48,29 @@ class CommonDialog extends ConsumerWidget {
         shape: RoundedSuperellipseBorder(
           borderRadius: BorderRadius.circular(35),
         ),
-        title: EmojiText(
-          title,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontVariations: [FontVariation('wght', 700)],
-          ),
-        ),
+        title: titleTrailing == null
+            ? EmojiText(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontVariations: [FontVariation('wght', 700)],
+                ),
+              )
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  EmojiText(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontVariations: [FontVariation('wght', 700)],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  titleTrailing!,
+                ],
+              ),
         actions: actions,
         contentPadding: padding,
         backgroundColor: backgroundColor,

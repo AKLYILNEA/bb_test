@@ -111,10 +111,9 @@ List<DashboardWidget> desktopDashboardWidgetsSafeFromJson(
 }
 
 const List<MediaPlatform> defaultPinnedMediaPlatforms = [
-  MediaPlatform.netflix,
-  MediaPlatform.disney,
-  MediaPlatform.youtube,
-  MediaPlatform.openai,
+  MediaPlatform.reddit,
+  MediaPlatform.gemini,
+  MediaPlatform.cloudflare,
 ];
 
 List<MediaPlatform> pinnedMediaPlatformsSafeFromJson(
@@ -154,6 +153,9 @@ abstract class AppSettingProps with _$AppSettingProps {
     @Default(defaultPinnedMediaPlatforms)
     @JsonKey(fromJson: pinnedMediaPlatformsSafeFromJson)
     List<MediaPlatform> pinnedMediaPlatforms,
+    @Default(false) bool mediaUnlockExtraDetails,
+    @Default(true) bool mediaUnlockRefreshOnNodeChange,
+    @Default(true) bool mediaUnlockColorfulIcons,
     @Default(true) bool onlyStatisticsProxy,
     @Default(false) bool autoLaunch,
     @Default(false) bool silentLaunch,

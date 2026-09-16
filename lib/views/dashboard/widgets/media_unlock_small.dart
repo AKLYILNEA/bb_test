@@ -17,22 +17,13 @@ class MediaUnlockSmall extends ConsumerStatefulWidget {
 }
 
 class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mediaUnlockState.state.value.lastChecked == null) {
-        mediaUnlockState.tryStartCheck();
-      }
-    });
-  }
-
   Widget _buildPlatformRow(
     MediaPlatform platform,
     MediaUnlockResult? result,
     bool isLoading,
     BuildContext context, {
     bool isItemTesting = false,
+    required bool colorfulIcons,
   }) {
     final isTesting = isItemTesting ||
         (isLoading &&
@@ -55,6 +46,13 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
           context.colorScheme.onSurface,
           BlendMode.srcIn,
         ),
+      );
+    } else if (colorfulIcons) {
+      icon = SvgPicture.asset(
+        'assets/images/platforms/${platform.name}.svg',
+        width: 16.ap,
+        height: 16.ap,
+        fit: BoxFit.contain,
       );
     } else {
       icon = SvgPicture.asset(
@@ -122,6 +120,9 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
   Widget build(BuildContext context) {
     final pinned = ref.watch(
       appSettingProvider.select((state) => state.pinnedMediaPlatforms),
+    );
+    final colorfulIcons = ref.watch(
+      appSettingProvider.select((state) => state.mediaUnlockColorfulIcons),
     );
     final displayedPlatforms =
         (pinned.isNotEmpty ? pinned : defaultPinnedMediaPlatforms)
@@ -206,6 +207,7 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
                             context,
                             isItemTesting:
                                 state.testingPlatforms.contains(p),
+                            colorfulIcons: colorfulIcons,
                           ),
                       ],
                     ),

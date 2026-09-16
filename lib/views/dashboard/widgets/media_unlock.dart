@@ -17,16 +17,6 @@ class MediaUnlock extends ConsumerStatefulWidget {
 }
 
 class _MediaUnlockState extends ConsumerState<MediaUnlock> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mediaUnlockState.state.value.lastChecked == null) {
-        mediaUnlockState.tryStartCheck();
-      }
-    });
-  }
-
   String _getStatusText(MediaUnlockStatus status, [MediaPlatform? platform]) {
     switch (status) {
       case MediaUnlockStatus.unlocked:
@@ -36,7 +26,10 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
         }
         return appLocalizations.unlocked;
       case MediaUnlockStatus.limited:
-        return appLocalizations.limitedUnlock;
+        if (platform?.category == MediaCategory.streaming) {
+          return appLocalizations.limitedUnlock;
+        }
+        return appLocalizations.flagged;
       case MediaUnlockStatus.flagged:
         return appLocalizations.flagged;
       case MediaUnlockStatus.blocked:
@@ -56,6 +49,7 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
     bool isLoading,
     BuildContext context, {
     bool isItemTesting = false,
+    required bool colorfulIcons,
   }) {
     final isTesting = isItemTesting ||
         (isLoading &&
@@ -71,7 +65,9 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
     } else if (status == MediaUnlockStatus.testing) {
       statusDisplay = '...';
     } else if (status == MediaUnlockStatus.limited) {
-      statusDisplay = appLocalizations.limitedUnlock;
+      statusDisplay = platform.category == MediaCategory.streaming
+          ? appLocalizations.limitedUnlock
+          : appLocalizations.flagged;
     } else if (status == MediaUnlockStatus.flagged) {
       statusDisplay = appLocalizations.flagged;
     } else if (latency != null) {
@@ -96,6 +92,13 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
           context.colorScheme.onSurface,
           BlendMode.srcIn,
         ),
+      );
+    } else if (colorfulIcons) {
+      icon = SvgPicture.asset(
+        'assets/images/platforms/${platform.name}.svg',
+        width: 16.ap,
+        height: 16.ap,
+        fit: BoxFit.contain,
       );
     } else {
       icon = SvgPicture.asset(
@@ -177,6 +180,9 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
   Widget build(BuildContext context) {
     final pinned = ref.watch(
       appSettingProvider.select((state) => state.pinnedMediaPlatforms),
+    );
+    final colorfulIcons = ref.watch(
+      appSettingProvider.select((state) => state.mediaUnlockColorfulIcons),
     );
     final displayedPlatforms =
         (pinned.isNotEmpty ? pinned : defaultPinnedMediaPlatforms)
@@ -261,6 +267,7 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
                             context,
                             isItemTesting:
                                 state.testingPlatforms.contains(p),
+                            colorfulIcons: colorfulIcons,
                           ),
                       ],
                     ),
