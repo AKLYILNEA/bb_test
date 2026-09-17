@@ -61,10 +61,6 @@ Future<T?> showSheet<T>({
       isScrollControlled: props.isScrollControlled,
       backgroundColor: Colors.transparent,
       elevation: 0,
-      // 底部抽屉上移到底部安全区之上后，下面那条手势导航条区域要能透出后面的页面
-      // （完全沉浸、拖动抽屉时不留任何色块），因此遮罩默认透明；
-      // 需要压暗背景时在 SheetProps 里显式传 barrierColor。
-      barrierColor: props.barrierColor ?? Colors.transparent,
       builder: (_) {
         return builder(context, SheetType.bottomSheet);
       },
@@ -149,22 +145,16 @@ class AdaptiveSheetScaffold extends StatelessWidget {
       ]),
     );
     final content = bottomSheet
-        // SafeArea 必须放在 Material **外面**：Flutter 的模态底部弹层无论 useSafeArea
-        // 与否都会铺到屏幕最底（官方文档：the bottom sheet extends all the way to the
-        // bottom of the screen, including any system intrusions），若把 SafeArea 放在
-        // Material 内部，底部手势导航条那条内边距就会被卡片背景色填满 —— 表现为
-        // 小白条后面出现一块「主题色浅块」，而且拖动抽屉时它跟着一起上下移动，
-        // 与其它页面的 edge-to-edge 沉浸观感不一致（第 38 节）。
-        ? SafeArea(
-            top: false,
-            child: Material(
-              color: backgroundColor,
-              clipBehavior: Clip.antiAlias,
-              shape: RoundedSuperellipseBorder(
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(35.0),
-                ),
+        ? Material(
+            color: backgroundColor,
+            clipBehavior: Clip.antiAlias,
+            shape: RoundedSuperellipseBorder(
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(35.0),
               ),
+            ),
+            child: SafeArea(
+              top: false,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
