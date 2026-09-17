@@ -143,9 +143,8 @@ class AppController {
     _invalidateCoreReads();
 
     final wasRunning = _ref.read(runTimeProvider.notifier).isStart;
-    final keepVpnService = system.isAndroid;
     if (wasRunning) {
-      await globalState.handleStop(!keepVpnService);
+      await globalState.handleStop();
       _ref.read(runTimeProvider.notifier).value = null;
     }
     if (system.isAndroid) {
@@ -153,6 +152,9 @@ class AppController {
       await clashCore.flushFakeIP();
       await clashCore.flushDnsCache();
       await clashCore.requestGc(forceFreeOSMemory: true);
+      if (wasRunning) {
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
     }
     if (system.isDesktop) {
       lastProfileModified = null;
@@ -171,7 +173,7 @@ class AppController {
       await globalState.handleStart([
         updateRunTime,
         updateTraffic,
-      ], !keepVpnService);
+      ]);
       _scheduleCheckIpRefresh();
       _backgroundLoad();
     }

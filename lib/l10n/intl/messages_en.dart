@@ -542,7 +542,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Modify global settings",
     ),
     "generateFromPrivateKey": MessageLookupByLibrary.simpleMessage(
-      "Generate from Age private key",
+      "Generate from private key",
     ),
     "generateSecret": MessageLookupByLibrary.simpleMessage("Generate"),
     "geoData": MessageLookupByLibrary.simpleMessage("GeoData"),
