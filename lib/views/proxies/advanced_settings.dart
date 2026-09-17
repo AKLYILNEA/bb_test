@@ -51,7 +51,7 @@ class _NodeExclusionWithInverseItem extends ConsumerWidget {
     final nodeExcludeFilter = ref.watch(nodeExcludeFilterProvider);
 
     return ListItem(
-      leading: const Icon(Icons.call_split_rounded),
+      leading: const Icon(Icons.filter_alt_outlined),
       title: Text(appLocalizations.nodeExclusion),
       subtitle: Text(appLocalizations.nodeExclusionDesc),
       onTap: () async {
@@ -156,7 +156,7 @@ class _ConcurrencyLimitItem extends ConsumerWidget {
     );
 
     return ListItem<int>.options(
-      leading: const Icon(Icons.call_split_rounded),
+      leading: const Icon(Icons.traffic_rounded),
       title: Text(appLocalizations.concurrencyLimit),
       subtitle: Text(appLocalizations.concurrencyLimitDesc),
       delegate: OptionsDelegate(
@@ -190,7 +190,7 @@ class _HealthCheckTimeoutItem extends ConsumerWidget {
     final timeout = ref.watch(healthCheckTimeoutProvider);
 
     return ListItem<int>.options(
-      leading: const Icon(Icons.call_split_rounded),
+      leading: const Icon(Icons.timer_outlined),
       title: Text(appLocalizations.healthCheckTimeout),
       subtitle: Text(appLocalizations.healthCheckTimeoutDesc),
       delegate: OptionsDelegate(
@@ -247,7 +247,7 @@ class _DelayAnimationItem extends ConsumerWidget {
     );
 
     return ListItem<DelayAnimationType>.options(
-      leading: const Icon(Icons.call_split_rounded),
+      leading: const Icon(Icons.animation_rounded),
       title: Text(appLocalizations.delayAnimation),
       subtitle: Text(appLocalizations.delayAnimationDesc),
       delegate: OptionsDelegate(

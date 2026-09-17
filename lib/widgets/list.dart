@@ -419,15 +419,7 @@ class ListItem<T> extends StatelessWidget {
         },
         trailing: Padding(
           padding: const EdgeInsets.only(right: 8),
-          child: Icon(
-            checkboxDelegate.value
-                ? Icons.check_circle_rounded
-                : Icons.circle_outlined,
-            size: 24,
-            color: checkboxDelegate.value
-                ? context.colorScheme.primary
-                : context.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-          ),
+          child: OptionRadioIcon(selected: checkboxDelegate.value, size: 24),
         ),
       );
     }
@@ -464,13 +456,7 @@ class ListItem<T> extends StatelessWidget {
             radioDelegate.onChanged!(radioDelegate.value);
           }
         },
-        leading: Icon(
-          isSelected ? Icons.check_circle_rounded : Icons.circle_outlined,
-          size: 21,
-          color: isSelected
-              ? context.colorScheme.primary
-              : context.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-        ),
+        leading: OptionRadioIcon(selected: isSelected, size: 21),
         trailing: trailing,
       );
     }
@@ -802,4 +788,47 @@ Widget generateListView(List<Widget> items) {
       );
     },
   );
+}
+
+/// 「选中 / 未选中」单选指示图标（出站模式部件与各处选项弹窗共用）。
+class OptionRadioIcon extends StatelessWidget {
+  final bool selected;
+
+  /// 外框边长（默认 21；圆环与实心点按比例缩放）
+  final double size;
+
+  const OptionRadioIcon({super.key, required this.selected, this.size = 21});
+
+  @override
+  Widget build(BuildContext context) {
+    final primary = context.colorScheme.primary;
+    final idle = context.colorScheme.onSurfaceVariant.withValues(alpha: 0.6);
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Center(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOut,
+          width: size - 2,
+          height: size - 2,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: selected ? primary : idle, width: 2),
+          ),
+          child: selected
+              ? Container(
+                  width: size * 9 / 21,
+                  height: size * 9 / 21,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: primary,
+                  ),
+                )
+              : null,
+        ),
+      ),
+    );
+  }
 }

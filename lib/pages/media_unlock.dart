@@ -350,7 +350,6 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ListItem.switchItem(
-                    leading: const Icon(Icons.call_split_rounded),
                     title: Text(appLocalizations.mediaUnlockExtraDetails),
                     delegate: SwitchDelegate(
                       value: setting.mediaUnlockExtraDetails,
@@ -362,7 +361,6 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                     ),
                   ),
                   ListItem.switchItem(
-                    leading: const Icon(Icons.call_split_rounded),
                     title: Text(appLocalizations.mediaUnlockRefreshOnNodeChange),
                     delegate: SwitchDelegate(
                       value: setting.mediaUnlockRefreshOnNodeChange,
@@ -374,7 +372,6 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                     ),
                   ),
                   ListItem.switchItem(
-                    leading: const Icon(Icons.call_split_rounded),
                     title: Text(appLocalizations.mediaUnlockColorfulIcons),
                     delegate: SwitchDelegate(
                       value: setting.mediaUnlockColorfulIcons,

@@ -130,13 +130,7 @@ class _UaDialog extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
                   children: [
-                    Icon(
-                      !isCustom ? Icons.check_circle_rounded : Icons.circle_outlined,
-                      size: 21,
-                      color: !isCustom
-                          ? context.colorScheme.primary
-                          : context.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-                    ),
+                    OptionRadioIcon(selected: !isCustom, size: 21),
                     const SizedBox(width: 12),
                     Text(
                       appLocalizations.defaultText,
@@ -158,13 +152,7 @@ class _UaDialog extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
                   children: [
-                    Icon(
-                      isCustom ? Icons.check_circle_rounded : Icons.circle_outlined,
-                      size: 21,
-                      color: isCustom
-                          ? context.colorScheme.primary
-                          : context.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-                    ),
+                    OptionRadioIcon(selected: isCustom, size: 21),
                     const SizedBox(width: 12),
                     Text(
                       appLocalizations.custom,
@@ -310,17 +298,7 @@ class _TestUrlDialog extends ConsumerWidget {
                   ),
                   child: Row(
                     children: [
-                      Icon(
-                        isSelected
-                            ? Icons.check_circle_rounded
-                            : Icons.circle_outlined,
-                        size: 21,
-                        color: isSelected
-                            ? context.colorScheme.primary
-                            : context.colorScheme.onSurfaceVariant.withValues(
-                                alpha: 0.6,
-                              ),
-                      ),
+                      OptionRadioIcon(selected: isSelected, size: 21),
                       const SizedBox(width: 12),
                       Expanded(
                         child: isSelected
@@ -383,17 +361,7 @@ class _TestUrlDialog extends ConsumerWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      !isPresetUrl
-                          ? Icons.check_circle_rounded
-                          : Icons.circle_outlined,
-                      size: 21,
-                      color: !isPresetUrl
-                          ? context.colorScheme.primary
-                          : context.colorScheme.onSurfaceVariant.withValues(
-                              alpha: 0.6,
-                            ),
-                    ),
+                    OptionRadioIcon(selected: !isPresetUrl, size: 21),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(

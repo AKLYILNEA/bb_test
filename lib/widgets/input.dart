@@ -53,17 +53,7 @@ class OptionsDialog<T> extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Icon(
-                        value == option
-                            ? Icons.check_circle_rounded
-                            : Icons.circle_outlined,
-                        size: 21,
-                        color: value == option
-                            ? context.colorScheme.primary
-                            : context.colorScheme.onSurfaceVariant.withValues(
-                                alpha: 0.6,
-                              ),
-                      ),
+                      OptionRadioIcon(selected: value == option, size: 21),
                       const SizedBox(width: 12),
                       Expanded(
                         child: EmojiText(
