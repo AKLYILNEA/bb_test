@@ -827,10 +827,11 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
             slivers: [
               SliverToBoxAdapter(
                 child: _buildSummaryCard(
+                  // 形参顺序以上游为准：(unlocked, blocked, other, {isStreaming})；
+                  // isStreaming 保留我们的定制（streaming 与 AI 分类都算流媒体）
                   unlockedList.length,
                   blockedList.length,
                   otherList.length,
-                  unlockedList.length,
                   isStreaming: effectiveCategory == MediaCategory.streaming ||
                       effectiveCategory == MediaCategory.ai,
                 ),
