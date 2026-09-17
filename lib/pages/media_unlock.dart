@@ -142,8 +142,8 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
     if (platform.isMonochrome) {
       icon = SvgPicture.asset(
         assetPath,
-        width: iconWidth,
-        height: iconHeight,
+        width: size,
+        height: size,
         fit: BoxFit.contain,
         colorFilter: ColorFilter.mode(
           isUnlocked
@@ -157,8 +157,8 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
     } else if (isUnlocked) {
       icon = SvgPicture.asset(
         assetPath,
-        width: iconWidth,
-        height: iconHeight,
+        width: size,
+        height: size,
         fit: BoxFit.contain,
       );
     } else {
@@ -166,8 +166,8 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
         colorFilter: monochromeColorFilter,
         child: SvgPicture.asset(
           assetPath,
-          width: iconWidth,
-          height: iconHeight,
+          width: size,
+          height: size,
           fit: BoxFit.contain,
         ),
       );
@@ -350,6 +350,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ListItem.switchItem(
+                    leading: const Icon(Icons.call_split_rounded),
                     title: Text(appLocalizations.mediaUnlockExtraDetails),
                     delegate: SwitchDelegate(
                       value: setting.mediaUnlockExtraDetails,
@@ -361,6 +362,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                     ),
                   ),
                   ListItem.switchItem(
+                    leading: const Icon(Icons.call_split_rounded),
                     title: Text(appLocalizations.mediaUnlockRefreshOnNodeChange),
                     delegate: SwitchDelegate(
                       value: setting.mediaUnlockRefreshOnNodeChange,
@@ -372,6 +374,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                     ),
                   ),
                   ListItem.switchItem(
+                    leading: const Icon(Icons.call_split_rounded),
                     title: Text(appLocalizations.mediaUnlockColorfulIcons),
                     delegate: SwitchDelegate(
                       value: setting.mediaUnlockColorfulIcons,
@@ -839,16 +842,6 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
               const SliverToBoxAdapter(child: SizedBox(height: 4)),
               SliverToBoxAdapter(child: _buildCategoryTabs(isChinese)),
               const SliverToBoxAdapter(child: SizedBox(height: 8)),
-              ..._buildStatusSectionSlivers(
-                title: _selectedCategory == MediaCategory.streaming
-                    ? appLocalizations.mediaUnlocked
-                    : appLocalizations.unlocked,
-                icon: Icons.check_circle_outline_rounded,
-                color: mediaUnlockGreen,
-                platforms: unlockedList,
-                state: state,
-                showExtraDetails: showExtraDetails,
-              ),
               ..._buildStatusSectionSlivers(
                 title: appLocalizations.notUnlocked,
                 icon: Icons.cancel_outlined,
