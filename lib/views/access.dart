@@ -400,9 +400,12 @@ class _AccessViewState extends ConsumerState<AccessView>
     final currentList = accessControl.currentList;
     final packageNameList = packages.map((e) => e.packageName).toList();
     final valueList = currentList.intersection(packageNameList);
-    final describe = accessControlMode == AccessControlMode.acceptSelected
-        ? '${appLocalizations.accessControlAllowDesc} (${appLocalizations.whitelistMode})'
-        : '${appLocalizations.accessControlNotAllowDesc} (${appLocalizations.blacklistMode})';
+    final modeText = accessControlMode == AccessControlMode.acceptSelected
+        ? appLocalizations.whitelistMode
+        : appLocalizations.blacklistMode;
+    final modeDesc = accessControlMode == AccessControlMode.acceptSelected
+        ? appLocalizations.accessControlAllowDesc
+        : appLocalizations.accessControlNotAllowDesc;
 
     return Column(
       mainAxisSize: MainAxisSize.max,
@@ -498,7 +501,42 @@ class _AccessViewState extends ConsumerState<AccessView>
                                         ],
                                       ),
                                     ),
-                                    Flexible(child: Text(describe)),
+                                     Flexible(
+                                       child: InkWell(
+                                         borderRadius: BorderRadius.circular(4),
+                                         onTap: () {
+                                           globalState.showMessage(
+                                             title: modeText,
+                                             message: TextSpan(text: modeDesc),
+                                             cancelable: false,
+                                           );
+                                         },
+                                         child: Row(
+                                           mainAxisSize: MainAxisSize.min,
+                                           children: [
+                                             Text(
+                                               modeText,
+                                               style: Theme.of(context)
+                                                   .textTheme
+                                                   .bodyMedium
+                                                   ?.copyWith(
+                                                     color: Theme.of(context)
+                                                         .colorScheme
+                                                         .onSurfaceVariant,
+                                                   ),
+                                             ),
+                                             const SizedBox(width: 4),
+                                             Icon(
+                                               Icons.info_outline_rounded,
+                                               size: 15,
+                                               color: Theme.of(context)
+                                                   .colorScheme
+                                                   .onSurfaceVariant,
+                                             ),
+                                           ],
+                                         ),
+                                       ),
+                                     ),
                                   ],
                                 ),
                               ),

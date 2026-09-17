@@ -52,7 +52,7 @@ const wakelockEnabledKey = 'wakelock_enabled';
 // 小型流量统计小部件显示上传还是下载（默认下载），长按小部件可切换
 const trafficUsageShowUploadKey = 'traffic_usage_show_upload';
 const double dialogCommonWidth = 300;
-const repository = 'appshubcc/Bettbox';
+const repository = 'aaANDkk/Bettbox_Myui';
 const ipInfoToken = String.fromEnvironment('IPINFO_TOKEN', defaultValue: '');
 const defaultExternalController = '127.0.0.1:9090';
 const maxMobileWidth = 600;

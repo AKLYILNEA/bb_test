@@ -41,7 +41,7 @@ class AboutView extends StatelessWidget {
             title: 'Github Releases',
             icon: Icons.star_rounded,
             onTap: () =>
-                globalState.openUrl('https://github.com/appshubcc/Bettbox'),
+                globalState.openUrl('https://github.com/$repository'),
           ),
           right: _LinkGridTile(
             title: appLocalizations.checkUpdate,
@@ -65,16 +65,30 @@ class AboutView extends StatelessWidget {
         ),
         _LinkGridRow(
           left: _LinkGridTile(
+            title: 'Bettbox',
+            icon: Icons.launch_rounded,
+            onTap: () =>
+                globalState.openUrl('https://github.com/appshubcc/Bettbox'),
+          ),
+          right: _LinkGridTile(
             title: 'FlClash',
             icon: Icons.launch_rounded,
             onTap: () =>
                 globalState.openUrl('https://github.com/chen08209/FlClash'),
           ),
-          right: _LinkGridTile(
+        ),
+        _LinkGridRow(
+          left: _LinkGridTile(
             title: 'Mihomo',
             icon: Icons.launch_rounded,
             onTap: () =>
                 globalState.openUrl('https://github.com/MetaCubeX/mihomo'),
+          ),
+          right: _LinkGridTile(
+            title: 'Config',
+            icon: Icons.launch_rounded,
+            onTap: () =>
+                globalState.openUrl('https://github.com/aaANDkk/ClashConfig'),
           ),
         ),
       ],

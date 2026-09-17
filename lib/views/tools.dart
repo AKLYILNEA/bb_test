@@ -90,41 +90,12 @@ class _ToolViewState extends ConsumerState<ToolsView> {
     BuildContext context, {
     required String title,
     required List<Widget> items,
+    bool isFirst = false,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ListHeader(
-            title: title,
-            padding: const EdgeInsets.only(left: 8, bottom: 8),
-          ),
-          CommonCard(
-            type: CommonCardType.filled,
-            child: Column(
-              children: [
-                for (var i = 0; i < items.length; i++) ...[
-                  items[i],
-                  if (i != items.length - 1)
-                    Divider(
-                      height: 1,
-                      thickness: 1,
-                      color: context.colorScheme.outlineVariant.withValues(
-                        alpha:
-                            context.colorScheme.brightness == Brightness.light
-                            ? 0.6
-                            : 0.45,
-                      ),
-                      indent: 16,
-                      endIndent: 16,
-                    ),
-                ],
-              ],
-            ),
-          ),
-        ],
-      ),
+    return SectionContainer(
+      title: title,
+      items: items,
+      isFirst: isFirst,
     );
   }
 
@@ -1324,6 +1295,7 @@ class _ToolViewState extends ConsumerState<ToolsView> {
     }
 
     final sections = <Widget>[];
+    var isFirst = true;
     for (final entry in groups.entries) {
       sections.add(
         _buildModernSection(
@@ -1339,8 +1311,10 @@ class _ToolViewState extends ConsumerState<ToolsView> {
                 ),
               )
               .toList(),
+          isFirst: isFirst,
         ),
       );
+      isFirst = false;
     }
     return sections;
   }
@@ -1363,22 +1337,17 @@ class _ToolViewState extends ConsumerState<ToolsView> {
         : const <Widget>[];
     final isSearchEmpty = isSearching && searchResults.isEmpty;
 
+    final hasMoreSection = moreItems.isNotEmpty;
     final items = [
-      Consumer(
-        builder: (_, ref, _) {
-          final state = ref.watch(moreToolsSelectorStateProvider);
-          if (state.navigationItems.isEmpty) {
-            return Container();
-          }
-          return _buildModernSection(
-            context,
-            title: appLocalizations.more,
-            items: state.navigationItems
-                .map((item) => _buildNavigationMenuItem(item))
-                .toList(),
-          );
-        },
-      ),
+      if (hasMoreSection)
+        _buildModernSection(
+          context,
+          title: appLocalizations.more,
+          items: moreItems
+              .map((item) => _buildNavigationMenuItem(item))
+              .toList(),
+          isFirst: true,
+        ),
       _buildModernSection(
         context,
         title: appLocalizations.settings,
@@ -1393,6 +1362,7 @@ class _ToolViewState extends ConsumerState<ToolsView> {
           _OtherSettingItem(),
           _SettingItem(),
         ],
+        isFirst: !hasMoreSection,
       ),
       _buildModernSection(
         context,
