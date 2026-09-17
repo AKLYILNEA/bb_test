@@ -48,7 +48,7 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
             ListTile(
               leading: const Icon(Icons.file_upload_outlined),
               title: Text(appLocalizations.upload),
-              trailing: _showUpload ? const Icon(Icons.check_rounded) : null,
+              trailing: OptionRadioIcon(selected: _showUpload),
               onTap: () {
                 Navigator.of(context, rootNavigator: true).pop();
                 _setShowUpload(true);
@@ -57,7 +57,7 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
             ListTile(
               leading: const Icon(Icons.file_download_outlined),
               title: Text(appLocalizations.download),
-              trailing: _showUpload ? null : const Icon(Icons.check_rounded),
+              trailing: OptionRadioIcon(selected: !_showUpload),
               onTap: () {
                 Navigator.of(context, rootNavigator: true).pop();
                 _setShowUpload(false);

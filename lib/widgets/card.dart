@@ -256,19 +256,14 @@ class CommonCard extends StatelessWidget {
   }
 }
 
+/// 选中标记：与出站模式部件共用同一套「圆环 + 实心点」指示图标
+/// （第 40 节统一规范），不再使用单独的勾选图标。
 class SelectIcon extends StatelessWidget {
   const SelectIcon({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.inversePrimary,
-      shape: const CircleBorder(),
-      child: Container(
-        padding: const EdgeInsets.all(4),
-        child: const Icon(Icons.check_rounded, size: 16),
-      ),
-    );
+    return const OptionRadioIcon(selected: true, size: 20);
   }
 }
 
