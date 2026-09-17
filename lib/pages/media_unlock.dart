@@ -263,10 +263,10 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                               ),
                               for (final platform in MediaPlatform.values
                                   .where((p) => p.category == category))
-                                CheckboxListTile(
+                                ListTile(
                                   dense: true,
                                   contentPadding: EdgeInsets.zero,
-                                  secondary: Container(
+                                  leading: Container(
                                     width: 32,
                                     height: 32,
                                     clipBehavior: Clip.antiAlias,
@@ -285,9 +285,13 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                                     platform.defaultName,
                                     style: context.textTheme.bodyMedium,
                                   ),
-                                  value: currentPinned.contains(platform),
-                                  onChanged: (bool? checked) {
-                                    if (checked == true) {
+                                  trailing: OptionRadioIcon(
+                                    selected: currentPinned.contains(platform),
+                                  ),
+                                  onTap: () {
+                                    final checked =
+                                        currentPinned.contains(platform);
+                                    if (!checked) {
                                       if (currentPinned.length >= 4) {
                                         globalState.showNotifier(
                                           appLocalizations

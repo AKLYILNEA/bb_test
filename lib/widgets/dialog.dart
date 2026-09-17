@@ -57,14 +57,14 @@ class CommonDialog extends ConsumerWidget {
                 ),
               )
             : Row(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  EmojiText(
-                    title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontVariations: [FontVariation('wght', 700)],
+                  Expanded(
+                    child: EmojiText(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontVariations: [FontVariation('wght', 700)],
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
