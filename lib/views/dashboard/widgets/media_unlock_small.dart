@@ -154,7 +154,8 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
                   // 右侧刷新按钮不撑高表头：图标 / 标题 / 按钮同处一行标题高度
                   actionsHeight: globalState.measure.titleSmallHeight,
                   info: Info(
-                    label: appLocalizations.mediaUnlock,
+                    // 与连通性测试大卡一致：短标题键（英文 Connectivity）
+                    label: appLocalizations.mediaUnlockShort,
                     iconData: Icons.link_rounded,
                   ),
                   actions: [

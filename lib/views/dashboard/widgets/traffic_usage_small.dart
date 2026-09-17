@@ -117,7 +117,10 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
                               // 标题接近圆环时省略号收尾，避免与圆环贴到一起
                               child: TooltipText(
                                 text: Text(
-                                  appLocalizations.trafficUsage,
+                                  // 专用键：英文只写 Traffic（半宽卡里 "Traffic Usage"
+                                  // 会被省略号截断）；其它语言沿用流量统计的翻译，
+                                  // 大卡的英文仍保持 Traffic Usage
+                                  appLocalizations.trafficUsageSmall,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: context.textTheme.titleSmall?.copyWith(

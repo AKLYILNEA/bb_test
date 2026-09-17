@@ -109,9 +109,9 @@ class AppLocalizations {
     return Intl.message('Profiles', name: 'profiles', desc: '', args: []);
   }
 
-  /// `Current Profile`
+  /// `Profile`
   String get currentProfile {
-    return Intl.message('Current Profile', name: 'currentProfile', desc: '', args: []);
+    return Intl.message('Profile', name: 'currentProfile', desc: '', args: []);
   }
 
   /// `Tools`
@@ -174,6 +174,16 @@ class AppLocalizations {
     return Intl.message(
       'Traffic Usage',
       name: 'trafficUsage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Traffic`
+  String get trafficUsageSmall {
+    return Intl.message(
+      'Traffic',
+      name: 'trafficUsageSmall',
       desc: '',
       args: [],
     );
@@ -1539,6 +1549,16 @@ class AppLocalizations {
     return Intl.message(
       'App Access Control',
       name: 'appAccessControl',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Access`
+  String get accessControlShort {
+    return Intl.message(
+      'Access',
+      name: 'accessControlShort',
       desc: '',
       args: [],
     );
@@ -5894,6 +5914,16 @@ class AppLocalizations {
     return Intl.message(
       'Connectivity Test',
       name: 'mediaUnlock',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Connectivity`
+  String get mediaUnlockShort {
+    return Intl.message(
+      'Connectivity',
+      name: 'mediaUnlockShort',
       desc: '',
       args: [],
     );

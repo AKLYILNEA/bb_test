@@ -123,6 +123,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "app": MessageLookupByLibrary.simpleMessage("앱"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("앱 액세스 제어"),
+    "accessControlShort": MessageLookupByLibrary.simpleMessage("앱 액세스 제어"),
     "appDesc": MessageLookupByLibrary.simpleMessage("앱 관련 설정 관리"),
     "application": MessageLookupByLibrary.simpleMessage("애플리케이션"),
     "applicationDesc": MessageLookupByLibrary.simpleMessage("앱 설정 변경"),
@@ -545,6 +546,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("IP 다시 가져오기"),
     "maximize": MessageLookupByLibrary.simpleMessage("최대화"),
     "mediaUnlock": MessageLookupByLibrary.simpleMessage("연결성 테스트"),
+    "mediaUnlockShort": MessageLookupByLibrary.simpleMessage("연결성 테스트"),
     "mediaUnlockColorfulIcons": MessageLookupByLibrary.simpleMessage(
       "기본적으로 컬러 아이콘 표시",
     ),
@@ -991,6 +993,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "totalTraffic": MessageLookupByLibrary.simpleMessage("전체 전송량"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("Tproxy 포트"),
     "trafficUsage": MessageLookupByLibrary.simpleMessage("트래픽 사용량"),
+    "trafficUsageSmall": MessageLookupByLibrary.simpleMessage("트래픽 사용량"),
     "trayClickBehavior": MessageLookupByLibrary.simpleMessage("트레이 클릭 동작"),
     "trayEnhancement": MessageLookupByLibrary.simpleMessage("트레이 기능 향상"),
     "trayEnhancementDesc": MessageLookupByLibrary.simpleMessage(

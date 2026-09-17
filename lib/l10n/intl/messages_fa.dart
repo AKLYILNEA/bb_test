@@ -138,6 +138,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "appAccessControl": MessageLookupByLibrary.simpleMessage(
       "کنترل دسترسی برنامه‌ها",
     ),
+    "accessControlShort": MessageLookupByLibrary.simpleMessage("کنترل دسترسی برنامه‌ها"),
     "appDesc": MessageLookupByLibrary.simpleMessage("تنظیمات مربوط به برنامه"),
     "application": MessageLookupByLibrary.simpleMessage("برنامه"),
     "applicationDesc": MessageLookupByLibrary.simpleMessage(
@@ -674,6 +675,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("دریافت مجدد IP"),
     "maximize": MessageLookupByLibrary.simpleMessage("بزرگ کردن"),
     "mediaUnlock": MessageLookupByLibrary.simpleMessage("تست اتصال"),
+    "mediaUnlockShort": MessageLookupByLibrary.simpleMessage("تست اتصال"),
     "mediaUnlockColorfulIcons": MessageLookupByLibrary.simpleMessage(
       "نمایش آیکون‌های رنگی به‌صورت پیش‌فرض",
     ),
@@ -1258,6 +1260,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "totalTraffic": MessageLookupByLibrary.simpleMessage("مجموع ترافیک"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("پورت Tproxy"),
     "trafficUsage": MessageLookupByLibrary.simpleMessage("مصرف ترافیک"),
+    "trafficUsageSmall": MessageLookupByLibrary.simpleMessage("مصرف ترافیک"),
     "trayClickBehavior": MessageLookupByLibrary.simpleMessage(
       "رفتار کلیک روی سینی",
     ),

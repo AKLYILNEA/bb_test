@@ -119,6 +119,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "app": MessageLookupByLibrary.simpleMessage("アプリ"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("アプリのアクセス制御"),
+    "accessControlShort": MessageLookupByLibrary.simpleMessage("アプリのアクセス制御"),
     "appDesc": MessageLookupByLibrary.simpleMessage("アプリ設定を管理"),
     "application": MessageLookupByLibrary.simpleMessage("アプリケーション"),
     "applicationDesc": MessageLookupByLibrary.simpleMessage("アプリ設定の変更"),
@@ -533,6 +534,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("IPを再取得"),
     "maximize": MessageLookupByLibrary.simpleMessage("最大化"),
     "mediaUnlock": MessageLookupByLibrary.simpleMessage("接続性テスト"),
+    "mediaUnlockShort": MessageLookupByLibrary.simpleMessage("接続性テスト"),
     "mediaUnlockColorfulIcons": MessageLookupByLibrary.simpleMessage(
       "既定でカラーアイコンを表示",
     ),
@@ -981,6 +983,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "totalTraffic": MessageLookupByLibrary.simpleMessage("総通信量"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("Tproxyポート"),
     "trafficUsage": MessageLookupByLibrary.simpleMessage("通信量統計"),
+    "trafficUsageSmall": MessageLookupByLibrary.simpleMessage("通信量統計"),
     "trayClickBehavior": MessageLookupByLibrary.simpleMessage("トレイクリック動作"),
     "trayEnhancement": MessageLookupByLibrary.simpleMessage("トレイ拡張"),
     "trayEnhancementDesc": MessageLookupByLibrary.simpleMessage(

@@ -149,6 +149,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "appAccessControl": MessageLookupByLibrary.simpleMessage(
       "Маршрутизация приложений",
     ),
+    "accessControlShort": MessageLookupByLibrary.simpleMessage("Маршрутизация приложений"),
     "appDesc": MessageLookupByLibrary.simpleMessage("Настройки приложения"),
     "application": MessageLookupByLibrary.simpleMessage("Приложение"),
     "applicationDesc": MessageLookupByLibrary.simpleMessage(
@@ -693,6 +694,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("Обновить IP"),
     "maximize": MessageLookupByLibrary.simpleMessage("Развернуть"),
     "mediaUnlock": MessageLookupByLibrary.simpleMessage("Проверка доступности"),
+    "mediaUnlockShort": MessageLookupByLibrary.simpleMessage("Проверка доступности"),
     "mediaUnlockColorfulIcons": MessageLookupByLibrary.simpleMessage(
       "Показывать цветные значки по умолчанию",
     ),
@@ -1271,6 +1273,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "totalTraffic": MessageLookupByLibrary.simpleMessage("Общий трафик"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("Порт Tproxy"),
     "trafficUsage": MessageLookupByLibrary.simpleMessage("Трафик"),
+    "trafficUsageSmall": MessageLookupByLibrary.simpleMessage("Трафик"),
     "trayClickBehavior": MessageLookupByLibrary.simpleMessage(
       "Действие при нажатии на значок",
     ),

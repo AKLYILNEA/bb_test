@@ -111,6 +111,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "app": MessageLookupByLibrary.simpleMessage("应用"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("应用访问控制"),
+    "accessControlShort": MessageLookupByLibrary.simpleMessage("应用访问控制"),
     "appDesc": MessageLookupByLibrary.simpleMessage("处理应用相关设置"),
     "application": MessageLookupByLibrary.simpleMessage("应用程序"),
     "applicationDesc": MessageLookupByLibrary.simpleMessage("修改应用程序设置"),
@@ -481,6 +482,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("重新获取 IP"),
     "maximize": MessageLookupByLibrary.simpleMessage("最大化"),
     "mediaUnlock": MessageLookupByLibrary.simpleMessage("连通性测试"),
+    "mediaUnlockShort": MessageLookupByLibrary.simpleMessage("连通性测试"),
     "mediaUnlockColorfulIcons": MessageLookupByLibrary.simpleMessage(
       "默认显示彩色 ICON 图标",
     ),
@@ -883,6 +885,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "totalTraffic": MessageLookupByLibrary.simpleMessage("传输总量"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("Tproxy端口"),
     "trafficUsage": MessageLookupByLibrary.simpleMessage("流量统计"),
+    "trafficUsageSmall": MessageLookupByLibrary.simpleMessage("流量统计"),
     "trayClickBehavior": MessageLookupByLibrary.simpleMessage("托盘点击行为"),
     "trayEnhancement": MessageLookupByLibrary.simpleMessage("托盘增强"),
     "trayEnhancementDesc": MessageLookupByLibrary.simpleMessage(

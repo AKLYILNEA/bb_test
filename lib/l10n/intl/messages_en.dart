@@ -144,6 +144,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "appAccessControl": MessageLookupByLibrary.simpleMessage(
       "App Access Control",
     ),
+    "accessControlShort": MessageLookupByLibrary.simpleMessage("Access"),
     "appDesc": MessageLookupByLibrary.simpleMessage("App-related settings"),
     "application": MessageLookupByLibrary.simpleMessage("Application"),
     "applicationDesc": MessageLookupByLibrary.simpleMessage(
@@ -321,7 +322,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "crashTest": MessageLookupByLibrary.simpleMessage("Crash Test"),
     "create": MessageLookupByLibrary.simpleMessage("Create"),
     "creationTime": MessageLookupByLibrary.simpleMessage("Creation Time"),
-    "currentProfile": MessageLookupByLibrary.simpleMessage("Current Profile"),
+    "currentProfile": MessageLookupByLibrary.simpleMessage("Profile"),
     "custom": MessageLookupByLibrary.simpleMessage("Custom"),
     "customDashboardTitle": MessageLookupByLibrary.simpleMessage(
       "Custom Dashboard Title",
@@ -672,6 +673,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("Refresh IP"),
     "maximize": MessageLookupByLibrary.simpleMessage("Maximize"),
     "mediaUnlock": MessageLookupByLibrary.simpleMessage("Connectivity Test"),
+    "mediaUnlockShort": MessageLookupByLibrary.simpleMessage("Connectivity"),
     "mediaUnlockColorfulIcons": MessageLookupByLibrary.simpleMessage(
       "Show colored icons by default",
     ),
@@ -1228,6 +1230,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "totalTraffic": MessageLookupByLibrary.simpleMessage("Total Traffic"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("Tproxy Port"),
     "trafficUsage": MessageLookupByLibrary.simpleMessage("Traffic Usage"),
+    "trafficUsageSmall": MessageLookupByLibrary.simpleMessage("Traffic"),
     "trayClickBehavior": MessageLookupByLibrary.simpleMessage(
       "Tray Click Behavior",
     ),

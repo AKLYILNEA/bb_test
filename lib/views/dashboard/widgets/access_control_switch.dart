@@ -40,7 +40,9 @@ class AccessControlSwitch extends ConsumerWidget {
         height: getWidgetHeight(1),
         child: CommonCard(
           info: Info(
-            label: appLocalizations.accessControl,
+            // 卡片标题用短标题键（英文只写 Access）；「更多」页入口与
+            // 应用访问控制页面标题仍用 accessControl / appAccessControl
+            label: appLocalizations.accessControlShort,
             iconData: Icons.fact_check_rounded,
           ),
           onPressed: () {
