@@ -191,6 +191,29 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
     globalState.showCommonDialog<void>(
       child: StatefulBuilder(
         builder: (context, setDialogState) {
+          // 整行点击与右侧方块勾选共用同一份多选逻辑：最多 4 个、至少保留 1 个。
+          void togglePinned(MediaPlatform platform) {
+            final checked = currentPinned.contains(platform);
+            if (!checked) {
+              if (currentPinned.length >= 4) {
+                globalState.showNotifier(
+                  appLocalizations.mediaUnlockSelectLimit,
+                );
+                return;
+              }
+              setDialogState(() {
+                currentPinned.add(platform);
+              });
+            } else {
+              if (currentPinned.length <= 1) {
+                return;
+              }
+              setDialogState(() {
+                currentPinned.remove(platform);
+              });
+            }
+          }
+
           return CommonDialog(
             title: appLocalizations.mediaUnlockDisplaySettings,
             titleTrailing: IconButton(
@@ -285,32 +308,18 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                                     platform.defaultName,
                                     style: context.textTheme.bodyMedium,
                                   ),
-                                  trailing: OptionRadioIcon(
-                                    selected: currentPinned.contains(platform),
+                                  // 可多选（最多 4 个）→ 方块勾选（Bettbox 原本的
+                                  // 样式）；右侧留 4，与标题栏右上角的设置按钮
+                                  // 右边线对齐（规范第 7 节）。
+                                  trailing: Padding(
+                                    padding: const EdgeInsets.only(right: 4),
+                                    child: OptionCheckIcon(
+                                      selected:
+                                          currentPinned.contains(platform),
+                                      onChanged: (_) => togglePinned(platform),
+                                    ),
                                   ),
-                                  onTap: () {
-                                    final checked =
-                                        currentPinned.contains(platform);
-                                    if (!checked) {
-                                      if (currentPinned.length >= 4) {
-                                        globalState.showNotifier(
-                                          appLocalizations
-                                              .mediaUnlockSelectLimit,
-                                        );
-                                        return;
-                                      }
-                                      setDialogState(() {
-                                        currentPinned.add(platform);
-                                      });
-                                    } else {
-                                      if (currentPinned.length <= 1) {
-                                        return;
-                                      }
-                                      setDialogState(() {
-                                        currentPinned.remove(platform);
-                                      });
-                                    }
-                                  },
+                                  onTap: () => togglePinned(platform),
                                 ),
                             ],
                           ],

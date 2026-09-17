@@ -45,8 +45,9 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // 选中一次即结束的单选 → 圆形指示（规范第 7 节）。
             ListTile(
-              leading: const Icon(Icons.file_upload_outlined),
+              leading: const Icon(Icons.file_upload_rounded),
               title: Text(appLocalizations.upload),
               trailing: OptionRadioIcon(selected: _showUpload),
               onTap: () {
@@ -55,7 +56,7 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.file_download_outlined),
+              leading: const Icon(Icons.file_download_rounded),
               title: Text(appLocalizations.download),
               trailing: OptionRadioIcon(selected: !_showUpload),
               onTap: () {

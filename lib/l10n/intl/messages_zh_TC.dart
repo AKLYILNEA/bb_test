@@ -113,6 +113,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "app": MessageLookupByLibrary.simpleMessage("應用"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("應用存取控制"),
+    "accessControlSetting": MessageLookupByLibrary.simpleMessage(
+      "存取控制設定",
+    ),
     "accessControlShort": MessageLookupByLibrary.simpleMessage("存取控制"),
     "appDesc": MessageLookupByLibrary.simpleMessage("處理應用相關設定"),
     "application": MessageLookupByLibrary.simpleMessage("應用程式"),

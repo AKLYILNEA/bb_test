@@ -180,6 +180,7 @@
   "selectAll": "전체 선택",
   "cancelSelectAll": "전체 선택 해제",
   "appAccessControl": "앱 액세스 제어",
+  "accessControlSetting": "액세스 제어 설정",
   "accessControlShort": "액세스 제어",
   "accessControlAllowDesc": "선택한 앱만 VPN을 통해 연결",
   "accessControlNotAllowDesc": "선택한 앱은 VPN 연결에서 제외",

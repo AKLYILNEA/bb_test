@@ -119,6 +119,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "app": MessageLookupByLibrary.simpleMessage("アプリ"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("アプリのアクセス制御"),
+    "accessControlSetting": MessageLookupByLibrary.simpleMessage(
+      "アクセス制御設定",
+    ),
     "accessControlShort": MessageLookupByLibrary.simpleMessage("アクセス制御"),
     "appDesc": MessageLookupByLibrary.simpleMessage("アプリ設定を管理"),
     "application": MessageLookupByLibrary.simpleMessage("アプリケーション"),

@@ -417,9 +417,13 @@ class ListItem<T> extends StatelessWidget {
             checkboxDelegate.onChanged!(!checkboxDelegate.value);
           }
         },
+        // 可多选的复选框行 → 方块勾选（规范第 7 节）。
         trailing: Padding(
           padding: const EdgeInsets.only(right: 8),
-          child: OptionRadioIcon(selected: checkboxDelegate.value, size: 24),
+          child: OptionCheckIcon(
+            selected: checkboxDelegate.value,
+            onChanged: checkboxDelegate.onChanged,
+          ),
         ),
       );
     }

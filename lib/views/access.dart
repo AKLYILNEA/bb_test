@@ -349,7 +349,7 @@ class _AccessViewState extends ConsumerState<AccessView>
             return AdaptiveSheetScaffold(
               type: type,
               body: AccessControlPanel(),
-              title: appLocalizations.proxiesSetting,
+              title: appLocalizations.accessControlSetting,
             );
           },
         );

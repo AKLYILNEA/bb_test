@@ -149,6 +149,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "appAccessControl": MessageLookupByLibrary.simpleMessage(
       "Маршрутизация приложений",
     ),
+    "accessControlSetting": MessageLookupByLibrary.simpleMessage(
+      "Настройки маршрутизации приложений",
+    ),
     "accessControlShort": MessageLookupByLibrary.simpleMessage("Маршрутизация приложений"),
     "appDesc": MessageLookupByLibrary.simpleMessage("Настройки приложения"),
     "application": MessageLookupByLibrary.simpleMessage("Приложение"),

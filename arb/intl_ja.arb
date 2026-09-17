@@ -180,6 +180,7 @@
   "selectAll": "すべて選択",
   "cancelSelectAll": "全選択解除",
   "appAccessControl": "アプリのアクセス制御",
+  "accessControlSetting": "アクセス制御設定",
   "accessControlShort": "アクセス制御",
   "accessControlAllowDesc": "選択したアプリのみVPN経由で通信",
   "accessControlNotAllowDesc": "選択したアプリをVPN対象外に設定",

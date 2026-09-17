@@ -180,6 +180,7 @@
   "selectAll": "Select All",
   "cancelSelectAll": "Deselect All",
   "appAccessControl": "App Access Control",
+  "accessControlSetting": "Access Control Settings",
   "accessControlShort": "Access",
   "accessControlAllowDesc": "Only route selected apps through VPN",
   "accessControlNotAllowDesc": "Exclude selected apps from VPN",

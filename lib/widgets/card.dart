@@ -274,7 +274,10 @@ class SelectIcon extends StatelessWidget {
   }
 }
 
-/// 「选中 / 未选中」单选指示图标（出站模式部件与各处选项弹窗共用）。
+/// 「选中 / 未选中」圆形单选指示图标（出站模式部件与各处选项弹窗共用）。
+///
+/// 用于**选中一次即结束**的单选场合（选项弹窗、单选行、只取一个值的显示设置弹窗）；
+/// **可多选**的场合用 [OptionCheckIcon]（方块勾选），见定制规范第 7 节。
 class OptionRadioIcon extends StatelessWidget {
   final bool selected;
 
@@ -313,6 +316,31 @@ class OptionRadioIcon extends StatelessWidget {
               : null,
         ),
       ),
+    );
+  }
+}
+
+/// 「选中 / 未选中」方块勾选指示图标（**可多选**的场合使用）。
+///
+/// 与 [OptionRadioIcon] 成对，构成全站选项指示的两套体系（定制规范第 7 节）：
+/// - **选中一次即结束**的单选 → 圆形 [OptionRadioIcon]（出站模式同款）；
+/// - **可多选**（访问控制列表、连通性测试置顶平台等）→ 本组件（Bettbox 原本的方块勾选）。
+///
+/// 用 `shrinkWrap` 去掉 Checkbox 自带 48×48 的隐形点击区（整行本身就可点），
+/// 并固定 `standard` 视觉密度，避免桌面端被主题压成迷你方块。
+class OptionCheckIcon extends StatelessWidget {
+  final bool selected;
+  final ValueChanged<bool?>? onChanged;
+
+  const OptionCheckIcon({super.key, required this.selected, this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return Checkbox(
+      value: selected,
+      onChanged: onChanged,
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: VisualDensity.standard,
     );
   }
 }

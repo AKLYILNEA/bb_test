@@ -180,6 +180,7 @@
   "selectAll": "全选",
   "cancelSelectAll": "取消全选",
   "appAccessControl": "应用访问控制",
+  "accessControlSetting": "访问控制设置",
   "accessControlShort": "访问控制",
   "accessControlAllowDesc": "只允许选中的应用进入 VPN",
   "accessControlNotAllowDesc": "选中的应用将被排除在 VPN 之外",

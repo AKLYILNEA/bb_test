@@ -123,6 +123,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "app": MessageLookupByLibrary.simpleMessage("앱"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("앱 액세스 제어"),
+    "accessControlSetting": MessageLookupByLibrary.simpleMessage(
+      "액세스 제어 설정",
+    ),
     "accessControlShort": MessageLookupByLibrary.simpleMessage("액세스 제어"),
     "appDesc": MessageLookupByLibrary.simpleMessage("앱 관련 설정 관리"),
     "application": MessageLookupByLibrary.simpleMessage("애플리케이션"),

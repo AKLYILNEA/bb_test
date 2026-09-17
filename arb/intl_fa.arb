@@ -180,6 +180,7 @@
   "selectAll": "انتخاب همه",
   "cancelSelectAll": "لغو انتخاب همه",
   "appAccessControl": "کنترل دسترسی برنامه‌ها",
+  "accessControlSetting": "تنظیمات کنترل دسترسی",
   "accessControlShort": "کنترل دسترسی",
   "accessControlAllowDesc": "تنها برنامه‌های انتخاب شده از VPN عبور کنند",
   "accessControlNotAllowDesc": "برنامه‌های انتخاب شده از VPN استثنا شوند",

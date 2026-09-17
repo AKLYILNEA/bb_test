@@ -1545,6 +1545,16 @@ class AppLocalizations {
     );
   }
 
+  /// `Access Control Settings`
+  String get accessControlSetting {
+    return Intl.message(
+      'Access Control Settings',
+      name: 'accessControlSetting',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Access`
   String get accessControlShort {
     return Intl.message(

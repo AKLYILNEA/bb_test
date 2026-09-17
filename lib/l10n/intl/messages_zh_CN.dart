@@ -111,6 +111,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "app": MessageLookupByLibrary.simpleMessage("应用"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("应用访问控制"),
+    "accessControlSetting": MessageLookupByLibrary.simpleMessage(
+      "访问控制设置",
+    ),
     "accessControlShort": MessageLookupByLibrary.simpleMessage("访问控制"),
     "appDesc": MessageLookupByLibrary.simpleMessage("处理应用相关设置"),
     "application": MessageLookupByLibrary.simpleMessage("应用程序"),

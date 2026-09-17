@@ -180,6 +180,7 @@
   "selectAll": "Выбрать все",
   "cancelSelectAll": "Отменить выбор",
   "appAccessControl": "Маршрутизация приложений",
+  "accessControlSetting": "Настройки маршрутизации приложений",
   "accessControlShort": "Маршрутизация приложений",
   "accessControlAllowDesc": "Только выбранные приложения используют VPN",
   "accessControlNotAllowDesc": "Выбранные приложения исключены из VPN",

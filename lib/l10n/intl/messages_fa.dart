@@ -138,6 +138,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "appAccessControl": MessageLookupByLibrary.simpleMessage(
       "کنترل دسترسی برنامه‌ها",
     ),
+    "accessControlSetting": MessageLookupByLibrary.simpleMessage(
+      "تنظیمات کنترل دسترسی",
+    ),
     "accessControlShort": MessageLookupByLibrary.simpleMessage("کنترل دسترسی"),
     "appDesc": MessageLookupByLibrary.simpleMessage("تنظیمات مربوط به برنامه"),
     "application": MessageLookupByLibrary.simpleMessage("برنامه"),
