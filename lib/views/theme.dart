@@ -300,7 +300,7 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
         return true;
       },
       child: ItemCard(
-        info: Info(label: appLocalizations.themeColor, iconData: Icons.palette_rounded),
+        info: Info(label: appLocalizations.themeColor, iconData: Icons.call_split_rounded),
         actions: genActions([
           if (_removablePrimaryColor == null)
             FilledButton(
@@ -478,7 +478,7 @@ class _CustomFontItem extends ConsumerWidget {
         }
 
         return ListItem.switchItem(
-          leading: const Icon(Icons.font_download_outlined),
+          leading: const Icon(Icons.call_split_rounded),
           horizontalTitleGap: 12,
           title: Text(
             appLocalizations.harmonyFont,
@@ -543,7 +543,7 @@ class _SelectCustomFontItem extends ConsumerWidget {
       builder: (context, _, _) {
         final fontName = FontManager.customFontName;
         return ListItem(
-          leading: const Icon(Icons.folder_open_rounded),
+          leading: const Icon(Icons.call_split_rounded),
           horizontalTitleGap: 12,
           title: Text(
             appLocalizations.selectCustomFont,
@@ -582,7 +582,7 @@ class _EmojiStyleItem extends StatelessWidget {
       valueListenable: EmojiManager.emojiStyleNotifier,
       builder: (context, currentStyle, _) {
         return ListItem(
-          leading: const Icon(Icons.sentiment_very_satisfied_rounded),
+          leading: const Icon(Icons.call_split_rounded),
           horizontalTitleGap: 12,
           title: Text(
             appLocalizations.emojiStyle,
@@ -712,7 +712,7 @@ class _DarkIconItem extends ConsumerWidget {
       themeSettingProvider.select((state) => state.useDarkIcon),
     );
     return ListItem.switchItem(
-      leading: const Icon(Icons.join_left_rounded),
+      leading: const Icon(Icons.call_split_rounded),
       horizontalTitleGap: 12,
       title: Text(
         appLocalizations.darkIcon,
