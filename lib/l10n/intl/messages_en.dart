@@ -1229,8 +1229,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "tools": MessageLookupByLibrary.simpleMessage("Tools"),
     "totalTraffic": MessageLookupByLibrary.simpleMessage("Total Traffic"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("Tproxy Port"),
-    "trafficUsage": MessageLookupByLibrary.simpleMessage("Traffic Usage"),
-    "trafficUsageSmall": MessageLookupByLibrary.simpleMessage("Traffic"),
+    "trafficUsage": MessageLookupByLibrary.simpleMessage("Traffic"),
     "trayClickBehavior": MessageLookupByLibrary.simpleMessage(
       "Tray Click Behavior",
     ),
@@ -1285,6 +1284,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Exclude handshake delays from testing",
     ),
     "unknown": MessageLookupByLibrary.simpleMessage("Unknown"),
+    "notAcquired": MessageLookupByLibrary.simpleMessage("Null"),
     "unlocked": MessageLookupByLibrary.simpleMessage("Completed"),
     "unnamed": MessageLookupByLibrary.simpleMessage("Unnamed"),
     "unpin": MessageLookupByLibrary.simpleMessage("Unpin"),

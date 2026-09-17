@@ -169,25 +169,16 @@ class AppLocalizations {
     );
   }
 
-  /// `Traffic Usage`
+  /// `Traffic`
   String get trafficUsage {
     return Intl.message(
-      'Traffic Usage',
+      'Traffic',
       name: 'trafficUsage',
       desc: '',
       args: [],
     );
   }
 
-  /// `Traffic`
-  String get trafficUsageSmall {
-    return Intl.message(
-      'Traffic',
-      name: 'trafficUsageSmall',
-      desc: '',
-      args: [],
-    );
-  }
 
   /// `Core Info`
   String get coreInfo {
@@ -1942,6 +1933,16 @@ class AppLocalizations {
   /// `Unknown`
   String get unknown {
     return Intl.message('Unknown', name: 'unknown', desc: '', args: []);
+  }
+
+  /// `Null`
+  String get notAcquired {
+    return Intl.message(
+      'Null',
+      name: 'notAcquired',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `GeoData`

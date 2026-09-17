@@ -1273,7 +1273,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "totalTraffic": MessageLookupByLibrary.simpleMessage("Общий трафик"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("Порт Tproxy"),
     "trafficUsage": MessageLookupByLibrary.simpleMessage("Трафик"),
-    "trafficUsageSmall": MessageLookupByLibrary.simpleMessage("Трафик"),
     "trayClickBehavior": MessageLookupByLibrary.simpleMessage(
       "Действие при нажатии на значок",
     ),
@@ -1338,6 +1337,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Убрать задержку рукопожатия и разбора",
     ),
     "unknown": MessageLookupByLibrary.simpleMessage("Неизвестно"),
+    "notAcquired": MessageLookupByLibrary.simpleMessage("Не получено"),
     "unlocked": MessageLookupByLibrary.simpleMessage("Завершено"),
     "unnamed": MessageLookupByLibrary.simpleMessage("Без имени"),
     "unpin": MessageLookupByLibrary.simpleMessage("Открепить"),

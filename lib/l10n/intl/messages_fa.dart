@@ -138,7 +138,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "appAccessControl": MessageLookupByLibrary.simpleMessage(
       "کنترل دسترسی برنامه‌ها",
     ),
-    "accessControlShort": MessageLookupByLibrary.simpleMessage("کنترل دسترسی برنامه‌ها"),
+    "accessControlShort": MessageLookupByLibrary.simpleMessage("کنترل دسترسی"),
     "appDesc": MessageLookupByLibrary.simpleMessage("تنظیمات مربوط به برنامه"),
     "application": MessageLookupByLibrary.simpleMessage("برنامه"),
     "applicationDesc": MessageLookupByLibrary.simpleMessage(
@@ -1260,7 +1260,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "totalTraffic": MessageLookupByLibrary.simpleMessage("مجموع ترافیک"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("پورت Tproxy"),
     "trafficUsage": MessageLookupByLibrary.simpleMessage("مصرف ترافیک"),
-    "trafficUsageSmall": MessageLookupByLibrary.simpleMessage("مصرف ترافیک"),
     "trayClickBehavior": MessageLookupByLibrary.simpleMessage(
       "رفتار کلیک روی سینی",
     ),
@@ -1317,6 +1316,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "حذف تاخیرهای اضافی دست‌تکانی",
     ),
     "unknown": MessageLookupByLibrary.simpleMessage("نامشخص"),
+    "notAcquired": MessageLookupByLibrary.simpleMessage("دریافت نشد"),
     "unlocked": MessageLookupByLibrary.simpleMessage("تکمیل شد"),
     "unnamed": MessageLookupByLibrary.simpleMessage("بدون نام"),
     "unpin": MessageLookupByLibrary.simpleMessage("برداشتن پین"),
