@@ -117,10 +117,8 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
                               // 标题接近圆环时省略号收尾，避免与圆环贴到一起
                               child: TooltipText(
                                 text: Text(
-                                  // 专用键：英文只写 Traffic（半宽卡里 "Traffic Usage"
-                                  // 会被省略号截断）；其它语言沿用流量统计的翻译，
-                                  // 大卡的英文仍保持 Traffic Usage
-                                  appLocalizations.trafficUsageSmall,
+                                  // 与流量统计大卡统一用同一个标题键（英文都是 Traffic）
+                                  appLocalizations.trafficUsage,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: context.textTheme.titleSmall?.copyWith(
@@ -168,9 +166,10 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
                 ),
                 Padding(
                   // 上下与右侧留白一致（各 (卡片高度 - 圆环边长) / 2），圆环因此上下居中；
-                  // 左侧只留一个贴边间距，把宽度让给标题，避免标题被压成省略号
+                  // 左侧间距由 8 收到 4：把宽度让给标题与数值文案（放宽一点文字显示），
+                  // 同时与圆环仍留 4dp 间隙，不会贴到圆环
                   padding: EdgeInsets.only(
-                    left: 8,
+                    left: 4,
                     top: _donutEdge,
                     right: _donutEdge,
                     bottom: _donutEdge,

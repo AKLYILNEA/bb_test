@@ -51,9 +51,10 @@ class CurrentProfile extends ConsumerWidget {
                     Flexible(
                       flex: 1,
                       child: TooltipText(
-                        // 配置名可能含 emoji：用 EmojiText 才会走自定义表情字体渲染
+                        // 配置名可能含 emoji：用 EmojiText 才会走自定义表情字体渲染；
+                        // 没有配置时显示占位文案（中文「未获取」/ 英文 Null）
                         text: EmojiText(
-                          profile?.label ?? '',
+                          profile?.label ?? appLocalizations.notAcquired,
                           style: context.textTheme.bodyMedium?.toLight
                               .adjustSize(1),
                           maxLines: 1,
