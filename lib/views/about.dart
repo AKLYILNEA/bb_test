@@ -187,26 +187,28 @@ class AboutView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.colorScheme.brightness == Brightness.dark;
     final items = [
-      Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-        child: Column(
+      ListTile(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Consumer(
               builder: (_, ref, _) {
                 return _DeveloperModeDetector(
-                  child: Row(
+                  child: Wrap(
+                    spacing: 16,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      SvgPicture.asset(
-                        isDark
-                            ? 'assets/images/splash_icon_dark.svg'
-                            : 'assets/images/splash_icon_light.svg',
-                        width: 48,
-                        height: 48,
+                      Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: SvgPicture.asset(
+                          context.colorScheme.brightness == Brightness.dark
+                              ? 'assets/images/splash_icon_dark.svg'
+                              : 'assets/images/splash_icon_light.svg',
+                          width: 48,
+                          height: 48,
+                        ),
                       ),
-                      const SizedBox(width: 16),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -235,11 +237,12 @@ class AboutView extends StatelessWidget {
                 );
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             Text(
               appLocalizations.desc,
               style: Theme.of(context).textTheme.bodySmall,
             ),
+            const SizedBox(height: 4),
           ],
         ),
       ),
