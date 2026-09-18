@@ -761,8 +761,8 @@
   "staggeredDotsWave": "Staggered Wave",
   "dotsTriangle": "Dots Triangle",
   "zoom": "Zoom",
-  "basicInfo": "Basic Info",
-  "addressInfo": "Address Info",
+  "basicInfo": "General",
+  "addressInfo": "Address",
   "traffic": "Traffic",
-  "advancedInfo": "Advanced Info"
+  "advancedInfo": "Advanced"
 }

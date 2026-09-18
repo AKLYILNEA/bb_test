@@ -761,8 +761,8 @@
   "fourRotatingDots": "四星環繞",
   "staggeredDotsWave": "錯落波浪",
   "dotsTriangle": "動態三角",
-  "basicInfo": "基本資訊",
-  "addressInfo": "地址資訊",
-  "traffic": "流量資訊",
-  "advancedInfo": "進階資訊"
+  "basicInfo": "常規",
+  "addressInfo": "地址",
+  "traffic": "流量",
+  "advancedInfo": "進階"
 }

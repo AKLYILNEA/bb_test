@@ -58,10 +58,9 @@ const defaultExternalController = '127.0.0.1:9090';
 const maxMobileWidth = 600;
 const maxLaptopWidth = 840;
 double getFloatingBottomBarReserveHeight(BuildContext context) {
-  final mediaQuery = MediaQuery.of(context);
   final viewBottom = max(
-    mediaQuery.viewPadding.bottom,
-    mediaQuery.padding.bottom,
+    MediaQuery.viewPaddingOf(context).bottom,
+    MediaQuery.paddingOf(context).bottom,
   );
   if (globalState.isAndroidTV) {
     return 132.0 + (viewBottom > 12 ? viewBottom - 12 : 0);
@@ -70,10 +69,9 @@ double getFloatingBottomBarReserveHeight(BuildContext context) {
 }
 
 double getFloatingBottomBarFABReserveHeight(BuildContext context) {
-  final mediaQuery = MediaQuery.of(context);
   final viewBottom = max(
-    mediaQuery.viewPadding.bottom,
-    mediaQuery.padding.bottom,
+    MediaQuery.viewPaddingOf(context).bottom,
+    MediaQuery.paddingOf(context).bottom,
   );
   return 84.0 - min(viewBottom, 12.0);
 }

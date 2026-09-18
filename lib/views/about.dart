@@ -239,6 +239,7 @@ class AboutView extends StatelessWidget {
               appLocalizations.desc,
               style: Theme.of(context).textTheme.bodySmall,
             ),
+            const SizedBox(height: 16),
           ],
         ),
       ),

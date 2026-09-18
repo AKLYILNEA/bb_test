@@ -6220,20 +6220,20 @@ class AppLocalizations {
     );
   }
 
-  /// `Basic Info`
+  /// `General`
   String get basicInfo {
     return Intl.message(
-      'Basic Info',
+      'General',
       name: 'basicInfo',
       desc: '',
       args: [],
     );
   }
 
-  /// `Address Info`
+  /// `Address`
   String get addressInfo {
     return Intl.message(
-      'Address Info',
+      'Address',
       name: 'addressInfo',
       desc: '',
       args: [],
@@ -6245,10 +6245,10 @@ class AppLocalizations {
     return Intl.message('Traffic', name: 'traffic', desc: '', args: []);
   }
 
-  /// `Advanced Info`
+  /// `Advanced`
   String get advancedInfo {
     return Intl.message(
-      'Advanced Info',
+      'Advanced',
       name: 'advancedInfo',
       desc: '',
       args: [],

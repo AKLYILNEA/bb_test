@@ -674,8 +674,10 @@ class _GroupHeader extends ConsumerWidget {
         height: iconSize,
         alignment: Alignment.center,
         padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+        decoration: ShapeDecoration(
+          shape: RoundedSuperellipseBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           color: context.colorScheme.secondaryContainer,
         ),
         clipBehavior: Clip.antiAlias,

@@ -81,46 +81,41 @@ class NetworkSpeed extends ConsumerWidget {
           label: appLocalizations.networkSpeed,
           iconData: Icons.speed_rounded,
         ),
+        actions: [
+          ValueListenableBuilder<int>(
+            valueListenable: dashboardRefreshManager.tick1s,
+            builder: (_, _, _) {
+              final traffics = ref.read(trafficsProvider).list;
+              final speedText = _getLastTraffic(traffics).toSpeedText();
+              return Text(
+                speedText,
+                style: context.textTheme.bodySmall?.copyWith(
+                  color: color,
+                ),
+              );
+            },
+          ),
+        ],
         child: RepaintBoundary(
           child: ValueListenableBuilder<int>(
             valueListenable: dashboardRefreshManager.tick1s,
             builder: (_, _, _) {
               final traffics = ref.read(trafficsProvider).list;
               final points = _getPoints(traffics);
-              final speedText = _getLastTraffic(traffics).toSpeedText();
-              return Stack(
-                children: [
-                  Positioned.fill(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        top: 16,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                      ),
-                      child: RepaintBoundary(
-                        child: LineChart(
-                          gradient: true,
-                          color: primaryColor,
-                          points: points,
-                        ),
-                      ),
-                    ),
+              return Padding(
+                padding: const EdgeInsets.only(
+                  top: 16,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                ),
+                child: RepaintBoundary(
+                  child: LineChart(
+                    gradient: true,
+                    color: primaryColor,
+                    points: points,
                   ),
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: Transform.translate(
-                      offset: const Offset(-16, -20),
-                      child: Text(
-                        speedText,
-                        style: context.textTheme.bodySmall?.copyWith(
-                          color: color,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               );
             },
           ),

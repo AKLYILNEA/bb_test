@@ -1002,9 +1002,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "staggeredDotsWave": MessageLookupByLibrary.simpleMessage("錯落波浪"),
     "dotsTriangle": MessageLookupByLibrary.simpleMessage("動態三角"),
     "zoom": MessageLookupByLibrary.simpleMessage("縮放"),
-    "basicInfo": MessageLookupByLibrary.simpleMessage("基本資訊"),
-    "addressInfo": MessageLookupByLibrary.simpleMessage("地址資訊"),
-    "traffic": MessageLookupByLibrary.simpleMessage("流量資訊"),
-    "advancedInfo": MessageLookupByLibrary.simpleMessage("進階資訊"),
+    "basicInfo": MessageLookupByLibrary.simpleMessage("常規"),
+    "addressInfo": MessageLookupByLibrary.simpleMessage("地址"),
+    "traffic": MessageLookupByLibrary.simpleMessage("流量"),
+    "advancedInfo": MessageLookupByLibrary.simpleMessage("進階"),
   };
 }

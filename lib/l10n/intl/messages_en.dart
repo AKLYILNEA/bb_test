@@ -1357,9 +1357,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "staggeredDotsWave": MessageLookupByLibrary.simpleMessage("Staggered Wave"),
     "dotsTriangle": MessageLookupByLibrary.simpleMessage("Dots Triangle"),
     "zoom": MessageLookupByLibrary.simpleMessage("Zoom"),
-    "basicInfo": MessageLookupByLibrary.simpleMessage("Basic Info"),
-    "addressInfo": MessageLookupByLibrary.simpleMessage("Address Info"),
+    "basicInfo": MessageLookupByLibrary.simpleMessage("General"),
+    "addressInfo": MessageLookupByLibrary.simpleMessage("Address"),
     "traffic": MessageLookupByLibrary.simpleMessage("Traffic"),
-    "advancedInfo": MessageLookupByLibrary.simpleMessage("Advanced Info"),
+    "advancedInfo": MessageLookupByLibrary.simpleMessage("Advanced"),
   };
 }
