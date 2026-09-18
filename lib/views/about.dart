@@ -66,30 +66,16 @@ class AboutView extends StatelessWidget {
         ),
         _LinkGridRow(
           left: _LinkGridTile(
-            title: 'Bettbox',
-            icon: Icons.launch_rounded,
-            onTap: () =>
-                globalState.openUrl('https://github.com/appshubcc/Bettbox'),
-          ),
-          right: _LinkGridTile(
             title: 'FlClash',
             icon: Icons.launch_rounded,
             onTap: () =>
                 globalState.openUrl('https://github.com/chen08209/FlClash'),
           ),
-        ),
-        _LinkGridRow(
-          left: _LinkGridTile(
+          right: _LinkGridTile(
             title: 'Mihomo',
             icon: Icons.launch_rounded,
             onTap: () =>
                 globalState.openUrl('https://github.com/MetaCubeX/mihomo'),
-          ),
-          right: _LinkGridTile(
-            title: 'Config',
-            icon: Icons.launch_rounded,
-            onTap: () =>
-                globalState.openUrl('https://github.com/aaANDkk/ClashConfig'),
           ),
         ),
       ],
@@ -242,7 +228,7 @@ class AboutView extends StatelessWidget {
               appLocalizations.desc,
               style: Theme.of(context).textTheme.bodySmall,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
           ],
         ),
       ),
