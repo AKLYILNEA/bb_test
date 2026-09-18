@@ -676,7 +676,7 @@ class _GroupHeader extends ConsumerWidget {
         padding: const EdgeInsets.all(6),
         decoration: ShapeDecoration(
           shape: RoundedSuperellipseBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(12),
           ),
           color: context.colorScheme.secondaryContainer,
         ),
