@@ -199,7 +199,7 @@ class AboutView extends StatelessWidget {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
                         child: Image.asset(
                           'assets/images/icon.png',
                           width: 48,
@@ -239,7 +239,7 @@ class AboutView extends StatelessWidget {
               appLocalizations.desc,
               style: Theme.of(context).textTheme.bodySmall,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
           ],
         ),
       ),

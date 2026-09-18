@@ -133,7 +133,7 @@ class _HomePageState extends State<HomePage> {
                     bottom:
                         getFloatingBottomBarFABReserveHeight(context) +
                         16 +
-                        MediaQuery.paddingOf(context).bottom,
+                        MediaQuery.viewPaddingOf(context).bottom,
                     child: RepaintBoundary(child: const ResidentFab()),
                   ),
                 ],
