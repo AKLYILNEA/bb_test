@@ -6,6 +6,7 @@ import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 
 @immutable
 class Contributor {
@@ -200,8 +201,10 @@ class AboutView extends StatelessWidget {
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Image.asset(
-                          'assets/images/icon.png',
+                        child: SvgPicture.asset(
+                          context.colorScheme.brightness == Brightness.dark
+                              ? 'assets/images/splash_icon_dark.svg'
+                              : 'assets/images/splash_icon_light.svg',
                           width: 48,
                           height: 48,
                         ),
