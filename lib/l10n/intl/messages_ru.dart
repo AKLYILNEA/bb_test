@@ -785,7 +785,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "networkSpeed": MessageLookupByLibrary.simpleMessage("Скорость сети"),
     "speedTest": MessageLookupByLibrary.simpleMessage("Тест скорости"),
-    "speedTestDesc": MessageLookupByLibrary.simpleMessage("Откроется сайт проверки скорости в браузере"),
+    "speedTestDesc": MessageLookupByLibrary.simpleMessage(
+      "В браузере по умолчанию будет открыт онлайн-сервис проверки скорости. Продолжить?",
+    ),
     "networkSpeedNotification": MessageLookupByLibrary.simpleMessage(
       "Скорость в уведомлениях",
     ),

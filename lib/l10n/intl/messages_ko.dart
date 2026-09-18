@@ -617,7 +617,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "networkSpeed": MessageLookupByLibrary.simpleMessage("네트워크 속도"),
     "speedTest": MessageLookupByLibrary.simpleMessage("속도 테스트"),
-    "speedTestDesc": MessageLookupByLibrary.simpleMessage("브라우저 속도 테스트 사이트로 이동합니다"),
+    "speedTestDesc": MessageLookupByLibrary.simpleMessage(
+      "기본 브라우저에서 온라인 속도 측정 서비스를 엽니다. 계속하시겠습니까?",
+    ),
     "networkSpeedNotification": MessageLookupByLibrary.simpleMessage("속도 알림"),
     "networkSpeedNotificationDesc": MessageLookupByLibrary.simpleMessage(
       "알림 표시줄에 속도 및 구독 정보 표시",

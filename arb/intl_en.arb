@@ -21,7 +21,7 @@
   "coreInfo": "Core Info",
   "networkSpeed": "Network Speed",
   "speedTest": "Speed Test",
-  "speedTestDesc": "You will be taken to a browser speed test site.",
+  "speedTestDesc": "The online speed test service will be opened in your default browser. Do you wish to continue?",
   "realTimeSpeed": "Real-time Speed",
   "connectionsSort": "Connections Sort",
   "totalTraffic": "Total Traffic",

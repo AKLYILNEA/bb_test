@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart' hide Mode;
+import 'package:bett_box/manager/manager.dart';
 import 'package:bett_box/models/common.dart';
 import 'package:bett_box/plugins/clipboard_ext.dart';
 import 'package:bett_box/providers/app.dart';
@@ -405,7 +406,12 @@ class _EditorPageState extends ConsumerState<EditorPage> {
                   contentPadding: EdgeInsets.zero,
                   hintText: appLocalizations.unnamed,
                 ),
-                style: context.textTheme.titleLarge,
+                style: context.textTheme.titleLarge?.copyWith(
+                  fontFamilyFallback: [
+                    if (EmojiManager.currentFamily != null)
+                      EmojiManager.currentFamily!,
+                  ],
+                ),
                 autofocus: false,
               ),
               actions: genActions([
@@ -480,49 +486,59 @@ class _EditorPageState extends ConsumerState<EditorPage> {
               children: [
                 if (!_isLoading)
                   RepaintBoundary(
-                    child: CodeForge(
-                      controller: _controller,
-                      focusNode: _focusNode,
-                      findController: _findController,
-                      undoController: _undoController,
-                      readOnly: readOnly,
-                      lineWrap: _lineWrap,
-                      enableFolding: !widget.simple && !_disableSyntaxHighlight,
-                      enableGuideLines:
-                          !widget.simple && !_disableSyntaxHighlight,
-                      enableGutter: true,
-                      enableGutterDivider: false,
-                      enableLocalSuggestions: true,
-                      enableKeyboardSuggestions: true,
-                      enableMagnifier: true,
-                      language: _languageMode(),
-                      languageId: switch (widget.languages.firstOrNull) {
-                        Language.yaml => 'yaml',
-                        Language.javaScript => 'javascript',
-                        _ => null,
+                    child: ValueListenableBuilder<EmojiStyle>(
+                      valueListenable: EmojiManager.emojiStyleNotifier,
+                      builder: (_, emojiStyle, _) {
+                        final emojiFamily = emojiStyle.family;
+                        return CodeForge(
+                          controller: _controller,
+                          focusNode: _focusNode,
+                          findController: _findController,
+                          undoController: _undoController,
+                          readOnly: readOnly,
+                          lineWrap: _lineWrap,
+                          enableFolding:
+                              !widget.simple && !_disableSyntaxHighlight,
+                          enableGuideLines:
+                              !widget.simple && !_disableSyntaxHighlight,
+                          enableGutter: true,
+                          enableGutterDivider: false,
+                          enableLocalSuggestions: true,
+                          enableKeyboardSuggestions: true,
+                          enableMagnifier: true,
+                          language: _languageMode(),
+                          languageId: switch (widget.languages.firstOrNull) {
+                            Language.yaml => 'yaml',
+                            Language.javaScript => 'javascript',
+                            _ => null,
+                          },
+                          blockCommentLabel: appLocalizations.blockComment,
+                          editorTheme: brightness == Brightness.dark
+                              ? atomOneDarkTheme
+                              : atomOneLightTheme,
+                          textStyle: TextStyle(
+                            fontFamily: FontFamily.jetBrainsMono.value,
+                            fontFamilyFallback: [
+                              if (emojiFamily != null) emojiFamily,
+                            ],
+                            fontSize: context.textTheme.bodyLarge?.fontSize?.ap,
+                          ),
+                          innerPadding: const EdgeInsets.only(right: 16),
+                          finderBuilder: (context, controller) => FindPanel(
+                            controller: controller,
+                            readOnly: readOnly,
+                            isMobileView: isMobileView,
+                          ),
+                          scrollbarDecoration: ScrollbarDecoration(
+                            showLineNumberIndicator: false,
+                            thumbVisibility: false,
+                            thickness: 8,
+                            thumbColor: context.colorScheme.onSurface.withAlpha(
+                              100,
+                            ),
+                          ),
+                        );
                       },
-                      blockCommentLabel: appLocalizations.blockComment,
-                      editorTheme: brightness == Brightness.dark
-                          ? atomOneDarkTheme
-                          : atomOneLightTheme,
-                      textStyle: TextStyle(
-                        fontFamily: FontFamily.jetBrainsMono.value,
-                        fontSize: context.textTheme.bodyLarge?.fontSize?.ap,
-                      ),
-                      innerPadding: const EdgeInsets.only(right: 16),
-                      finderBuilder: (context, controller) => FindPanel(
-                        controller: controller,
-                        readOnly: readOnly,
-                        isMobileView: isMobileView,
-                      ),
-                      scrollbarDecoration: ScrollbarDecoration(
-                        showLineNumberIndicator: false,
-                        thumbVisibility: false,
-                        thickness: 8,
-                        thumbColor: context.colorScheme.onSurface.withAlpha(
-                          100,
-                        ),
-                      ),
                     ),
                   ),
                 if (_isBusy || _isLoading)

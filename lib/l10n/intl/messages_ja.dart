@@ -607,7 +607,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "networkSpeed": MessageLookupByLibrary.simpleMessage("通信速度"),
     "speedTest": MessageLookupByLibrary.simpleMessage("速度テスト"),
-    "speedTestDesc": MessageLookupByLibrary.simpleMessage("ブラウザのスピードテストサイトを開きます"),
+    "speedTestDesc": MessageLookupByLibrary.simpleMessage(
+      "既定のブラウザでオンライン速度テストサービスを開きます。続行しますか？",
+    ),
     "networkSpeedNotification": MessageLookupByLibrary.simpleMessage("速度通知"),
     "networkSpeedNotificationDesc": MessageLookupByLibrary.simpleMessage(
       "通知バーに通信速度とサブスク情報を表示",

@@ -549,7 +549,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "networkSpeed": MessageLookupByLibrary.simpleMessage("网络速度"),
     "speedTest": MessageLookupByLibrary.simpleMessage("测速"),
-    "speedTestDesc": MessageLookupByLibrary.simpleMessage("将前往浏览器测速网站进行测速"),
+    "speedTestDesc": MessageLookupByLibrary.simpleMessage(
+      "即将打开默认浏览器访问在线测速服务进行网络质量测试，是否继续？",
+    ),
     "networkSpeedNotification": MessageLookupByLibrary.simpleMessage("网速通知"),
     "networkSpeedNotificationDesc": MessageLookupByLibrary.simpleMessage(
       "在通知栏显示网速和订阅信息",

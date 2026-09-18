@@ -610,10 +610,18 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
   void _initState() {
     _targetItems = [
       ...widget.snippet.proxyGroups.map(
-        (item) => DropdownMenuEntry<String>(value: item.name, label: item.name),
+        (item) => DropdownMenuEntry<String>(
+          value: item.name,
+          label: item.name,
+          labelWidget: EmojiText(item.name),
+        ),
       ),
       ...RuleTarget.values.map(
-        (item) => DropdownMenuEntry<String>(value: item.name, label: item.name),
+        (item) => DropdownMenuEntry<String>(
+          value: item.name,
+          label: item.name,
+          labelWidget: EmojiText(item.name),
+        ),
       ),
     ];
     _ruleProviderItems = [
@@ -930,11 +938,15 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      _ruleTargetController.text.isEmpty
-                                          ? appLocalizations.ruleTarget
-                                          : _ruleTargetController.text,
-                                      style: context.textTheme.bodyLarge,
+                                    Expanded(
+                                      child: EmojiText(
+                                        _ruleTargetController.text.isEmpty
+                                            ? appLocalizations.ruleTarget
+                                            : _ruleTargetController.text,
+                                        style: context.textTheme.bodyLarge,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
                                     const Icon(Icons.arrow_drop_down_rounded),
                                   ],
