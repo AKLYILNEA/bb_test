@@ -590,7 +590,7 @@ class AddRuleDialog extends StatefulWidget {
 
 class _AddRuleDialogState extends State<AddRuleDialog> {
   late RuleAction _ruleAction;
-  final _ruleTargetController = TextEditingController();
+  final _ruleTargetController = EmojiTextEditingController();
   final _contentController = TextEditingController();
   final _ruleProviderController = TextEditingController();
   final _subRuleController = TextEditingController();
@@ -957,6 +957,12 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
                               alignmentOffset: const Offset(0, 8),
                               menuStyle: menuStyle,
                               controller: _ruleTargetController,
+                              textStyle: context.textTheme.bodyLarge?.copyWith(
+                                fontFamilyFallback: [
+                                  if (EmojiManager.currentFamily != null)
+                                    EmojiManager.currentFamily!,
+                                ],
+                              ),
                               label: Text(appLocalizations.ruleTarget),
                               width: 200,
                               menuHeight: 250,

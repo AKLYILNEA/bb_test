@@ -9,6 +9,7 @@ import 'package:bett_box/providers/app.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:code_forge/code_forge.dart';
+import 'package:emoji_regex/emoji_regex.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -132,7 +133,7 @@ class _EditorPageState extends ConsumerState<EditorPage> {
     _controller.text = widget.content;
     _findController = _EditorFindController(_controller);
     _undoController = UndoRedoController();
-    _titleController = TextEditingController(text: widget.title);
+    _titleController = EmojiTextEditingController(text: widget.title);
 
     if (system.isWindows) {
       _removePasteHandler = clipboardExt.addHandler(_handleNativePaste);
@@ -516,6 +517,8 @@ class _EditorPageState extends ConsumerState<EditorPage> {
                           editorTheme: brightness == Brightness.dark
                               ? atomOneDarkTheme
                               : atomOneLightTheme,
+                          emojiFamily: emojiFamily,
+                          emojiRegex: emojiRegex(),
                           textStyle: TextStyle(
                             fontFamily: FontFamily.jetBrainsMono.value,
                             fontFamilyFallback: [

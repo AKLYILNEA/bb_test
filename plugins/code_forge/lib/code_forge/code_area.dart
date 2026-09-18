@@ -24,12 +24,12 @@ const int kExactWrappedHeightThreshold = 5800;
 const int kWrappedHeightSampleSize = 64;
 final List<String> kEmojiFontFallback =
     defaultTargetPlatform == TargetPlatform.windows
-    ? const ['Twemoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Roboto']
+    ? const ['OpenMoji', 'Twemoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Roboto']
     : defaultTargetPlatform == TargetPlatform.linux
-    ? const ['Twemoji', 'Noto Color Emoji', 'Roboto']
+    ? const ['OpenMoji', 'Twemoji', 'Noto Color Emoji', 'Roboto']
     : defaultTargetPlatform == TargetPlatform.android
-    ? const ['Noto Color Emoji', 'Twemoji', 'Roboto']
-    : const ['Apple Color Emoji', 'Twemoji', 'Roboto'];
+    ? const ['OpenMoji', 'Twemoji', 'Noto Color Emoji', 'Roboto']
+    : const ['OpenMoji', 'Apple Color Emoji', 'Twemoji', 'Roboto'];
 const double _kSelectionHandleHitPadding = 20.0;
 const double _kCaretHandleHitPadding = 24.0;
 const double _kMobileHandleDragSlop = 8.0;
@@ -111,6 +111,9 @@ class CodeForge extends StatefulWidget {
   ///
   /// Defines the font family, size, and other text properties.
   final TextStyle? textStyle;
+
+  final String? emojiFamily;
+  final RegExp? emojiRegex;
 
   /// The text style for ghost text (inline suggestions).
   ///
@@ -311,6 +314,8 @@ class CodeForge extends StatefulWidget {
     this.horizontalScrollController,
     this.verticalScrollPhysics = const ClampingScrollPhysics(),
     this.textStyle,
+    this.emojiFamily,
+    this.emojiRegex,
     this.innerPadding,
     this.keyboardShotcuts = const CodeForgeKeyboardShortcuts(),
     this.customCodeSnippets,
@@ -3083,6 +3088,8 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
                                                 lineHighlightController:
                                                     _lineHighlightController,
                                                 textStyle: widget.textStyle,
+                                                emojiFamily: widget.emojiFamily,
+                                                emojiRegex: widget.emojiRegex,
                                                 enableFolding:
                                                     widget.enableFolding,
                                                 enableGuideLines:
@@ -4535,6 +4542,8 @@ class _CodeField extends LeafRenderObjectWidget {
   final AnimationController caretBlinkController;
   final AnimationController lineHighlightController;
   final TextStyle? textStyle;
+  final String? emojiFamily;
+  final RegExp? emojiRegex;
   final bool enableFolding, enableGuideLines, enableGutter, enableGutterDivider;
   final bool enableMagnifier;
   final GutterStyle gutterStyle;
@@ -4595,6 +4604,8 @@ class _CodeField extends LeafRenderObjectWidget {
     this.textDirection = TextDirection.ltr,
     this.filePath,
     this.textStyle,
+    this.emojiFamily,
+    this.emojiRegex,
     this.languageId,
     this.lspConfig,
     this.semanticTokens,
@@ -4623,6 +4634,8 @@ class _CodeField extends LeafRenderObjectWidget {
       caretBlinkController: caretBlinkController,
       lineHighlightController: lineHighlightController,
       textStyle: textStyle,
+      emojiFamily: emojiFamily,
+      emojiRegex: emojiRegex,
       matchHighlightStyle: matchHighlightStyle,
       enableFolding: enableFolding,
       enableGuideLines: enableGuideLines,
@@ -4674,6 +4687,8 @@ class _CodeField extends LeafRenderObjectWidget {
       ..language = language
       ..extraLanguages = extraLanguages
       ..textStyle = textStyle
+      ..emojiFamily = emojiFamily
+      ..emojiRegex = emojiRegex
       ..innerPadding = innerPadding
       ..readOnly = readOnly
       ..lineWrap = lineWrap
@@ -5066,10 +5081,48 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
 
   void updateScreenWidth() => _screenWidth = MediaQuery.sizeOf(context).width;
 
+  void _addTextWithEmoji(
+    ui.ParagraphBuilder builder,
+    String text,
+    ui.TextStyle baseStyle,
+    double fontSize,
+  ) {
+    if (_emojiFamily == null || _emojiRegex == null || !_emojiRegex!.hasMatch(text)) {
+      builder.addText(text);
+      return;
+    }
+    int lastEnd = 0;
+    for (final match in _emojiRegex!.allMatches(text)) {
+      if (match.start > lastEnd) {
+        builder.addText(text.substring(lastEnd, match.start));
+      }
+      builder.pushStyle(
+        ui.TextStyle(
+          color: baseStyle.color,
+          fontSize: fontSize,
+          fontFamily: _emojiFamily,
+          fontFamilyFallback: [_emojiFamily!, ...kEmojiFontFallback],
+        ),
+      );
+      builder.addText(match.group(0)!);
+      builder.pop();
+      lastEnd = match.end;
+    }
+    if (lastEnd < text.length) {
+      builder.addText(text.substring(lastEnd));
+    }
+  }
+
   ui.Paragraph _buildParagraph(String text, {double? width}) {
-    final builder = ui.ParagraphBuilder(_paragraphStyle)
-      ..pushStyle(_uiTextStyle)
-      ..addText(text.isEmpty ? ' ' : text);
+    final builder = ui.ParagraphBuilder(_paragraphStyle);
+    builder.pushStyle(_uiTextStyle);
+    final fontSize = _textStyle?.fontSize ?? 14.0;
+    _addTextWithEmoji(
+      builder,
+      text.isEmpty ? ' ' : text,
+      _uiTextStyle,
+      fontSize,
+    );
     final p = builder.build();
     p.layout(ui.ParagraphConstraints(width: width ?? double.infinity));
     return p;
@@ -5136,12 +5189,16 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
     this.onHoverSetByTap,
     EdgeInsets? innerPadding,
     this._textStyle,
+    String? emojiFamily,
+    RegExp? emojiRegex,
     this._ghostTextStyle,
     this._textDirection = TextDirection.ltr,
   }) : _enableFolding = enableFolding,
        _gutterStyle = gutterStyle,
        _lineWrap = lineWrap,
        _innerPadding = innerPadding,
+       _emojiFamily = emojiFamily,
+       _emojiRegex = emojiRegex,
        _matchHighlightStyle = matchHighlightStyle {
     final fontSize = _textStyle?.fontSize ?? 14.0;
     final fontFamily = _textStyle?.fontFamily;
@@ -5161,6 +5218,8 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
             baseTextStyle: _textStyle,
             languageId: languageId,
             getLineText: controller.getLineText,
+            emojiFamily: _emojiFamily,
+            emojiRegex: _emojiRegex,
           );
     _layoutMap = LayoutMap();
     _rebuildLayoutMap();
@@ -5196,11 +5255,15 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
       textDirection: _textDirection,
       textAlign: ui.TextAlign.start,
     );
+    final fallback = [
+      if (_emojiFamily != null) _emojiFamily!,
+      ...kEmojiFontFallback,
+    ];
     _uiTextStyle = ui.TextStyle(
       color: color,
       fontSize: fontSize,
       fontFamily: fontFamily,
-      fontFamilyFallback: kEmojiFontFallback,
+      fontFamilyFallback: fallback,
     );
 
     vscrollController.addListener(() {
@@ -5353,6 +5416,74 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
     _indentGuideFirstFramePending = true;
   }
 
+  String? _emojiFamily;
+  String? get emojiFamily => _emojiFamily;
+  set emojiFamily(String? value) {
+    if (value == _emojiFamily) return;
+    _emojiFamily = value;
+    _recreateHighlighterAndClearCache();
+  }
+
+  RegExp? _emojiRegex;
+  RegExp? get emojiRegex => _emojiRegex;
+  set emojiRegex(RegExp? value) {
+    if (value == _emojiRegex) return;
+    _emojiRegex = value;
+    _recreateHighlighterAndClearCache();
+  }
+
+  void _recreateHighlighterAndClearCache() {
+    final fallback = [
+      if (_emojiFamily != null) _emojiFamily!,
+      ...kEmojiFontFallback,
+    ];
+    final fontSize = _textStyle?.fontSize ?? 14.0;
+    final fontFamily = _textStyle?.fontFamily;
+    final color =
+        _textStyle?.color ?? _editorTheme['root']?.color ?? Colors.black;
+    _uiTextStyle = ui.TextStyle(
+      color: color,
+      fontSize: fontSize,
+      fontFamily: fontFamily,
+      fontFamilyFallback: fallback,
+    );
+    try {
+      _syntaxHighlighter?.dispose();
+    } catch (_) {}
+    _syntaxHighlighter = _language == null
+        ? null
+        : SyntaxHighlighter(
+            language: _language!,
+            extraLanguages: _extraLanguages,
+            editorTheme: _editorTheme,
+            baseTextStyle: _textStyle,
+            languageId: languageId,
+            getLineText: controller.getLineText,
+            emojiFamily: _emojiFamily,
+            emojiRegex: _emojiRegex,
+          );
+    _preHighlightInitialized = false;
+    _paragraphCache.clear();
+    _lineWidthCache.clear();
+    _lineTextCache.clear();
+    _lineHeightCache.clear();
+    _bracketCache.clear();
+    _indentGuideCache.clear();
+    _indentEndLineCache.clear();
+    _diagnosticPathCache.clear();
+    _searchHighlightCache.clear();
+    _invalidateWrappedLayoutCache();
+    _caretInfoCache.clear();
+    _lineIndentCache.clear();
+    _longLineWidth = 0.0;
+    _cachedRtlContentWidth = 0.0;
+    _hasCachedHeight = false;
+    _isCachedHeightExact = false;
+    _rebuildLayoutMap();
+    markNeedsLayout();
+    markNeedsPaint();
+  }
+
   Map<String, TextStyle> get editorTheme => _editorTheme;
   Mode? get language => _language;
   TextStyle? get textStyle => _textStyle;
@@ -5418,6 +5549,8 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
             baseTextStyle: textStyle,
             languageId: languageId,
             getLineText: controller.getLineText,
+            emojiFamily: _emojiFamily,
+            emojiRegex: _emojiRegex,
           );
     _preHighlightInitialized = false;
     _paragraphCache.clear();
@@ -5441,6 +5574,8 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
             baseTextStyle: textStyle,
             languageId: languageId,
             getLineText: controller.getLineText,
+            emojiFamily: _emojiFamily,
+            emojiRegex: _emojiRegex,
           );
     _preHighlightInitialized = false;
     _paragraphCache.clear();
@@ -5466,11 +5601,15 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
       textDirection: _textDirection,
       textAlign: ui.TextAlign.start,
     );
+    final fallback = [
+      if (_emojiFamily != null) _emojiFamily!,
+      ...kEmojiFontFallback,
+    ];
     _uiTextStyle = ui.TextStyle(
       color: color,
       fontSize: fontSize,
       fontFamily: fontFamily,
-      fontFamilyFallback: kEmojiFontFallback,
+      fontFamilyFallback: fallback,
     );
 
     _gutterPadding = fontSize;
@@ -5504,6 +5643,8 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
             baseTextStyle: style,
             languageId: languageId,
             getLineText: controller.getLineText,
+            emojiFamily: _emojiFamily,
+            emojiRegex: _emojiRegex,
           );
     _preHighlightInitialized = false;
 
@@ -5553,6 +5694,8 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
             baseTextStyle: textStyle,
             languageId: languageId,
             getLineText: controller.getLineText,
+            emojiFamily: _emojiFamily,
+            emojiRegex: _emojiRegex,
           );
     _preHighlightInitialized = false;
     _paragraphCache.clear();
