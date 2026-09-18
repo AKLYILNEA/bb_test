@@ -190,7 +190,7 @@ class AboutView extends StatelessWidget {
     final isDark = context.colorScheme.brightness == Brightness.dark;
     final items = [
       Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -235,7 +235,7 @@ class AboutView extends StatelessWidget {
                 );
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Text(
               appLocalizations.desc,
               style: Theme.of(context).textTheme.bodySmall,
