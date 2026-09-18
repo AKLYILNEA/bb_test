@@ -323,7 +323,7 @@ class _UpdateGeoUrlFormDialogState extends State<UpdateGeoUrlFormDialog> {
   @override
   void initState() {
     super.initState();
-    urlController = TextEditingController(text: widget.url);
+    urlController = EmojiTextEditingController(text: widget.url);
   }
 
   Future<void> _handleReset() async {

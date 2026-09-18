@@ -201,14 +201,22 @@ class ApplicationState extends ConsumerState<Application>
             );
             final themeProps = ref.watch(themeSettingProvider);
 
-            return ValueListenableBuilder<String?>(
-              valueListenable: FontManager.fontFamilyNotifier,
-              builder: (_, customFontFamily, _) {
+            return AnimatedBuilder(
+              animation: Listenable.merge([
+                FontManager.fontFamilyNotifier,
+                EmojiManager.emojiStyleNotifier,
+              ]),
+              builder: (_, __) {
+                final customFontFamily = FontManager.fontFamilyNotifier.value;
                 final fontFamily = (themeProps.useHarmonyFont &&
                         customFontFamily != null &&
                         customFontFamily.isNotEmpty)
                     ? customFontFamily
                     : null;
+                final emojiFamily = EmojiManager.currentFamily;
+                final emojiFallback = [
+                  if (emojiFamily != null) emojiFamily,
+                ];
 
                 return MaterialApp(
               debugShowCheckedModeBanner: false,
@@ -253,6 +261,13 @@ class ApplicationState extends ConsumerState<Application>
                   primaryColor: themeProps.primaryColor,
                 ),
                 fontFamily: fontFamily,
+                textTheme: ThemeData(
+                  useMaterial3: true,
+                  brightness: Brightness.light,
+                ).textTheme.apply(
+                  fontFamily: fontFamily,
+                  fontFamilyFallback: emojiFallback,
+                ),
                 actionIconTheme: ActionIconThemeData(
                   backButtonIconBuilder: (BuildContext context) =>
                       const Icon(Icons.arrow_back_rounded),
@@ -267,6 +282,7 @@ class ApplicationState extends ConsumerState<Application>
                   hoverElevation: 5,
                   extendedTextStyle: TextStyle(
                     fontFamily: fontFamily,
+                    fontFamilyFallback: emojiFallback,
                     fontWeight: FontWeight.bold,
                     fontVariations: const [FontVariation('wght', 700)],
                   ),
@@ -359,6 +375,7 @@ class ApplicationState extends ConsumerState<Application>
                     color: Colors.white,
                     fontSize: 12,
                     fontFamily: fontFamily,
+                    fontFamilyFallback: emojiFallback,
                   ),
                 ),
               ),
@@ -370,6 +387,13 @@ class ApplicationState extends ConsumerState<Application>
                   primaryColor: themeProps.primaryColor,
                 ).toPureBlack(themeProps.pureBlack),
                 fontFamily: fontFamily,
+                textTheme: ThemeData(
+                  useMaterial3: true,
+                  brightness: Brightness.dark,
+                ).textTheme.apply(
+                  fontFamily: fontFamily,
+                  fontFamilyFallback: emojiFallback,
+                ),
                 actionIconTheme: ActionIconThemeData(
                   backButtonIconBuilder: (BuildContext context) =>
                       const Icon(Icons.arrow_back_rounded),
@@ -384,6 +408,7 @@ class ApplicationState extends ConsumerState<Application>
                   hoverElevation: 5,
                   extendedTextStyle: TextStyle(
                     fontFamily: fontFamily,
+                    fontFamilyFallback: emojiFallback,
                     fontWeight: FontWeight.bold,
                     fontVariations: const [FontVariation('wght', 700)],
                   ),
@@ -488,6 +513,7 @@ class ApplicationState extends ConsumerState<Application>
                     color: Colors.white,
                     fontSize: 12,
                     fontFamily: fontFamily,
+                    fontFamilyFallback: emojiFallback,
                   ),
                 ),
               ),

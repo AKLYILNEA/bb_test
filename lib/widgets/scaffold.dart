@@ -58,7 +58,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
   late final ValueNotifier<AppBarState> _appBarState;
   final ValueNotifier<Widget?> _floatingActionButton = ValueNotifier(null);
   final ValueNotifier<List<String>> _keywordsNotifier = ValueNotifier([]);
-  final _textController = TextEditingController();
+  final _textController = EmojiTextEditingController();
   final _searchFocusNode = FocusNode();
 
   bool get _isSearch {

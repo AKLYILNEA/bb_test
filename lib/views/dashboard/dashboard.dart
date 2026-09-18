@@ -403,7 +403,7 @@ class _DashboardTitleDialogState extends State<_DashboardTitleDialog> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.initialValue);
+    _controller = EmojiTextEditingController(text: widget.initialValue);
   }
 
   @override

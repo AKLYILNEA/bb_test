@@ -127,7 +127,23 @@ class EmojiText extends StatelessWidget {
 }
 
 class EmojiTextEditingController extends TextEditingController {
-  EmojiTextEditingController({super.text});
+  VoidCallback? _emojiListener;
+
+  EmojiTextEditingController({super.text}) {
+    _emojiListener = () {
+      notifyListeners();
+    };
+    EmojiManager.emojiStyleNotifier.addListener(_emojiListener!);
+  }
+
+  @override
+  void dispose() {
+    if (_emojiListener != null) {
+      EmojiManager.emojiStyleNotifier.removeListener(_emojiListener!);
+      _emojiListener = null;
+    }
+    super.dispose();
+  }
 
   @override
   TextSpan buildTextSpan({

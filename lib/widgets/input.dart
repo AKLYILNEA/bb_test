@@ -153,7 +153,7 @@ class _InputDialogState extends State<InputDialog> {
   @override
   void initState() {
     super.initState();
-    textController = TextEditingController(text: value);
+    textController = EmojiTextEditingController(text: value);
     if (widget.delayedFocus) {
       _focusNode = FocusNode();
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -560,9 +560,9 @@ class _AddDialogState extends State<AddDialog> {
   void initState() {
     super.initState();
     if (keyField != null) {
-      keyController = TextEditingController(text: keyField!.value);
+      keyController = EmojiTextEditingController(text: keyField!.value);
     }
-    valueController = TextEditingController(text: valueField.value);
+    valueController = EmojiTextEditingController(text: valueField.value);
   }
 
   void _submit() {

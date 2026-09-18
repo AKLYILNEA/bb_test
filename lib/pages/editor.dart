@@ -867,7 +867,12 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
       child: TextField(
         maxLines: 1,
         focusNode: focusNode,
-        style: context.textTheme.bodyMedium,
+        style: context.textTheme.bodyMedium?.copyWith(
+          fontFamilyFallback: [
+            if (EmojiManager.currentFamily != null)
+              EmojiManager.currentFamily!,
+          ],
+        ),
         decoration: InputDecoration(
           isDense: true,
           filled: true,

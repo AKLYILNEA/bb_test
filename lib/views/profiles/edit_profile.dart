@@ -47,7 +47,7 @@ class EditProfileViewState extends State<EditProfileView> {
   @override
   void initState() {
     super.initState();
-    labelController = TextEditingController(text: widget.profile.label);
+    labelController = EmojiTextEditingController(text: widget.profile.label);
     urlController = TextEditingController(text: widget.profile.url);
     autoUpdate = widget.isNew ? false : widget.profile.autoUpdate;
     autoUpdateDurationController = TextEditingController(
