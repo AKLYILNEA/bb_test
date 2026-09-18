@@ -5084,7 +5084,6 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
   void _addTextWithEmoji(
     ui.ParagraphBuilder builder,
     String text,
-    ui.TextStyle baseStyle,
     double fontSize,
   ) {
     if (_emojiFamily == null || _emojiRegex == null || !_emojiRegex!.hasMatch(text)) {
@@ -5098,7 +5097,6 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
       }
       builder.pushStyle(
         ui.TextStyle(
-          color: baseStyle.color,
           fontSize: fontSize,
           fontFamily: _emojiFamily,
           fontFamilyFallback: [_emojiFamily!, ...kEmojiFontFallback],
@@ -5120,7 +5118,6 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
     _addTextWithEmoji(
       builder,
       text.isEmpty ? ' ' : text,
-      _uiTextStyle,
       fontSize,
     );
     final p = builder.build();

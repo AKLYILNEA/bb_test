@@ -885,7 +885,6 @@ class SyntaxHighlighter {
   void _addTextWithEmoji(
     ui.ParagraphBuilder builder,
     String text,
-    ui.TextStyle baseStyle,
     double fontSize,
   ) {
     if (emojiFamily == null || emojiRegex == null || !emojiRegex!.hasMatch(text)) {
@@ -899,7 +898,6 @@ class SyntaxHighlighter {
       }
       builder.pushStyle(
         ui.TextStyle(
-          color: baseStyle.color,
           fontSize: fontSize,
           fontFamily: emojiFamily,
           fontFamilyFallback: [emojiFamily!, ..._kEmojiFontFallback],
@@ -931,7 +929,6 @@ class SyntaxHighlighter {
       _addTextWithEmoji(
         builder,
         lineText.isEmpty ? ' ' : lineText,
-        style,
         fontSize,
       );
       final p = builder.build();
@@ -956,7 +953,7 @@ class SyntaxHighlighter {
     builder.pushStyle(style);
 
     if (span.text != null) {
-      _addTextWithEmoji(builder, span.text!, style, fontSize);
+      _addTextWithEmoji(builder, span.text!, fontSize);
     }
 
     if (span.children != null) {
