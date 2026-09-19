@@ -162,6 +162,7 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
           icon: startData.icon,
           labelText: startData.labelText,
           labelWidth: startData.labelWidth,
+          isRunTime: startData.isRunTime,
           onPressed: startData.onPressed,
           onLongPress: startData.onLongPress,
           contentOpacity: startData.showLoading ? 0.0 : 1.0,
@@ -172,7 +173,8 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
           page: page,
           icon: Icons.add_rounded,
           labelText: appLocalizations.addProfile,
-          labelWidth: startFabLabelWidth(context, appLocalizations.addProfile),
+          labelWidth: startFabTextWidth(context, appLocalizations.addProfile),
+          isRunTime: false,
           onPressed: showAddProfileExtend,
         );
       case PageLabel.proxies:
@@ -180,7 +182,8 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
           page: page,
           icon: Icons.network_ping_rounded,
           labelText: appLocalizations.startTest,
-          labelWidth: startFabLabelWidth(context, appLocalizations.startTest),
+          labelWidth: startFabTextWidth(context, appLocalizations.startTest),
+          isRunTime: false,
           onPressed: (delayTestCoordinator.isTesting || _groupName.isEmpty)
               ? null
               : () => _handleProxyTest(proxyTestAction),
@@ -195,6 +198,7 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
           icon: startData.icon,
           labelText: startData.labelText,
           labelWidth: startData.labelWidth,
+          isRunTime: startData.isRunTime,
           onPressed: startData.onPressed,
           onLongPress: startData.onLongPress,
           contentOpacity: startData.showLoading ? 0.0 : 1.0,
@@ -212,6 +216,7 @@ class _FabContent {
     required this.icon,
     required this.labelText,
     required this.labelWidth,
+    this.isRunTime = false,
     this.onPressed,
     this.onLongPress,
     this.contentOpacity = 1.0,
@@ -223,6 +228,7 @@ class _FabContent {
   final IconData icon;
   final String labelText;
   final double labelWidth;
+  final bool isRunTime;
   final VoidCallback? onPressed;
   final VoidCallback? onLongPress;
   final double contentOpacity;
@@ -275,6 +281,14 @@ class _ResidentFabShell extends StatelessWidget {
                       duration: const Duration(milliseconds: 160),
                       switchInCurve: Curves.easeOut,
                       switchOutCurve: Curves.easeIn,
+                      layoutBuilder: (currentChild, previousChildren) => Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.center,
+                        children: [
+                          ...previousChildren,
+                          if (currentChild != null) currentChild,
+                        ],
+                      ),
                       transitionBuilder: (child, animation) =>
                           FadeTransition(opacity: animation, child: child),
                       child: KeyedSubtree(
@@ -291,17 +305,37 @@ class _ResidentFabShell extends StatelessWidget {
                           : Duration.zero,
                       curve: Curves.easeOut,
                       width: content.labelWidth,
-                      alignment: Alignment.centerLeft,
-                      padding: const EdgeInsets.only(left: 6.0),
+                      alignment: content.isRunTime
+                          ? Alignment.centerLeft
+                          : Alignment.center,
+                      padding: content.isRunTime
+                          ? const EdgeInsets.only(left: 6.0)
+                          : EdgeInsets.zero,
+                      clipBehavior: Clip.none,
                       child: OverflowBox(
                         fit: OverflowBoxFit.deferToChild,
-                        alignment: Alignment.centerLeft,
+                        alignment: content.isRunTime
+                            ? Alignment.centerLeft
+                            : Alignment.center,
                         minWidth: 0,
                         maxWidth: double.infinity,
+                        minHeight: 0,
+                        maxHeight: double.infinity,
                         child: AnimatedSwitcher(
                           duration: const Duration(milliseconds: 160),
                           switchInCurve: Curves.easeOut,
                           switchOutCurve: Curves.easeIn,
+                          layoutBuilder: (currentChild, previousChildren) =>
+                              Stack(
+                                clipBehavior: Clip.none,
+                                alignment: content.isRunTime
+                                    ? Alignment.centerLeft
+                                    : Alignment.center,
+                                children: [
+                                  ...previousChildren,
+                                  if (currentChild != null) currentChild,
+                                ],
+                              ),
                           transitionBuilder: (child, animation) =>
                               FadeTransition(opacity: animation, child: child),
                           child: KeyedSubtree(
@@ -309,7 +343,9 @@ class _ResidentFabShell extends StatelessWidget {
                             child: Text(
                               content.labelText,
                               maxLines: 1,
-                              textAlign: TextAlign.left,
+                              textAlign: content.isRunTime
+                                  ? TextAlign.left
+                                  : TextAlign.center,
                               overflow: TextOverflow.visible,
                               style: startFabLabelStyle(context),
                             ),

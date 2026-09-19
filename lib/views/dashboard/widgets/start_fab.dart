@@ -32,7 +32,8 @@ TextStyle startFabLabelStyle(BuildContext context) {
     fontFamily: fontFamily,
     fontWeight: FontWeight.bold,
     fontVariations: const [FontVariation('wght', 700)],
-    height: 1.15,
+    height: 1.25,
+    leadingDistribution: TextLeadingDistribution.even,
     fontFeatures: const [FontFeature.tabularFigures()],
   );
 }
@@ -59,6 +60,7 @@ class StartFabData {
     required this.labelText,
     required this.labelWidth,
     required this.showLoading,
+    this.isRunTime = false,
     this.onPressed,
     this.onLongPress,
   });
@@ -67,6 +69,7 @@ class StartFabData {
   final String labelText;
   final double labelWidth;
   final bool showLoading;
+  final bool isRunTime;
   final VoidCallback? onPressed;
   final VoidCallback? onLongPress;
 }
@@ -225,6 +228,7 @@ class _StartFabDataProviderState extends ConsumerState<StartFabDataProvider> {
                   )
                 : startFabLabelWidth(context, appLocalizations.startRunning),
             showLoading: showLoading,
+            isRunTime: displayStart,
             onPressed: !canPress
                 ? null
                 : state.hasProfile
@@ -289,12 +293,19 @@ Widget buildStartFabBody(BuildContext context, StartFabData data) {
                 duration: startFabWidthAnimationDuration,
                 curve: Curves.easeOut,
                 width: data.labelWidth,
-                alignment: Alignment.centerLeft,
-                padding: const EdgeInsets.only(left: 6.0),
+                alignment: data.isRunTime
+                    ? Alignment.centerLeft
+                    : Alignment.center,
+                padding: data.isRunTime
+                    ? const EdgeInsets.only(left: 6.0)
+                    : EdgeInsets.zero,
+                clipBehavior: Clip.none,
                 child: Text(
                   data.labelText,
                   maxLines: 1,
-                  textAlign: TextAlign.left,
+                  textAlign: data.isRunTime
+                      ? TextAlign.left
+                      : TextAlign.center,
                   overflow: TextOverflow.visible,
                   style: startFabLabelStyle(context),
                 ),
