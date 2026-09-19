@@ -158,6 +158,7 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
     switch (page) {
       case PageLabel.dashboard:
         return _FabContent(
+          page: page,
           icon: startData.icon,
           labelText: startData.labelText,
           labelWidth: startData.labelWidth,
@@ -168,6 +169,7 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
         );
       case PageLabel.profiles:
         return _FabContent(
+          page: page,
           icon: Icons.add_rounded,
           labelText: appLocalizations.addProfile,
           labelWidth: startFabTextWidth(context, appLocalizations.addProfile),
@@ -175,6 +177,7 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
         );
       case PageLabel.proxies:
         return _FabContent(
+          page: page,
           icon: Icons.network_ping_rounded,
           labelText: appLocalizations.startTest,
           labelWidth: startFabTextWidth(context, appLocalizations.startTest),
@@ -188,6 +191,7 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
         );
       default:
         return _FabContent(
+          page: page,
           icon: startData.icon,
           labelText: startData.labelText,
           labelWidth: startData.labelWidth,
@@ -204,6 +208,7 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
 @immutable
 class _FabContent {
   const _FabContent({
+    required this.page,
     required this.icon,
     required this.labelText,
     required this.labelWidth,
@@ -214,6 +219,7 @@ class _FabContent {
     this.showLoading = false,
   });
 
+  final PageLabel page;
   final IconData icon;
   final String labelText;
   final double labelWidth;
@@ -272,7 +278,7 @@ class _ResidentFabShell extends StatelessWidget {
                       transitionBuilder: (child, animation) =>
                           FadeTransition(opacity: animation, child: child),
                       child: KeyedSubtree(
-                        key: ValueKey(content.icon),
+                        key: ValueKey(content.page),
                         child: Icon(content.icon),
                       ),
                     ),
@@ -298,7 +304,7 @@ class _ResidentFabShell extends StatelessWidget {
                           transitionBuilder: (child, animation) =>
                               FadeTransition(opacity: animation, child: child),
                           child: KeyedSubtree(
-                            key: ValueKey(content.labelText),
+                            key: ValueKey(content.page),
                             child: Text(
                               content.labelText,
                               maxLines: 1,
