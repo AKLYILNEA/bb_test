@@ -339,7 +339,7 @@ class _TestUrlDialog extends ConsumerWidget {
                       if (inputValue == null || inputValue.isEmpty) {
                         return appLocalizations.emptyTip(appLocalizations.testUrl);
                       }
-                      if (!inputValue.isUrl) {
+                      if (!inputValue.isHttpUrl) {
                         return appLocalizations.urlTip(appLocalizations.testUrl);
                       }
                       return null;

@@ -482,14 +482,12 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
 
   Widget _buildPlatformRow(
     MediaPlatform platform,
-    MediaUnlockResult? result,
-    bool isGlobalLoading, {
+    MediaUnlockResult? result, {
     bool isItemTesting = false,
     required bool showExtraDetails,
   }) {
-    final isTesting = isItemTesting ||
-        (isGlobalLoading &&
-            (result == null || result.status == MediaUnlockStatus.testing));
+    final isTesting =
+        isItemTesting || result?.status == MediaUnlockStatus.testing;
     final status = result?.status ??
         (isTesting ? MediaUnlockStatus.testing : MediaUnlockStatus.unknown);
     final color = isTesting
@@ -757,7 +755,6 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
           return _buildPlatformRow(
             platform,
             state.results[platform],
-            state.isLoading,
             isItemTesting: state.testingPlatforms.contains(platform),
             showExtraDetails: showExtraDetails,
           );

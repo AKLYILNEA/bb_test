@@ -91,6 +91,13 @@ class GlobalState {
         widgets.contains(DashboardWidget.mediaUnlockSmall);
   }
 
+  bool get hasNetworkDetectionWidget {
+    final widgets = system.isAndroid
+        ? config.appSetting.mobileDashboardWidgets
+        : config.appSetting.desktopDashboardWidgets;
+    return widgets.contains(DashboardWidget.networkDetection);
+  }
+
   bool get isStart => startTime != null && startTime!.isBeforeNow;
 
   AppController get appController => _appController!;
@@ -1287,12 +1294,10 @@ class DetectionState {
     final appState = globalState.appState;
     if (!appState.isInit) return;
 
-    if (showLoading || state.value.ipInfo == null) {
-      state.value = state.value.copyWith(
-        isLoading: true,
-        errorMessage: null,
-      );
-    }
+    state.value = state.value.copyWith(
+      isLoading: true,
+      errorMessage: null,
+    );
 
     final delay = immediate
         ? Duration.zero
@@ -1426,10 +1431,36 @@ class MediaUnlockStateNotifier {
   int _requestId = 0;
   Timer? _nodeChangeTimer;
   static const _nodeChangeDelay = Duration(milliseconds: 800);
+  String? _lastCheckedNodeSignature;
+  bool? _preIsStart;
+
+  String _getNodeSignature() {
+    final profileId = globalState.config.currentProfileId ?? '';
+    final mode = globalState.config.patchClashConfig.mode.name;
+    final selectedMap = globalState.config.currentProfile?.selectedMap ?? {};
+    final sortedEntries = selectedMap.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+    final selectedStr =
+        sortedEntries.map((e) => '${e.key}:${e.value}').join(';');
+    return '$profileId|$mode|$selectedStr';
+  }
 
   final state = ValueNotifier<MediaUnlockState>(
     const MediaUnlockState(),
   );
+  final Set<MediaPlatform> _batchTestingPlatforms = {};
+
+  bool isBatchChecking([Iterable<MediaPlatform>? platforms]) {
+    if (state.value.isLoading) return true;
+    if (platforms == null) {
+      return state.value.testingPlatforms.any(_batchTestingPlatforms.contains);
+    }
+    return platforms.any(
+      (p) =>
+          state.value.testingPlatforms.contains(p) &&
+          _batchTestingPlatforms.contains(p),
+    );
+  }
 
   MediaUnlockStateNotifier._internal();
 
@@ -1446,6 +1477,7 @@ class MediaUnlockStateNotifier {
   }
 
   void checkSingle(MediaPlatform platform) async {
+    _batchTestingPlatforms.remove(platform);
     if (state.value.testingPlatforms.contains(platform)) return;
     final requestId = _requestId;
     final currentTesting =
@@ -1496,6 +1528,7 @@ class MediaUnlockStateNotifier {
     List<MediaPlatform> platforms, {
     bool force = false,
     bool isFullCheck = false,
+    bool isBatchCheck = false,
   }) async {
     final isRunning = globalState.appState.runTime != null;
     if (!isRunning && !force) return;
@@ -1506,6 +1539,9 @@ class MediaUnlockStateNotifier {
     if (targetPlatforms.isEmpty) return;
 
     final requestId = ++_requestId;
+    if (isBatchCheck) {
+      _batchTestingPlatforms.addAll(targetPlatforms);
+    }
     final pendingTesting =
         Set<MediaPlatform>.from(state.value.testingPlatforms)
           ..addAll(targetPlatforms);
@@ -1601,11 +1637,18 @@ class MediaUnlockStateNotifier {
         testingPlatforms: nextTesting,
         lastChecked: DateTime.now(),
       );
+    } finally {
+      throttleTimer?.cancel();
+      _batchTestingPlatforms.removeAll(targetPlatforms);
     }
   }
 
   void checkPinned({bool force = false, List<MediaPlatform>? platforms}) {
-    checkPlatforms(platforms ?? pinnedPlatforms, force: force);
+    checkPlatforms(
+      platforms ?? pinnedPlatforms,
+      force: force,
+      isBatchCheck: true,
+    );
   }
 
   void checkAll({
@@ -1614,29 +1657,77 @@ class MediaUnlockStateNotifier {
   }) {
     final targets = platforms ?? MediaPlatform.values;
     final isFull = targets.length >= MediaPlatform.values.length;
-    checkPlatforms(targets, force: force, isFullCheck: isFull);
+    checkPlatforms(
+      targets,
+      force: force,
+      isFullCheck: isFull,
+      isBatchCheck: true,
+    );
   }
 
-  void startCheckOnNodeChange() {
+  void startCheckOnNodeChange() async {
     final isRunning = globalState.appState.runTime != null;
-    if (!isRunning) return;
+    if (!isRunning) {
+      _preIsStart = false;
+      return;
+    }
+    final isStartup = _preIsStart != true;
+    _preIsStart = true;
+
     if (!globalState.hasMediaUnlockWidget) return;
     if (!globalState.config.appSetting.mediaUnlockRefreshOnNodeChange) return;
-    _checker.cancel();
+
+    final requestId = ++_requestId;
     _nodeChangeTimer?.cancel();
-    final nextResults =
-        Map<MediaPlatform, MediaUnlockResult>.from(state.value.results);
-    for (final p in pinnedPlatforms) {
-      nextResults.remove(p);
+    _checker.cancel();
+
+    if (isStartup) {
+      if (globalState.hasNetworkDetectionWidget) {
+        var waited = 0;
+        while (detectionState.state.value.isLoading &&
+            waited < 6000 &&
+            globalState.appState.runTime != null &&
+            requestId == _requestId) {
+          await Future.delayed(const Duration(milliseconds: 150));
+          waited += 150;
+        }
+      } else {
+        await Future.delayed(const Duration(seconds: 2));
+      }
+      if (requestId != _requestId || globalState.appState.runTime == null) return;
+      final nextResults =
+          Map<MediaPlatform, MediaUnlockResult>.from(state.value.results);
+      for (final p in pinnedPlatforms) {
+        nextResults.remove(p);
+      }
+      state.value = state.value.copyWith(
+        results: nextResults,
+        testingPlatforms: {},
+        isLoading: false,
+      );
+    } else {
+      final currentSignature = _getNodeSignature();
+      if (_lastCheckedNodeSignature == currentSignature &&
+          state.value.results.isNotEmpty) {
+        return;
+      }
+      _lastCheckedNodeSignature = currentSignature;
+      final nextResults =
+          Map<MediaPlatform, MediaUnlockResult>.from(state.value.results);
+      for (final p in pinnedPlatforms) {
+        nextResults.remove(p);
+      }
+      state.value = state.value.copyWith(
+        results: nextResults,
+        testingPlatforms: {},
+        isLoading: false,
+      );
+      await Future.delayed(_nodeChangeDelay);
+      if (requestId != _requestId || globalState.appState.runTime == null) return;
     }
-    state.value = state.value.copyWith(
-      results: nextResults,
-      testingPlatforms: {},
-      isLoading: false,
-    );
-    _nodeChangeTimer = Timer(_nodeChangeDelay, () {
-      checkPinned(force: true);
-    });
+
+    _lastCheckedNodeSignature = _getNodeSignature();
+    checkPinned(force: true);
   }
 
   void tryStartCheck() {

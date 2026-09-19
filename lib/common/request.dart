@@ -90,10 +90,84 @@ class Request {
     return Uint8List.fromList((data as List).cast<int>());
   }
 
+  Future<Response> _getFileResponseForUrl(
+    String url,
+    ResponseType responseType,
+  ) async {
+    final uri = Uri.parse(url);
+    final segments =
+        uri.pathSegments.where((segment) => segment.isNotEmpty).toList();
+    if (segments.isEmpty && uri.host.isEmpty) {
+      throw Exception('Empty file path in file url: $url');
+    }
+
+    final filePath = _buildFilePath(uri, segments);
+    final file = File(filePath);
+
+    if (!await file.exists()) {
+      throw Exception('Local file not found: $filePath');
+    }
+
+    final bytes = await file.readAsBytes();
+    return _buildResponseFromBytes(
+      url: url,
+      bytes: bytes,
+      responseType: responseType,
+      fileName: segments.lastOrNull,
+    );
+  }
+
+  String _buildFilePath(Uri uri, List<String> segments) {
+    if (segments.isNotEmpty && segments.first.contains(':')) {
+      return segments.join('/');
+    }
+    final host = uri.host;
+    if (host.isNotEmpty && host.toLowerCase() != 'localhost') {
+      if (host.length == 1 && RegExp(r'^[a-zA-Z]$').hasMatch(host)) {
+        return '$host:/${segments.join('/')}';
+      }
+      return '//$host/${segments.join('/')}';
+    }
+    return '/${segments.join('/')}';
+  }
+
+  Response _buildResponseFromBytes({
+    required String url,
+    required Uint8List bytes,
+    required ResponseType responseType,
+    String? fileName,
+  }) {
+    final requestOptions = RequestOptions(path: url);
+    final disposition = fileName == null
+        ? null
+        : 'attachment; filename*=UTF-8\'\'${Uri.encodeComponent(fileName)}';
+    final headers = disposition == null
+        ? null
+        : Headers.fromMap({'content-disposition': [disposition]});
+    if (responseType == ResponseType.plain) {
+      return Response(
+        requestOptions: requestOptions,
+        data: utf8.decode(bytes, allowMalformed: true),
+        statusCode: HttpStatus.ok,
+        headers: headers,
+      );
+    }
+    return Response(
+      requestOptions: requestOptions,
+      data: bytes,
+      statusCode: HttpStatus.ok,
+      headers: headers,
+    );
+  }
+
   Future<Response> _getResponseForUrl(
     String url,
     ResponseType responseType,
   ) async {
+    if (url.isFileUrl) {
+      return _getFileResponseForUrl(url, responseType);
+    }
+
     String? userInfo;
     String requestUrl = url;
 
@@ -250,12 +324,14 @@ class Request {
       BaseOptions(
         receiveTimeout: effectiveTimeout,
         connectTimeout: effectiveTimeout,
+        sendTimeout: effectiveTimeout,
       ),
     );
     dio.httpClientAdapter = IOHttpClientAdapter(
       createHttpClient: () {
         final client = HttpClient();
         client.autoUncompress = false;
+        client.connectionTimeout = effectiveTimeout;
         return client;
       },
     );
@@ -353,7 +429,15 @@ class Request {
 
     return await firstCompleter.future.timeout(
       effectiveTimeout,
-      onTimeout: () => Result.success(primaryInfo ?? fallbackInfo),
+      onTimeout: () {
+        cleanup();
+        cancelToken?.cancel('timeout');
+        final res = primaryInfo ?? fallbackInfo;
+        if (res != null) {
+          return Result.success(res);
+        }
+        return Result.error('timeout');
+      },
     );
   }
 
@@ -402,7 +486,7 @@ class Request {
   }
 
   static const _ipCacheKey = 'ip_detail_cache';
-  static const _cacheDuration = Duration(days: 14);
+  static const _cacheDuration = Duration(days: 30);
 
   Future<IpInfo?> _getValidCachedIp(String cacheKey) async {
     try {
@@ -568,7 +652,6 @@ class Request {
           return Result.error(message);
         }
         final ipInfo = IpInfo.fromJson(data);
-        // 2. 写入 7 天有效期的本地缓存
         await _saveCachedIp(cacheKey, ipInfo);
         return Result.success(ipInfo);
       }
