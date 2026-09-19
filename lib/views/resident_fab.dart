@@ -31,26 +31,16 @@ class ResidentFab extends ConsumerStatefulWidget {
 }
 
 class _ResidentFabState extends ConsumerState<ResidentFab>
-    with TickerProviderStateMixin {
-  /// 页面之间切换：只让内部图标与文字忽隐忽现（外壳不动）
-  static const _contentFadeIn = Duration(milliseconds: 180);
-  static const _contentFadeOut = Duration(milliseconds: 110);
-
+    with SingleTickerProviderStateMixin {
   /// 出现 / 消失：整体弱隐
   static const _shellFadeIn = Duration(milliseconds: 180);
   static const _shellFadeOut = Duration(milliseconds: 130);
-
-  late final AnimationController _contentFade = AnimationController(
-    vsync: this,
-    duration: _contentFadeIn,
-    reverseDuration: _contentFadeOut,
-    value: 1.0,
-  );
 
   late final AnimationController _shellFade = AnimationController(
     vsync: this,
     duration: _shellFadeIn,
     reverseDuration: _shellFadeOut,
+    value: 1.0,
   );
 
   /// 代理页测速时的内容缩放，沿用 DelayTestButton 的实现（1 → 0）
@@ -66,17 +56,8 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
     CurvedAnimation(parent: _testScaleController, curve: const Interval(0, 1)),
   );
 
-  /// 当前真正渲染的根页面（过渡期间保持旧值，等内容淡出结束再替换；
-  /// 非常驻页面不会覆盖它，这样回到常驻页面时内容还是对的那一个）
-  PageLabel? _renderedPage;
-  bool _renderedVisible = false;
-
-  /// 已经登记过的目标，用来避免同一目标被反复调度
-  PageLabel? _pendingPage;
-  bool? _pendingVisible;
-
-  /// 换页序号：新目标到来时让上一轮过渡自行退出，避免排队等待
-  int _switchGeneration = 0;
+  PageLabel? _lastResidentPage;
+  bool? _lastVisible;
 
   /// 代理页当前策略组名（测速按钮据此判断是否正在测速）
   String _groupName = '';
@@ -101,7 +82,6 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
   @override
   void dispose() {
     delayTestCoordinator.removeListener(_handleTestingChanged);
-    _contentFade.dispose();
     _shellFade.dispose();
     _testScaleController.dispose();
     super.dispose();
@@ -110,45 +90,6 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
   void _handleProxyTest(VoidCallback? action) {
     if (delayTestCoordinator.isTesting) return;
     action?.call();
-  }
-
-  /// 顺序执行，绝不让两段动画叠加：
-  /// 同一页面可见性下换页 = 只淡出内容；出现 / 消失 = 只淡入淡出外壳。
-  Future<void> _switch(PageLabel? page, bool visible) async {
-    final generation = ++_switchGeneration;
-    final wasVisible = _renderedVisible;
-
-    if (wasVisible && visible) {
-      await _contentFade.reverse();
-      if (!mounted || generation != _switchGeneration) return;
-    }
-
-    if (!mounted || generation != _switchGeneration) return;
-
-    setState(() {
-      if (page != null) {
-        _renderedPage = page;
-      }
-      _renderedVisible = visible;
-    });
-
-    if (!visible) {
-      if (wasVisible) {
-        await _shellFade.reverse();
-        if (!mounted || generation != _switchGeneration) return;
-      }
-      // 不可见期间内容直接回到完整状态，下次出现只做整体淡入
-      _contentFade.value = 1.0;
-      return;
-    }
-
-    if (wasVisible) {
-      _contentFade.forward();
-      return;
-    }
-
-    _contentFade.value = 1.0;
-    await _shellFade.forward();
   }
 
   @override
@@ -171,24 +112,35 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
         '';
     final proxyTestAction = ref.watch(residentProxyTestProvider);
 
-    if (_pendingPage != residentPage || _pendingVisible != visible) {
-      _pendingPage = residentPage;
-      _pendingVisible = visible;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        _switch(residentPage, visible);
-      });
+    if (_lastVisible != visible) {
+      final wasVisible = _lastVisible ?? true;
+      _lastVisible = visible;
+      if (visible) {
+        _shellFade.forward();
+      } else if (wasVisible) {
+        _shellFade.reverse();
+      }
     }
+
+    if (residentPage != null) {
+      _lastResidentPage = residentPage;
+    }
+
+    final activePage = residentPage ?? _lastResidentPage ?? PageLabel.dashboard;
 
     return StartFabDataProvider(
       builder: (context, startData) => AnimatedBuilder(
-        animation: _testScaleController.view,
+        animation: Listenable.merge([_testScaleController, _shellFade]),
         builder: (context, _) {
           return _ResidentFabShell(
-            content: _buildContent(context, startData, proxyTestAction),
-            contentFade: _contentFade,
+            content: _buildContent(
+              context,
+              startData,
+              proxyTestAction,
+              activePage,
+            ),
             shellFade: _shellFade,
-            visible: _renderedVisible,
+            visible: visible,
             // 只有屏幕上看得见的时候才连续变宽，不可见期间直接到位
             animateWidth: _shellFade.value > 0,
           );
@@ -201,8 +153,9 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
     BuildContext context,
     StartFabData startData,
     VoidCallback? proxyTestAction,
+    PageLabel page,
   ) {
-    switch (_renderedPage) {
+    switch (page) {
       case PageLabel.dashboard:
         return _FabContent(
           icon: startData.icon,
@@ -234,7 +187,6 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
               _testScaleController.isCompleted,
         );
       default:
-        // 首帧（还没登记目标）用启动按钮的数据兜底；此时外壳是完全透明的
         return _FabContent(
           icon: startData.icon,
           labelText: startData.labelText,
@@ -280,14 +232,12 @@ class _FabContent {
 class _ResidentFabShell extends StatelessWidget {
   const _ResidentFabShell({
     required this.content,
-    required this.contentFade,
     required this.shellFade,
     required this.visible,
     required this.animateWidth,
   });
 
   final _FabContent content;
-  final Animation<double> contentFade;
   final Animation<double> shellFade;
   final bool visible;
   final bool animateWidth;
@@ -314,10 +264,19 @@ class _ResidentFabShell extends StatelessWidget {
                   clipBehavior: Clip.none,
                   heroTag: null,
                   onPressed: content.onPressed,
-                  icon: _buildContentChild(Icon(content.icon)),
-                  // 与图标走同一个内容包装：加载中（showLoading）时图标与文字一起隐藏、
-                  // 只留加载点阵（冷启动时内核状态还没初始化，之前文字没跟着隐藏，
-                  // 就出现了文字和加载动画重叠）；代理页测速时两者也一起缩放
+                  icon: _buildContentChild(
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 160),
+                      switchInCurve: Curves.easeOut,
+                      switchOutCurve: Curves.easeIn,
+                      transitionBuilder: (child, animation) =>
+                          FadeTransition(opacity: animation, child: child),
+                      child: KeyedSubtree(
+                        key: ValueKey(content.icon),
+                        child: Icon(content.icon),
+                      ),
+                    ),
+                  ),
                   label: _buildContentChild(
                     AnimatedContainer(
                       // 看不见的时候宽度直接到位，只有看得见才连续变宽
@@ -327,24 +286,27 @@ class _ResidentFabShell extends StatelessWidget {
                       curve: Curves.easeOut,
                       width: content.labelWidth,
                       alignment: Alignment.center,
-                      // 文字必须先按自身宽度单行排版，再整体居中：
-                      // 宽度动画期间 label 盒子会比新文字窄，若直接放 Text（默认 softWrap），
-                      // 中文会在窄盒里折行、只画出前两个字，等盒子变宽才整段显示，
-                      // 表现为「最后一下卡顿展开」。
-                      // 注意 fit 必须是 deferToChild：OverflowBox 默认的 max 是 sizedByParent，
-                      // 尺寸会取 constraints.biggest，把整个 label 区撑到父级允许的最大宽度，
-                      // 结果图标被顶到最左、文字被挤出屏幕之外。
                       child: OverflowBox(
                         fit: OverflowBoxFit.deferToChild,
                         alignment: Alignment.center,
                         minWidth: 0,
                         maxWidth: double.infinity,
-                        child: Text(
-                          content.labelText,
-                          maxLines: 1,
-                          textAlign: TextAlign.center,
-                          overflow: TextOverflow.visible,
-                          style: startFabLabelStyle(context),
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 160),
+                          switchInCurve: Curves.easeOut,
+                          switchOutCurve: Curves.easeIn,
+                          transitionBuilder: (child, animation) =>
+                              FadeTransition(opacity: animation, child: child),
+                          child: KeyedSubtree(
+                            key: ValueKey(content.labelText),
+                            child: Text(
+                              content.labelText,
+                              maxLines: 1,
+                              textAlign: TextAlign.center,
+                              overflow: TextOverflow.visible,
+                              style: startFabLabelStyle(context),
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -378,17 +340,9 @@ class _ResidentFabShell extends StatelessWidget {
   }
 
   Widget _buildContentChild(Widget child) {
-    // 结构必须恒定：这里曾经按 `contentScale != 1` 决定要不要包 Transform.scale，
-    // 于是测速进行中切到首页时（scale ≠ 1 → 1）整棵子树换了形状、被重建，
-    // label 里的 AnimatedContainer 拿到的是新初始宽度，宽度动画直接消失
-    // （表现就是「按钮直接变长、没有动画」）。
-    // scale = 1 / opacity = 1 都是无副作用的恒等包装，所以无条件保留。
-    return FadeTransition(
-      opacity: contentFade,
-      child: Opacity(
-        opacity: content.contentOpacity,
-        child: Transform.scale(scale: content.contentScale, child: child),
-      ),
+    return Opacity(
+      opacity: content.contentOpacity,
+      child: Transform.scale(scale: content.contentScale, child: child),
     );
   }
 }

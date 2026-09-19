@@ -353,6 +353,18 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
     );
   }
 
+  double _getNoneChipWidth(BuildContext context) {
+    final painter = TextPainter(
+      text: TextSpan(
+        text: appLocalizations.none,
+        style: context.textTheme.labelSmall?.copyWith(fontSize: 11),
+      ),
+      textDirection: Directionality.of(context),
+    )..layout();
+    // 左右内边距各 8dp，加上左右边框各 1dp
+    return (painter.width + 16 + 2).ceilToDouble();
+  }
+
   Widget _buildGridItem(_MetricItem item, {bool isFullWidth = false}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -407,11 +419,18 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
           ),
           if (isFullWidth) ...[
             const SizedBox(width: 8),
-            Text(
-              item.value,
-              style: context.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontVariations: const [FontVariation('wght', 700)],
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                minWidth: _getNoneChipWidth(context),
+              ),
+              child: Center(
+                child: Text(
+                  item.value,
+                  style: context.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontVariations: const [FontVariation('wght', 700)],
+                  ),
+                ),
               ),
             ),
           ],
