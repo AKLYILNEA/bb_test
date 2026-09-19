@@ -172,7 +172,7 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
           page: page,
           icon: Icons.add_rounded,
           labelText: appLocalizations.addProfile,
-          labelWidth: startFabTextWidth(context, appLocalizations.addProfile),
+          labelWidth: startFabLabelWidth(context, appLocalizations.addProfile),
           onPressed: showAddProfileExtend,
         );
       case PageLabel.proxies:
@@ -180,7 +180,7 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
           page: page,
           icon: Icons.network_ping_rounded,
           labelText: appLocalizations.startTest,
-          labelWidth: startFabTextWidth(context, appLocalizations.startTest),
+          labelWidth: startFabLabelWidth(context, appLocalizations.startTest),
           onPressed: (delayTestCoordinator.isTesting || _groupName.isEmpty)
               ? null
               : () => _handleProxyTest(proxyTestAction),
@@ -291,10 +291,11 @@ class _ResidentFabShell extends StatelessWidget {
                           : Duration.zero,
                       curve: Curves.easeOut,
                       width: content.labelWidth,
-                      alignment: Alignment.center,
+                      alignment: Alignment.centerLeft,
+                      padding: const EdgeInsets.only(left: 6.0),
                       child: OverflowBox(
                         fit: OverflowBoxFit.deferToChild,
-                        alignment: Alignment.center,
+                        alignment: Alignment.centerLeft,
                         minWidth: 0,
                         maxWidth: double.infinity,
                         child: AnimatedSwitcher(
@@ -308,7 +309,7 @@ class _ResidentFabShell extends StatelessWidget {
                             child: Text(
                               content.labelText,
                               maxLines: 1,
-                              textAlign: TextAlign.center,
+                              textAlign: TextAlign.left,
                               overflow: TextOverflow.visible,
                               style: startFabLabelStyle(context),
                             ),
