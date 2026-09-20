@@ -158,9 +158,10 @@ class AboutView extends StatelessWidget {
       title: appLocalizations.otherContributors,
       items: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 14),
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 7),
             child: Row(
               children: [
                 for (int i = 0; i < contributors.length; i++) ...[
@@ -264,21 +265,30 @@ class Avatar extends StatelessWidget {
             child: _ContributorDialog(contributor: contributor),
           );
         },
-        child: Container(
+        child: SizedBox(
           width: 44,
           height: 44,
-          foregroundDecoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: borderColor,
-              width: 1.25,
-            ),
-          ),
-          child: ClipOval(
-            child: Image.asset(
-              contributor.avatar,
-              fit: BoxFit.cover,
-            ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              ClipOval(
+                child: Image.asset(
+                  contributor.avatar,
+                  width: 41.5,
+                  height: 41.5,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: borderColor,
+                    width: 1.25,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -311,40 +321,51 @@ class _ContributorDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Container(
+            SizedBox(
               width: 82,
               height: 82,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(
-                      alpha: isDark ? 0.35 : 0.14,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(
+                            alpha: isDark ? 0.35 : 0.14,
+                          ),
+                          blurRadius: 14,
+                          offset: const Offset(0, 4),
+                        ),
+                        BoxShadow(
+                          color: Colors.black.withValues(
+                            alpha: isDark ? 0.20 : 0.06,
+                          ),
+                          blurRadius: 4,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
                     ),
-                    blurRadius: 14,
-                    offset: const Offset(0, 4),
                   ),
-                  BoxShadow(
-                    color: Colors.black.withValues(
-                      alpha: isDark ? 0.20 : 0.06,
+                  ClipOval(
+                    child: Image.asset(
+                      contributor.avatar,
+                      width: 76,
+                      height: 76,
+                      fit: BoxFit.cover,
                     ),
-                    blurRadius: 4,
-                    offset: const Offset(0, 1),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: borderColor,
+                        width: 3.0,
+                      ),
+                    ),
                   ),
                 ],
-              ),
-              foregroundDecoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: borderColor,
-                  width: 3.0,
-                ),
-              ),
-              child: ClipOval(
-                child: Image.asset(
-                  contributor.avatar,
-                  fit: BoxFit.cover,
-                ),
               ),
             ),
             const SizedBox(height: 20),
