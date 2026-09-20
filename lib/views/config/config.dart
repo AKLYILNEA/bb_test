@@ -39,7 +39,7 @@ class _ConfigViewState extends State<ConfigView> {
       ListItem.next(
         title: Text(appLocalizations.network),
         subtitle: Text(appLocalizations.networkDesc),
-        leading: const Icon(FluentIcons.cellular_data_1_24_regular),
+        leading: const Icon(FluentIcons.sound_source_24_regular),
         delegate: NextDelegate(
           title: appLocalizations.network,
           blur: false,
@@ -222,7 +222,7 @@ class _ConfigViewState extends State<ConfigView> {
       ListItem.next(
         title: Text(appLocalizations.tunnel),
         subtitle: Text(appLocalizations.tunnelDesc),
-        leading: const Icon(FluentIcons.arrow_swap_24_regular),
+        leading: const Icon(FluentIcons.arrows_bidirectional_24_regular),
         delegate: NextDelegate(
           title: appLocalizations.tunnel,
           actions: [

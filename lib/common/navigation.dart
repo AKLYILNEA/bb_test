@@ -16,7 +16,7 @@ class Navigation {
     return [
       NavigationItem(
         keep: false,
-        icon: const Icon(FluentIcons.home_24_filled),
+        icon: const Icon(FluentIcons.glance_24_filled),
         label: PageLabel.dashboard,
         builder: (_) =>
             DashboardView(key: const GlobalObjectKey(PageLabel.dashboard)),
@@ -78,7 +78,7 @@ class Navigation {
         modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.grid_24_filled),
+        icon: const Icon(FluentIcons.briefcase_24_filled),
         label: PageLabel.tools,
         builder: (_) => ToolsView(key: const GlobalObjectKey(PageLabel.tools)),
         modes: [NavigationItemMode.desktop, NavigationItemMode.mobile],
