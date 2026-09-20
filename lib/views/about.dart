@@ -157,17 +157,18 @@ class AboutView extends StatelessWidget {
       separated: false,
       title: appLocalizations.otherContributors,
       items: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          clipBehavior: Clip.none,
+        Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-          child: Row(
-            children: [
-              for (int i = 0; i < contributors.length; i++) ...[
-                if (i > 0) const SizedBox(width: 14),
-                Avatar(contributor: contributors[i]),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (int i = 0; i < contributors.length; i++) ...[
+                  if (i > 0) const SizedBox(width: 14),
+                  Avatar(contributor: contributors[i]),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ],
