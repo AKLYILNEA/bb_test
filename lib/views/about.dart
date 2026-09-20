@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/providers/config.dart';
@@ -164,7 +165,7 @@ class AboutView extends StatelessWidget {
         maxTextWidth = painter.width;
       }
     }
-    final itemWidth = max(36.0, maxTextWidth.ceilToDouble());
+    final itemWidth = maxTextWidth > 36.0 ? maxTextWidth.ceilToDouble() : 36.0;
 
     return generateSection(
       separated: false,
