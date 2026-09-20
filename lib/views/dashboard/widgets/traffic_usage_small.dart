@@ -5,6 +5,7 @@ import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class TrafficUsageSmall extends ConsumerStatefulWidget {
   const TrafficUsageSmall({super.key});
@@ -41,7 +42,7 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.file_upload_rounded),
+              leading: const Icon(FluentIcons.arrow_upload_24_regular),
               title: Text(appLocalizations.upload),
               trailing: OptionRadioIcon(selected: _showUpload),
               onTap: () {
@@ -50,7 +51,7 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.file_download_rounded),
+              leading: const Icon(FluentIcons.arrow_download_24_regular),
               title: Text(appLocalizations.download),
               trailing: OptionRadioIcon(selected: !_showUpload),
               onTap: () {
@@ -103,7 +104,7 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
                         Row(
                           children: [
                             Icon(
-                              Icons.data_usage_rounded,
+                              FluentIcons.data_usage_24_regular,
                               color: context.colorScheme.onSurfaceVariant,
                             ),
                             const SizedBox(width: 8),

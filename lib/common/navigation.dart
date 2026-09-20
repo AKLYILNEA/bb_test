@@ -4,6 +4,7 @@ import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/views/views.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class Navigation {
   static Navigation? _instance;
@@ -15,13 +16,13 @@ class Navigation {
     return [
       NavigationItem(
         keep: false,
-        icon: const Icon(Icons.dashboard_rounded),
+        icon: const Icon(FluentIcons.home_24_filled),
         label: PageLabel.dashboard,
         builder: (_) =>
             DashboardView(key: const GlobalObjectKey(PageLabel.dashboard)),
       ),
       NavigationItem(
-        icon: const Icon(Icons.explore_rounded),
+        icon: const Icon(FluentIcons.compass_northwest_24_filled),
         label: PageLabel.proxies,
         builder: (_) => ProviderScope(
           overrides: [queryProvider.overrideWith(() => Query())],
@@ -32,13 +33,13 @@ class Navigation {
             : [],
       ),
       NavigationItem(
-        icon: const Icon(Icons.create_new_folder_rounded),
+        icon: const Icon(FluentIcons.folder_24_filled),
         label: PageLabel.profiles,
         builder: (_) =>
             ProfilesView(key: const GlobalObjectKey(PageLabel.profiles)),
       ),
       NavigationItem(
-        icon: const Icon(Icons.view_timeline_rounded),
+        icon: const Icon(FluentIcons.history_24_filled),
         label: PageLabel.requests,
         builder: (_) =>
             RequestsView(key: const GlobalObjectKey(PageLabel.requests)),
@@ -46,7 +47,7 @@ class Navigation {
         modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: const Icon(Icons.ballot_rounded),
+        icon: const Icon(FluentIcons.arrow_swap_24_filled),
         label: PageLabel.connections,
         builder: (_) =>
             ConnectionsView(key: const GlobalObjectKey(PageLabel.connections)),
@@ -54,7 +55,7 @@ class Navigation {
         modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: const Icon(Icons.storage_rounded),
+        icon: const Icon(FluentIcons.database_24_filled),
         label: PageLabel.resources,
         description: 'resourcesDesc',
         builder: (_) =>
@@ -62,7 +63,7 @@ class Navigation {
         modes: [NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: const Icon(Icons.functions_rounded),
+        icon: const Icon(FluentIcons.math_formula_24_filled),
         label: PageLabel.script,
         description: 'scriptDesc',
         builder: (_) =>
@@ -70,14 +71,14 @@ class Navigation {
         modes: [NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: const Icon(Icons.adb_rounded),
+        icon: const Icon(FluentIcons.bug_24_filled),
         label: PageLabel.logs,
         builder: (_) => LogsView(key: const GlobalObjectKey(PageLabel.logs)),
         description: 'logsDesc',
         modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: const Icon(Icons.construction_rounded),
+        icon: const Icon(FluentIcons.grid_24_filled),
         label: PageLabel.tools,
         builder: (_) => ToolsView(key: const GlobalObjectKey(PageLabel.tools)),
         modes: [NavigationItemMode.desktop, NavigationItemMode.mobile],

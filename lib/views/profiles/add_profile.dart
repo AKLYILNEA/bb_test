@@ -7,6 +7,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'edit_profile.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 void showAddProfileExtend() {
   final context = globalState.navigatorKey.currentState!.context;
@@ -44,7 +45,7 @@ class AddProfileView extends StatelessWidget {
           type: type,
           actions: [
             IconButton(
-              icon: const Icon(Icons.security_rounded),
+              icon: const Icon(FluentIcons.shield_24_regular),
               tooltip: appLocalizations.ageKeyGenerateTitle,
               onPressed: () {
                 editKey.currentState?.showAgeKeyGenerator();
@@ -122,7 +123,7 @@ class AddProfileView extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListItem(
-                leading: const Icon(Icons.qr_code_rounded),
+                leading: const Icon(FluentIcons.qr_code_24_regular),
                 title: Text(appLocalizations.qrcode),
                 subtitle: Text(appLocalizations.qrcodeDesc),
                 onTap: _toScan,
@@ -137,7 +138,7 @@ class AddProfileView extends StatelessWidget {
                 endIndent: 16,
               ),
               ListItem(
-                leading: const Icon(Icons.content_paste_rounded),
+                leading: const Icon(FluentIcons.clipboard_paste_24_regular),
                 title: Text(appLocalizations.clipboard),
                 subtitle: Text(appLocalizations.clipboardDesc),
                 onTap: _handleAddProfileFromClipboard,
@@ -152,7 +153,7 @@ class AddProfileView extends StatelessWidget {
                 endIndent: 16,
               ),
               ListItem(
-                leading: const Icon(Icons.cloud_download_rounded),
+                leading: const Icon(FluentIcons.cloud_arrow_down_24_regular),
                 title: Text(appLocalizations.url),
                 subtitle: Text(appLocalizations.urlDesc),
                 onTap: _toAdd,
@@ -167,7 +168,7 @@ class AddProfileView extends StatelessWidget {
                 endIndent: 16,
               ),
               ListItem(
-                leading: const Icon(Icons.file_open_rounded),
+                leading: const Icon(FluentIcons.folder_open_24_regular),
                 title: Text(appLocalizations.file),
                 subtitle: Text(appLocalizations.fileDesc),
                 onTap: _handleAddProfileFormFile,

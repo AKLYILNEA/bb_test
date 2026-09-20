@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 final proxyIconProvider = Provider.family<String, String>((ref, proxyName) {
   if (proxyName.isEmpty) return '';
@@ -107,7 +108,7 @@ class ProxyCard extends StatelessWidget {
               height: measure.labelSmallHeight,
               width: measure.labelSmallHeight,
               child: IconButton(
-                icon: const Icon(Icons.bolt_rounded),
+                icon: const Icon(FluentIcons.flash_24_regular),
                 iconSize: measure.labelSmallHeight,
                 padding: EdgeInsets.zero,
                 tooltip: appLocalizations.startTest,
@@ -386,7 +387,7 @@ class _ProxyComputedMarkIcon extends StatelessWidget {
           color: Theme.of(context).colorScheme.secondaryContainer,
         ),
         child: Icon(
-          Icons.lock_outline_rounded,
+          FluentIcons.lock_closed_24_regular,
           size: 18,
           color: Theme.of(context).colorScheme.onSecondaryContainer,
         ),

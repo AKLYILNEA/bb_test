@@ -8,6 +8,7 @@ import 'package:bett_box/models/common.dart';
 import 'package:bett_box/providers/config.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class GoogleBottomNavBar extends ConsumerWidget {
   final List<NavigationItem> navigationItems;
@@ -23,9 +24,9 @@ class GoogleBottomNavBar extends ConsumerWidget {
 
   IconData _extractIconData(Widget iconWidget) {
     if (iconWidget is Icon) {
-      return iconWidget.icon ?? Icons.home_rounded;
+      return iconWidget.icon ?? FluentIcons.home_24_filled;
     }
-    return Icons.home_rounded;
+    return FluentIcons.home_24_filled;
   }
 
   @override

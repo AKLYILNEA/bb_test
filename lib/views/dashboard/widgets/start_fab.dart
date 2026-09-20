@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 const startFabWidthAnimationDuration = Duration(milliseconds: 200);
 
@@ -207,8 +208,8 @@ class _StartFabDataProviderState extends ConsumerState<StartFabDataProvider> {
           context,
           StartFabData(
             icon: displayStart
-                ? Icons.pause_rounded
-                : Icons.play_arrow_rounded,
+                ? FluentIcons.pause_24_filled
+                : FluentIcons.play_24_filled,
             labelText: displayStart
                 ? _formatRunTime(runTime)
                 : appLocalizations.startRunning,

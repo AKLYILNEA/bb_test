@@ -4,6 +4,7 @@ import 'package:bett_box/widgets/fade_box.dart';
 import 'package:flutter/material.dart';
 
 import 'text.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class Info {
   final String label;
@@ -269,7 +270,7 @@ class SelectIcon extends StatelessWidget {
       shape: const CircleBorder(),
       child: Container(
         padding: const EdgeInsets.all(4),
-        child: const Icon(Icons.check_rounded, size: 16),
+        child: const Icon(FluentIcons.checkmark_24_regular, size: 16),
       ),
     );
   }

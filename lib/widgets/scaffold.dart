@@ -14,6 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'chip.dart';
 import 'text.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 typedef OnKeywordsUpdateCallback = void Function(List<String> keywords);
 
@@ -185,14 +186,14 @@ class CommonScaffoldState extends State<CommonScaffold> {
     if (_isEdit) {
       return IconButton(
         onPressed: _appBarState.value.editState?.onExit,
-        icon: const Icon(Icons.close_rounded),
+        icon: const Icon(FluentIcons.dismiss_24_regular),
         tooltip: appLocalizations.cancel,
       );
     }
     if (_isSearch) {
       return IconButton(
         onPressed: _handleExitSearching,
-        icon: const Icon(Icons.arrow_back_rounded),
+        icon: const Icon(FluentIcons.arrow_left_24_regular),
         tooltip: appLocalizations.back,
       );
     }
@@ -202,7 +203,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
     if (canPop) {
       return IconButton(
         onPressed: () => Navigator.maybePop(context),
-        icon: const Icon(Icons.arrow_back_rounded),
+        icon: const Icon(FluentIcons.arrow_left_24_regular),
         tooltip: appLocalizations.back,
       );
     }
@@ -240,7 +241,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
       return genActions([
         IconButton(
           onPressed: _handleClear,
-          icon: const Icon(Icons.close_rounded),
+          icon: const Icon(FluentIcons.dismiss_24_regular),
           tooltip: appLocalizations.clear,
         ),
       ]);
@@ -257,7 +258,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
               });
             });
           },
-          icon: const Icon(Icons.search_rounded),
+          icon: const Icon(FluentIcons.search_24_regular),
           tooltip: appLocalizations.search,
         ),
       ...actions,

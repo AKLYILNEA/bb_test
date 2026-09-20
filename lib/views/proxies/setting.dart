@@ -6,22 +6,23 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class ProxiesSetting extends StatelessWidget {
   const ProxiesSetting({super.key});
 
   IconData _getIconWithProxiesType(ProxiesType type) {
     return switch (type) {
-      ProxiesType.tab => Icons.view_carousel_rounded,
-      ProxiesType.list => Icons.view_list_rounded,
+      ProxiesType.tab => FluentIcons.slide_multiple_24_regular,
+      ProxiesType.list => FluentIcons.text_bullet_list_ltr_24_regular,
     };
   }
 
   IconData _getIconWithProxiesSortType(ProxiesSortType type) {
     return switch (type) {
-      ProxiesSortType.none => Icons.align_horizontal_left_rounded,
-      ProxiesSortType.delay => Icons.network_ping_rounded,
-      ProxiesSortType.name => Icons.sort_by_alpha_rounded,
+      ProxiesSortType.none => FluentIcons.text_align_left_24_regular,
+      ProxiesSortType.delay => FluentIcons.wifi_1_24_regular,
+      ProxiesSortType.name => FluentIcons.text_sort_ascending_24_regular,
     };
   }
 

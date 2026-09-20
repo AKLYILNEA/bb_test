@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'widgets/start_fab.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 final customDashboardTitleProvider =
     StateNotifierProvider<CustomDashboardTitleNotifier, String?>((ref) {
@@ -106,7 +107,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                   onPressed: () {
                     _showAddWidgetsModal();
                   },
-                  icon: Icon(Icons.add_circle_rounded),
+                  icon: Icon(FluentIcons.add_circle_24_regular),
                 ),
               )
             : SizedBox();
@@ -125,7 +126,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
           child: Padding(
             padding: const EdgeInsets.all(12.0),
             child: _buildIsEdit((isEdit) {
-              return isEdit ? const Icon(Icons.save_rounded) : const Icon(Icons.edit_rounded);
+              return isEdit ? const Icon(FluentIcons.save_24_regular) : const Icon(FluentIcons.edit_24_regular);
             }),
           ),
         ),
@@ -377,7 +378,7 @@ class _AddedContainerState extends State<_AddedContainer> {
                 iconSize: 20,
                 padding: EdgeInsets.all(2),
                 onPressed: _handleAdd,
-                icon: Icon(Icons.add_rounded),
+                icon: Icon(FluentIcons.add_24_regular),
               ),
             ),
           ),

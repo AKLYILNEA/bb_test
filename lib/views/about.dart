@@ -8,6 +8,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 @immutable
 class Contributor {
@@ -41,26 +42,26 @@ class AboutView extends StatelessWidget {
         _LinkGridRow(
           left: _LinkGridTile(
             title: 'Github Releases',
-            icon: Icons.star_rounded,
+            icon: FluentIcons.star_24_regular,
             onTap: () =>
                 globalState.openUrl('https://github.com/$repository'),
           ),
           right: _LinkGridTile(
             title: appLocalizations.checkUpdate,
-            icon: Icons.refresh_rounded,
+            icon: FluentIcons.arrow_clockwise_24_regular,
             onTap: () => _checkUpdate(context),
           ),
         ),
         _LinkGridRow(
           left: _LinkGridTile(
             title: 'Telegram Group',
-            icon: Icons.launch_rounded,
+            icon: FluentIcons.open_24_regular,
             onTap: () =>
                 globalState.openUrl('https://telegram.me/appshub_chat'),
           ),
           right: _LinkGridTile(
             title: 'Channel',
-            icon: Icons.launch_rounded,
+            icon: FluentIcons.open_24_regular,
             onTap: () =>
                 globalState.openUrl('https://telegram.me/appshub_channel'),
           ),
@@ -68,13 +69,13 @@ class AboutView extends StatelessWidget {
         _LinkGridRow(
           left: _LinkGridTile(
             title: 'FlClash',
-            icon: Icons.launch_rounded,
+            icon: FluentIcons.open_24_regular,
             onTap: () =>
                 globalState.openUrl('https://github.com/chen08209/FlClash'),
           ),
           right: _LinkGridTile(
             title: 'Mihomo',
-            icon: Icons.launch_rounded,
+            icon: FluentIcons.open_24_regular,
             onTap: () =>
                 globalState.openUrl('https://github.com/MetaCubeX/mihomo'),
           ),
@@ -402,7 +403,7 @@ class _ContributorDialog extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    Icons.account_circle_rounded,
+                    FluentIcons.person_circle_24_regular,
                     size: 20,
                     color: fabFgColor,
                   ),

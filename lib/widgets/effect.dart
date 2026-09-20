@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class EffectGestureDetector extends StatefulWidget {
   final Widget child;
@@ -72,7 +73,7 @@ class CommonExpandIcon extends StatelessWidget {
       turns: expand ? 0.5 : 0.0,
       duration: const Duration(milliseconds: 200),
       curve: Curves.fastOutSlowIn,
-      child: const Icon(Icons.expand_more_rounded),
+      child: const Icon(FluentIcons.chevron_down_24_regular),
     );
   }
 }

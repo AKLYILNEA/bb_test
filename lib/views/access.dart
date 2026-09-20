@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 // Force refresh icon flag
 final forceRefreshIconProvider = StateProvider<bool>((ref) => false);
@@ -69,7 +70,7 @@ class _AccessViewState extends ConsumerState<AccessView>
           _requestedPackageListPermission = true;
           await app.requestPackageListPermission();
         },
-        icon: const Icon(Icons.settings_rounded),
+        icon: const Icon(FluentIcons.settings_24_regular),
         label: Text(appLocalizations.openSettings),
       ),
     );
@@ -236,7 +237,7 @@ class _AccessViewState extends ConsumerState<AccessView>
           }
         });
       },
-      icon: const Icon(Icons.search_rounded),
+      icon: const Icon(FluentIcons.search_24_regular),
     );
   }
 
@@ -271,7 +272,7 @@ class _AccessViewState extends ConsumerState<AccessView>
           });
         }
       },
-      icon: const Icon(Icons.sync_rounded),
+      icon: const Icon(FluentIcons.arrow_sync_24_regular),
     );
   }
 
@@ -302,8 +303,8 @@ class _AccessViewState extends ConsumerState<AccessView>
         });
       },
       icon: isSelectedAll
-          ? const Icon(Icons.deselect_rounded)
-          : const Icon(Icons.select_all_rounded),
+          ? const Icon(FluentIcons.select_all_off_24_regular)
+          : const Icon(FluentIcons.select_all_on_24_regular),
     );
   }
 
@@ -357,7 +358,7 @@ class _AccessViewState extends ConsumerState<AccessView>
           _intelligentSelected();
         }
       },
-      icon: const Icon(Icons.build_circle_outlined),
+      icon: const Icon(FluentIcons.wrench_24_regular),
     );
   }
 
@@ -527,7 +528,7 @@ class _AccessViewState extends ConsumerState<AccessView>
                                              ),
                                              const SizedBox(width: 4),
                                              Icon(
-                                               Icons.info_outline_rounded,
+                                               FluentIcons.info_24_regular,
                                                size: 15,
                                                color: Theme.of(context)
                                                    .colorScheme
@@ -733,7 +734,7 @@ class PackageListItem extends ConsumerWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Icon(
-        Icons.apps_rounded,
+        FluentIcons.apps_24_regular,
         size: 24,
         color: Theme.of(context).colorScheme.onSurfaceVariant,
       ),
@@ -761,7 +762,7 @@ class AccessControlSearchDelegate extends SearchDelegate {
           }
           query = '';
         },
-        icon: const Icon(Icons.clear_rounded),
+        icon: const Icon(FluentIcons.dismiss_24_regular),
       ),
       const SizedBox(width: 8),
     ];
@@ -773,7 +774,7 @@ class AccessControlSearchDelegate extends SearchDelegate {
       onPressed: () {
         close(context, null);
       },
-      icon: const Icon(Icons.arrow_back_rounded),
+      icon: const Icon(FluentIcons.arrow_left_24_regular),
     );
   }
 
@@ -894,8 +895,8 @@ class AccessControlPanel extends ConsumerStatefulWidget {
 class _AccessControlPanelState extends ConsumerState<AccessControlPanel> {
   IconData _getIconWithAccessControlMode(AccessControlMode mode) {
     return switch (mode) {
-      AccessControlMode.acceptSelected => Icons.check_circle_outline_rounded,
-      AccessControlMode.rejectSelected => Icons.block_rounded,
+      AccessControlMode.acceptSelected => FluentIcons.checkmark_circle_24_regular,
+      AccessControlMode.rejectSelected => FluentIcons.prohibited_24_regular,
     };
   }
 
@@ -916,9 +917,9 @@ class _AccessControlPanelState extends ConsumerState<AccessControlPanel> {
 
   IconData _getIconWithProxiesSortType(AccessSortType type) {
     return switch (type) {
-      AccessSortType.none => Icons.align_horizontal_left_rounded,
-      AccessSortType.installTime => Icons.install_mobile_rounded,
-      AccessSortType.updateTime => Icons.update_rounded,
+      AccessSortType.none => FluentIcons.text_align_left_24_regular,
+      AccessSortType.installTime => FluentIcons.phone_update_24_regular,
+      AccessSortType.updateTime => FluentIcons.arrow_sync_24_regular,
     };
   }
 
@@ -1120,19 +1121,19 @@ class _AccessControlPanelState extends ConsumerState<AccessControlPanel> {
             spacing: 16,
             children: [
               CommonChip(
-                avatar: const Icon(Icons.auto_awesome_rounded),
+                avatar: const Icon(FluentIcons.sparkle_24_regular),
                 label: appLocalizations.intelligentSelected,
                 onPressed: () {
                   Navigator.of(context).pop(1);
                 },
               ),
               CommonChip(
-                avatar: const Icon(Icons.paste_rounded),
+                avatar: const Icon(FluentIcons.clipboard_paste_24_regular),
                 label: appLocalizations.clipboardImport,
                 onPressed: _pasteToClipboard,
               ),
               CommonChip(
-                avatar: const Icon(Icons.content_copy_rounded),
+                avatar: const Icon(FluentIcons.copy_24_regular),
                 label: appLocalizations.clipboardExport,
                 onPressed: _copyToClipboard,
               ),

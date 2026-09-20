@@ -26,6 +26,7 @@ import 'common/common.dart';
 import 'controller.dart';
 import 'manager/manager.dart';
 import 'models/models.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 typedef UpdateTasks = List<FutureOr Function()>;
 
@@ -556,7 +557,7 @@ class GlobalState {
                     child: const Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.check_circle_outline_rounded),
+                        Icon(FluentIcons.checkmark_circle_24_regular),
                         SizedBox(height: 8),
                         Text('warmup'),
                       ],

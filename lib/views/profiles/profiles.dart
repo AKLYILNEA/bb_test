@@ -15,6 +15,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'add_profile.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class ProfilesView extends ConsumerStatefulWidget {
   const ProfilesView({super.key});
@@ -61,7 +62,7 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
         onPressed: () {
           _updateProfiles();
         },
-        icon: const Icon(Icons.sync_rounded),
+        icon: const Icon(FluentIcons.arrow_sync_24_regular),
         tooltip: appLocalizations.syncAll,
       ),
       IconButton(
@@ -80,7 +81,7 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
               scriptStateProvider.select((state) => state.realId != null),
             );
             return Icon(
-              Icons.functions_rounded,
+              FluentIcons.math_formula_24_regular,
               color: isScriptMode ? context.colorScheme.primary : null,
             );
           },
@@ -97,7 +98,7 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
           );
         },
         tooltip: appLocalizations.sort,
-        icon: const Icon(Icons.sort_rounded),
+        icon: const Icon(FluentIcons.arrow_sort_24_regular),
         iconSize: 26,
       ),
     ];
@@ -124,7 +125,7 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
           clipBehavior: Clip.none,
           heroTag: null,
           onPressed: _handleShowAddExtendPage,
-          icon: const Icon(Icons.add_rounded),
+          icon: const Icon(FluentIcons.add_24_filled),
           label: Text(
             appLocalizations.addProfile,
             style: TextStyle(
@@ -292,7 +293,7 @@ class ProfileItem extends StatelessWidget {
           type: type,
           actions: [
             IconButton(
-              icon: const Icon(Icons.security_rounded),
+              icon: const Icon(FluentIcons.shield_24_regular),
               tooltip: appLocalizations.ageKeyGenerateTitle,
               onPressed: () {
                 editKey.currentState?.showAgeKeyGenerator();
@@ -470,14 +471,14 @@ class ProfileItem extends StatelessWidget {
   List<PopupMenuItemData> _buildMenuItems(BuildContext context) {
     return [
       PopupMenuItemData(
-        icon: Icons.edit_outlined,
+        icon: FluentIcons.edit_24_regular,
         label: appLocalizations.edit,
         onPressed: () {
           _handleShowEditExtendPage(context);
         },
       ),
       PopupMenuItemData(
-        icon: Icons.visibility_outlined,
+        icon: FluentIcons.eye_24_regular,
         label: appLocalizations.preview,
         onPressed: () {
           _handlePreviewRuntimeConfig(context);
@@ -485,7 +486,7 @@ class ProfileItem extends StatelessWidget {
       ),
       if (profile.type == ProfileType.url) ...[
         PopupMenuItemData(
-          icon: Icons.sync_rounded,
+          icon: FluentIcons.arrow_sync_24_regular,
           label: appLocalizations.sync,
           onPressed: () {
             updateProfile();
@@ -493,21 +494,21 @@ class ProfileItem extends StatelessWidget {
         ),
       ],
       PopupMenuItemData(
-        icon: Icons.extension_outlined,
+        icon: FluentIcons.puzzle_piece_24_regular,
         label: appLocalizations.override,
         onPressed: () {
           _handlePushGenProfilePage(context, profile.id);
         },
       ),
       PopupMenuItemData(
-        icon: Icons.file_copy_outlined,
+        icon: FluentIcons.document_copy_24_regular,
         label: appLocalizations.exportFile,
         onPressed: () {
           _handleExportFile(context);
         },
       ),
       PopupMenuItemData(
-        icon: Icons.delete_outlined,
+        icon: FluentIcons.delete_24_regular,
         label: appLocalizations.delete,
         onPressed: () {
           _handleDeleteProfile(context);
@@ -561,7 +562,7 @@ class ProfileItem extends StatelessWidget {
                       open();
                     },
                     tooltip: appLocalizations.more,
-                    icon: const Icon(Icons.more_vert_rounded, size: 20),
+                    icon: const Icon(FluentIcons.more_vertical_24_regular, size: 20),
                   );
                 },
               ),
@@ -609,7 +610,7 @@ class ProfileItem extends StatelessWidget {
         ),
         IconButton(
           onPressed: () => _showTVMenu(context),
-          icon: const Icon(Icons.more_vert_rounded),
+          icon: const Icon(FluentIcons.more_vertical_24_regular),
         ),
       ],
     );
@@ -684,7 +685,7 @@ class _ReorderableProfilesSheetState extends State<ReorderableProfilesSheet> {
             Navigator.of(context).pop();
             globalState.appController.setProfiles(profiles);
           },
-          icon: Icon(Icons.save_rounded),
+          icon: Icon(FluentIcons.save_24_regular),
         ),
       ],
       body: ReorderableListView.builder(
@@ -714,7 +715,7 @@ class _ReorderableProfilesSheetState extends State<ReorderableProfilesSheet> {
                 title: EmojiText(profile.label ?? profile.id),
                 trailing: ReorderableDragStartListener(
                   index: index,
-                  child: const Icon(Icons.drag_handle_rounded),
+                  child: const Icon(FluentIcons.re_order_dots_vertical_24_regular),
                 ),
               ),
             ),

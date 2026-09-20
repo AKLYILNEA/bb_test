@@ -5,6 +5,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class WakelockSwitch extends StatelessWidget {
   const WakelockSwitch({super.key});
@@ -33,7 +34,7 @@ class WakelockSwitch extends StatelessWidget {
         child: CommonCard(
           info: Info(
             label: appLocalizations.wakelock,
-            iconData: Icons.lightbulb_outline_rounded,
+            iconData: FluentIcons.lightbulb_24_regular,
           ),
           onPressed: () async {
             // click: show function description dialog

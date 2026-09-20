@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show OverflowBoxFit;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class ResidentFab extends ConsumerStatefulWidget {
   const ResidentFab({super.key});
@@ -156,7 +157,7 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
       case PageLabel.profiles:
         return _FabContent(
           page: page,
-          icon: Icons.add_rounded,
+          icon: FluentIcons.add_24_filled,
           labelText: appLocalizations.addProfile,
           labelWidth: startFabTextWidth(context, appLocalizations.addProfile),
           isRunTime: false,
@@ -165,7 +166,7 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
       case PageLabel.proxies:
         return _FabContent(
           page: page,
-          icon: Icons.network_ping_rounded,
+          icon: FluentIcons.flash_24_filled,
           labelText: appLocalizations.startTest,
           labelWidth: startFabTextWidth(context, appLocalizations.startTest),
           isRunTime: false,

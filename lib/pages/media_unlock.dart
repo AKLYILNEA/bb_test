@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class MediaUnlockPage extends ConsumerStatefulWidget {
   final SheetType type;
@@ -218,7 +219,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
             title: appLocalizations.mediaUnlockDisplaySettings,
             titleTrailing: IconButton(
               icon: Icon(
-                Icons.settings_outlined,
+                FluentIcons.settings_24_regular,
                 size: 20.ap,
                 color: context.colorScheme.onSurfaceVariant,
               ),
@@ -705,7 +706,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                       mediaUnlockState.checkSingle(platform);
                     },
               icon: Icon(
-                Icons.refresh_rounded,
+                FluentIcons.arrow_clockwise_24_regular,
                 size: 18,
                 color: context.colorScheme.onSurfaceVariant,
               ),
@@ -810,7 +811,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
           title: appLocalizations.mediaUnlock,
           actions: [
             IconButton(
-              icon: const Icon(Icons.tune_rounded),
+              icon: const Icon(FluentIcons.options_24_regular),
               tooltip: appLocalizations.mediaUnlockDisplaySettings,
               onPressed: _showPinnedSettingsDialog,
             ),
@@ -830,7 +831,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                         size: 16,
                       ),
                     )
-                  : const Icon(Icons.sync_rounded),
+                  : const Icon(FluentIcons.arrow_sync_24_regular),
             ),
           ],
           body: CustomScrollView(
@@ -851,7 +852,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
               const SliverToBoxAdapter(child: SizedBox(height: 8)),
               ..._buildStatusSectionSlivers(
                 title: appLocalizations.notUnlocked,
-                icon: Icons.cancel_outlined,
+                icon: FluentIcons.dismiss_circle_24_regular,
                 color: context.colorScheme.error,
                 platforms: blockedList,
                 state: state,
@@ -859,7 +860,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
               ),
               ..._buildStatusSectionSlivers(
                 title: appLocalizations.other,
-                icon: Icons.help_outline_rounded,
+                icon: FluentIcons.question_circle_24_regular,
                 color: mediaUnlockOrange,
                 platforms: otherList,
                 state: state,
@@ -870,7 +871,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                         _selectedCategory == MediaCategory.ai)
                     ? appLocalizations.mediaUnlocked
                     : appLocalizations.unlocked,
-                icon: Icons.check_circle_outline_rounded,
+                icon: FluentIcons.checkmark_circle_24_regular,
                 color: mediaUnlockGreen,
                 platforms: unlockedList,
                 state: state,

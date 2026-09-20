@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class LogLevelItem extends ConsumerWidget {
   const LogLevelItem({super.key});
@@ -18,7 +19,7 @@ class LogLevelItem extends ConsumerWidget {
       patchClashConfigProvider.select((state) => state.logLevel),
     );
     return ListItem<LogLevel>.options(
-      leading: const Icon(Icons.info_outline_rounded),
+      leading: const Icon(FluentIcons.info_24_regular),
       title: Text(appLocalizations.logLevel),
       subtitle: Text(logLevel.name),
       delegate: OptionsDelegate<LogLevel>(
@@ -61,7 +62,7 @@ class _UaItemState extends ConsumerState<UaItem> {
     }
 
     return ListItem(
-      leading: const Icon(Icons.computer_rounded),
+      leading: const Icon(FluentIcons.desktop_24_regular),
       title: const Text('UA'),
       subtitle: Text(isCustom ? appLocalizations.custom : appLocalizations.defaultText),
       onTap: () async {
@@ -182,7 +183,7 @@ class KeepAliveIntervalItem extends ConsumerWidget {
       patchClashConfigProvider.select((state) => state.keepAliveInterval),
     );
     return ListItem.input(
-      leading: const Icon(Icons.timer_outlined),
+      leading: const Icon(FluentIcons.timer_24_regular),
       title: Text(appLocalizations.keepAliveIntervalDesc),
       subtitle: Text('$keepAliveInterval ${appLocalizations.seconds}'),
       delegate: InputDelegate(
@@ -226,7 +227,7 @@ class TestUrlItem extends ConsumerWidget {
     );
 
     return ListItem(
-      leading: const Icon(Icons.timeline),
+      leading: const Icon(FluentIcons.data_line_24_regular),
       title: Text(appLocalizations.testUrl),
       subtitle: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -398,7 +399,7 @@ class PortItem extends ConsumerWidget {
       patchClashConfigProvider.select((state) => state.mixedPort),
     );
     return ListItem(
-      leading: const Icon(Icons.hdr_strong_rounded),
+      leading: const Icon(FluentIcons.star_emphasis_24_regular),
       title: Text(appLocalizations.port),
       subtitle: Text('$mixedPort'),
       onTap: () {
@@ -417,7 +418,7 @@ class Ipv6Item extends ConsumerWidget {
       patchClashConfigProvider.select((state) => state.ipv6),
     );
     return ListItem.switchItem(
-      leading: const Icon(Icons.looks_6_outlined),
+      leading: const Icon(FluentIcons.number_symbol_24_regular),
       title: const Text('IPv6'),
       subtitle: Text(appLocalizations.ipv6Desc),
       delegate: SwitchDelegate(
@@ -441,7 +442,7 @@ class AllowLanItem extends ConsumerWidget {
       patchClashConfigProvider.select((state) => state.allowLan),
     );
     return ListItem.switchItem(
-      leading: const Icon(Icons.device_hub_rounded),
+      leading: const Icon(FluentIcons.flowchart_24_regular),
       title: Text(appLocalizations.allowLan),
       subtitle: Text(appLocalizations.allowLanDesc),
       delegate: SwitchDelegate(
@@ -466,7 +467,7 @@ class UnifiedDelayItem extends ConsumerWidget {
     );
 
     return ListItem.switchItem(
-      leading: const Icon(Icons.compress_rounded),
+      leading: const Icon(FluentIcons.arrow_minimize_24_regular),
       title: Text(appLocalizations.unifiedDelay),
       subtitle: Text(appLocalizations.unifiedDelayDesc),
       delegate: SwitchDelegate(
@@ -493,7 +494,7 @@ class FindProcessItem extends ConsumerWidget {
     );
 
     return ListItem.switchItem(
-      leading: const Icon(Icons.polymer_outlined),
+      leading: const Icon(FluentIcons.cube_24_regular),
       title: Text(appLocalizations.findProcessMode),
       subtitle: Text(appLocalizations.findProcessModeDesc),
       delegate: SwitchDelegate(
@@ -523,7 +524,7 @@ class TcpConcurrentItem extends ConsumerWidget {
       patchClashConfigProvider.select((state) => state.tcpConcurrent),
     );
     return ListItem.switchItem(
-      leading: const Icon(Icons.double_arrow_rounded),
+      leading: const Icon(FluentIcons.arrow_sync_24_regular),
       title: Text(appLocalizations.tcpConcurrent),
       subtitle: Text(appLocalizations.tcpConcurrentDesc),
       delegate: SwitchDelegate(
@@ -549,7 +550,7 @@ class GeodataLoaderItem extends ConsumerWidget {
       ),
     );
     return ListItem.switchItem(
-      leading: const Icon(Icons.memory_rounded),
+      leading: const Icon(FluentIcons.hard_drive_24_regular),
       title: Text(appLocalizations.geodataLoader),
       subtitle: Text(appLocalizations.geodataLoaderDesc),
       delegate: SwitchDelegate(
@@ -589,7 +590,7 @@ class ExternalControllerItem extends ConsumerWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         ListItem.switchItem(
-          leading: const Icon(Icons.api_rounded),
+          leading: const Icon(FluentIcons.code_24_regular),
           title: Text(appLocalizations.externalController),
           subtitle: Text(appLocalizations.externalControllerDesc),
           delegate: SwitchDelegate(
@@ -632,7 +633,7 @@ class ExternalControllerItem extends ConsumerWidget {
             endIndent: 16,
           ),
           ListItem(
-            leading: const Icon(Icons.password_rounded),
+            leading: const Icon(FluentIcons.password_24_regular),
             title: Text(appLocalizations.controlSecret),
             subtitle: Text(
               secret.isEmpty ? appLocalizations.controlSecretDesc : secret,
@@ -642,7 +643,7 @@ class ExternalControllerItem extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.open_in_new_rounded),
+                        icon: const Icon(FluentIcons.open_24_regular),
                         tooltip: appLocalizations.onlinePanel,
                         onPressed: () async {
                           final uri = Uri.parse(
@@ -657,7 +658,7 @@ class ExternalControllerItem extends ConsumerWidget {
                         },
                       ),
                       IconButton(
-                        icon: const Icon(Icons.copy_rounded),
+                        icon: const Icon(FluentIcons.copy_24_regular),
                         tooltip: appLocalizations.copy,
                         onPressed: () {
                           Clipboard.setData(ClipboardData(text: secret));

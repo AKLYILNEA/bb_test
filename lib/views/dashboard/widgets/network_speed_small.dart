@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'network_speed.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class NetworkSpeedSmall extends ConsumerWidget {
   const NetworkSpeedSmall({super.key});
@@ -81,7 +82,7 @@ class NetworkSpeedSmall extends ConsumerWidget {
               },
               info: Info(
                 label: _getSpeedText(lastTraffic, isMobile),
-                iconData: Icons.speed_rounded,
+                iconData: FluentIcons.gauge_24_regular,
                 style: speedStyle,
               ),
               child: Padding(
