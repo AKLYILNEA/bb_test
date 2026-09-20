@@ -726,11 +726,6 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
                   visualDensity: VisualDensity.compact,
                   onPressed: () => controller.isActive = false,
                   style: ButtonStyle(
-                    shape: WidgetStatePropertyAll(
-                      RoundedSuperellipseBorder(
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                    ),
                     backgroundColor: WidgetStatePropertyAll(
                       colorScheme.errorContainer.withAlpha(160),
                     ),

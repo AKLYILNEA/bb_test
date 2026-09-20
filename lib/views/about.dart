@@ -157,19 +157,17 @@ class AboutView extends StatelessWidget {
       separated: false,
       title: appLocalizations.otherContributors,
       items: [
-        ListItem(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          title: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            clipBehavior: Clip.none,
-            child: Row(
-              children: [
-                for (int i = 0; i < contributors.length; i++) ...[
-                  if (i > 0) const SizedBox(width: 14),
-                  Avatar(contributor: contributors[i]),
-                ],
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          clipBehavior: Clip.none,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: Row(
+            children: [
+              for (int i = 0; i < contributors.length; i++) ...[
+                if (i > 0) const SizedBox(width: 16),
+                Avatar(contributor: contributors[i]),
               ],
-            ),
+            ],
           ),
         ),
       ],
@@ -251,6 +249,10 @@ class Avatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final borderColor = context.colorScheme.outline.withValues(
+      alpha: context.colorScheme.brightness == Brightness.dark ? 0.65 : 0.5,
+    );
+
     return Material(
       color: Colors.transparent,
       shape: const CircleBorder(),
@@ -261,11 +263,19 @@ class Avatar extends StatelessWidget {
             child: _ContributorDialog(contributor: contributor),
           );
         },
-        child: SizedBox(
-          width: 38,
-          height: 38,
-          child: CircleAvatar(
-            foregroundImage: AssetImage(contributor.avatar),
+        child: Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: borderColor,
+              width: 2.5,
+            ),
+            image: DecorationImage(
+              image: AssetImage(contributor.avatar),
+              fit: BoxFit.cover,
+            ),
           ),
         ),
       ),
@@ -280,7 +290,16 @@ class _ContributorDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = context.colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
+    final fabTheme = theme.floatingActionButtonTheme;
+    final fabBgColor = fabTheme.backgroundColor ?? colorScheme.primaryContainer;
+    final fabFgColor = fabTheme.foregroundColor ?? colorScheme.onPrimaryContainer;
+    final borderColor = colorScheme.outline.withValues(
+      alpha: isDark ? 0.65 : 0.5,
+    );
+
     return CommonDialog(
       title: appLocalizations.contributor,
       child: Padding(
@@ -290,54 +309,81 @@ class _ContributorDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              decoration: ShapeDecoration(
-                shape: const CircleBorder(),
-                shadows: [
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: borderColor,
+                  width: 3.0,
+                ),
+                image: DecorationImage(
+                  image: AssetImage(contributor.avatar),
+                  fit: BoxFit.cover,
+                ),
+                boxShadow: [
                   BoxShadow(
-                    color: colorScheme.primary.withValues(alpha: 0.18),
-                    blurRadius: 20,
-                    spreadRadius: 2,
+                    color: Colors.black.withValues(
+                      alpha: isDark ? 0.35 : 0.14,
+                    ),
+                    blurRadius: 14,
                     offset: const Offset(0, 4),
                   ),
+                  BoxShadow(
+                    color: Colors.black.withValues(
+                      alpha: isDark ? 0.20 : 0.06,
+                    ),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  ),
                 ],
-              ),
-              child: CircleAvatar(
-                radius: 40,
-                backgroundColor: colorScheme.surfaceContainerHigh,
-                foregroundImage: AssetImage(contributor.avatar),
               ),
             ),
             const SizedBox(height: 20),
             Container(
               padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 8,
+                horizontal: 20,
+                vertical: 10,
               ),
               decoration: ShapeDecoration(
-                color: colorScheme.primaryContainer.withValues(alpha: 0.45),
+                color: fabBgColor,
                 shape: RoundedSuperellipseBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(
-                    color: colorScheme.primary.withValues(alpha: 0.2),
-                    width: 1,
-                  ),
+                  borderRadius: BorderRadius.circular(20),
                 ),
+                shadows: [
+                  BoxShadow(
+                    color: Colors.black.withValues(
+                      alpha: isDark ? 0.35 : 0.14,
+                    ),
+                    blurRadius: 14,
+                    offset: const Offset(0, 4),
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withValues(
+                      alpha: isDark ? 0.20 : 0.06,
+                    ),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
                     Icons.person_rounded,
-                    size: 18,
-                    color: colorScheme.primary,
+                    size: 20,
+                    color: fabFgColor,
                   ),
                   const SizedBox(width: 8),
                   Flexible(
                     child: Text(
                       contributor.name,
-                      style: context.textTheme.titleMedium?.copyWith(
-                        color: colorScheme.onSurface,
-                        fontWeight: FontWeight.w600,
+                      style: (fabTheme.extendedTextStyle ??
+                              context.textTheme.titleMedium)
+                          ?.copyWith(
+                        color: fabFgColor,
+                        fontWeight: FontWeight.bold,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
