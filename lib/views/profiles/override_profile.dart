@@ -219,6 +219,7 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
                 return true;
               },
               child: CommonScaffold(
+                resizeToAvoidBottomInset: false,
                 title: appLocalizations.override,
                 body: _buildContent(),
                 actions: [
@@ -806,6 +807,8 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
                               alignmentOffset: const Offset(0, 8),
                               menuStyle: menuStyle,
                               expandedInsets: EdgeInsets.zero,
+                              enableFilter: false,
+                              enableSearch: false,
                               controller: _ruleProviderController,
                               textStyle: context.textTheme.bodyLarge?.copyWith(
                                 fontFamilyFallback: [

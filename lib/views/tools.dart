@@ -96,7 +96,6 @@ class _ToolViewState extends ConsumerState<ToolsView> {
       title: title,
       items: items,
       isFirst: isFirst,
-      radius: 25.0,
     );
   }
 

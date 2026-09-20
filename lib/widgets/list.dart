@@ -583,7 +583,7 @@ class SectionContainer extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
           child: CommonCard(
             type: CommonCardType.filled,
-            radius: radius ?? 25.0,
+            radius: radius ?? 20.0,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -625,7 +625,7 @@ class ContinuousListItem extends StatelessWidget {
     required this.index,
     required this.count,
     this.reversed = false,
-    this.radius = 25.0,
+    this.radius = 20.0,
   });
 
   @override

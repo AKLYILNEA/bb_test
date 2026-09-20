@@ -154,6 +154,7 @@ class AboutView extends StatelessWidget {
     ]..shuffle();
 
     final textStyle = context.textTheme.bodySmall;
+    final widths = <double>[];
     double maxTextWidth = 0;
     for (final c in contributors) {
       final painter = TextPainter(
@@ -161,11 +162,28 @@ class AboutView extends StatelessWidget {
         textDirection: TextDirection.ltr,
         maxLines: 1,
       )..layout();
+      final w = max(36.0, painter.width.ceilToDouble());
+      widths.add(w);
       if (painter.width > maxTextWidth) {
         maxTextWidth = painter.width;
       }
     }
-    final itemWidth = maxTextWidth > 36.0 ? maxTextWidth.ceilToDouble() : 36.0;
+    const minGap = 6.0;
+    final step = max(68.0, maxTextWidth.ceilToDouble() + minGap);
+
+    final widgets = <Widget>[];
+    for (int i = 0; i < contributors.length; i++) {
+      if (i > 0) {
+        final gap = step - (widths[i - 1] + widths[i]) / 2;
+        widgets.add(SizedBox(width: gap));
+      }
+      widgets.add(
+        SizedBox(
+          width: widths[i],
+          child: Avatar(contributor: contributors[i]),
+        ),
+      );
+    }
 
     return generateSection(
       separated: false,
@@ -174,15 +192,8 @@ class AboutView extends StatelessWidget {
         ListItem(
           title: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            child: Wrap(
-              spacing: 8,
-              children: [
-                for (final contributor in contributors)
-                  SizedBox(
-                    width: itemWidth,
-                    child: Avatar(contributor: contributor),
-                  ),
-              ],
+            child: Row(
+              children: widgets,
             ),
           ),
         ),
