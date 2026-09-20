@@ -332,7 +332,7 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
                       return IconButton(
                         onPressed: _updatePin,
                         icon: value
-                            ? const Icon(FluentIcons.pin_24_regular)
+                            ? const Icon(FluentIcons.pin_24_filled)
                             : const Icon(FluentIcons.pin_24_regular),
                       );
                     },
