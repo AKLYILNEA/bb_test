@@ -74,7 +74,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
         popup: CommonPopupMenu(
           items: [
             PopupMenuItemData(
-              icon: FluentIcons.wrench_24_regular,
+              icon: FluentIcons.settings_24_regular,
               label: appLocalizations.styleSetting,
               onPressed: () {
                 showSheet(
@@ -91,7 +91,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
               },
             ),
             PopupMenuItemData(
-              icon: FluentIcons.settings_24_regular,
+              icon: FluentIcons.wand_24_regular,
               label: appLocalizations.advancedSettings,
               onPressed: () {
                 showExtend(

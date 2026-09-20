@@ -358,7 +358,7 @@ class _AccessViewState extends ConsumerState<AccessView>
           _intelligentSelected();
         }
       },
-      icon: const Icon(FluentIcons.wrench_24_regular),
+      icon: const Icon(FluentIcons.settings_24_regular),
     );
   }
 
@@ -919,7 +919,7 @@ class _AccessControlPanelState extends ConsumerState<AccessControlPanel> {
     return switch (type) {
       AccessSortType.none => FluentIcons.text_align_left_24_regular,
       AccessSortType.installTime => FluentIcons.phone_update_24_regular,
-      AccessSortType.updateTime => FluentIcons.arrow_sync_24_regular,
+      AccessSortType.updateTime => FluentIcons.history_24_regular,
     };
   }
 

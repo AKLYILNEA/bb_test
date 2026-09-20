@@ -107,7 +107,7 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
                           )
                         : null,
                     iconData:
-                        ipInfo == null ? FluentIcons.wifi_1_24_regular : null,
+                        ipInfo == null ? FluentIcons.network_check_24_regular : null,
                   ),
                   actions: [
                     SizedBox(

@@ -620,7 +620,7 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
         ),
       if ((status?.proxyProviders ?? 0) > 0)
         _MetricItem(
-          icon: FluentIcons.calendar_3_day_24_regular,
+          icon: FluentIcons.airplane_take_off_24_regular,
           label: appLocalizations.proxyProvidersCount,
           value: proxyProvidersText,
         ),

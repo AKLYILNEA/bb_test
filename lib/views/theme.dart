@@ -741,7 +741,7 @@ class _TrayIconInvertItem extends ConsumerWidget {
       themeSettingProvider.select((state) => state.invertTrayIcon),
     );
     return ListItem.switchItem(
-      leading: Icon(FluentIcons.eyedropper_24_regular),
+      leading: Icon(FluentIcons.dark_theme_24_regular),
       horizontalTitleGap: 12,
       title: Text(
         appLocalizations.trayIconInvert,
