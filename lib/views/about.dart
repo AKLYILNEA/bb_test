@@ -274,8 +274,8 @@ class Avatar extends StatelessWidget {
               ClipOval(
                 child: Image.asset(
                   contributor.avatar,
-                  width: 41.5,
-                  height: 41.5,
+                  width: 42,
+                  height: 42,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -284,7 +284,7 @@ class Avatar extends StatelessWidget {
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: borderColor,
-                    width: 1.25,
+                    width: 1.0,
                   ),
                 ),
               ),
