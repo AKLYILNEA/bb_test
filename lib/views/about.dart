@@ -160,11 +160,11 @@ class AboutView extends StatelessWidget {
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           clipBehavior: Clip.none,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
           child: Row(
             children: [
               for (int i = 0; i < contributors.length; i++) ...[
-                if (i > 0) const SizedBox(width: 16),
+                if (i > 0) const SizedBox(width: 14),
                 Avatar(contributor: contributors[i]),
               ],
             ],
@@ -264,16 +264,19 @@ class Avatar extends StatelessWidget {
           );
         },
         child: Container(
-          width: 48,
-          height: 48,
+          width: 44,
+          height: 44,
+          padding: const EdgeInsets.all(2),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
               color: borderColor,
-              width: 2.5,
+              width: 1.25,
             ),
-            image: DecorationImage(
-              image: AssetImage(contributor.avatar),
+          ),
+          child: ClipOval(
+            child: Image.asset(
+              contributor.avatar,
               fit: BoxFit.cover,
             ),
           ),
@@ -309,17 +312,14 @@ class _ContributorDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              width: 80,
-              height: 80,
+              width: 82,
+              height: 82,
+              padding: const EdgeInsets.all(3),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: borderColor,
                   width: 3.0,
-                ),
-                image: DecorationImage(
-                  image: AssetImage(contributor.avatar),
-                  fit: BoxFit.cover,
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -338,6 +338,12 @@ class _ContributorDialog extends StatelessWidget {
                   ),
                 ],
               ),
+              child: ClipOval(
+                child: Image.asset(
+                  contributor.avatar,
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
             const SizedBox(height: 20),
             Container(
@@ -348,7 +354,7 @@ class _ContributorDialog extends StatelessWidget {
               decoration: ShapeDecoration(
                 color: fabBgColor,
                 shape: RoundedSuperellipseBorder(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 shadows: [
                   BoxShadow(
@@ -371,7 +377,7 @@ class _ContributorDialog extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    Icons.person_rounded,
+                    Icons.account_circle_rounded,
                     size: 20,
                     color: fabFgColor,
                   ),
