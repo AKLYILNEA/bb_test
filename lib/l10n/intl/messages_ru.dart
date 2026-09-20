@@ -1,4 +1,4 @@
-﻿// DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
+// DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
 // This is a library that provides messages for a ru locale. All the
 // messages from the main program should be duplicated here with the same
 // function name.
@@ -868,6 +868,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "operatorOrAsn": MessageLookupByLibrary.simpleMessage("Организация / ASN"),
     "options": MessageLookupByLibrary.simpleMessage("Опции"),
     "other": MessageLookupByLibrary.simpleMessage("Другое"),
+    "contributor": MessageLookupByLibrary.simpleMessage("Участник"),
     "otherContributors": MessageLookupByLibrary.simpleMessage(
       "Другие участники (в случайном порядке)",
     ),

@@ -2520,6 +2520,16 @@ class AppLocalizations {
     );
   }
 
+  /// `Contributor`
+  String get contributor {
+    return Intl.message(
+      'Contributor',
+      name: 'contributor',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Other Contributors (Random Order)`
   String get otherContributors {
     return Intl.message(

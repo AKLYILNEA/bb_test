@@ -1,4 +1,4 @@
-﻿// DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
+// DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
 // This is a library that provides messages for a zh_TC locale. All the
 // messages from the main program should be duplicated here with the same
 // function name.
@@ -620,6 +620,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "operatorOrAsn": MessageLookupByLibrary.simpleMessage("歸屬 / ASN"),
     "options": MessageLookupByLibrary.simpleMessage("選項"),
     "other": MessageLookupByLibrary.simpleMessage("其他"),
+    "contributor": MessageLookupByLibrary.simpleMessage("貢獻者"),
     "otherContributors": MessageLookupByLibrary.simpleMessage("其他貢獻者(隨機排序)"),
     "otherSettings": MessageLookupByLibrary.simpleMessage("增強工具"),
     "otherSettingsDesc": MessageLookupByLibrary.simpleMessage("修改增強工具設定"),

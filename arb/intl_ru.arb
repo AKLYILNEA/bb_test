@@ -1,4 +1,4 @@
-﻿{
+{
   "rule": "По правилам",
   "global": "Глобально",
   "direct": "Напрямую",
@@ -310,6 +310,7 @@
   "proxyGroup": "Группа прокси",
   "go": "Перейти",
   "externalLink": "Внешняя ссылка",
+  "contributor": "Участник",
   "otherContributors": "Другие участники (в случайном порядке)",
   "autoCloseConnections": "Автозакрытие соединений",
   "autoCloseConnectionsDesc": "Закрывать соединения при смене узла",

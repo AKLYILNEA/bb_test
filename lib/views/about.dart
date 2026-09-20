@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/providers/config.dart';
 import 'package:bett_box/state.dart';
-import 'package:bett_box/widgets/list.dart';
+import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -153,47 +153,22 @@ class AboutView extends StatelessWidget {
       ),
     ]..shuffle();
 
-    final textStyle = context.textTheme.bodySmall;
-    final widths = <double>[];
-    double maxTextWidth = 0;
-    for (final c in contributors) {
-      final painter = TextPainter(
-        text: TextSpan(text: c.name, style: textStyle),
-        textDirection: TextDirection.ltr,
-        maxLines: 1,
-      )..layout();
-      final w = max(36.0, painter.width.ceilToDouble());
-      widths.add(w);
-      if (painter.width > maxTextWidth) {
-        maxTextWidth = painter.width;
-      }
-    }
-    const minGap = 6.0;
-    final step = max(68.0, maxTextWidth.ceilToDouble() + minGap);
-
-    final widgets = <Widget>[];
-    for (int i = 0; i < contributors.length; i++) {
-      if (i > 0) {
-        final gap = step - (widths[i - 1] + widths[i]) / 2;
-        widgets.add(SizedBox(width: gap));
-      }
-      widgets.add(
-        SizedBox(
-          width: widths[i],
-          child: Avatar(contributor: contributors[i]),
-        ),
-      );
-    }
-
     return generateSection(
       separated: false,
       title: appLocalizations.otherContributors,
       items: [
         ListItem(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           title: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
+            clipBehavior: Clip.none,
             child: Row(
-              children: widgets,
+              children: [
+                for (int i = 0; i < contributors.length; i++) ...[
+                  if (i > 0) const SizedBox(width: 14),
+                  Avatar(contributor: contributors[i]),
+                ],
+              ],
             ),
           ),
         ),
@@ -276,23 +251,104 @@ class Avatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(
-          width: 36,
-          height: 36,
-          child: CircleAvatar(foregroundImage: AssetImage(contributor.avatar)),
+    return Material(
+      color: Colors.transparent,
+      shape: const CircleBorder(),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () {
+          globalState.showCommonDialog(
+            child: _ContributorDialog(contributor: contributor),
+          );
+        },
+        child: SizedBox(
+          width: 38,
+          height: 38,
+          child: CircleAvatar(
+            foregroundImage: AssetImage(contributor.avatar),
+          ),
         ),
-        const SizedBox(height: 4),
-        Text(
-          contributor.name,
-          style: context.textTheme.bodySmall,
-          textAlign: TextAlign.center,
-          maxLines: 1,
-          overflow: TextOverflow.visible,
+      ),
+    );
+  }
+}
+
+class _ContributorDialog extends StatelessWidget {
+  final Contributor contributor;
+
+  const _ContributorDialog({required this.contributor});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.colorScheme;
+    return CommonDialog(
+      title: appLocalizations.contributor,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              decoration: ShapeDecoration(
+                shape: const CircleBorder(),
+                shadows: [
+                  BoxShadow(
+                    color: colorScheme.primary.withValues(alpha: 0.18),
+                    blurRadius: 20,
+                    spreadRadius: 2,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: CircleAvatar(
+                radius: 40,
+                backgroundColor: colorScheme.surfaceContainerHigh,
+                foregroundImage: AssetImage(contributor.avatar),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ),
+              decoration: ShapeDecoration(
+                color: colorScheme.primaryContainer.withValues(alpha: 0.45),
+                shape: RoundedSuperellipseBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(
+                    color: colorScheme.primary.withValues(alpha: 0.2),
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.person_rounded,
+                    size: 18,
+                    color: colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      contributor.name,
+                      style: context.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

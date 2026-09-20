@@ -1,4 +1,4 @@
-﻿// DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
+// DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
 // This is a library that provides messages for a ko locale. All the
 // messages from the main program should be duplicated here with the same
 // function name.
@@ -686,6 +686,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "operatorOrAsn": MessageLookupByLibrary.simpleMessage("소속 / ASN"),
     "options": MessageLookupByLibrary.simpleMessage("옵션"),
     "other": MessageLookupByLibrary.simpleMessage("기타"),
+    "contributor": MessageLookupByLibrary.simpleMessage("기여자"),
     "otherContributors": MessageLookupByLibrary.simpleMessage(
       "기타 기여자 (무작위 정렬)",
     ),

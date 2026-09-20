@@ -1,4 +1,4 @@
-﻿// DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
+// DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
 // This is a library that provides messages for a en locale. All the
 // messages from the main program should be duplicated here with the same
 // function name.
@@ -843,6 +843,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "operatorOrAsn": MessageLookupByLibrary.simpleMessage("Organization / ASN"),
     "options": MessageLookupByLibrary.simpleMessage("Options"),
     "other": MessageLookupByLibrary.simpleMessage("Other"),
+    "contributor": MessageLookupByLibrary.simpleMessage("Contributor"),
     "otherContributors": MessageLookupByLibrary.simpleMessage(
       "Other Contributors (Random Order)",
     ),

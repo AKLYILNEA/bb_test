@@ -1,4 +1,4 @@
-﻿{
+{
   "rule": "Rule",
   "global": "Global",
   "direct": "Direct",
@@ -310,6 +310,7 @@
   "proxyGroup": "Proxy Group",
   "go": "Go",
   "externalLink": "External Link",
+  "contributor": "Contributor",
   "otherContributors": "Other Contributors (Random Order)",
   "autoCloseConnections": "Auto-Close Connections",
   "autoCloseConnectionsDesc": "Close connections when switching nodes",

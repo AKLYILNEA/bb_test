@@ -1,4 +1,4 @@
-﻿// DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
+// DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
 // This is a library that provides messages for a ja locale. All the
 // messages from the main program should be duplicated here with the same
 // function name.
@@ -674,6 +674,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "operatorOrAsn": MessageLookupByLibrary.simpleMessage("組織 / ASN"),
     "options": MessageLookupByLibrary.simpleMessage("オプション"),
     "other": MessageLookupByLibrary.simpleMessage("その他"),
+    "contributor": MessageLookupByLibrary.simpleMessage("貢献者"),
     "otherContributors": MessageLookupByLibrary.simpleMessage("その他の貢献者（ランダム順）"),
     "otherSettings": MessageLookupByLibrary.simpleMessage("拡張ツール"),
     "otherSettingsDesc": MessageLookupByLibrary.simpleMessage("拡張ツールの設定を変更"),

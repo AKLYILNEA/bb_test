@@ -615,14 +615,16 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
       builder: (context, _) => Container(
         margin: const EdgeInsets.fromLTRB(12, 4, 12, 6),
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-        decoration: BoxDecoration(
+        decoration: ShapeDecoration(
           color: colorScheme.surfaceContainerHighest.withAlpha(220),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: colorScheme.outlineVariant.withAlpha(120),
-            width: 1,
+          shape: RoundedSuperellipseBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(
+              color: colorScheme.outlineVariant.withAlpha(120),
+              width: 1,
+            ),
           ),
-          boxShadow: [
+          shadows: [
             BoxShadow(
               color: Colors.black.withAlpha(20),
               blurRadius: 8,
@@ -659,11 +661,13 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
           ],
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
+            decoration: ShapeDecoration(
               color: colorScheme.surfaceContainerHigh,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: colorScheme.outlineVariant.withAlpha(80),
+              shape: RoundedSuperellipseBorder(
+                borderRadius: BorderRadius.circular(8),
+                side: BorderSide(
+                  color: colorScheme.outlineVariant.withAlpha(80),
+                ),
               ),
             ),
             child: Text(
@@ -722,6 +726,11 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
                   visualDensity: VisualDensity.compact,
                   onPressed: () => controller.isActive = false,
                   style: ButtonStyle(
+                    shape: WidgetStatePropertyAll(
+                      RoundedSuperellipseBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
                     backgroundColor: WidgetStatePropertyAll(
                       colorScheme.errorContainer.withAlpha(160),
                     ),
@@ -890,19 +899,19 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
             minWidth: 32,
             minHeight: 36,
           ),
-          border: OutlineInputBorder(
+          border: SuperellipseInputBorder(
             borderRadius: BorderRadius.circular(8),
             borderSide: BorderSide(
               color: colorScheme.outlineVariant.withAlpha(100),
             ),
           ),
-          enabledBorder: OutlineInputBorder(
+          enabledBorder: SuperellipseInputBorder(
             borderRadius: BorderRadius.circular(8),
             borderSide: BorderSide(
               color: colorScheme.outlineVariant.withAlpha(100),
             ),
           ),
-          focusedBorder: OutlineInputBorder(
+          focusedBorder: SuperellipseInputBorder(
             borderRadius: BorderRadius.circular(8),
             borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
           ),
@@ -934,19 +943,23 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
     return Container(
       width: 28,
       height: 24,
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: isSelected
             ? colorScheme.primaryContainer
             : colorScheme.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: isSelected
-              ? colorScheme.primary.withAlpha(120)
-              : colorScheme.outlineVariant.withAlpha(60),
+        shape: RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.circular(6),
+          side: BorderSide(
+            color: isSelected
+                ? colorScheme.primary.withAlpha(120)
+                : colorScheme.outlineVariant.withAlpha(60),
+          ),
         ),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(6),
+        customBorder: RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.circular(6),
+        ),
         onTap: onPressed,
         child: Center(
           child: Text(
@@ -972,9 +985,14 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
       visualDensity: VisualDensity.compact,
       onPressed: onPressed,
       tooltip: tooltip,
-      style: const ButtonStyle(
-        padding: WidgetStatePropertyAll(EdgeInsets.all(6)),
-        minimumSize: WidgetStatePropertyAll(Size(28, 28)),
+      style: ButtonStyle(
+        shape: WidgetStatePropertyAll(
+          RoundedSuperellipseBorder(
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        padding: const WidgetStatePropertyAll(EdgeInsets.all(6)),
+        minimumSize: const WidgetStatePropertyAll(Size(28, 28)),
       ),
       icon: Icon(icon, size: 18),
     );

@@ -1,4 +1,4 @@
-﻿{
+{
   "rule": "規則",
   "global": "全域",
   "direct": "直連",
@@ -310,6 +310,7 @@
   "proxyGroup": "代理群組",
   "go": "前往",
   "externalLink": "外部連結",
+  "contributor": "貢獻者",
   "otherContributors": "其他貢獻者(隨機排序)",
   "autoCloseConnections": "自動關閉連線",
   "autoCloseConnectionsDesc": "切換節點後自動關閉連線",

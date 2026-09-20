@@ -1,4 +1,4 @@
-﻿{
+{
   "rule": "قوانین",
   "global": "سراسر جهان",
   "direct": "مستقیم",
@@ -310,6 +310,7 @@
   "proxyGroup": "گروه پروکسی",
   "go": "رفتن",
   "externalLink": "لینک خارجی",
+  "contributor": "مشارکت‌کننده",
   "otherContributors": "مشارکت‌کنندگان دیگر (ترتیب تصادفی)",
   "autoCloseConnections": "بستن خودکار اتصالات",
   "autoCloseConnectionsDesc": "قطع خودکار اتصالات هنگام تغییر نود",

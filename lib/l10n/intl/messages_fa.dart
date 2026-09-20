@@ -1,4 +1,4 @@
-﻿// DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
+// DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
 // This is a library that provides messages for a fa locale. All the
 // messages from the main program should be duplicated here with the same
 // function name.
@@ -851,6 +851,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "operatorOrAsn": MessageLookupByLibrary.simpleMessage("سازمان / ASN"),
     "options": MessageLookupByLibrary.simpleMessage("گزینه‌ها"),
     "other": MessageLookupByLibrary.simpleMessage("سایر"),
+    "contributor": MessageLookupByLibrary.simpleMessage("مشارکت‌کننده"),
     "otherContributors": MessageLookupByLibrary.simpleMessage(
       "مشارکت‌کنندگان دیگر (ترتیب تصادفی)",
     ),
