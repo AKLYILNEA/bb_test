@@ -96,7 +96,7 @@ class _TrafficUsageState extends ConsumerState<TrafficUsage> {
       child: CommonCard(
         info: Info(
           label: appLocalizations.trafficUsage,
-          iconData: FluentIcons.data_usage_24_regular,
+          iconData: FluentIcons.data_pie_24_regular,
         ),
         onPressed: () {},
         child: ValueListenableBuilder<int>(

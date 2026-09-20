@@ -399,7 +399,7 @@ class PortItem extends ConsumerWidget {
       patchClashConfigProvider.select((state) => state.mixedPort),
     );
     return ListItem(
-      leading: const Icon(FluentIcons.star_emphasis_24_regular),
+      leading: const Icon(FluentIcons.data_sunburst_24_regular),
       title: Text(appLocalizations.port),
       subtitle: Text('$mixedPort'),
       onTap: () {
@@ -467,7 +467,7 @@ class UnifiedDelayItem extends ConsumerWidget {
     );
 
     return ListItem.switchItem(
-      leading: const Icon(FluentIcons.arrow_minimize_24_regular),
+      leading: const Icon(FluentIcons.molecule_24_regular),
       title: Text(appLocalizations.unifiedDelay),
       subtitle: Text(appLocalizations.unifiedDelayDesc),
       delegate: SwitchDelegate(
@@ -524,7 +524,7 @@ class TcpConcurrentItem extends ConsumerWidget {
       patchClashConfigProvider.select((state) => state.tcpConcurrent),
     );
     return ListItem.switchItem(
-      leading: const Icon(FluentIcons.arrow_sync_24_regular),
+      leading: const Icon(FluentIcons.iot_24_regular),
       title: Text(appLocalizations.tcpConcurrent),
       subtitle: Text(appLocalizations.tcpConcurrentDesc),
       delegate: SwitchDelegate(
@@ -550,7 +550,7 @@ class GeodataLoaderItem extends ConsumerWidget {
       ),
     );
     return ListItem.switchItem(
-      leading: const Icon(FluentIcons.hard_drive_24_regular),
+      leading: const Icon(FluentIcons.developer_board_24_regular),
       title: Text(appLocalizations.geodataLoader),
       subtitle: Text(appLocalizations.geodataLoaderDesc),
       delegate: SwitchDelegate(
@@ -590,7 +590,7 @@ class ExternalControllerItem extends ConsumerWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         ListItem.switchItem(
-          leading: const Icon(FluentIcons.code_24_regular),
+          leading: const Icon(FluentIcons.drag_24_regular),
           title: Text(appLocalizations.externalController),
           subtitle: Text(appLocalizations.externalControllerDesc),
           delegate: SwitchDelegate(

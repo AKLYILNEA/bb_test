@@ -598,7 +598,7 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
       // 顺序与显示条件保持官方逻辑（路由规则在最前，两个「集」类指标按需出现），
       // 仅保留本地挑选的图标
       _MetricItem(
-        icon: FluentIcons.ruler_24_regular,
+        icon: FluentIcons.task_list_rtl_24_regular,
         label: appLocalizations.rulesCount,
         value: rulesText,
       ),
@@ -608,7 +608,7 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
         value: proxiesText,
       ),
       _MetricItem(
-        icon: FluentIcons.router_24_regular,
+        icon: FluentIcons.calendar_day_24_regular,
         label: appLocalizations.proxyGroupsCount,
         value: proxyGroupsText,
       ),
@@ -620,7 +620,7 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
         ),
       if ((status?.proxyProviders ?? 0) > 0)
         _MetricItem(
-          icon: FluentIcons.airplane_take_off_24_regular,
+          icon: FluentIcons.calendar_3_day_24_regular,
           label: appLocalizations.proxyProvidersCount,
           value: proxyProvidersText,
         ),

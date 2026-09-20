@@ -108,7 +108,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
             ),
             if (!_isTab)
               PopupMenuItemData(
-                icon: FluentIcons.slide_multiple_24_regular,
+                icon: FluentIcons.image_edit_24_regular,
                 label: appLocalizations.iconConfiguration,
                 onPressed: () {
                   showExtend(
@@ -125,7 +125,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
               ),
             if (_hasProviders)
               PopupMenuItemData(
-                icon: FluentIcons.data_bar_vertical_24_regular,
+                icon: FluentIcons.calendar_3_day_24_regular,
                 label: appLocalizations.providers,
                 onPressed: () {
                   showExtend(
@@ -138,7 +138,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
               ),
             PopupMenuItemData(
               icon: showHiddenItems
-                  ? FluentIcons.radio_button_24_regular
+                  ? FluentIcons.record_24_regular
                   : FluentIcons.circle_24_regular,
               label: appLocalizations.showHiddenItems,
               onPressed: () {

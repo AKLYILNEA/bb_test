@@ -418,7 +418,7 @@ class EditProfileViewState extends State<EditProfileView> {
                                 onPressed: _editProfileFile,
                               ),
                               CommonChip(
-                                avatar: const Icon(FluentIcons.arrow_upload_24_regular),
+                                avatar: const Icon(FluentIcons.arrow_up_24_regular),
                                 label: appLocalizations.upload,
                                 onPressed: _uploadProfileFile,
                               ),
@@ -433,10 +433,7 @@ class EditProfileViewState extends State<EditProfileView> {
     ];
     return CommonPopScope(
       onPop: () {
-        if (dismissTvInputFocus()) {
-          return false;
-        }
-        if (fileData == null) {
+        if (_formKey.currentState?.validate() ?? false) {
           return true;
         }
         _handleBack();
@@ -463,7 +460,7 @@ class EditProfileViewState extends State<EditProfileView> {
                   fontVariations: const [FontVariation('wght', 700)],
                 ),
               ),
-              icon: const Icon(FluentIcons.save_24_regular),
+              icon: const Icon(FluentIcons.save_24_filled),
             ),
           ),
         ),

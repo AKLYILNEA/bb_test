@@ -13,15 +13,15 @@ class ProxiesSetting extends StatelessWidget {
 
   IconData _getIconWithProxiesType(ProxiesType type) {
     return switch (type) {
-      ProxiesType.tab => FluentIcons.slide_multiple_24_regular,
-      ProxiesType.list => FluentIcons.text_bullet_list_ltr_24_regular,
+      ProxiesType.tab => FluentIcons.column_triple_24_regular,
+      ProxiesType.list => FluentIcons.row_triple_24_regular,
     };
   }
 
   IconData _getIconWithProxiesSortType(ProxiesSortType type) {
     return switch (type) {
       ProxiesSortType.none => FluentIcons.text_align_left_24_regular,
-      ProxiesSortType.delay => FluentIcons.wifi_1_24_regular,
+      ProxiesSortType.delay => FluentIcons.top_speed_24_regular,
       ProxiesSortType.name => FluentIcons.text_sort_ascending_24_regular,
     };
   }

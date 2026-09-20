@@ -13,7 +13,7 @@ class ProvidersInfo extends StatelessWidget {
       child: SizedBox(
         height: getWidgetHeight(1),
         child: CommonCard(
-          info: const Info(iconData: FluentIcons.data_bar_vertical_24_regular, label: 'INFO'),
+          info: const Info(iconData: FluentIcons.calendar_3_day_24_regular, label: 'INFO'),
           onPressed: () {
             showExtend(
               context,

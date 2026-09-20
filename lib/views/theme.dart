@@ -109,7 +109,7 @@ class _ThemeModeItem extends ConsumerWidget {
         themeMode: ThemeMode.system,
       ),
       ThemeModeItem(
-        iconData: FluentIcons.weather_sunny_24_regular,
+        iconData: FluentIcons.weather_sunny_low_24_regular,
         label: appLocalizations.light,
         themeMode: ThemeMode.light,
       ),
@@ -122,7 +122,7 @@ class _ThemeModeItem extends ConsumerWidget {
     return ItemCard(
       info: Info(
         label: appLocalizations.themeMode,
-        iconData: FluentIcons.weather_sunny_24_regular,
+        iconData: FluentIcons.weather_sunny_low_24_regular,
       ),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -301,7 +301,7 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
         return true;
       },
       child: ItemCard(
-        info: Info(label: appLocalizations.themeColor, iconData: FluentIcons.color_24_regular),
+        info: Info(label: appLocalizations.themeColor, iconData: FluentIcons.paint_brush_24_regular),
         actions: genActions([
           if (_removablePrimaryColor == null)
             FilledButton(
@@ -741,7 +741,7 @@ class _TrayIconInvertItem extends ConsumerWidget {
       themeSettingProvider.select((state) => state.invertTrayIcon),
     );
     return ListItem.switchItem(
-      leading: Icon(FluentIcons.color_24_regular),
+      leading: Icon(FluentIcons.eyedropper_24_regular),
       horizontalTitleGap: 12,
       title: Text(
         appLocalizations.trayIconInvert,

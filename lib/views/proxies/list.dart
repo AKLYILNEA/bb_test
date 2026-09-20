@@ -641,7 +641,7 @@ class _GroupHeader extends ConsumerWidget {
                                 size: 18,
                               ),
                             )
-                          : const Icon(FluentIcons.wifi_1_24_regular),
+                          : const Icon(FluentIcons.top_speed_24_regular),
                       onPressed: delayTestCoordinator.isTesting
                           ? null
                           : () => _delayTest(context),

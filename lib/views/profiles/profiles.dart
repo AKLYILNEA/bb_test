@@ -81,7 +81,7 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
               scriptStateProvider.select((state) => state.realId != null),
             );
             return Icon(
-              FluentIcons.math_formula_24_regular,
+              FluentIcons.javascript_24_regular,
               color: isScriptMode ? context.colorScheme.primary : null,
             );
           },
@@ -293,7 +293,7 @@ class ProfileItem extends StatelessWidget {
           type: type,
           actions: [
             IconButton(
-              icon: const Icon(FluentIcons.shield_24_regular),
+              icon: const Icon(FluentIcons.shield_24_filled),
               tooltip: appLocalizations.ageKeyGenerateTitle,
               onPressed: () {
                 editKey.currentState?.showAgeKeyGenerator();

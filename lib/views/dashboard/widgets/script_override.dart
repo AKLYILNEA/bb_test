@@ -11,7 +11,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 /// 首页仪表盘「脚本覆写」小部件
 ///
 /// 排版与 DNS / NTP / 嗅探 覆写小部件保持 100% 一致：
-/// 左上角为「脚本」标题与脚本功能图标（`FluentIcons.math_formula_24_regular`），
+/// 左上角为「脚本」标题与脚本功能图标（`FluentIcons.javascript_24_regular`），
 /// 下方文案为「覆写」，右上角为开关。
 ///
 /// 开关状态与覆写脚本的生效状态严格对应（[ScriptProps.realId]）：
@@ -77,7 +77,7 @@ class ScriptOverride extends ConsumerWidget {
           label: appLocalizations.script,
           // 与其它小部件保持一致：图标始终为常规 onSurfaceVariant 色，
           // 不随开关状态改变颜色，避免与整排小部件视觉违和
-          iconData: FluentIcons.math_formula_24_regular,
+          iconData: FluentIcons.javascript_24_regular,
         ),
         onPressed: () {
           _openScripts(context);

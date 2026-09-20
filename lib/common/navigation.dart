@@ -39,7 +39,7 @@ class Navigation {
             ProfilesView(key: const GlobalObjectKey(PageLabel.profiles)),
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.history_24_filled),
+        icon: const Icon(FluentIcons.document_one_page_24_filled),
         label: PageLabel.requests,
         builder: (_) =>
             RequestsView(key: const GlobalObjectKey(PageLabel.requests)),
@@ -47,7 +47,7 @@ class Navigation {
         modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.arrow_swap_24_filled),
+        icon: const Icon(FluentIcons.preview_link_24_filled),
         label: PageLabel.connections,
         builder: (_) =>
             ConnectionsView(key: const GlobalObjectKey(PageLabel.connections)),
@@ -63,7 +63,7 @@ class Navigation {
         modes: [NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.math_formula_24_filled),
+        icon: const Icon(FluentIcons.javascript_24_filled),
         label: PageLabel.script,
         description: 'scriptDesc',
         builder: (_) =>
