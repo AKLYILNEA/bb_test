@@ -1052,7 +1052,6 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
             ),
           ),
         ),
-      ),
     );
   }
 }
