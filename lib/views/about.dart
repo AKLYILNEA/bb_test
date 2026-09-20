@@ -160,10 +160,9 @@ class AboutView extends StatelessWidget {
         SizedBox(
           width: double.infinity,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 7),
               child: Row(
                 children: [
                   for (int i = 0; i < contributors.length; i++) ...[
@@ -269,16 +268,16 @@ class Avatar extends StatelessWidget {
           );
         },
         child: SizedBox(
-          width: 44,
-          height: 44,
+          width: 42,
+          height: 42,
           child: Stack(
             alignment: Alignment.center,
             children: [
               ClipOval(
                 child: Image.asset(
                   contributor.avatar,
-                  width: 42,
-                  height: 42,
+                  width: 40,
+                  height: 40,
                   fit: BoxFit.cover,
                 ),
               ),
