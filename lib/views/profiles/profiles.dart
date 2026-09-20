@@ -105,7 +105,6 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
 
   Widget? _buildFAB() {
     final isMobileView = ref.watch(isMobileViewProvider);
-    // 竖屏下改由全局常驻悬浮按钮承担，页面自身不再显示（避免双按钮）
     if (isMobileView) {
       return null;
     }

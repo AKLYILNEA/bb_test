@@ -47,7 +47,6 @@ class _NodeExclusionWithInverseItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // 通过响应式 provider 监听，对话框确认后立即重建
     final nodeExcludeFilter = ref.watch(nodeExcludeFilterProvider);
 
     return ListItem(
@@ -99,7 +98,6 @@ class _NodeExclusionDialogState extends ConsumerState<_NodeExclusionDialog> {
     if (_formKey.currentState?.validate() == false) return;
 
     final filter = _controller.text.trim();
-    // 通过 provider notifier 更新，触发父 Widget 响应式重建
     ref.read(nodeExcludeFilterProvider.notifier).value = filter;
     globalState.appController.applyProfileDebounce();
     Navigator.of(context, rootNavigator: true).pop();

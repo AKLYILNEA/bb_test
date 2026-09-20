@@ -1,4 +1,4 @@
-// DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
+﻿// DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
 // This is a library that provides messages for a ko locale. All the
 // messages from the main program should be duplicated here with the same
 // function name.
@@ -458,8 +458,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("글로벌"),
     "go": MessageLookupByLibrary.simpleMessage("이동"),
     "goDownload": MessageLookupByLibrary.simpleMessage("다운로드 이동"),
-    "harmonyFont": MessageLookupByLibrary.simpleMessage("사용자 정의 글꼴"),
-    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("기본 시스템 글꼴, 활성화하여 원하는 글꼴 적용"),
+    "customFont": MessageLookupByLibrary.simpleMessage("사용자 정의 글꼴"),
+    "customFontDesc": MessageLookupByLibrary.simpleMessage("기본 시스템 글꼴, 활성화하여 원하는 글꼴 적용"),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage("수정 사항을 캐시하시겠습니까?"),
     "healthCheckTimeout": MessageLookupByLibrary.simpleMessage("타임아웃 시간"),
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(

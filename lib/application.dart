@@ -204,7 +204,7 @@ class ApplicationState extends ConsumerState<Application>
             return ValueListenableBuilder<String?>(
               valueListenable: FontManager.fontFamilyNotifier,
               builder: (_, customFontFamily, _) {
-                final fontFamily = (themeProps.useHarmonyFont &&
+                final fontFamily = (themeProps.useCustomFont &&
                         customFontFamily != null &&
                         customFontFamily.isNotEmpty)
                     ? customFontFamily

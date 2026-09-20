@@ -19,7 +19,6 @@ class WakelockSwitch extends StatelessWidget {
         globalState.appController.stopWakelockAutoRecovery();
       }
       globalState.updateWakelockState(value);
-      // 记忆开关状态：下次启动自动恢复（完全退出应用时依然会释放系统亮屏锁）
       await preferences.setWakelockEnabled(value);
     } catch (e) {
       commonPrint.log('WakeLock toggle error: $e');

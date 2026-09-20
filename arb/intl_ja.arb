@@ -1,4 +1,4 @@
-{
+﻿{
   "rule": "ルール",
   "global": "グローバル",
   "direct": "ダイレクト",
@@ -594,8 +594,8 @@
   "trayIconInvertDesc": "現在のトレイアイコンの色を反転設定",
   "darkIcon": "ダークアイコン",
   "darkIconDesc": "アプリアイコンをダーク系に切り替え",
-  "harmonyFont": "カスタムフォント",
-  "harmonyFontDesc": "デフォルトはシステムフォント、有効にして好みのフォントを適用",
+  "customFont": "カスタムフォント",
+  "customFontDesc": "デフォルトはシステムフォント、有効にして好みのフォントを適用",
   "internet": "インターネット",
   "systemApp": "システムアプリ",
   "noNetworkApp": "非通信アプリ",

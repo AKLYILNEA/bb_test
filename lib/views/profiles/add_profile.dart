@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'edit_profile.dart';
 
-/// 打开「添加配置」弹层：配置页悬浮按钮与全局常驻悬浮按钮共用同一个入口。
 void showAddProfileExtend() {
   final context = globalState.navigatorKey.currentState!.context;
   showExtend(

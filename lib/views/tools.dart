@@ -96,6 +96,7 @@ class _ToolViewState extends ConsumerState<ToolsView> {
       title: title,
       items: items,
       isFirst: isFirst,
+      radius: 25.0,
     );
   }
 
@@ -336,8 +337,8 @@ class _ToolViewState extends ConsumerState<ToolsView> {
             _pushPage(context, appLocalizations.theme, const ThemeView()),
       ),
       _SearchItem(
-        title: appLocalizations.harmonyFont,
-        subtitle: appLocalizations.harmonyFontDesc,
+        title: appLocalizations.customFont,
+        subtitle: appLocalizations.customFontDesc,
         category: themeCategory,
         onTap: (context, _) =>
             _pushPage(context, appLocalizations.theme, const ThemeView()),

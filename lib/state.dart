@@ -181,11 +181,11 @@ class GlobalState {
         utils.getSystemLocale();
     await AppLocalizations.load(locale);
     final hasFont = await FontManager.init(
-      enabled: config.themeProps.useHarmonyFont,
+      enabled: config.themeProps.useCustomFont,
     );
-    if (!hasFont && config.themeProps.useHarmonyFont) {
+    if (!hasFont && config.themeProps.useCustomFont) {
       config = config.copyWith(
-        themeProps: config.themeProps.copyWith(useHarmonyFont: false),
+        themeProps: config.themeProps.copyWith(useCustomFont: false),
       );
     }
     await EmojiManager.init();

@@ -82,7 +82,7 @@ class AboutView extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildContributorsSection() {
+  List<Widget> _buildContributorsSection(BuildContext context) {
     final contributors = [
       const Contributor(
         avatar: 'assets/images/avatars/june2.jpg',
@@ -151,6 +151,21 @@ class AboutView extends StatelessWidget {
         name: 'aaANDkk',
       ),
     ]..shuffle();
+
+    final textStyle = context.textTheme.bodySmall;
+    double maxTextWidth = 0;
+    for (final c in contributors) {
+      final painter = TextPainter(
+        text: TextSpan(text: c.name, style: textStyle),
+        textDirection: TextDirection.ltr,
+        maxLines: 1,
+      )..layout();
+      if (painter.width > maxTextWidth) {
+        maxTextWidth = painter.width;
+      }
+    }
+    final itemWidth = max(36.0, maxTextWidth.ceilToDouble());
+
     return generateSection(
       separated: false,
       title: appLocalizations.otherContributors,
@@ -159,10 +174,13 @@ class AboutView extends StatelessWidget {
           title: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Wrap(
-              spacing: 24,
+              spacing: 16,
               children: [
                 for (final contributor in contributors)
-                  Avatar(contributor: contributor),
+                  SizedBox(
+                    width: itemWidth,
+                    child: Avatar(contributor: contributor),
+                  ),
               ],
             ),
           ),
@@ -232,7 +250,7 @@ class AboutView extends StatelessWidget {
           ],
         ),
       ),
-      ..._buildContributorsSection(),
+      ..._buildContributorsSection(context),
       ..._buildMoreSection(context),
     ];
     return generateListView(items);
@@ -247,6 +265,7 @@ class Avatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
           width: 36,
@@ -254,7 +273,13 @@ class Avatar extends StatelessWidget {
           child: CircleAvatar(foregroundImage: AssetImage(contributor.avatar)),
         ),
         const SizedBox(height: 4),
-        Text(contributor.name, style: context.textTheme.bodySmall),
+        Text(
+          contributor.name,
+          style: context.textTheme.bodySmall,
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.visible,
+        ),
       ],
     );
   }

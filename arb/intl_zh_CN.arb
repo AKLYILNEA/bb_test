@@ -1,4 +1,4 @@
-{
+﻿{
   "rule": "规则",
   "global": "全局",
   "direct": "直连",
@@ -594,8 +594,8 @@
   "trayIconInvertDesc": "针对当前托盘图标颜色取反设置",
   "darkIcon": "深色图标",
   "darkIconDesc": "手动切换深色系桌面 APP 图标",
-  "harmonyFont": "自定义字体",
-  "harmonyFontDesc": "默认系统字体，开启后可自定义自己喜欢的字体",
+  "customFont": "自定义字体",
+  "customFontDesc": "默认系统字体，开启后可自定义自己喜欢的字体",
   "internet": "互联网",
   "systemApp": "系统应用",
   "noNetworkApp": "无网络应用",

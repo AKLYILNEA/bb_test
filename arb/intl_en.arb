@@ -1,4 +1,4 @@
-{
+﻿{
   "rule": "Rule",
   "global": "Global",
   "direct": "Direct",
@@ -593,8 +593,8 @@
   "trayIconInvertDesc": "Invert the current tray icon color",
   "darkIcon": "Dark Icon",
   "darkIconDesc": "Manually switch dark app icon",
-  "harmonyFont": "Custom Font",
-  "harmonyFontDesc": "Use system font by default, enable to customize your favorite font",
+  "customFont": "Custom Font",
+  "customFontDesc": "Use system font by default, enable to customize your favorite font",
   "internet": "Internet",
   "systemApp": "System App",
   "noNetworkApp": "No Network App",

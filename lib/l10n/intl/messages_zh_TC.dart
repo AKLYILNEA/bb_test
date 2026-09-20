@@ -1,4 +1,4 @@
-// DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
+﻿// DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
 // This is a library that provides messages for a zh_TC locale. All the
 // messages from the main program should be duplicated here with the same
 // function name.
@@ -410,8 +410,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("全域"),
     "go": MessageLookupByLibrary.simpleMessage("前往"),
     "goDownload": MessageLookupByLibrary.simpleMessage("前往下載"),
-    "harmonyFont": MessageLookupByLibrary.simpleMessage("自訂字體"),
-    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("預設系統字體，開啟後可自訂自己喜好的字體"),
+    "customFont": MessageLookupByLibrary.simpleMessage("自訂字體"),
+    "customFontDesc": MessageLookupByLibrary.simpleMessage("預設系統字體，開啟後可自訂自己喜好的字體"),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage("是否快取修改"),
     "healthCheckTimeout": MessageLookupByLibrary.simpleMessage("超時時間"),
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(

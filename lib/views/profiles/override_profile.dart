@@ -713,23 +713,22 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
           child: Text(appLocalizations.confirm),
         ),
       ],
-      child: DropdownMenuTheme(
-        data: DropdownMenuThemeData(
-          menuStyle: menuStyle,
-          inputDecorationTheme: InputDecorationTheme(
-            border: const OutlineInputBorder(),
-            labelStyle: context.textTheme.bodyLarge?.copyWith(
-              overflow: TextOverflow.ellipsis,
+      child: RepaintBoundary(
+        child: DropdownMenuTheme(
+          data: DropdownMenuThemeData(
+            menuStyle: menuStyle,
+            inputDecorationTheme: InputDecorationTheme(
+              border: const OutlineInputBorder(),
+              labelStyle: context.textTheme.bodyLarge?.copyWith(
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ),
-        ),
-        child: Form(
-          key: _formKey,
-          child: LayoutBuilder(
-            builder: (_, constraints) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                   FilledButton.tonal(
                     onPressed: () async {
                       _ruleAction =
@@ -1049,8 +1048,8 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
                   ],
                   const SizedBox(height: 20),
                 ],
-              );
-            },
+              ),
+            ),
           ),
         ),
       ),

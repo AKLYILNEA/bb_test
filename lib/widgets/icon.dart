@@ -17,11 +17,6 @@ class CommonTargetIcon extends StatefulWidget {
 
   const CommonTargetIcon({super.key, required this.src, required this.size});
 
-  /// 主动预取图标（不依赖组件是否挂载或可见）。
-  ///
-  /// 策略组数据更新后（例如用户在 YAML 里更换了策略组图标）立即把所有
-  /// 图标拉取到本地缓存，避免「只有当前可见的图标才会被懒加载」，
-  /// 从而无需重启应用即可显示新图标。
   static Future<void> prefetchAll(Iterable<String> srcs) {
     return _CommonTargetIconState.prefetchAll(srcs);
   }
@@ -61,10 +56,6 @@ class _CommonTargetIconState extends State<CommonTargetIcon> {
     return key.startsWith('bmp|$src|');
   }
 
-  /// 清除某个 URL 残留的「永久无效」标记。
-  ///
-  /// 仅清理内存中的判定标记，**绝不删除磁盘缓存文件**，因此在断网、
-  /// 弱网或上游临时异常时依旧可以回退渲染旧图（遵循 SWR 高可用原则）。
   static bool _clearInvalidMark(String src) {
     if (src.isEmpty) return false;
     final poisonKeys = _moduleFileCache.entries
@@ -219,9 +210,6 @@ class _CommonTargetIconState extends State<CommonTargetIcon> {
       _unsubscribeFromUrl();
       _subscribeToUrl(widget.src);
 
-      // 配置（YAML）中更换了图标地址：必须让新地址真正走一次网络拉取，
-      // 并清掉该地址可能残留的「永久无效 / 失败冷却」标记，
-      // 否则会一直显示默认准星图标，只能靠完全重启应用才能恢复。
       _clearInvalidMark(widget.src);
       if (widget.src.isNotEmpty) {
         _urlFailureCache.remove(widget.src);
@@ -421,9 +409,6 @@ class _CommonTargetIconState extends State<CommonTargetIcon> {
     if (_moduleFileCache.containsKey(mKey)) {
       final cachedFile = _moduleFileCache[mKey];
       if (cachedFile == null) {
-        // 历史版本会写入 null 作为「永久无效」标记，导致该地址此后
-        // 永远不再尝试拉取（只能靠完全重启应用恢复）。这里直接剔除，
-        // 让其走正常的失败冷却 + 自动补试流程。
         _moduleFileCache.remove(mKey);
       } else {
         if (mounted) {
@@ -529,11 +514,6 @@ class _CommonTargetIconState extends State<CommonTargetIcon> {
     }
   }
 
-  /// 主动预取图标（不依赖组件是否挂载或可见）。
-  ///
-  /// 策略组数据更新后（例如用户在 YAML 里更换了策略组图标）立即把所有
-  /// 图标拉取到本地缓存，避免「只有当前可见的图标才会被懒加载」，
-  /// 从而无需重启应用即可显示新图标。
   static Future<void> prefetchAll(Iterable<String> srcs) async {
     final targets = <String>[];
     final seen = <String>{};
@@ -541,7 +521,6 @@ class _CommonTargetIconState extends State<CommonTargetIcon> {
       final src = raw.trim();
       if (src.isEmpty || src.getBase64 != null) continue;
       if (!seen.add(src)) continue;
-      // 清理历史版本遗留的「永久无效」标记，否则该地址永远不会再被拉取
       _clearInvalidMark(src);
       if (_findCachedFileForSrc(src) != null) continue;
       targets.add(src);
@@ -573,11 +552,9 @@ class _CommonTargetIconState extends State<CommonTargetIcon> {
       info = await DefaultCacheManager().getFileFromCache(url);
     } catch (_) {}
     if (info != null && !DateTime.now().isAfter(info.validTill)) {
-      // 本地副本仍然新鲜：直接广播给已挂载的同源组件，无需网络
       _notifyUrlUpdated(url, info.file);
       return;
     }
-    // 无缓存或已过期：走 single-flight 拉取（内含 URL 级并发去重与广播）
     await _downloadFileSingleFlight(url);
   }
 
@@ -586,8 +563,6 @@ class _CommonTargetIconState extends State<CommonTargetIcon> {
       final isValid = await _validateSvg(file);
       if (!isValid) {
         await DefaultCacheManager().removeFile(widget.src);
-        // 不再写入 null 永久标记：仅记录失败冷却，冷却结束后自动补试，
-        // 网络恢复或上游恢复时无需重启应用即可显示图标。
         _moduleFileCache.remove(mKey);
         _moduleSvgValidCache.remove(widget.src);
         _urlFailureCache[widget.src] = DateTime.now();

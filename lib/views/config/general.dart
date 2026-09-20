@@ -115,7 +115,7 @@ class _UaDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return CommonDialog(
       title: 'UA',
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -132,9 +132,11 @@ class _UaDialog extends StatelessWidget {
                   children: [
                     OptionRadioIcon(selected: !isCustom, size: 21),
                     const SizedBox(width: 12),
-                    Text(
-                      appLocalizations.defaultText,
-                      style: context.textTheme.bodyMedium,
+                    Expanded(
+                      child: Text(
+                        appLocalizations.defaultText,
+                        style: context.textTheme.bodyMedium,
+                      ),
                     ),
                   ],
                 ),
@@ -154,9 +156,11 @@ class _UaDialog extends StatelessWidget {
                   children: [
                     OptionRadioIcon(selected: isCustom, size: 21),
                     const SizedBox(width: 12),
-                    Text(
-                      appLocalizations.custom,
-                      style: context.textTheme.bodyMedium,
+                    Expanded(
+                      child: Text(
+                        appLocalizations.custom,
+                        style: context.textTheme.bodyMedium,
+                      ),
                     ),
                   ],
                 ),

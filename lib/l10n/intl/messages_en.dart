@@ -1,4 +1,4 @@
-// DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
+﻿// DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
 // This is a library that provides messages for a en locale. All the
 // messages from the main program should be duplicated here with the same
 // function name.
@@ -559,8 +559,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("Global"),
     "go": MessageLookupByLibrary.simpleMessage("Go"),
     "goDownload": MessageLookupByLibrary.simpleMessage("Download Now"),
-    "harmonyFont": MessageLookupByLibrary.simpleMessage("Custom Font"),
-    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("Use system font by default, enable to customize your favorite font"),
+    "customFont": MessageLookupByLibrary.simpleMessage("Custom Font"),
+    "customFontDesc": MessageLookupByLibrary.simpleMessage("Use system font by default, enable to customize your favorite font"),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage(
       "Cache modifications?",
     ),

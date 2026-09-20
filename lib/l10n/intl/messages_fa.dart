@@ -1,4 +1,4 @@
-// DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
+﻿// DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
 // This is a library that provides messages for a fa locale. All the
 // messages from the main program should be duplicated here with the same
 // function name.
@@ -555,8 +555,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("سراسر جهان"),
     "go": MessageLookupByLibrary.simpleMessage("رفتن"),
     "goDownload": MessageLookupByLibrary.simpleMessage("رفتن به دانلود"),
-    "harmonyFont": MessageLookupByLibrary.simpleMessage("فونت سفارشی"),
-    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("به طور پیش فرض فونت سیستم، برای اعمال فونت دلخواه خود فعال کنید"),
+    "customFont": MessageLookupByLibrary.simpleMessage("فونت سفارشی"),
+    "customFontDesc": MessageLookupByLibrary.simpleMessage("به طور پیش فرض فونت سیستم، برای اعمال فونت دلخواه خود فعال کنید"),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage(
       "آیا تغییرات ذخیره شوند؟",
     ),

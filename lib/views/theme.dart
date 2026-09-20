@@ -41,8 +41,8 @@ class ThemeView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final brightness = ref.watch(currentBrightnessProvider);
-    final useHarmonyFont = ref.watch(
-      themeSettingProvider.select((state) => state.useHarmonyFont),
+    final useCustomFont = ref.watch(
+      themeSettingProvider.select((state) => state.useCustomFont),
     );
 
     final toggleItems = [
@@ -50,7 +50,7 @@ class ThemeView extends ConsumerWidget {
       if (system.isWindows) _TrayIconInvertItem(),
       _TextScaleFactorItem(),
       const _CustomFontItem(),
-      if (useHarmonyFont) const _SelectCustomFontItem(),
+      if (useCustomFont) const _SelectCustomFontItem(),
       const _EmojiStyleItem(),
     ];
 
@@ -460,8 +460,8 @@ class _CustomFontItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final useHarmonyFont = ref.watch(
-      themeSettingProvider.select((state) => state.useHarmonyFont),
+    final useCustomFont = ref.watch(
+      themeSettingProvider.select((state) => state.useCustomFont),
     );
 
     return ValueListenableBuilder<String?>(
@@ -469,19 +469,19 @@ class _CustomFontItem extends ConsumerWidget {
       builder: (context, _, _) {
         final fontName = FontManager.customFontName;
         final String subtitle;
-        if (useHarmonyFont) {
+        if (useCustomFont) {
           subtitle = fontName?.isNotEmpty == true
               ? '${appLocalizations.customFontApplied}: $fontName'
               : appLocalizations.selectCustomFontDesc;
         } else {
-          subtitle = appLocalizations.harmonyFontDesc;
+          subtitle = appLocalizations.customFontDesc;
         }
 
         return ListItem.switchItem(
           leading: const Icon(Icons.font_download_outlined),
           horizontalTitleGap: 12,
           title: Text(
-            appLocalizations.harmonyFont,
+            appLocalizations.customFont,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
               color: context.colorScheme.onSurfaceVariant,
             ),
@@ -493,7 +493,7 @@ class _CustomFontItem extends ConsumerWidget {
             ),
           ),
           delegate: SwitchDelegate(
-            value: useHarmonyFont,
+            value: useCustomFont,
             onChanged: (value) async {
               if (value) {
                 final hasFile = await FontManager.hasFontFile();
@@ -501,13 +501,13 @@ class _CustomFontItem extends ConsumerWidget {
                   final loaded = await FontManager.ensureLoaded();
                   if (loaded) {
                     ref.read(themeSettingProvider.notifier).updateState(
-                      (state) => state.copyWith(useHarmonyFont: true),
+                      (state) => state.copyWith(useCustomFont: true),
                     );
                   } else {
                     final picked = await FontManager.pickAndApplyFont(context);
                     if (picked) {
                       ref.read(themeSettingProvider.notifier).updateState(
-                        (state) => state.copyWith(useHarmonyFont: true),
+                        (state) => state.copyWith(useCustomFont: true),
                       );
                     }
                   }
@@ -515,13 +515,13 @@ class _CustomFontItem extends ConsumerWidget {
                   final picked = await FontManager.pickAndApplyFont(context);
                   if (picked) {
                     ref.read(themeSettingProvider.notifier).updateState(
-                      (state) => state.copyWith(useHarmonyFont: true),
+                      (state) => state.copyWith(useCustomFont: true),
                     );
                   }
                 }
               } else {
                 ref.read(themeSettingProvider.notifier).updateState(
-                  (state) => state.copyWith(useHarmonyFont: false),
+                  (state) => state.copyWith(useCustomFont: false),
                 );
                 FontManager.disableFont();
               }
@@ -563,7 +563,7 @@ class _SelectCustomFontItem extends ConsumerWidget {
             final picked = await FontManager.pickAndApplyFont(context);
             if (picked) {
               ref.read(themeSettingProvider.notifier).updateState(
-                (state) => state.copyWith(useHarmonyFont: true),
+                (state) => state.copyWith(useCustomFont: true),
               );
             }
           },

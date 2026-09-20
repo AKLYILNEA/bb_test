@@ -10,11 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
-/// label 宽度变化时长。官方的启动/停止按钮与常驻悬浮按钮共用同一时长与曲线，
-/// 这样两者“变长变短”的手感完全一致。
 const startFabWidthAnimationDuration = Duration(milliseconds: 200);
 
-/// 启动/停止按钮的文字样式（常驻悬浮按钮复用，保证排版一致）
 TextStyle startFabLabelStyle(BuildContext context) {
   final theme = Theme.of(context);
   final base =
@@ -38,21 +35,16 @@ TextStyle startFabLabelStyle(BuildContext context) {
   );
 }
 
-/// 按启动按钮的算法测量 label 文字宽度
 double startFabTextWidth(BuildContext context, String text) {
   return globalState.measure
       .computeTextSize(Text(text, style: startFabLabelStyle(context)))
       .width;
 }
 
-/// 启动按钮的 label 宽度（文字宽 + 12 余量）
 double startFabLabelWidth(BuildContext context, String text) {
   return startFabTextWidth(context, text) + 12.0;
 }
 
-/// 启动/停止按钮对外暴露的状态数据。
-///
-/// 官方按钮与常驻悬浮按钮共用同一份数据，动画与点击行为因此不会出现两套实现。
 @immutable
 class StartFabData {
   const StartFabData({
@@ -74,7 +66,6 @@ class StartFabData {
   final VoidCallback? onLongPress;
 }
 
-/// 只负责计算出 [StartFabData]，界面完全交给 [builder]。
 class StartFabDataProvider extends ConsumerStatefulWidget {
   const StartFabDataProvider({super.key, required this.builder});
 
@@ -265,7 +256,6 @@ class _StartFabDataProviderState extends ConsumerState<StartFabDataProvider> {
   }
 }
 
-/// 官方启动/停止悬浮按钮本体：外观、动效与改造前完全一致。
 Widget buildStartFabBody(BuildContext context, StartFabData data) {
   return GestureDetector(
     onLongPress: data.onLongPress,

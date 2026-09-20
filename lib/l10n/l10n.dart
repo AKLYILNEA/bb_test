@@ -4910,16 +4910,16 @@ class AppLocalizations {
     );
   }
 
-  /// `Font Fix`
-  String get harmonyFont {
-    return Intl.message('Custom Font', name: 'harmonyFont', desc: '', args: []);
+  /// `Custom Font`
+  String get customFont {
+    return Intl.message('Custom Font', name: 'customFont', desc: '', args: []);
   }
 
-  /// `Use built-in font to fix display issues`
-  String get harmonyFontDesc {
+  /// `Use system font by default, enable to customize your favorite font`
+  String get customFontDesc {
     return Intl.message(
       'Use system font by default, enable to customize your favorite font',
-      name: 'harmonyFontDesc',
+      name: 'customFontDesc',
       desc: '',
       args: [],
     );

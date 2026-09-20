@@ -1,4 +1,4 @@
-{
+﻿{
   "rule": "規則",
   "global": "全域",
   "direct": "直連",
@@ -594,8 +594,8 @@
   "trayIconInvertDesc": "針對目前托盤圖示顏色取反設定",
   "darkIcon": "深色圖示",
   "darkIconDesc": "手動切換深色系桌面應用程式圖示",
-  "harmonyFont": "自訂字體",
-  "harmonyFontDesc": "預設系統字體，開啟後可自訂自己喜好的字體",
+  "customFont": "自訂字體",
+  "customFontDesc": "預設系統字體，開啟後可自訂自己喜好的字體",
   "internet": "網際網路",
   "systemApp": "系統應用程式",
   "noNetworkApp": "無網路應用程式",

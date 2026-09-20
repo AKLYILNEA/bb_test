@@ -254,9 +254,7 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. IP 地址（右侧图标复制）
           _buildIpTile(context),
-          // 2. 国家 / 地区（EmojiText 精准基线对齐）
           if (countryText.isNotEmpty || flagEmoji.isNotEmpty)
             ListTile(
               contentPadding: EdgeInsets.zero,
@@ -267,7 +265,6 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
                 style: context.textTheme.bodyMedium,
               ),
             ),
-          // 3. 省份 / 城市
           if (provinceCity.isNotEmpty)
             ListTile(
               contentPadding: EdgeInsets.zero,
@@ -275,7 +272,6 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
               title: Text(appLocalizations.provinceAndCity),
               subtitle: Text(provinceCity),
             ),
-          // 4. 归属 / ASN
           if (operatorText.isNotEmpty)
             ListTile(
               contentPadding: EdgeInsets.zero,
@@ -283,7 +279,6 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
               title: Text(appLocalizations.operatorOrAsn),
               subtitle: Text(operatorText),
             ),
-          // 5. 运营商（单独一行放到下方）
           if (ispText.isNotEmpty)
             ListTile(
               contentPadding: EdgeInsets.zero,
@@ -291,7 +286,6 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
               title: Text(appLocalizations.isp),
               subtitle: Text(ispText),
             ),
-          // 6. 组织 / 域名（非空才展示）
           if (domainText.isNotEmpty)
             ListTile(
               contentPadding: EdgeInsets.zero,

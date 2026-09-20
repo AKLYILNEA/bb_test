@@ -1,4 +1,4 @@
-// DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
+﻿// DO NOT EDIT. This is code generated via package:intl/generate_localized.dart
 // This is a library that provides messages for a ru locale. All the
 // messages from the main program should be duplicated here with the same
 // function name.
@@ -578,8 +578,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("Глобально"),
     "go": MessageLookupByLibrary.simpleMessage("Перейти"),
     "goDownload": MessageLookupByLibrary.simpleMessage("Перейти к загрузке"),
-    "harmonyFont": MessageLookupByLibrary.simpleMessage("Пользовательский шрифт"),
-    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("По умолчанию системный шрифт, включите для применения своего шрифта"),
+    "customFont": MessageLookupByLibrary.simpleMessage("Пользовательский шрифт"),
+    "customFontDesc": MessageLookupByLibrary.simpleMessage("По умолчанию системный шрифт, включите для применения своего шрифта"),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage(
       "Кэшировать изменения?",
     ),

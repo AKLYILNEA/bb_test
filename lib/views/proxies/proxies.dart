@@ -156,7 +156,6 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
   }
 
   Widget? _buildFAB() {
-    // 竖屏下改由全局常驻悬浮按钮承担（列表模式本来就不显示）
     if (!_isTab ||
         globalState.isAndroidTV ||
         ref.watch(isMobileViewProvider)) {
@@ -207,8 +206,6 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
   void initState() {
     super.initState();
 
-    // 把「测速当前策略组」注册给全局常驻悬浮按钮使用；页面销毁后 GlobalKey
-    // 取不到 state，回调自然变成空操作，无需额外清理
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         ref.read(residentProxyTestProvider.notifier).state = () {
