@@ -202,7 +202,8 @@ class CommonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final actualRadius = radius ?? 20.0;
+    final actualRadius =
+        radius ?? (type == CommonCardType.filled ? 25.0 : 20.0);
     var childWidget = child;
 
     if (info != null) {

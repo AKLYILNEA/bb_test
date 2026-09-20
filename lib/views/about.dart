@@ -175,7 +175,7 @@ class AboutView extends StatelessWidget {
           title: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Wrap(
-              spacing: 16,
+              spacing: 8,
               children: [
                 for (final contributor in contributors)
                   SizedBox(

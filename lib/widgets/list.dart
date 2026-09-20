@@ -583,7 +583,7 @@ class SectionContainer extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
           child: CommonCard(
             type: CommonCardType.filled,
-            radius: radius ?? 20.0,
+            radius: radius ?? 25.0,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
