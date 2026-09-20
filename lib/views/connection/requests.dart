@@ -78,7 +78,7 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
               : null,
           onPressed: _toggleAutoScroll,
           tooltip: appLocalizations.autoScroll,
-          icon: const Icon(FluentIcons.arrow_up_24_regular),
+          icon: const Icon(FluentIcons.swipe_up_24_regular),
         ),
       ],
       searchState: AppBarSearchState(onSearch: _onSearch),

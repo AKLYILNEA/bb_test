@@ -603,7 +603,7 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
         value: rulesText,
       ),
       _MetricItem(
-        icon: FluentIcons.text_number_list_ltr_24_regular,
+        icon: FluentIcons.brain_circuit_24_regular,
         label: appLocalizations.proxiesCount,
         value: proxiesText,
       ),

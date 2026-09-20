@@ -418,7 +418,7 @@ class EditProfileViewState extends State<EditProfileView> {
                                 onPressed: _editProfileFile,
                               ),
                               CommonChip(
-                                avatar: const Icon(FluentIcons.arrow_up_24_regular),
+                                avatar: const Icon(FluentIcons.folder_open_24_regular),
                                 label: appLocalizations.upload,
                                 onPressed: _uploadProfileFile,
                               ),

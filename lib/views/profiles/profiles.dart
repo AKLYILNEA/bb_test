@@ -293,7 +293,7 @@ class ProfileItem extends StatelessWidget {
           type: type,
           actions: [
             IconButton(
-              icon: const Icon(FluentIcons.shield_24_filled),
+              icon: const Icon(FluentIcons.shield_keyhole_24_regular),
               tooltip: appLocalizations.ageKeyGenerateTitle,
               onPressed: () {
                 editKey.currentState?.showAgeKeyGenerator();

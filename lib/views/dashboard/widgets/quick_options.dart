@@ -38,7 +38,7 @@ class TUNButton extends StatelessWidget {
         },
         info: Info(
           label: appLocalizations.tun,
-          iconData: FluentIcons.data_trending_24_regular,
+          iconData: FluentIcons.data_waterfall_24_regular,
         ),
         child: Container(
           padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 8),
@@ -196,7 +196,7 @@ class VpnButton extends StatelessWidget {
             },
           );
         },
-        info: Info(label: 'VPN', iconData: FluentIcons.data_trending_24_regular),
+        info: Info(label: 'VPN', iconData: FluentIcons.data_waterfall_24_regular),
         child: Container(
           padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 8),
           child: Row(

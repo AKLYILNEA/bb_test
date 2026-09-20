@@ -109,7 +109,7 @@ class _ThemeModeItem extends ConsumerWidget {
         themeMode: ThemeMode.system,
       ),
       ThemeModeItem(
-        iconData: FluentIcons.weather_sunny_low_24_regular,
+        iconData: FluentIcons.weather_sunny_24_regular,
         label: appLocalizations.light,
         themeMode: ThemeMode.light,
       ),

@@ -344,7 +344,7 @@ class ProviderItem extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               CommonChip(
-                avatar: const Icon(FluentIcons.arrow_upload_24_regular),
+                avatar: const Icon(FluentIcons.folder_open_24_regular),
                 label: appLocalizations.upload,
                 onPressed: _handleSideLoadProvider,
               ),
