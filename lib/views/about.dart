@@ -266,8 +266,7 @@ class Avatar extends StatelessWidget {
         child: Container(
           width: 44,
           height: 44,
-          padding: const EdgeInsets.all(2),
-          decoration: BoxDecoration(
+          foregroundDecoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
               color: borderColor,
@@ -314,13 +313,8 @@ class _ContributorDialog extends StatelessWidget {
             Container(
               width: 82,
               height: 82,
-              padding: const EdgeInsets.all(3),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: borderColor,
-                  width: 3.0,
-                ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(
@@ -337,6 +331,13 @@ class _ContributorDialog extends StatelessWidget {
                     offset: const Offset(0, 1),
                   ),
                 ],
+              ),
+              foregroundDecoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: borderColor,
+                  width: 3.0,
+                ),
               ),
               child: ClipOval(
                 child: Image.asset(
