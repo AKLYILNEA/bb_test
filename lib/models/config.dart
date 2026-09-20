@@ -350,14 +350,9 @@ abstract class ThemeProps with _$ThemeProps {
     @Default(false) bool pureBlack,
     @Default(TextScale()) TextScale textScale,
     @Default(false) bool useDarkIcon,
-    @JsonKey(readValue: _readUseCustomFont)
     @Default(false) bool useCustomFont,
     @Default(false) bool invertTrayIcon,
   }) = _ThemeProps;
-
-  static Object? _readUseCustomFont(Map json, String key) {
-    return json['useCustomFont'] ?? json['useHarmonyFont'];
-  }
 
   factory ThemeProps.fromJson(Map<String, Object?> json) =>
       _$ThemePropsFromJson(json);
