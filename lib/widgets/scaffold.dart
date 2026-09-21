@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui' show FontVariation;
 
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
@@ -229,10 +228,6 @@ class CommonScaffoldState extends State<CommonScaffold> {
                 : appLocalizations.selectedCountTitle(
                     '${_appBarState.value.editState?.editCount ?? 0}',
                   ),
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontVariations: [FontVariation('wght', 700)],
-            ),
           );
   }
 
@@ -314,8 +309,14 @@ class CommonScaffoldState extends State<CommonScaffold> {
                   return _buildAppBarWrap(
                     AppBar(
                       centerTitle: widget.centerTitle ?? false,
-                      leading: leading,
-                      titleSpacing: hasLeading ? 0.0 : null,
+                      leading: leading != null
+                          ? Padding(
+                              padding: const EdgeInsets.only(left: 2.0),
+                              child: leading,
+                            )
+                          : null,
+                      leadingWidth: hasLeading ? 58.0 : null,
+                      titleSpacing: hasLeading ? 0.0 : 18.0,
                       title: _buildTitle(state.searchState),
                       actions: _buildActions(
                         state.searchState != null,
@@ -406,7 +407,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
 List<Widget> genActions(List<Widget> actions, {double? space}) {
   return <Widget>[
     ...actions.separated(SizedBox(width: space ?? 4)),
-    SizedBox(width: 8),
+    const SizedBox(width: 10),
   ];
 }
 

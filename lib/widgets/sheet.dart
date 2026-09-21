@@ -1,4 +1,3 @@
-import 'dart:ui' show FontVariation;
 
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
@@ -126,21 +125,23 @@ class AdaptiveSheetScaffold extends StatelessWidget {
     final implyLeading = !bottomSheet && (!(actions.isEmpty && sideSheet));
     final hasLeading = leading != null || (implyLeading && canPop);
     final appBar = AppBar(
-      leading: leading,
+      leading: leading != null
+          ? Padding(
+              padding: const EdgeInsets.only(left: 2.0),
+              child: leading,
+            )
+          : null,
+      leadingWidth: hasLeading ? 58.0 : null,
       forceMaterialTransparency: bottomSheet ? true : false,
       automaticallyImplyLeading: implyLeading,
-      titleSpacing: hasLeading ? 0.0 : null,
+      titleSpacing: hasLeading ? 0.0 : (bottomSheet ? null : 18.0),
       centerTitle: bottomSheet,
       backgroundColor: backgroundColor,
       title: EmojiText(
         title,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontVariations: [FontVariation('wght', 700)],
-        ),
       ),
       actions: genActions([
-        if (actions.isEmpty && sideSheet) CloseButton(),
+        if (actions.isEmpty && sideSheet) const CloseButton(),
         ...actions,
       ]),
     );

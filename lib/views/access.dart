@@ -1026,8 +1026,11 @@ class _AccessControlPanelState extends ConsumerState<AccessControlPanel> {
               return Wrap(
                 spacing: 16,
                 children: [
-                  SettingTextCard(
-                    appLocalizations.systemApp,
+                  SettingInfoCard(
+                    Info(
+                      label: appLocalizations.systemApp,
+                      iconData: FluentIcons.phone_tablet_24_regular,
+                    ),
                     isSelected: vm2.a == false,
                     onPressed: () {
                       ref
@@ -1039,8 +1042,11 @@ class _AccessControlPanelState extends ConsumerState<AccessControlPanel> {
                           );
                     },
                   ),
-                  SettingTextCard(
-                    appLocalizations.noNetworkApp,
+                  SettingInfoCard(
+                    Info(
+                      label: appLocalizations.noNetworkApp,
+                      iconData: FluentIcons.cellular_off_24_regular,
+                    ),
                     isSelected: vm2.b == false,
                     onPressed: () {
                       ref

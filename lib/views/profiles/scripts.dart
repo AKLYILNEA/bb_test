@@ -447,7 +447,7 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
         clipBehavior: Clip.none,
         heroTag: null,
         onPressed: _handleImport,
-        child: const Icon(FluentIcons.add_24_filled),
+        child: const Icon(FluentIcons.add_circle_24_filled),
       ),
     );
   }

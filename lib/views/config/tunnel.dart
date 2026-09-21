@@ -228,7 +228,7 @@ class TunnelListView extends ConsumerWidget {
         clipBehavior: Clip.none,
         heroTag: null,
         onPressed: () => _showTunnelDialog(context, ref, tunnels),
-        child: const Icon(FluentIcons.add_24_filled),
+        child: const Icon(FluentIcons.add_circle_24_filled),
       ),
     );
   }

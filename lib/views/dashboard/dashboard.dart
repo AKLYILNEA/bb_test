@@ -107,7 +107,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                   onPressed: () {
                     _showAddWidgetsModal();
                   },
-                  icon: Icon(FluentIcons.add_circle_24_filled),
+                  icon: const Icon(FluentIcons.add_circle_24_regular),
                 ),
               )
             : SizedBox();
@@ -126,7 +126,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
           child: Padding(
             padding: const EdgeInsets.all(12.0),
             child: _buildIsEdit((isEdit) {
-              return isEdit ? const Icon(FluentIcons.save_24_filled) : const Icon(FluentIcons.edit_24_filled);
+              return isEdit ? const Icon(FluentIcons.save_24_regular) : const Icon(FluentIcons.edit_24_regular);
             }),
           ),
         ),

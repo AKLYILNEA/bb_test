@@ -389,6 +389,11 @@ class _EditorPageState extends ConsumerState<EditorPage> {
           absorbing: _isBusy || _isLoading,
           child: CommonScaffold(
             appBar: AppBar(
+              leading: const Padding(
+                padding: EdgeInsets.only(left: 2.0),
+                child: BackButton(),
+              ),
+              leadingWidth: 58.0,
               titleSpacing: 0.0,
               title: TextField(
                 focusNode: _titleFocusNode,

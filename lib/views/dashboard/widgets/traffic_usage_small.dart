@@ -42,7 +42,7 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(FluentIcons.arrow_up_24_regular),
+              leading: const Icon(FluentIcons.arrow_circle_up_24_regular),
               title: Text(appLocalizations.upload),
               trailing: OptionRadioIcon(selected: _showUpload),
               onTap: () {
@@ -51,7 +51,7 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
               },
             ),
             ListTile(
-              leading: const Icon(FluentIcons.arrow_down_24_regular),
+              leading: const Icon(FluentIcons.arrow_circle_down_24_regular),
               title: Text(appLocalizations.download),
               trailing: OptionRadioIcon(selected: !_showUpload),
               onTap: () {

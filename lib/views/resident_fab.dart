@@ -157,7 +157,7 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
       case PageLabel.profiles:
         return _FabContent(
           page: page,
-          icon: FluentIcons.add_24_filled,
+          icon: FluentIcons.add_circle_24_filled,
           labelText: appLocalizations.addProfile,
           labelWidth: startFabTextWidth(context, appLocalizations.addProfile),
           isRunTime: false,
