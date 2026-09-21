@@ -71,7 +71,7 @@ class ColorSchemeBox extends StatelessWidget {
                   const Positioned(
                     bottom: 4,
                     right: 4,
-                    child: Icon(FluentIcons.eyedropper_24_regular, size: 20),
+                    child: Icon(FluentIcons.eyedropper_24_filled, size: 20),
                   ),
               ],
             );

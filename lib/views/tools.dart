@@ -193,7 +193,7 @@ class _ToolViewState extends ConsumerState<ToolsView> {
         title: appLocalizations.language,
         subtitle: appLocalizations.language,
         category: settingsCategory,
-        leading: const Icon(FluentIcons.earth_24_filled),
+        leading: const Icon(FluentIcons.translate_24_filled),
         onTap: (context, _) =>
             _pushPage(context, appLocalizations.language, const _LocaleItem()),
       ),
@@ -1439,7 +1439,7 @@ class _LocaleItem extends ConsumerWidget {
     final currentLocale =
         utils.getLocaleForString(locale) ?? utils.getSystemLocale();
     return ListItem<Locale>.options(
-      leading: const Icon(FluentIcons.earth_24_filled),
+      leading: const Icon(FluentIcons.translate_24_filled),
       title: Text(appLocalizations.language),
       subtitle: Text(_getLocaleString(currentLocale)),
       delegate: OptionsDelegate(

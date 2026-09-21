@@ -39,7 +39,7 @@ class Navigation {
             ProfilesView(key: const GlobalObjectKey(PageLabel.profiles)),
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.document_one_page_24_filled),
+        icon: const Icon(FluentIcons.shifts_activity_24_filled),
         label: PageLabel.requests,
         builder: (_) =>
             RequestsView(key: const GlobalObjectKey(PageLabel.requests)),

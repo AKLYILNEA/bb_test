@@ -53,7 +53,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
             _proxiesTabKey.currentState?.scrollToGroupSelected();
           },
           tooltip: appLocalizations.locate,
-          icon: const Icon(FluentIcons.target_24_regular, weight: 1),
+          icon: const Icon(FluentIcons.my_location_24_regular),
         ),
       if (hasCustom)
         IconButton(

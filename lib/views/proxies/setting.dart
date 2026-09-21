@@ -28,24 +28,7 @@ class _MinStorageIcon extends StatelessWidget {
   }
 }
 
-class _FilledResizeImageIcon extends StatelessWidget {
-  const _FilledResizeImageIcon();
 
-  @override
-  Widget build(BuildContext context) {
-    final color = IconTheme.of(context).color ??
-        Theme.of(context).iconTheme.color ??
-        context.colorScheme.onSurface;
-    return SvgPicture.string(
-      '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">'
-      '<path d="M2.75 11C2.33579 11 2 10.6642 2 10.25V5.25C2 3.45507 3.45507 2 5.25 2H18.75C20.5449 2 22 3.45507 22 5.25V18.75C22 20.5449 20.5449 22 18.75 22H13.75C13.3358 22 13 21.6642 13 21.25C13 20.8358 13.3358 20.5 13.75 20.5H18.75C19.7165 20.5 20.5 19.7165 20.5 18.75V5.25C20.5 4.2835 19.7165 3.5 18.75 3.5H5.25C4.2835 3.5 3.5 4.2835 3.5 5.25V10.25C3.5 10.6642 3.16421 11 2.75 11ZM4 12C2.34315 12 1 13.3431 1 15V20C1 20.5564 1.15145 21.0773 1.41536 21.524L4.90901 18.0303C5.78769 17.1516 7.21231 17.1517 8.09099 18.0303L11.5846 21.524C11.8486 21.0773 12 20.5564 12 20V15C12 13.3431 10.6569 12 9 12H4ZM4 23C3.44364 23 2.92266 22.8486 2.47602 22.5846L5.96967 19.091C6.26256 18.7981 6.73744 18.7981 7.03033 19.091L10.524 22.5846C10.0773 22.8486 9.55636 23 9 23H4ZM9 16C8.44772 16 8 15.5523 8 15C8 14.4477 8.44772 14 9 14C9.55229 14 10 14.4477 10 15C10 15.5523 9.55229 16 9 16Z" fill="black"/>'
-      '</svg>',
-      width: 24,
-      height: 24,
-      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-    );
-  }
-}
 
 class ProxiesSetting extends StatelessWidget {
   const ProxiesSetting({super.key});
@@ -214,7 +197,7 @@ class ProxiesSetting extends StatelessWidget {
     return switch (style) {
       ProxiesIconStyle.standard => Info(
           label: _getTextWithProxiesIconStyle(style),
-          icon: const _FilledResizeImageIcon(),
+          iconData: FluentIcons.picture_in_picture_24_regular,
         ),
       ProxiesIconStyle.none => Info(
           label: _getTextWithProxiesIconStyle(style),
