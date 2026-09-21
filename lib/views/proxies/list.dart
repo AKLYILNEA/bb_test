@@ -616,7 +616,7 @@ class _GroupHeader extends ConsumerWidget {
                   key: ValueKey('locate_${group.name}'),
                   style: _circleButtonStyle,
                   iconSize: 19,
-                  icon: const Icon(FluentIcons.my_location_24_regular),
+                  icon: const Icon(FluentIcons.target_arrow_24_regular),
                   onPressed: onScrollToSelected,
                   tooltip: appLocalizations.locate,
                 ),
