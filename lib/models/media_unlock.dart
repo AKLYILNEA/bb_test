@@ -233,7 +233,9 @@ extension MediaPlatformExt on MediaPlatform {
     MediaPlatform.coinbase ||
     MediaPlatform.phantom ||
     MediaPlatform.kraken => false,
-    MediaPlatform.ehentai => true,
+    MediaPlatform.ehentai ||
+    MediaPlatform.tiktok ||
+    MediaPlatform.ubisoft => true,
     _ => category == MediaCategory.crypto,
   };
 

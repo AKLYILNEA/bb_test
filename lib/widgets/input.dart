@@ -323,7 +323,7 @@ class ListInputPage extends StatelessWidget {
             onPressed: () async {
               _handleAddOrEdit();
             },
-            child: const Icon(FluentIcons.add_24_filled),
+            child: const Icon(FluentIcons.add_circle_24_filled),
           ),
         ),
       ),
@@ -477,7 +477,7 @@ class MapInputPage extends StatelessWidget {
             onPressed: () async {
               _handleAddOrEdit();
             },
-            child: const Icon(FluentIcons.add_24_filled),
+            child: const Icon(FluentIcons.add_circle_24_filled),
           ),
         ),
       ),
