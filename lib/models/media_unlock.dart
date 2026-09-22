@@ -115,7 +115,6 @@ extension MediaPlatformExt on MediaPlatform {
     MediaPlatform.openrouter ||
     MediaPlatform.poe ||
     MediaPlatform.suno ||
-    MediaPlatform.cloudflare ||
     MediaPlatform.perplexity => MediaCategory.ai,
     MediaPlatform.netflix ||
     MediaPlatform.disney ||
@@ -144,6 +143,7 @@ extension MediaPlatformExt on MediaPlatform {
     MediaPlatform.wikipedia ||
     MediaPlatform.apple ||
     MediaPlatform.onetrust ||
+    MediaPlatform.cloudflare ||
     MediaPlatform.gitlab ||
     MediaPlatform.npm ||
     MediaPlatform.cdnjs ||
@@ -183,7 +183,7 @@ extension MediaPlatformExt on MediaPlatform {
     MediaPlatform.tencent => 'Tencent(CN)',
     MediaPlatform.alibaba => 'Alibaba(CN)',
     MediaPlatform.netease => 'Netease(CN)',
-    MediaPlatform.douyin => 'Douyin(CN)',
+    MediaPlatform.douyin => 'ByteDance(CN)',
     MediaPlatform.cloudflarecn => 'Cloudflare(CN)',
     MediaPlatform.reddit => 'Reddit',
     MediaPlatform.x => 'Twitter',
@@ -225,8 +225,7 @@ extension MediaPlatformExt on MediaPlatform {
     MediaPlatform.openrouter ||
     MediaPlatform.suno ||
     MediaPlatform.v2ex ||
-    MediaPlatform.unpkg ||
-    MediaPlatform.okx => true,
+    MediaPlatform.unpkg => true,
     _ => false,
   };
 

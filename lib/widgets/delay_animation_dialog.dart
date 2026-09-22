@@ -267,13 +267,15 @@ class _DelayAnimationPickerDialogState
           Container(
             height: 110,
             width: double.infinity,
-            decoration: BoxDecoration(
+            decoration: ShapeDecoration(
               color: context.colorScheme.surfaceContainerHighest
                   .withValues(alpha: 0.45),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color:
-                    context.colorScheme.outlineVariant.withValues(alpha: 0.3),
+              shape: RoundedSuperellipseBorder(
+                borderRadius: BorderRadius.circular(18),
+                side: BorderSide(
+                  color:
+                      context.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                ),
               ),
             ),
             child: Column(
@@ -324,12 +326,12 @@ class _DelayAnimationPickerDialogState
                       diameterRatio: 1.25,
                       selectionOverlay: Container(
                         margin: const EdgeInsets.symmetric(horizontal: 16),
-                        decoration: BoxDecoration(
+                        decoration: ShapeDecoration(
                           color: context.colorScheme.primary
                               .withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.symmetric(
-                            horizontal: BorderSide(
+                          shape: RoundedSuperellipseBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: BorderSide(
                               color: context.colorScheme.primary
                                   .withValues(alpha: 0.25),
                               width: 1,
@@ -348,7 +350,7 @@ class _DelayAnimationPickerDialogState
                         return Center(
                           child: Text(
                             getDelayAnimationLabel(type),
-                            style: TextStyle(
+                            style: context.textTheme.bodyMedium?.copyWith(
                               fontSize: isSelected ? 16 : 14,
                               fontWeight: isSelected
                                   ? FontWeight.w600
