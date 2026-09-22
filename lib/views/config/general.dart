@@ -467,7 +467,7 @@ class UnifiedDelayItem extends ConsumerWidget {
     );
 
     return ListItem.switchItem(
-      leading: const Icon(FluentIcons.molecule_24_regular),
+      leading: const Icon(FluentIcons.pulse_square_24_regular),
       title: Text(appLocalizations.unifiedDelay),
       subtitle: Text(appLocalizations.unifiedDelayDesc),
       delegate: SwitchDelegate(

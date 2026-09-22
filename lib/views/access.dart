@@ -358,7 +358,7 @@ class _AccessViewState extends ConsumerState<AccessView>
           _intelligentSelected();
         }
       },
-      icon: const Icon(FluentIcons.settings_24_regular),
+      icon: const Icon(FluentIcons.options_24_regular),
     );
   }
 
@@ -896,7 +896,7 @@ class _AccessControlPanelState extends ConsumerState<AccessControlPanel> {
   IconData _getIconWithAccessControlMode(AccessControlMode mode) {
     return switch (mode) {
       AccessControlMode.acceptSelected => FluentIcons.checkmark_circle_24_regular,
-      AccessControlMode.rejectSelected => FluentIcons.prohibited_24_regular,
+      AccessControlMode.rejectSelected => FluentIcons.dismiss_circle_24_regular,
     };
   }
 

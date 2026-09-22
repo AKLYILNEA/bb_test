@@ -68,13 +68,13 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
               open(offset: const Offset(0, 20));
             },
             tooltip: appLocalizations.more,
-            icon: const Icon(FluentIcons.more_vertical_24_regular),
+            icon: const Icon(FluentIcons.symbols_24_regular),
           );
         },
         popup: CommonPopupMenu(
           items: [
             PopupMenuItemData(
-              icon: FluentIcons.settings_24_regular,
+              icon: FluentIcons.style_guide_24_regular,
               label: appLocalizations.styleSetting,
               onPressed: () {
                 showSheet(
@@ -91,7 +91,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
               },
             ),
             PopupMenuItemData(
-              icon: FluentIcons.wand_24_regular,
+              icon: FluentIcons.star_emphasis_24_regular,
               label: appLocalizations.advancedSettings,
               onPressed: () {
                 showExtend(

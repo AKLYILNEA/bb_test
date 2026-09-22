@@ -42,6 +42,12 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
         ? MediaCategory.values
         : MediaCategory.values.where((c) => c != MediaCategory.china).toList();
     final categories = [null, ...availableCategories];
+    final fabTheme = Theme.of(context).floatingActionButtonTheme;
+    final fabBgColor =
+        fabTheme.backgroundColor ?? context.colorScheme.primaryContainer;
+    final fabFgColor =
+        fabTheme.foregroundColor ?? context.colorScheme.onPrimaryContainer;
+
     return SizedBox(
       height: 34,
       child: ListView.separated(
@@ -57,7 +63,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
           );
           return Material(
             color: isSelected
-                ? context.colorScheme.primary
+                ? fabBgColor
                 : context.colorScheme.surfaceContainerHigh,
             shape: shape,
             clipBehavior: Clip.antiAlias,
@@ -77,7 +83,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                   _getCategoryLabel(cat),
                   style: context.textTheme.labelMedium?.copyWith(
                     color: isSelected
-                        ? context.colorScheme.onPrimary
+                        ? fabFgColor
                         : context.colorScheme.onSurfaceVariant,
                     fontWeight:
                         isSelected ? FontWeight.w600 : FontWeight.normal,

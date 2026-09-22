@@ -292,12 +292,22 @@ class BackupAndRecovery extends ConsumerWidget {
               final recoveryStrategy = ref.watch(
                 appSettingProvider.select((state) => state.recoveryStrategy),
               );
+              final fabTheme = Theme.of(context).floatingActionButtonTheme;
+              final fabBgColor =
+                  fabTheme.backgroundColor ?? context.colorScheme.primaryContainer;
+              final fabFgColor =
+                  fabTheme.foregroundColor ?? context.colorScheme.onPrimaryContainer;
+
               return ListItem(
                 onTap: () {
                   _handleUpdateRecoveryStrategy(ref);
                 },
                 title: Text(appLocalizations.recoveryStrategy),
                 trailing: FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: fabBgColor,
+                    foregroundColor: fabFgColor,
+                  ),
                   onPressed: () {
                     _handleUpdateRecoveryStrategy(ref);
                   },

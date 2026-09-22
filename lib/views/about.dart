@@ -42,7 +42,7 @@ class AboutView extends StatelessWidget {
         _LinkGridRow(
           left: _LinkGridTile(
             title: 'Github Releases',
-            icon: FluentIcons.star_24_regular,
+            icon: FluentIcons.star_add_24_regular,
             onTap: () =>
                 globalState.openUrl('https://github.com/$repository'),
           ),
