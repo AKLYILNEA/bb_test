@@ -98,6 +98,18 @@ class CommonTargetIcon extends StatefulWidget {
 
   const CommonTargetIcon({super.key, required this.src, required this.size});
 
+  static Future<void> prefetchAll(Iterable<String> srcs) async {
+    final seen = <String>{};
+    for (final raw in srcs) {
+      final src = raw.trim();
+      if (src.isEmpty || src.getBase64 != null) continue;
+      if (!seen.add(src)) continue;
+      try {
+        await _IconFileManager.downloadFile(src);
+      } catch (_) {}
+    }
+  }
+
   @override
   State<CommonTargetIcon> createState() => _CommonTargetIconState();
 }
