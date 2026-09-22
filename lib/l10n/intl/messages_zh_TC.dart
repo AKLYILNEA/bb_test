@@ -1009,5 +1009,67 @@ class MessageLookup extends MessageLookupByLibrary {
     "addressInfo": MessageLookupByLibrary.simpleMessage("地址"),
     "traffic": MessageLookupByLibrary.simpleMessage("流量"),
     "advancedInfo": MessageLookupByLibrary.simpleMessage("進階"),
-  };
+
+    "chasingDots": MessageLookupByLibrary.simpleMessage("雙星追逐"),
+
+    "cubeGrid": MessageLookupByLibrary.simpleMessage("九宮爍影"),
+
+    "dancingSquare": MessageLookupByLibrary.simpleMessage("方塊起舞"),
+
+    "dualRing": MessageLookupByLibrary.simpleMessage("雙環迴旋"),
+
+    "fadingGrid": MessageLookupByLibrary.simpleMessage("柵格隱現"),
+
+    "hourGlass": MessageLookupByLibrary.simpleMessage("沙漏翻轉"),
+
+    "pianoWave": MessageLookupByLibrary.simpleMessage("琴鍵律動"),
+
+    "pouringHourGlassRefined": MessageLookupByLibrary.simpleMessage("玉漏凝光"),
+
+    "pulsingGrid": MessageLookupByLibrary.simpleMessage("矩陣脈動"),
+
+    "ring": MessageLookupByLibrary.simpleMessage("光環流轉"),
+
+    "ripple": MessageLookupByLibrary.simpleMessage("水波蕩漾"),
+
+    "rotatingPlain": MessageLookupByLibrary.simpleMessage("靈板翻轉"),
+
+    "spinningCircle": MessageLookupByLibrary.simpleMessage("圓盤翻轉"),
+
+    "wanderingCubes": MessageLookupByLibrary.simpleMessage("雙角巡遊"),
+
+    "waveSpinner": MessageLookupByLibrary.simpleMessage("波瀾疊轉"),
+
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("字體修復"),
+
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("使用內建字體解決顯示異常問題"),
+
+    "mediaUnlockRefreshByCategory": MessageLookupByLibrary.simpleMessage(
+      "根據當前分組狀態局部重新整理",
+    ),
+
+    "tvScanImport": MessageLookupByLibrary.simpleMessage("掃碼 / 局域網導入"),
+
+    "tvScanImportDesc": MessageLookupByLibrary.simpleMessage(
+      "手機掃碼或局域網推送設定檔至電視",
+    ),
+
+    "tvScanStep1": MessageLookupByLibrary.simpleMessage(
+      "確保手機與 TV 連接在同一 Wi-Fi 局域網",
+    ),
+
+    "tvScanStep2": MessageLookupByLibrary.simpleMessage("使用支援的相機或瀏覽器以掃描二維碼"),
+
+    "tvScanStep3": MessageLookupByLibrary.simpleMessage("在網頁中粘貼訂閱連結或上傳設定檔並推送"),
+
+    "tvScanManualUrl": MessageLookupByLibrary.simpleMessage("也可在手機瀏覽器中直接輸入："),
+
+    "tvScanWaiting": MessageLookupByLibrary.simpleMessage("等待手機推送設定檔中..."),
+
+    "tvScanSuccess": MessageLookupByLibrary.simpleMessage("設定檔推送成功，正在導入..."),
+
+    "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
+      "未檢測到可用的局域網，請檢查 Wi-Fi",
+    ),
+      };
 }

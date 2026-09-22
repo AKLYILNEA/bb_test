@@ -30,6 +30,8 @@ _AppSettingProps _$AppSettingPropsFromJson(
   mediaUnlockRefreshOnNodeChange:
       json['mediaUnlockRefreshOnNodeChange'] as bool? ?? true,
   mediaUnlockColorfulIcons: json['mediaUnlockColorfulIcons'] as bool? ?? true,
+  mediaUnlockRefreshByCategory:
+      json['mediaUnlockRefreshByCategory'] as bool? ?? true,
   onlyStatisticsProxy: json['onlyStatisticsProxy'] as bool? ?? true,
   autoLaunch: json['autoLaunch'] as bool? ?? false,
   silentLaunch: json['silentLaunch'] as bool? ?? false,
@@ -76,6 +78,7 @@ Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>
       'mediaUnlockExtraDetails': instance.mediaUnlockExtraDetails,
       'mediaUnlockRefreshOnNodeChange': instance.mediaUnlockRefreshOnNodeChange,
       'mediaUnlockColorfulIcons': instance.mediaUnlockColorfulIcons,
+      'mediaUnlockRefreshByCategory': instance.mediaUnlockRefreshByCategory,
       'onlyStatisticsProxy': instance.onlyStatisticsProxy,
       'autoLaunch': instance.autoLaunch,
       'silentLaunch': instance.silentLaunch,
@@ -151,10 +154,10 @@ const _$MediaPlatformEnumMap = {
   MediaPlatform.crunchyroll: 'crunchyroll',
   MediaPlatform.missav: 'missav',
   MediaPlatform.ehentai: 'ehentai',
-  MediaPlatform.qqnews: 'qqnews',
-  MediaPlatform.alidnsprobe: 'alidnsprobe',
+  MediaPlatform.tencent: 'tencent',
+  MediaPlatform.alibaba: 'alibaba',
   MediaPlatform.netease: 'netease',
-  MediaPlatform.bytedance: 'bytedance',
+  MediaPlatform.douyin: 'douyin',
   MediaPlatform.bilibili: 'bilibili',
   MediaPlatform.cloudflarecn: 'cloudflarecn',
   MediaPlatform.reddit: 'reddit',
@@ -246,6 +249,7 @@ _WindowProps _$WindowPropsFromJson(Map<String, dynamic> json) => _WindowProps(
   top: (json['top'] as num?)?.toDouble(),
   left: (json['left'] as num?)?.toDouble(),
   isPinned: json['isPinned'] as bool? ?? false,
+  scaleFactor: (json['scaleFactor'] as num?)?.toDouble() ?? 1.0,
 );
 
 Map<String, dynamic> _$WindowPropsToJson(_WindowProps instance) =>
@@ -255,11 +259,12 @@ Map<String, dynamic> _$WindowPropsToJson(_WindowProps instance) =>
       'top': instance.top,
       'left': instance.left,
       'isPinned': instance.isPinned,
+      'scaleFactor': instance.scaleFactor,
     };
 
 _VpnProps _$VpnPropsFromJson(Map<String, dynamic> json) => _VpnProps(
   enable: json['enable'] as bool? ?? true,
-  systemProxy: json['systemProxy'] as bool? ?? false,
+  systemProxy: json['systemProxy'] as bool? ?? true,
   allowBypass: json['allowBypass'] as bool? ?? false,
   bypassPrivateRoute: json['bypassPrivateRoute'] as bool? ?? true,
   dozeSuspend: json['dozeSuspend'] as bool? ?? true,
@@ -324,7 +329,7 @@ const _$TrayClickBehaviorEnumMap = {
 
 _NetworkProps _$NetworkPropsFromJson(Map<String, dynamic> json) =>
     _NetworkProps(
-      systemProxy: json['systemProxy'] as bool? ?? false,
+      systemProxy: json['systemProxy'] as bool? ?? true,
       bypassDomain:
           (json['bypassDomain'] as List<dynamic>?)
               ?.map((e) => e as String)
@@ -441,6 +446,26 @@ const _$DelayAnimationTypeEnumMap = {
   DelayAnimationType.fadingFour: 'fadingFour',
   DelayAnimationType.wave: 'wave',
   DelayAnimationType.doubleBounce: 'doubleBounce',
+  DelayAnimationType.chasingDots: 'chasingDots',
+  DelayAnimationType.cubeGrid: 'cubeGrid',
+  DelayAnimationType.dancingSquare: 'dancingSquare',
+  DelayAnimationType.dualRing: 'dualRing',
+  DelayAnimationType.fadingCube: 'fadingCube',
+  DelayAnimationType.fadingGrid: 'fadingGrid',
+  DelayAnimationType.foldingCube: 'foldingCube',
+  DelayAnimationType.hourGlass: 'hourGlass',
+  DelayAnimationType.pianoWave: 'pianoWave',
+  DelayAnimationType.pouringHourGlass: 'pouringHourGlass',
+  DelayAnimationType.pouringHourGlassRefined: 'pouringHourGlassRefined',
+  DelayAnimationType.pulsingGrid: 'pulsingGrid',
+  DelayAnimationType.pumpingHeart: 'pumpingHeart',
+  DelayAnimationType.ring: 'ring',
+  DelayAnimationType.ripple: 'ripple',
+  DelayAnimationType.rotatingPlain: 'rotatingPlain',
+  DelayAnimationType.spinningCircle: 'spinningCircle',
+  DelayAnimationType.squareCircle: 'squareCircle',
+  DelayAnimationType.wanderingCubes: 'wanderingCubes',
+  DelayAnimationType.waveSpinner: 'waveSpinner',
 };
 
 _TextScale _$TextScaleFromJson(Map<String, dynamic> json) => _TextScale(

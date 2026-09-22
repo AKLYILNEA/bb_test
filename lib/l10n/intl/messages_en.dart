@@ -1364,5 +1364,81 @@ class MessageLookup extends MessageLookupByLibrary {
     "addressInfo": MessageLookupByLibrary.simpleMessage("Address"),
     "traffic": MessageLookupByLibrary.simpleMessage("Traffic"),
     "advancedInfo": MessageLookupByLibrary.simpleMessage("Advanced"),
-  };
+
+    "chasingDots": MessageLookupByLibrary.simpleMessage("Chasing Dots"),
+
+    "cubeGrid": MessageLookupByLibrary.simpleMessage("Cube Grid"),
+
+    "dancingSquare": MessageLookupByLibrary.simpleMessage("Dancing Square"),
+
+    "dualRing": MessageLookupByLibrary.simpleMessage("Dual Ring"),
+
+    "fadingGrid": MessageLookupByLibrary.simpleMessage("Fading Grid"),
+
+    "hourGlass": MessageLookupByLibrary.simpleMessage("Hourglass"),
+
+    "pianoWave": MessageLookupByLibrary.simpleMessage("Piano Wave"),
+
+    "pouringHourGlassRefined": MessageLookupByLibrary.simpleMessage(
+      "Refined Hourglass",
+    ),
+
+    "pulsingGrid": MessageLookupByLibrary.simpleMessage("Pulsing Grid"),
+
+    "ring": MessageLookupByLibrary.simpleMessage("Ring"),
+
+    "ripple": MessageLookupByLibrary.simpleMessage("Ripple"),
+
+    "rotatingPlain": MessageLookupByLibrary.simpleMessage("Rotating Plain"),
+
+    "spinningCircle": MessageLookupByLibrary.simpleMessage("Spinning Circle"),
+
+    "wanderingCubes": MessageLookupByLibrary.simpleMessage("Wandering Cubes"),
+
+    "waveSpinner": MessageLookupByLibrary.simpleMessage("Wave Spinner"),
+
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("Font Fix"),
+
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage(
+      "Use built-in font to fix display issues",
+    ),
+
+    "mediaUnlockRefreshByCategory": MessageLookupByLibrary.simpleMessage(
+      "Partially refresh based on current category",
+    ),
+
+    "tvScanImport": MessageLookupByLibrary.simpleMessage("Scan / LAN Import"),
+
+    "tvScanImportDesc": MessageLookupByLibrary.simpleMessage(
+      "Scan QR or push profile to TV via LAN",
+    ),
+
+    "tvScanStep1": MessageLookupByLibrary.simpleMessage(
+      "Ensure phone and TV are on the same Wi-Fi network",
+    ),
+
+    "tvScanStep2": MessageLookupByLibrary.simpleMessage(
+      "Scan the QR code with a supported camera or browser",
+    ),
+
+    "tvScanStep3": MessageLookupByLibrary.simpleMessage(
+      "Paste subscription URL or upload profile on the webpage and push",
+    ),
+
+    "tvScanManualUrl": MessageLookupByLibrary.simpleMessage(
+      "Or enter directly in phone browser:",
+    ),
+
+    "tvScanWaiting": MessageLookupByLibrary.simpleMessage(
+      "Waiting for profile from phone...",
+    ),
+
+    "tvScanSuccess": MessageLookupByLibrary.simpleMessage(
+      "Profile received, importing...",
+    ),
+
+    "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
+      "No available LAN detected, please check Wi-Fi",
+    ),
+      };
 }

@@ -7,6 +7,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'edit_profile.dart';
+import 'tv_qr_import_dialog.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 void showAddProfileExtend() {
@@ -98,6 +99,13 @@ class AddProfileView extends StatelessWidget {
   Future<void> _toScan() async {
     if (system.isDesktop) {
       globalState.appController.addProfileFormQrCode();
+      return;
+    }
+    if (globalState.isAndroidTV) {
+      await showDialog(
+        context: context,
+        builder: (_) => const TvQrImportDialog(),
+      );
       return;
     }
     final url = await BaseNavigator.push(context, const ScanPage());

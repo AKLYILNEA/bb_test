@@ -1101,5 +1101,79 @@ class MessageLookup extends MessageLookupByLibrary {
     "addressInfo": MessageLookupByLibrary.simpleMessage("アドレス情報"),
     "traffic": MessageLookupByLibrary.simpleMessage("トラフィック"),
     "advancedInfo": MessageLookupByLibrary.simpleMessage("詳細情報"),
-  };
+
+    "chasingDots": MessageLookupByLibrary.simpleMessage("チェイシングドット"),
+
+    "cubeGrid": MessageLookupByLibrary.simpleMessage("キューブグリッド"),
+
+    "dancingSquare": MessageLookupByLibrary.simpleMessage("ダンシングスクエア"),
+
+    "dualRing": MessageLookupByLibrary.simpleMessage("デュアルリング"),
+
+    "fadingGrid": MessageLookupByLibrary.simpleMessage("フェードグリッド"),
+
+    "hourGlass": MessageLookupByLibrary.simpleMessage("アワーグラス"),
+
+    "pianoWave": MessageLookupByLibrary.simpleMessage("ピアノウェーブ"),
+
+    "pouringHourGlassRefined": MessageLookupByLibrary.simpleMessage(
+      "リファインドグラス",
+    ),
+
+    "pulsingGrid": MessageLookupByLibrary.simpleMessage("パルスグリッド"),
+
+    "ring": MessageLookupByLibrary.simpleMessage("リング"),
+
+    "ripple": MessageLookupByLibrary.simpleMessage("リップル"),
+
+    "rotatingPlain": MessageLookupByLibrary.simpleMessage("プレーンローテーション"),
+
+    "spinningCircle": MessageLookupByLibrary.simpleMessage("スピンサークル"),
+
+    "wanderingCubes": MessageLookupByLibrary.simpleMessage("ワンダリングキューブ"),
+
+    "waveSpinner": MessageLookupByLibrary.simpleMessage("ウェーブスピナー"),
+
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("フォント修復"),
+
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage(
+      "表示異常を改善するため内蔵フォントを使用",
+    ),
+
+    "mediaUnlockRefreshByCategory": MessageLookupByLibrary.simpleMessage(
+      "現在のカテゴリに基づいて部分更新",
+    ),
+
+    "tvScanImport": MessageLookupByLibrary.simpleMessage("スキャン / LANインポート"),
+
+    "tvScanImportDesc": MessageLookupByLibrary.simpleMessage(
+      "スマホでスキャンまたはLAN経由でTVに設定をプッシュ",
+    ),
+
+    "tvScanStep1": MessageLookupByLibrary.simpleMessage(
+      "スマホとTVが同じWi-Fiネットワークにあることを確認",
+    ),
+
+    "tvScanStep2": MessageLookupByLibrary.simpleMessage(
+      "対応するカメラまたはブラウザでQRコードをスキャン",
+    ),
+
+    "tvScanStep3": MessageLookupByLibrary.simpleMessage(
+      "Webページで購読URLを貼り付けまたは設定をアップロードしてプッシュ",
+    ),
+
+    "tvScanManualUrl": MessageLookupByLibrary.simpleMessage(
+      "スマホのブラウザに直接入力も可能：",
+    ),
+
+    "tvScanWaiting": MessageLookupByLibrary.simpleMessage("スマホからのプッシュを待機中..."),
+
+    "tvScanSuccess": MessageLookupByLibrary.simpleMessage(
+      "設定がプッシュされました。インポート中...",
+    ),
+
+    "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
+      "利用可能なLANが見つかりません。Wi-Fiを確認してください",
+    ),
+      };
 }

@@ -1400,5 +1400,83 @@ class MessageLookup extends MessageLookupByLibrary {
     "addressInfo": MessageLookupByLibrary.simpleMessage("اطلاعات آدرس"),
     "traffic": MessageLookupByLibrary.simpleMessage("ترافیک"),
     "advancedInfo": MessageLookupByLibrary.simpleMessage("پیشرفته"),
-  };
+
+    "chasingDots": MessageLookupByLibrary.simpleMessage("نقاط تعقیب‌کننده"),
+
+    "cubeGrid": MessageLookupByLibrary.simpleMessage("شبکه مکعب‌ها"),
+
+    "dancingSquare": MessageLookupByLibrary.simpleMessage("مربع رقصان"),
+
+    "dualRing": MessageLookupByLibrary.simpleMessage("حلقه دوتایی"),
+
+    "fadingGrid": MessageLookupByLibrary.simpleMessage("شبکه محوشونده"),
+
+    "hourGlass": MessageLookupByLibrary.simpleMessage("ساعت شنی"),
+
+    "pianoWave": MessageLookupByLibrary.simpleMessage("موج پیانو"),
+
+    "pouringHourGlassRefined": MessageLookupByLibrary.simpleMessage(
+      "ساعت شنی ظریف",
+    ),
+
+    "pulsingGrid": MessageLookupByLibrary.simpleMessage("شبکه تپنده"),
+
+    "ring": MessageLookupByLibrary.simpleMessage("حلقه"),
+
+    "ripple": MessageLookupByLibrary.simpleMessage("موج آب"),
+
+    "rotatingPlain": MessageLookupByLibrary.simpleMessage("صفحه چرخان"),
+
+    "spinningCircle": MessageLookupByLibrary.simpleMessage("دایره چرخان"),
+
+    "wanderingCubes": MessageLookupByLibrary.simpleMessage("مکعب‌های سرگردان"),
+
+    "waveSpinner": MessageLookupByLibrary.simpleMessage("چرخنده موجی"),
+
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("ترمیم فونت"),
+
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage(
+      "استفاده از فونت داخلی برای رفع مشکلات نمایش",
+    ),
+
+    "mediaUnlockRefreshByCategory": MessageLookupByLibrary.simpleMessage(
+      "تازه‌سازی جزئی بر اساس دسته‌بندی فعلی",
+    ),
+
+    "tvScanImport": MessageLookupByLibrary.simpleMessage(
+      "اسکن / وارد کردن از شبکه محلی",
+    ),
+
+    "tvScanImportDesc": MessageLookupByLibrary.simpleMessage(
+      "اسکن کد یا ارسال پروفایل به تلویزیون از شبکه محلی",
+    ),
+
+    "tvScanStep1": MessageLookupByLibrary.simpleMessage(
+      "مطمئن شوید گوشی و TV به یک شبکه Wi-Fi متصل هستند",
+    ),
+
+    "tvScanStep2": MessageLookupByLibrary.simpleMessage(
+      "کد QR را با یک دوربین یا مرورگر پشتیبانی‌شده اسکن کنید",
+    ),
+
+    "tvScanStep3": MessageLookupByLibrary.simpleMessage(
+      "لینک اشتراک را در صفحه وب جای‌گذاری کرده یا فایل پیکربندی را آپلود و ارسال کنید",
+    ),
+
+    "tvScanManualUrl": MessageLookupByLibrary.simpleMessage(
+      "یا آدرس را مستقیماً در مرورگر گوشی وارد کنید:",
+    ),
+
+    "tvScanWaiting": MessageLookupByLibrary.simpleMessage(
+      "در انتظار ارسال پروفایل از گوشی...",
+    ),
+
+    "tvScanSuccess": MessageLookupByLibrary.simpleMessage(
+      "پروفایل دریافت شد، در حال وارد کردن...",
+    ),
+
+    "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
+      "شبکه محلی در دسترس یافت نشد، لطفاً Wi-Fi را بررسی کنید",
+    ),
+      };
 }

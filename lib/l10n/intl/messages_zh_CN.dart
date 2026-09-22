@@ -995,5 +995,65 @@ class MessageLookup extends MessageLookupByLibrary {
     "addressInfo": MessageLookupByLibrary.simpleMessage("地址"),
     "traffic": MessageLookupByLibrary.simpleMessage("流量"),
     "advancedInfo": MessageLookupByLibrary.simpleMessage("高级"),
-  };
+
+    "chasingDots": MessageLookupByLibrary.simpleMessage("双星追逐"),
+
+    "cubeGrid": MessageLookupByLibrary.simpleMessage("九宫烁影"),
+
+    "dancingSquare": MessageLookupByLibrary.simpleMessage("方块起舞"),
+
+    "dualRing": MessageLookupByLibrary.simpleMessage("双环回旋"),
+
+    "fadingGrid": MessageLookupByLibrary.simpleMessage("栅格隐现"),
+
+    "hourGlass": MessageLookupByLibrary.simpleMessage("沙漏翻转"),
+
+    "pianoWave": MessageLookupByLibrary.simpleMessage("琴键律动"),
+
+    "pouringHourGlassRefined": MessageLookupByLibrary.simpleMessage("玉漏凝光"),
+
+    "pulsingGrid": MessageLookupByLibrary.simpleMessage("矩阵脉动"),
+
+    "ring": MessageLookupByLibrary.simpleMessage("光环流转"),
+
+    "ripple": MessageLookupByLibrary.simpleMessage("水波荡漾"),
+
+    "rotatingPlain": MessageLookupByLibrary.simpleMessage("灵板翻转"),
+
+    "spinningCircle": MessageLookupByLibrary.simpleMessage("圆盘翻转"),
+
+    "wanderingCubes": MessageLookupByLibrary.simpleMessage("双角巡游"),
+
+    "waveSpinner": MessageLookupByLibrary.simpleMessage("波澜叠转"),
+
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("字体修复"),
+
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("使用内置字体解决显示异常问题"),
+
+    "mediaUnlockRefreshByCategory": MessageLookupByLibrary.simpleMessage(
+      "根据当前分组状态局部刷新",
+    ),
+
+    "tvScanImport": MessageLookupByLibrary.simpleMessage("扫码 / 局域网导入"),
+
+    "tvScanImportDesc": MessageLookupByLibrary.simpleMessage("手机扫码或局域网推送配置至电视"),
+
+    "tvScanStep1": MessageLookupByLibrary.simpleMessage(
+      "确保手机与 TV 连接在同一 Wi-Fi 局域网",
+    ),
+
+    "tvScanStep2": MessageLookupByLibrary.simpleMessage("使用支持的相机或浏览器以扫描二维码"),
+
+    "tvScanStep3": MessageLookupByLibrary.simpleMessage("在网页中粘贴订阅链接或上传配置并推送"),
+
+    "tvScanManualUrl": MessageLookupByLibrary.simpleMessage("手机浏览器也可直接访问："),
+
+    "tvScanWaiting": MessageLookupByLibrary.simpleMessage("等待手机推送配置中..."),
+
+    "tvScanSuccess": MessageLookupByLibrary.simpleMessage("配置推送成功，正在导入..."),
+
+    "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
+      "未检测到可用的局域网，请检查 Wi-Fi",
+    ),
+      };
 }

@@ -1421,5 +1421,85 @@ class MessageLookup extends MessageLookupByLibrary {
     "addressInfo": MessageLookupByLibrary.simpleMessage("Адресная информация"),
     "traffic": MessageLookupByLibrary.simpleMessage("Трафик"),
     "advancedInfo": MessageLookupByLibrary.simpleMessage("Дополнительно"),
-  };
+
+    "chasingDots": MessageLookupByLibrary.simpleMessage("Догоняющие точки"),
+
+    "cubeGrid": MessageLookupByLibrary.simpleMessage("Сетка кубов"),
+
+    "dancingSquare": MessageLookupByLibrary.simpleMessage("Танцующий квадрат"),
+
+    "dualRing": MessageLookupByLibrary.simpleMessage("Двойное кольцо"),
+
+    "fadingGrid": MessageLookupByLibrary.simpleMessage("Затухающая сетка"),
+
+    "hourGlass": MessageLookupByLibrary.simpleMessage("Песочные часы"),
+
+    "pianoWave": MessageLookupByLibrary.simpleMessage("Фортепианная волна"),
+
+    "pouringHourGlassRefined": MessageLookupByLibrary.simpleMessage(
+      "Точные песочные часы",
+    ),
+
+    "pulsingGrid": MessageLookupByLibrary.simpleMessage("Пульсирующая сетка"),
+
+    "ring": MessageLookupByLibrary.simpleMessage("Кольцо"),
+
+    "ripple": MessageLookupByLibrary.simpleMessage("Рябь"),
+
+    "rotatingPlain": MessageLookupByLibrary.simpleMessage(
+      "Вращающаяся плоскость",
+    ),
+
+    "spinningCircle": MessageLookupByLibrary.simpleMessage("Вращающийся диск"),
+
+    "wanderingCubes": MessageLookupByLibrary.simpleMessage("Блуждающие кубы"),
+
+    "waveSpinner": MessageLookupByLibrary.simpleMessage("Волновой спиннер"),
+
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("Исправление шрифта"),
+
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage(
+      "Встроенный шрифт для исправления отображения",
+    ),
+
+    "mediaUnlockRefreshByCategory": MessageLookupByLibrary.simpleMessage(
+      "Частичное обновление по текущей категории",
+    ),
+
+    "tvScanImport": MessageLookupByLibrary.simpleMessage(
+      "Сканирование / Импорт по LAN",
+    ),
+
+    "tvScanImportDesc": MessageLookupByLibrary.simpleMessage(
+      "Сканируйте QR или отправьте профиль на ТВ через LAN",
+    ),
+
+    "tvScanStep1": MessageLookupByLibrary.simpleMessage(
+      "Убедитесь, что телефон и TV подключены к одной сети Wi-Fi",
+    ),
+
+    "tvScanStep2": MessageLookupByLibrary.simpleMessage(
+      "Отсканируйте QR-код поддерживаемой камерой или браузером",
+    ),
+
+    "tvScanStep3": MessageLookupByLibrary.simpleMessage(
+      "Вставьте URL подписки или загрузите конфигурацию на веб-странице и отправьте",
+    ),
+
+    "tvScanManualUrl": MessageLookupByLibrary.simpleMessage(
+      "Или введите адрес в браузере телефона:",
+    ),
+
+    "tvScanWaiting": MessageLookupByLibrary.simpleMessage(
+      "Ожидание отправки профиля с телефона...",
+    ),
+
+    "tvScanSuccess": MessageLookupByLibrary.simpleMessage(
+      "Профиль получен, выполняется импорт...",
+    ),
+
+    "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
+      "Доступная локальная сеть не найдена, проверьте Wi-Fi",
+    ),
+      };
 }

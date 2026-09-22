@@ -8,8 +8,6 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:emoji_regex/emoji_regex.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 final proxyIconProvider = Provider.family<String, String>((ref, proxyName) {
@@ -95,8 +93,8 @@ class ProxyCard extends StatelessWidget {
             return SizedBox(
               height: measure.labelSmallHeight,
               width: measure.labelSmallHeight,
-              child: buildDelayAnimationWidget(
-                delayAnimation,
+              child: DelayAnimation(
+                type: delayAnimation,
                 size: measure.labelSmallHeight,
                 color: context.colorScheme.primary,
               ),
@@ -394,83 +392,4 @@ class _ProxyComputedMarkIcon extends StatelessWidget {
       ),
     );
   }
-}
-
-Widget buildDelayAnimationWidget(
-  DelayAnimationType animationType, {
-  double size = 16.0,
-  required Color color,
-}) {
-  return switch (animationType) {
-    DelayAnimationType.none => SpinKitFadingCircle(
-        color: color,
-        size: size,
-      ),
-    DelayAnimationType.fadingCube => SpinKitFadingCube(
-        color: color,
-        size: size,
-      ),
-    DelayAnimationType.foldingCube => SpinKitFoldingCube(
-        color: color,
-        size: size,
-      ),
-    DelayAnimationType.pumpingHeart => SpinKitPumpingHeart(
-        color: color,
-        size: size,
-      ),
-    DelayAnimationType.pouringHourGlass => SpinKitPouringHourGlass(
-        color: color,
-        size: size,
-      ),
-    DelayAnimationType.squareCircle => SpinKitSquareCircle(
-        color: color,
-        size: size,
-      ),
-    DelayAnimationType.threeRotatingDots =>
-      LoadingAnimationWidget.threeRotatingDots(
-        color: color,
-        size: size,
-      ),
-    DelayAnimationType.fourRotatingDots =>
-      LoadingAnimationWidget.fourRotatingDots(
-        color: color,
-        size: size,
-      ),
-    DelayAnimationType.staggeredDotsWave =>
-      LoadingAnimationWidget.staggeredDotsWave(
-        color: color,
-        size: size,
-      ),
-    DelayAnimationType.dotsTriangle => LoadingAnimationWidget.dotsTriangle(
-        color: color,
-        size: size,
-      ),
-    DelayAnimationType.rotatingCircle => SpinKitRotatingCircle(
-        color: color,
-        size: size,
-      ),
-    DelayAnimationType.pulse => SpinKitPulse(color: color, size: size),
-    DelayAnimationType.spinningLines => SpinKitSpinningLines(
-        color: color,
-        size: size,
-      ),
-    DelayAnimationType.threeInOut => SpinKitThreeInOut(
-        color: color,
-        size: size,
-      ),
-    DelayAnimationType.threeBounce => SpinKitThreeBounce(
-        color: color,
-        size: size,
-      ),
-    DelayAnimationType.circle => SpinKitCircle(color: color, size: size),
-    DelayAnimationType.fadingFour => SpinKitFadingFour(
-        color: color,
-        size: size,
-      ),
-    DelayAnimationType.wave => SpinKitWave(color: color, size: size),
-    DelayAnimationType.doubleBounce => SpinKitDoubleBounce(
-        color: color,
-        size: size,
-      ),
-  };
 }

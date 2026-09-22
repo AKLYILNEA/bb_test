@@ -28,7 +28,6 @@ import 'package:yaml/yaml.dart';
 
 import 'common/archive.dart' show restoreBackupFiles;
 import 'common/common.dart';
-import 'common/flclash_database_extractor.dart';
 import 'models/models.dart';
 import 'views/profiles/override_profile.dart';
 
@@ -220,7 +219,6 @@ class AppController {
             return;
           }
           await globalState.handleStart([updateRunTime, updateTraffic]);
-          await updateProviders();
           if (!res.isError) {
             Future.microtask(() async {
               try {
@@ -236,7 +234,6 @@ class AppController {
         } catch (e) {
           commonPrint.log('FastStart macOS auth error: $e');
           await globalState.handleStart([updateRunTime, updateTraffic]);
-          await updateProviders();
           _backgroundLoad();
         }
         _scheduleCheckIpRefresh();
@@ -244,7 +241,6 @@ class AppController {
       }
 
       await globalState.handleStart([updateRunTime, updateTraffic]);
-      await updateProviders();
 
       Future.microtask(() async {
         try {
@@ -279,7 +275,6 @@ class AppController {
 
     _scheduleCheckIpRefresh();
 
-    await updateProviders();
     _backgroundLoad();
   }
 
@@ -295,6 +290,10 @@ class AppController {
 
     Future.microtask(() async {
       try {
+        await updateProviders();
+        if (version != _backgroundLoadVersion) return;
+        if (generation != _coreGeneration) return;
+
         List<Group> groups = [];
         for (var attempt = 0; attempt < 3; attempt++) {
           if (version != _backgroundLoadVersion) return;
@@ -1008,7 +1007,7 @@ class AppController {
       ChangeProxyParams(groupName: groupName, proxyName: proxyName),
     );
     if (_ref.read(appSettingProvider).closeConnections) {
-      clashCore.closeConnections();
+      await clashCore.closeConnections();
     }
     addCheckIp();
   }
@@ -1109,9 +1108,7 @@ class AppController {
     commonPrint.log('clear preferences');
     globalState.config = Config(
       themeProps: defaultThemeProps,
-      networkProps: defaultNetworkProps.copyWith(
-        systemProxy: system.isDesktop,
-      ),
+      networkProps: defaultNetworkProps,
     );
   }
 
@@ -1193,9 +1190,12 @@ class AppController {
     );
     if (res == true) {
       final file = File(await appPath.sharedPreferencesPath);
-      final isExists = await file.exists();
-      if (isExists) {
+      if (await file.exists()) {
         await file.delete();
+      }
+      final configFile = File(await appPath.appConfigPath);
+      if (await configFile.exists()) {
+        await configFile.delete();
       }
     }
     await handleExit();
@@ -2058,10 +2058,35 @@ class AppController {
       json.decode(utf8.decode(configContent)),
     );
 
+    final recoveryStrategy = _ref.read(
+      appSettingProvider.select((state) => state.recoveryStrategy),
+    );
+    if (recoveryStrategy == RecoveryStrategy.override) {
+      await _cleanProfilesDirForOverride();
+    }
+
     await restoreBackupFiles(profiles, homeDirPath);
 
-    // Apply recovery logic
     _recovery(tempConfig, recoveryOption);
+    await savePreferences();
+  }
+
+  Future<void> _cleanProfilesDirForOverride() async {
+    try {
+      final profilesDirPath = await appPath.profilesPath;
+      final dir = Directory(profilesDirPath);
+      if (await dir.exists()) {
+        await for (final entity in dir.list(followLinks: false)) {
+          try {
+            await entity.delete(recursive: true);
+          } catch (e) {
+            commonPrint.log('Delete profile entity failed: $e');
+          }
+        }
+      }
+    } catch (e) {
+      commonPrint.log('Clean profiles dir for override failed: $e');
+    }
   }
 
   /// Restore legacy
@@ -2097,88 +2122,47 @@ class AppController {
       json.decode(utf8.decode(configContent)),
     );
 
+    final recoveryStrategy = _ref.read(
+      appSettingProvider.select((state) => state.recoveryStrategy),
+    );
+    if (recoveryStrategy == RecoveryStrategy.override) {
+      await _cleanProfilesDirForOverride();
+    }
+
     await restoreBackupFiles(profileFiles, homeDirPath);
 
-    // Extract profiles from backup
     List<Profile> profiles = [];
-    bool extractedFromDatabase = false;
 
-    // 1. Try SQLite database first (FlClash backup)
-    final dbFile = archive.files.firstWhereOrNull(
-      (file) => file.name.endsWith('database.sqlite'),
-    );
+    if (backupConfig.profiles.isNotEmpty) {
+      profiles = backupConfig.profiles;
+    } else {
+      for (final profileFile in profileFiles) {
+        final fileName = profileFile.name.split('/').last;
+        if (fileName.endsWith('.yaml') || fileName.endsWith('.yml')) {
+          final id = fileName.replaceAll(RegExp(r'\.(yaml|yml)$'), '');
+          final label = await _extractLabelFromYaml(profileFile) ?? id;
 
-    if (dbFile != null && dbFile.content.isNotEmpty) {
-      try {
-        // Save database temporarily
-        final tempDbPath = join(await appPath.tempPath, 'temp_flclash.db');
-        final tempDb = File(tempDbPath);
-        await tempDb.writeAsBytes(dbFile.content);
-
-        // Extract profiles from database
-        profiles = await FlClashDatabaseExtractor.extractProfiles(tempDbPath);
-        extractedFromDatabase = true;
-
-        // Clean up temp file
-        if (await tempDb.exists()) {
-          await tempDb.delete();
-        }
-
-        commonPrint.log(
-          'Extracted ${profiles.length} profiles from FlClash database',
-        );
-      } catch (e) {
-        commonPrint.log(
-          'Failed to extract from database, fallback to file names: $e',
-        );
-        profiles = [];
-        extractedFromDatabase = false;
-      }
-    }
-
-    // 2. Fallback if database extraction failed
-    if (profiles.isEmpty) {
-      // Get from config.json
-      if (backupConfig.profiles.isNotEmpty) {
-        profiles = backupConfig.profiles;
-      } else {
-        // Extract ID from profile file names (FlClash mode)
-        for (final profileFile in profileFiles) {
-          final fileName = profileFile.name.split('/').last;
-          if (fileName.endsWith('.yaml') || fileName.endsWith('.yml')) {
-            final id = fileName.replaceAll(RegExp(r'\.(yaml|yml)$'), '');
-
-            // Try to extract friendly label from YAML
-            final label = await _extractLabelFromYaml(profileFile) ?? id;
-
-            // Create basic Profile object
-            profiles.add(
-              Profile(
-                id: id,
-                label: label,
-                autoUpdateDuration: defaultUpdateDuration,
-                url: '', // Mark empty, user needs to add
-              ),
-            );
-          }
+          profiles.add(
+            Profile(
+              id: id,
+              label: label,
+              autoUpdateDuration: defaultUpdateDuration,
+              url: '',
+            ),
+          );
         }
       }
     }
 
-    // Create limited recovery config (subscriptions only)
     Config limitedConfig = globalState.config.copyWith(profiles: profiles);
 
-    // Android: also restore app list
     if (system.isAndroid) {
-      // FlClash uses accessControlProps instead of accessControl
       final vpnProps = backupConfig.vpnProps;
       AccessControl? accessControl;
 
-      // Try to get from vpnProps.accessControl
       try {
         accessControl = vpnProps.accessControl;
       } catch (_) {
-        // Fallback: try accessControlProps from raw JSON
         try {
           final configJson = json.decode(utf8.decode(configFile.content));
           final vpnPropsJson = configJson['vpnProps'];
@@ -2200,11 +2184,10 @@ class AppController {
       }
     }
 
-    // Apply limited recovery
     _recoveryLimited(limitedConfig, recoveryOption);
+    await savePreferences();
 
-    // Show recovery result message
-    _showRecoveryResultMessage(profiles, extractedFromDatabase);
+    _showRecoveryResultMessage(profiles);
   }
 
   /// Extract label
@@ -2244,19 +2227,13 @@ class AppController {
   }
 
   /// Show results
-  void _showRecoveryResultMessage(
-    List<Profile> profiles,
-    bool extractedFromDatabase,
-  ) {
+  void _showRecoveryResultMessage(List<Profile> profiles) {
     if (profiles.isEmpty) return;
 
     final hasEmptyUrl = profiles.any((p) => p.url.isEmpty);
 
     String message;
-    if (extractedFromDatabase) {
-      // Successfully extracted from database
-      message = 'Restored ${profiles.length} subscriptions with URLs.';
-    } else if (hasEmptyUrl) {
+    if (hasEmptyUrl) {
       // Partial recovery, missing URLs
       message =
           'Restored ${profiles.length} subscriptions.\n\n'

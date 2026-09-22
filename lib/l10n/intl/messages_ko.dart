@@ -1111,5 +1111,79 @@ class MessageLookup extends MessageLookupByLibrary {
     "addressInfo": MessageLookupByLibrary.simpleMessage("주소 정보"),
     "traffic": MessageLookupByLibrary.simpleMessage("트래픽"),
     "advancedInfo": MessageLookupByLibrary.simpleMessage("고급 정보"),
-  };
+
+    "chasingDots": MessageLookupByLibrary.simpleMessage("체이싱 도트"),
+
+    "cubeGrid": MessageLookupByLibrary.simpleMessage("큐브 그리드"),
+
+    "dancingSquare": MessageLookupByLibrary.simpleMessage("댄싱 스퀘어"),
+
+    "dualRing": MessageLookupByLibrary.simpleMessage("듀얼 링"),
+
+    "fadingGrid": MessageLookupByLibrary.simpleMessage("페이딩 그리드"),
+
+    "hourGlass": MessageLookupByLibrary.simpleMessage("모래시계"),
+
+    "pianoWave": MessageLookupByLibrary.simpleMessage("피아노 웨이브"),
+
+    "pouringHourGlassRefined": MessageLookupByLibrary.simpleMessage("정밀 모래시계"),
+
+    "pulsingGrid": MessageLookupByLibrary.simpleMessage("펄싱 그리드"),
+
+    "ring": MessageLookupByLibrary.simpleMessage("링"),
+
+    "ripple": MessageLookupByLibrary.simpleMessage("물결 리플"),
+
+    "rotatingPlain": MessageLookupByLibrary.simpleMessage("로테이팅 플레인"),
+
+    "spinningCircle": MessageLookupByLibrary.simpleMessage("스피닝 서클"),
+
+    "wanderingCubes": MessageLookupByLibrary.simpleMessage("원더링 큐브"),
+
+    "waveSpinner": MessageLookupByLibrary.simpleMessage("웨이브 스피너"),
+
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("글꼴 복구"),
+
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage(
+      "표시 이상 해결을 위해 내장 글꼴 사용",
+    ),
+
+    "mediaUnlockRefreshByCategory": MessageLookupByLibrary.simpleMessage(
+      "현재 카테고리를 기반으로 부분 새로고침",
+    ),
+
+    "tvScanImport": MessageLookupByLibrary.simpleMessage("스캔 / LAN 가져오기"),
+
+    "tvScanImportDesc": MessageLookupByLibrary.simpleMessage(
+      "스마트폰으로 스캔하거나 LAN을 통해 TV로 프로필 푸시",
+    ),
+
+    "tvScanStep1": MessageLookupByLibrary.simpleMessage(
+      "스마트폰과 TV가 동일한 Wi-Fi 네트워크에 연결되어 있는지 확인",
+    ),
+
+    "tvScanStep2": MessageLookupByLibrary.simpleMessage(
+      "지원되는 카메라 또는 브라우저로 QR 코드를 스캔하세요",
+    ),
+
+    "tvScanStep3": MessageLookupByLibrary.simpleMessage(
+      "웹페이지에서 구독 링크를 붙여넣거나 프로필을 업로드하여 푸시하세요",
+    ),
+
+    "tvScanManualUrl": MessageLookupByLibrary.simpleMessage(
+      "스마트폰 브라우저에 직접 입력할 수도 있습니다:",
+    ),
+
+    "tvScanWaiting": MessageLookupByLibrary.simpleMessage(
+      "스마트폰에서 프로필 푸시 대기 중...",
+    ),
+
+    "tvScanSuccess": MessageLookupByLibrary.simpleMessage(
+      "프로필이 푸시되었습니다. 가져오는 중...",
+    ),
+
+    "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
+      "사용 가능한 LAN을 찾을 수 없습니다. Wi-Fi를 확인하세요",
+    ),
+      };
 }

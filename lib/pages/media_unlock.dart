@@ -366,6 +366,18 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                 globalState.appController.savePreferencesDebounce();
               }
 
+              final divider = Divider(
+                height: 1,
+                thickness: 1,
+                color: context.colorScheme.outlineVariant.withValues(
+                  alpha: context.colorScheme.brightness == Brightness.light
+                      ? 0.6
+                      : 0.45,
+                ),
+                indent: 16,
+                endIndent: 16,
+              );
+
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -380,6 +392,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                       },
                     ),
                   ),
+                  divider,
                   ListItem.switchItem(
                     title: Text(appLocalizations.mediaUnlockRefreshOnNodeChange),
                     delegate: SwitchDelegate(
@@ -391,6 +404,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                       },
                     ),
                   ),
+                  divider,
                   ListItem.switchItem(
                     title: Text(appLocalizations.mediaUnlockColorfulIcons),
                     delegate: SwitchDelegate(
@@ -398,6 +412,18 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                       onChanged: (value) {
                         updateSetting(
                           (s) => s.copyWith(mediaUnlockColorfulIcons: value),
+                        );
+                      },
+                    ),
+                  ),
+                  divider,
+                  ListItem.switchItem(
+                    title: Text(appLocalizations.mediaUnlockRefreshByCategory),
+                    delegate: SwitchDelegate(
+                      value: setting.mediaUnlockRefreshByCategory,
+                      onChanged: (value) {
+                        updateSetting(
+                          (s) => s.copyWith(mediaUnlockRefreshByCategory: value),
                         );
                       },
                     ),
@@ -558,7 +584,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
             child: _buildPlatformIcon(
               platform,
               status: status,
-              size: 20,
+              size: 25,
             ),
           ),
           const SizedBox(width: 12),
@@ -773,8 +799,13 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
   @override
   Widget build(BuildContext context) {
     final isChinese = Localizations.localeOf(context).languageCode == 'zh';
-    final showExtraDetails = ref.watch(
-      appSettingProvider.select((state) => state.mediaUnlockExtraDetails),
+    final (showExtraDetails, refreshByCategory) = ref.watch(
+      appSettingProvider.select(
+        (state) => (
+          state.mediaUnlockExtraDetails,
+          state.mediaUnlockRefreshByCategory,
+        ),
+      ),
     );
 
     return ValueListenableBuilder<MediaUnlockState>(
@@ -801,11 +832,16 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                 .where((p) => p.category == effectiveCategory)
                 .toList();
 
+        final isCategoryLoading = refreshByCategory
+            ? mediaUnlockState.isBatchChecking(displayedPlatforms)
+            : mediaUnlockState.isBatchChecking();
+
         for (final p in displayedPlatforms) {
           final status = state.results[p]?.status;
           if (status == MediaUnlockStatus.unlocked) {
             unlockedList.add(p);
-          } else if (status == MediaUnlockStatus.blocked) {
+          } else if (status == MediaUnlockStatus.blocked ||
+              status == MediaUnlockStatus.failed) {
             blockedList.add(p);
           } else {
             otherList.add(p);
@@ -822,13 +858,17 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
               onPressed: _showPinnedSettingsDialog,
             ),
             IconButton(
-              onPressed: state.isLoading
+              onPressed: isCategoryLoading
                   ? null
                   : () {
-                      mediaUnlockState.checkAll(force: true);
+                      mediaUnlockState.checkAll(
+                        force: true,
+                        platforms:
+                            refreshByCategory ? displayedPlatforms : null,
+                      );
                     },
               tooltip: appLocalizations.retry,
-              icon: state.isLoading
+              icon: isCategoryLoading
                   ? SizedBox(
                       width: 16,
                       height: 16,

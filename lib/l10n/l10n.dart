@@ -2451,15 +2451,6 @@ class AppLocalizations {
   }
 
   /// `Fading Circle`
-  String get fadingCircle {
-    return Intl.message(
-      'Fading Circle',
-      name: 'fadingCircle',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Fading Four`
   String get fadingFour {
     return Intl.message('Fading Four', name: 'fadingFour', desc: '', args: []);
@@ -6295,5 +6286,207 @@ class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {
       }
     }
     return false;
+  }
+  String get chasingDots {
+    return Intl.message(
+      'Chasing Dots',
+      name: 'chasingDots',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get cubeGrid {
+    return Intl.message('Cube Grid', name: 'cubeGrid', desc: '', args: []);
+  }
+
+  String get dancingSquare {
+    return Intl.message(
+      'Dancing Square',
+      name: 'dancingSquare',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get dualRing {
+    return Intl.message('Dual Ring', name: 'dualRing', desc: '', args: []);
+  }
+
+  String get fadingGrid {
+    return Intl.message('Fading Grid', name: 'fadingGrid', desc: '', args: []);
+  }
+
+  String get hourGlass {
+    return Intl.message('Hourglass', name: 'hourGlass', desc: '', args: []);
+  }
+
+  String get pianoWave {
+    return Intl.message('Piano Wave', name: 'pianoWave', desc: '', args: []);
+  }
+
+  String get pouringHourGlassRefined {
+    return Intl.message(
+      'Refined Hourglass',
+      name: 'pouringHourGlassRefined',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get pulsingGrid {
+    return Intl.message(
+      'Pulsing Grid',
+      name: 'pulsingGrid',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get ring {
+    return Intl.message('Ring', name: 'ring', desc: '', args: []);
+  }
+
+  String get ripple {
+    return Intl.message('Ripple', name: 'ripple', desc: '', args: []);
+  }
+
+  String get rotatingPlain {
+    return Intl.message(
+      'Rotating Plain',
+      name: 'rotatingPlain',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get spinningCircle {
+    return Intl.message(
+      'Spinning Circle',
+      name: 'spinningCircle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get wanderingCubes {
+    return Intl.message(
+      'Wandering Cubes',
+      name: 'wanderingCubes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get waveSpinner {
+    return Intl.message(
+      'Wave Spinner',
+      name: 'waveSpinner',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get harmonyFont {
+    return Intl.message('Font Fix', name: 'harmonyFont', desc: '', args: []);
+  }
+
+  String get harmonyFontDesc {
+    return Intl.message(
+      'Use built-in font to fix display issues',
+      name: 'harmonyFontDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get mediaUnlockRefreshByCategory {
+    return Intl.message(
+      'Partially refresh based on current category',
+      name: 'mediaUnlockRefreshByCategory',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get tvScanImport {
+    return Intl.message(
+      'Scan / LAN Import',
+      name: 'tvScanImport',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get tvScanImportDesc {
+    return Intl.message(
+      'Scan QR or push profile to TV via LAN',
+      name: 'tvScanImportDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get tvScanStep1 {
+    return Intl.message(
+      'Ensure phone and TV are on the same Wi-Fi network',
+      name: 'tvScanStep1',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get tvScanStep2 {
+    return Intl.message(
+      'Scan the QR code with a supported camera or browser',
+      name: 'tvScanStep2',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get tvScanStep3 {
+    return Intl.message(
+      'Paste subscription URL or upload profile on the webpage and push',
+      name: 'tvScanStep3',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get tvScanManualUrl {
+    return Intl.message(
+      'Or enter directly in phone browser:',
+      name: 'tvScanManualUrl',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get tvScanWaiting {
+    return Intl.message(
+      'Waiting for profile from phone...',
+      name: 'tvScanWaiting',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get tvScanSuccess {
+    return Intl.message(
+      'Profile received, importing...',
+      name: 'tvScanSuccess',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get tvScanNoNetwork {
+    return Intl.message(
+      'No available LAN detected, please check Wi-Fi',
+      name: 'tvScanNoNetwork',
+      desc: '',
+      args: [],
+    );
   }
 }

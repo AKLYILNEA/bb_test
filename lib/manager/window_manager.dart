@@ -66,6 +66,7 @@ class _WindowContainerState extends ConsumerState<WindowManager>
               height: bounds.height,
               left: bounds.left,
               top: bounds.top,
+              scaleFactor: windowManager.getDevicePixelRatio(),
             ),
           );
     });
