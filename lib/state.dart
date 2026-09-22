@@ -1662,9 +1662,6 @@ class MediaUnlockStateNotifier {
             : state.value.isLoading,
         testingPlatforms: nextTesting,
       );
-    } finally {
-      throttleTimer?.cancel();
-      _batchTestingPlatforms.removeAll(targetPlatforms);
     }
   }
 
