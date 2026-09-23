@@ -289,6 +289,11 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
     final primaryColors = [null, ...vm4.b];
     final schemeVariant = vm4.c;
     final isEquals = vm4.d;
+    final fabTheme = Theme.of(context).floatingActionButtonTheme;
+    final fabBgColor =
+        fabTheme.backgroundColor ?? context.colorScheme.primaryContainer;
+    final fabFgColor =
+        fabTheme.foregroundColor ?? context.colorScheme.onPrimaryContainer;
 
     return CommonPopScope(
       onPop: () {
@@ -305,13 +310,21 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
         actions: genActions([
           if (_removablePrimaryColor == null)
             FilledButton(
-              style: ButtonStyle(visualDensity: VisualDensity.compact),
+              style: FilledButton.styleFrom(
+                backgroundColor: fabBgColor,
+                foregroundColor: fabFgColor,
+                visualDensity: VisualDensity.compact,
+              ),
               onPressed: _handleChangeSchemeVariant,
               child: Text(Intl.message('${schemeVariant.name}Scheme')),
             ),
           if (_removablePrimaryColor != null)
             FilledButton(
-              style: ButtonStyle(visualDensity: VisualDensity.compact),
+              style: FilledButton.styleFrom(
+                backgroundColor: fabBgColor,
+                foregroundColor: fabFgColor,
+                visualDensity: VisualDensity.compact,
+              ),
               onPressed: () {
                 setState(() {
                   _removablePrimaryColor = null;

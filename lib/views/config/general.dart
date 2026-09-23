@@ -524,7 +524,7 @@ class TcpConcurrentItem extends ConsumerWidget {
       patchClashConfigProvider.select((state) => state.tcpConcurrent),
     );
     return ListItem.switchItem(
-      leading: const Icon(FluentIcons.iot_24_regular),
+      leading: const Icon(FluentIcons.pivot_24_regular),
       title: Text(appLocalizations.tcpConcurrent),
       subtitle: Text(appLocalizations.tcpConcurrentDesc),
       delegate: SwitchDelegate(

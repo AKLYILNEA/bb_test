@@ -39,7 +39,10 @@ class Navigation {
             ProfilesView(key: const GlobalObjectKey(PageLabel.profiles)),
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.document_one_page_24_filled),
+        icon: const RotatedBox(
+          quarterTurns: 2,
+          child: Icon(FluentIcons.timeline_24_filled),
+        ),
         label: PageLabel.requests,
         builder: (_) =>
             RequestsView(key: const GlobalObjectKey(PageLabel.requests)),
@@ -47,7 +50,7 @@ class Navigation {
         modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.preview_link_24_filled),
+        icon: const Icon(FluentIcons.iot_24_filled),
         label: PageLabel.connections,
         builder: (_) =>
             ConnectionsView(key: const GlobalObjectKey(PageLabel.connections)),
