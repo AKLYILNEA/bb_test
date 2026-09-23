@@ -73,7 +73,7 @@ class CommonExpandIcon extends StatelessWidget {
       turns: expand ? 0.5 : 0.0,
       duration: const Duration(milliseconds: 200),
       curve: Curves.fastOutSlowIn,
-      child: const Icon(FluentIcons.caret_down_24_regular),
+      child: const Icon(FluentIcons.caret_down_24_filled),
     );
   }
 }
