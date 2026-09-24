@@ -7,6 +7,7 @@ import 'package:bett_box/manager/window_manager.dart';
 import 'package:bett_box/plugins/app.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
+import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -386,13 +387,34 @@ class AppSidebarContainer extends ConsumerWidget {
                                                   .onSurfaceVariant,
                                             ),
                                         destinations: navigationItems
+                                            .asMap()
+                                            .entries
                                             .map(
-                                              (e) => NavigationRailDestination(
-                                                icon: e.icon,
-                                                label: Text(
-                                                  e.label.localizedName,
-                                                ),
-                                              ),
+                                              (entry) {
+                                                final index = entry.key;
+                                                final e = entry.value;
+                                                final isSelected =
+                                                    currentIndex == index;
+                                                return NavigationRailDestination(
+                                                  icon: AnimatedNavIcon(
+                                                    regularIcon:
+                                                        e.label.regularNavIcon,
+                                                    filledIcon:
+                                                        e.label.filledNavIcon,
+                                                    selected: isSelected,
+                                                    color: isSelected
+                                                        ? context
+                                                            .colorScheme
+                                                            .primary
+                                                        : context
+                                                            .colorScheme
+                                                            .onSurfaceVariant,
+                                                  ),
+                                                  label: Text(
+                                                    e.label.localizedName,
+                                                  ),
+                                                );
+                                              },
                                             )
                                             .toList(),
                                         onDestinationSelected: (index) {

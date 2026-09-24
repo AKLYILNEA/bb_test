@@ -17,13 +17,13 @@ class Navigation {
     return [
       NavigationItem(
         keep: false,
-        icon: const Icon(FluentIcons.home_24_filled),
+        icon: const Icon(FluentIcons.home_24_regular),
         label: PageLabel.dashboard,
         builder: (_) =>
             DashboardView(key: const GlobalObjectKey(PageLabel.dashboard)),
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.globe_24_filled),
+        icon: const Icon(FluentIcons.globe_24_regular),
         label: PageLabel.proxies,
         builder: (_) => ProviderScope(
           overrides: [queryProvider.overrideWith(() => Query())],
@@ -34,13 +34,13 @@ class Navigation {
             : [],
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.archive_24_filled),
+        icon: const Icon(FluentIcons.archive_24_regular),
         label: PageLabel.profiles,
         builder: (_) =>
             ProfilesView(key: const GlobalObjectKey(PageLabel.profiles)),
       ),
       NavigationItem(
-        icon: const Icon(IconsExt.calendarAgendaClock),
+        icon: const Icon(FluentIcons.calendar_agenda_24_regular),
         label: PageLabel.requests,
         builder: (_) =>
             RequestsView(key: const GlobalObjectKey(PageLabel.requests)),
@@ -48,7 +48,7 @@ class Navigation {
         modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.iot_24_filled),
+        icon: const Icon(FluentIcons.iot_24_regular),
         label: PageLabel.connections,
         builder: (_) =>
             ConnectionsView(key: const GlobalObjectKey(PageLabel.connections)),
@@ -56,7 +56,7 @@ class Navigation {
         modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.database_24_filled),
+        icon: const Icon(FluentIcons.database_24_regular),
         label: PageLabel.resources,
         description: 'resourcesDesc',
         builder: (_) =>
@@ -64,7 +64,7 @@ class Navigation {
         modes: [NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.javascript_24_filled),
+        icon: const Icon(FluentIcons.javascript_24_regular),
         label: PageLabel.script,
         description: 'scriptDesc',
         builder: (_) =>
@@ -72,14 +72,14 @@ class Navigation {
         modes: [NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.bug_24_filled),
+        icon: const Icon(FluentIcons.bug_24_regular),
         label: PageLabel.logs,
         builder: (_) => LogsView(key: const GlobalObjectKey(PageLabel.logs)),
         description: 'logsDesc',
         modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.clover_24_filled),
+        icon: const Icon(FluentIcons.clover_24_regular),
         label: PageLabel.tools,
         builder: (_) => ToolsView(key: const GlobalObjectKey(PageLabel.tools)),
         modes: [NavigationItemMode.desktop, NavigationItemMode.mobile],

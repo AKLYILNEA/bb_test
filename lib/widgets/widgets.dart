@@ -1,4 +1,5 @@
 export 'animate_grid.dart';
+export 'animated_nav_icon.dart';
 export 'google_bottom_nav_bar.dart';
 export 'pop_scope.dart';
 export 'builder.dart';

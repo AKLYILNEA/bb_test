@@ -9,6 +9,7 @@ import 'package:bett_box/providers/config.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
+import 'package:bett_box/widgets/animated_nav_icon.dart';
 
 class GoogleBottomNavBar extends ConsumerWidget {
   final List<NavigationItem> navigationItems;
@@ -34,14 +35,23 @@ class GoogleBottomNavBar extends ConsumerWidget {
     final enableHapticFeedback = ref.watch(
       appSettingProvider.select((state) => state.enableNavBarHapticFeedback),
     );
-    final tabsList = navigationItems
-        .map(
-          (e) => GButton(
-            icon: _extractIconData(e.icon),
-            text: Intl.message(e.label.name),
-          ),
-        )
-        .toList();
+    final tabsList = navigationItems.asMap().entries.map((entry) {
+      final index = entry.key;
+      final e = entry.value;
+      final isSelected = selectedIndex == index;
+      return GButton(
+        icon: e.label.regularNavIcon,
+        leading: AnimatedNavIcon(
+          regularIcon: e.label.regularNavIcon,
+          filledIcon: e.label.filledNavIcon,
+          selected: isSelected,
+          color: isSelected
+              ? context.colorScheme.primary
+              : context.colorScheme.onSurfaceVariant,
+        ),
+        text: Intl.message(e.label.name),
+      );
+    }).toList();
 
     void handleTabChange(int index) {
       // Trigger vibration only if haptic feedback enabled

@@ -273,14 +273,13 @@ class _HomePageState extends State<HomePage> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            IconTheme(
-                              data: IconThemeData(
-                                color: isSelected
-                                    ? context.colorScheme.primary
-                                    : context.colorScheme.onSurfaceVariant,
-                                size: 24,
-                              ),
-                              child: item.icon,
+                            AnimatedNavIcon(
+                              regularIcon: item.label.regularNavIcon,
+                              filledIcon: item.label.filledNavIcon,
+                              selected: isSelected,
+                              color: isSelected
+                                  ? context.colorScheme.primary
+                                  : context.colorScheme.onSurfaceVariant,
                             ),
                             const SizedBox(height: 4),
                             Text(
