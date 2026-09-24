@@ -403,7 +403,7 @@ class _ContributorDialog extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    FluentIcons.person_circle_24_regular,
+                    FluentIcons.person_starburst_24_regular,
                     size: 20,
                     color: fabFgColor,
                   ),

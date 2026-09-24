@@ -220,7 +220,7 @@ class _DelayAnimationItem extends ConsumerWidget {
     );
 
     return ListItem(
-      leading: const Icon(FluentIcons.movies_and_tv_24_regular),
+      leading: const Icon(FluentIcons.photo_filter_24_regular),
       title: Text(appLocalizations.delayAnimation),
       subtitle: Text(appLocalizations.delayAnimationDesc),
       onTap: () async {

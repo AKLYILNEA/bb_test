@@ -44,7 +44,7 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
             ),
             if (isZh)
               ListTile(
-                leading: Icon(FluentIcons.globe_24_regular),
+                leading: Icon(FluentIcons.cd_16_regular),
                 title: Text(appLocalizations.switchToDomesticIp),
                 onTap: () {
                   Navigator.of(context, rootNavigator: true).pop();

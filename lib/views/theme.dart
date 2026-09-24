@@ -596,7 +596,7 @@ class _EmojiStyleItem extends StatelessWidget {
       valueListenable: EmojiManager.emojiStyleNotifier,
       builder: (context, currentStyle, _) {
         return ListItem(
-          leading: const Icon(FluentIcons.emoji_24_regular),
+          leading: const Icon(FluentIcons.emoji_sparkle_24_regular),
           horizontalTitleGap: 12,
           title: Text(
             appLocalizations.emojiStyle,

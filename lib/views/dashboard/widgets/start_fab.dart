@@ -208,7 +208,7 @@ class _StartFabDataProviderState extends ConsumerState<StartFabDataProvider> {
           context,
           StartFabData(
             icon: displayStart
-                ? FluentIcons.pause_24_filled
+                ? FluentIcons.align_space_around_vertical_20_filled
                 : FluentIcons.play_24_filled,
             labelText: displayStart
                 ? _formatRunTime(runTime)

@@ -175,7 +175,7 @@ class ProxiesSetting extends StatelessWidget {
     return switch (style) {
       ProxiesIconStyle.standard => Info(
           label: _getTextWithProxiesIconStyle(style),
-          iconData: IconsExt.pictureInPicture,
+          iconData: FluentIcons.image_border_24_regular,
         ),
       ProxiesIconStyle.none => Info(
           label: _getTextWithProxiesIconStyle(style),

@@ -280,7 +280,7 @@ class _ToolViewState extends ConsumerState<ToolsView> {
         title: appLocalizations.application,
         subtitle: appLocalizations.applicationDesc,
         category: settingsCategory,
-        leading: const Icon(FluentIcons.wrench_settings_24_filled),
+        leading: const Icon(FluentIcons.wrench_screwdriver_24_filled),
         onTap: (context, _) => _pushPage(
           context,
           appLocalizations.application,
@@ -308,7 +308,7 @@ class _ToolViewState extends ConsumerState<ToolsView> {
       _SearchItem(
         title: appLocalizations.developerMode,
         category: otherCategory,
-        leading: const Icon(FluentIcons.developer_board_24_filled),
+        leading: const Icon(FluentIcons.window_dev_tools_24_regular),
         onTap: (context, _) => _pushPage(
           context,
           appLocalizations.developerMode,
@@ -1601,7 +1601,7 @@ class _SettingItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListItem.next(
-      leading: const Icon(FluentIcons.wrench_settings_24_filled),
+      leading: const Icon(FluentIcons.wrench_screwdriver_24_filled),
       title: Text(appLocalizations.application),
       subtitle: Text(appLocalizations.applicationDesc),
       delegate: NextDelegate(
@@ -1653,7 +1653,7 @@ class _DeveloperItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListItem.next(
-      leading: const Icon(FluentIcons.developer_board_24_filled),
+      leading: const Icon(FluentIcons.window_dev_tools_24_regular),
       title: Text(appLocalizations.developerMode),
       delegate: NextDelegate(
         title: appLocalizations.developerMode,

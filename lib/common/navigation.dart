@@ -1,3 +1,4 @@
+import 'package:bett_box/common/icons.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/providers/providers.dart';
@@ -16,13 +17,13 @@ class Navigation {
     return [
       NavigationItem(
         keep: false,
-        icon: const Icon(FluentIcons.home_24_filled),
+        icon: const Icon(FluentIcons.glance_24_filled),
         label: PageLabel.dashboard,
         builder: (_) =>
             DashboardView(key: const GlobalObjectKey(PageLabel.dashboard)),
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.compass_northwest_24_filled),
+        icon: const Icon(FluentIcons.globe_24_filled),
         label: PageLabel.proxies,
         builder: (_) => ProviderScope(
           overrides: [queryProvider.overrideWith(() => Query())],
@@ -33,16 +34,13 @@ class Navigation {
             : [],
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.folder_24_filled),
+        icon: const Icon(FluentIcons.folder_add_24_filled),
         label: PageLabel.profiles,
         builder: (_) =>
             ProfilesView(key: const GlobalObjectKey(PageLabel.profiles)),
       ),
       NavigationItem(
-        icon: const RotatedBox(
-          quarterTurns: 2,
-          child: Icon(FluentIcons.timeline_24_filled),
-        ),
+        icon: const Icon(IconsExt.calendarAgendaClock),
         label: PageLabel.requests,
         builder: (_) =>
             RequestsView(key: const GlobalObjectKey(PageLabel.requests)),
@@ -58,7 +56,7 @@ class Navigation {
         modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.database_24_filled),
+        icon: const Icon(FluentIcons.archive_24_filled),
         label: PageLabel.resources,
         description: 'resourcesDesc',
         builder: (_) =>
@@ -81,7 +79,7 @@ class Navigation {
         modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.grid_24_filled),
+        icon: const Icon(FluentIcons.clover_24_filled),
         label: PageLabel.tools,
         builder: (_) => ToolsView(key: const GlobalObjectKey(PageLabel.tools)),
         modes: [NavigationItemMode.desktop, NavigationItemMode.mobile],
