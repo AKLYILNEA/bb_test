@@ -34,7 +34,7 @@ class Navigation {
             : [],
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.folder_add_24_filled),
+        icon: const Icon(FluentIcons.document_text_24_filled),
         label: PageLabel.profiles,
         builder: (_) =>
             ProfilesView(key: const GlobalObjectKey(PageLabel.profiles)),
@@ -48,7 +48,7 @@ class Navigation {
         modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.iot_24_filled),
+        icon: const Icon(FluentIcons.connected_24_filled),
         label: PageLabel.connections,
         builder: (_) =>
             ConnectionsView(key: const GlobalObjectKey(PageLabel.connections)),
@@ -79,7 +79,7 @@ class Navigation {
         modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.clover_24_filled),
+        icon: const Icon(FluentIcons.toolbox_24_filled),
         label: PageLabel.tools,
         builder: (_) => ToolsView(key: const GlobalObjectKey(PageLabel.tools)),
         modes: [NavigationItemMode.desktop, NavigationItemMode.mobile],
