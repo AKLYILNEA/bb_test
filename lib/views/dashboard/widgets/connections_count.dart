@@ -63,7 +63,7 @@ class _ConnectionsCountState extends State<ConnectionsCount> {
       height: getWidgetHeight(1),
       child: CommonCard(
         info: Info(
-          iconData: FluentIcons.connected_24_regular,
+          iconData: FluentIcons.iot_24_regular,
           label: appLocalizations.connection,
         ),
         onPressed: () {
