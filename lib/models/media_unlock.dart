@@ -66,6 +66,7 @@ enum MediaPlatform {
   netflix,
   disney,
   youtube,
+  youtubemusic,
   spotify,
   tiktok,
   iqiyi,
@@ -119,6 +120,7 @@ extension MediaPlatformExt on MediaPlatform {
     MediaPlatform.netflix ||
     MediaPlatform.disney ||
     MediaPlatform.youtube ||
+    MediaPlatform.youtubemusic ||
     MediaPlatform.spotify ||
     MediaPlatform.tiktok ||
     MediaPlatform.iqiyi ||
@@ -173,6 +175,7 @@ extension MediaPlatformExt on MediaPlatform {
     MediaPlatform.netflix => 'Netflix',
     MediaPlatform.disney => 'Disney+',
     MediaPlatform.youtube => 'YouTube',
+    MediaPlatform.youtubemusic => 'YouTube Music',
     MediaPlatform.spotify => 'Spotify',
     MediaPlatform.tiktok => 'TikTok',
     MediaPlatform.bilibili => 'Bilibili(CN)',
@@ -243,6 +246,7 @@ extension MediaPlatformExt on MediaPlatform {
 
   Size get iconSize => switch (this) {
     MediaPlatform.youtube ||
+    MediaPlatform.youtubemusic ||
     MediaPlatform.disney ||
     MediaPlatform.onetrust ||
     MediaPlatform.iqiyi ||
