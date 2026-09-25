@@ -233,8 +233,9 @@ class _SidebarOverlay extends StatelessWidget {
                 autofocus: true,
                 child: Material(
                   color: colorScheme.surfaceContainer,
-                  elevation: 4.0,
-                  shadowColor: Colors.black26,
+                  shape: BorderDirectional(
+                    end: BorderSide(color: colorScheme.outlineVariant),
+                  ),
                   child: AnimatedBuilder(
                     animation: progress,
                     builder: (_, _) => builder(progress.value),

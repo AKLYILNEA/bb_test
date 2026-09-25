@@ -269,6 +269,9 @@ class AppSidebarContainer extends ConsumerWidget {
     final colorScheme = context.colorScheme;
     return Material(
       color: colorScheme.surfaceContainer,
+      shape: BorderDirectional(
+        end: BorderSide(color: colorScheme.outlineVariant),
+      ),
       child: child,
     );
   }
