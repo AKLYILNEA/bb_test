@@ -20,6 +20,100 @@ typedef OnKeywordsUpdateCallback = void Function(List<String> keywords);
 typedef AppBarSearchStateBuilder =
     AppBarSearchState? Function(AppBarSearchState? state);
 
+class ScrollFeatherGradientOverlay extends StatefulWidget {
+  final Widget child;
+  final double height;
+  final Color? surfaceColor;
+
+  const ScrollFeatherGradientOverlay({
+    super.key,
+    required this.child,
+    this.height = 28.0,
+    this.surfaceColor,
+  });
+
+  @override
+  State<ScrollFeatherGradientOverlay> createState() =>
+      _ScrollFeatherGradientOverlayState();
+}
+
+class _ScrollFeatherGradientOverlayState
+    extends State<ScrollFeatherGradientOverlay> {
+  final ValueNotifier<double> _progressNotifier = ValueNotifier(0.0);
+
+  @override
+  void dispose() {
+    _progressNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final surface =
+        widget.surfaceColor ?? Theme.of(context).colorScheme.surface;
+    return NotificationListener<Notification>(
+      onNotification: (notification) {
+        if (notification is ScrollNotification) {
+          if (notification.metrics.axis == Axis.vertical) {
+            final pixels = notification.metrics.pixels;
+            final progress = (pixels / 16.0).clamp(0.0, 1.0);
+            if (progress != _progressNotifier.value) {
+              _progressNotifier.value = progress;
+            }
+          }
+        } else if (notification is ScrollMetricsNotification) {
+          if (notification.metrics.axis == Axis.vertical) {
+            final pixels = notification.metrics.pixels;
+            final progress = (pixels / 16.0).clamp(0.0, 1.0);
+            if (progress != _progressNotifier.value) {
+              _progressNotifier.value = progress;
+            }
+          }
+        }
+        return false;
+      },
+      child: Stack(
+        children: [
+          widget.child,
+          ValueListenableBuilder<double>(
+            valueListenable: _progressNotifier,
+            builder: (context, progress, _) {
+              if (progress <= 0) return const SizedBox.shrink();
+              return Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: widget.height,
+                child: IgnorePointer(
+                  child: Opacity(
+                    opacity: progress,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            surface,
+                            surface.withValues(alpha: 0.85),
+                            surface.withValues(alpha: 0.50),
+                            surface.withValues(alpha: 0.18),
+                            surface.withValues(alpha: 0.0),
+                          ],
+                          stops: const [0.0, 0.25, 0.55, 0.80, 1.0],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class CommonScaffold extends StatefulWidget {
   final AppBar? appBar;
   final Widget body;
@@ -33,6 +127,7 @@ class CommonScaffold extends StatefulWidget {
   final AppBarSearchState? searchState;
   final OnKeywordsUpdateCallback? onKeywordsUpdate;
   final bool? resizeToAvoidBottomInset;
+  final bool? showScrollGradient;
 
   const CommonScaffold({
     super.key,
@@ -48,6 +143,7 @@ class CommonScaffold extends StatefulWidget {
     this.floatingActionButton,
     this.onKeywordsUpdate,
     this.resizeToAvoidBottomInset,
+    this.showScrollGradient,
   });
 
   @override
@@ -99,9 +195,9 @@ class CommonScaffoldState extends State<CommonScaffold> {
     return Theme(
       data: theme.copyWith(
         appBarTheme: theme.appBarTheme.copyWith(
-          backgroundColor: colorScheme.brightness == Brightness.dark
-              ? Colors.grey[900]
-              : Colors.white,
+          backgroundColor: widget.backgroundColor ?? colorScheme.surface,
+          surfaceTintColor: Colors.transparent,
+          scrolledUnderElevation: 0,
           iconTheme: theme.primaryIconTheme.copyWith(color: Colors.grey),
           titleTextStyle: theme.textTheme.titleLarge,
           toolbarTextStyle: theme.textTheme.bodyMedium,
@@ -308,6 +404,10 @@ class CommonScaffoldState extends State<CommonScaffold> {
                   final hasLeading = leading != null || canPop;
                   return _buildAppBarWrap(
                     AppBar(
+                      backgroundColor:
+                          widget.backgroundColor ?? context.colorScheme.surface,
+                      surfaceTintColor: Colors.transparent,
+                      scrolledUnderElevation: 0,
                       centerTitle: widget.centerTitle ?? false,
                       leading: leading != null
                           ? Padding(
@@ -376,7 +476,14 @@ class CommonScaffoldState extends State<CommonScaffold> {
               );
             },
           ),
-          Expanded(child: widget.body),
+          Expanded(
+            child: (widget.showScrollGradient ?? true)
+                ? ScrollFeatherGradientOverlay(
+                    surfaceColor: widget.backgroundColor,
+                    child: widget.body,
+                  )
+                : widget.body,
+          ),
         ],
       ),
     );

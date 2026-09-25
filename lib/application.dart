@@ -253,6 +253,14 @@ class ApplicationState extends ConsumerState<Application>
                   brightness: Brightness.light,
                   primaryColor: themeProps.primaryColor,
                 ),
+                appBarTheme: AppBarTheme(
+                  backgroundColor: _getAppColorScheme(
+                    brightness: Brightness.light,
+                    primaryColor: themeProps.primaryColor,
+                  ).surface,
+                  surfaceTintColor: Colors.transparent,
+                  scrolledUnderElevation: 0,
+                ),
                 fontFamily: fontFamily,
                 actionIconTheme: ActionIconThemeData(
                   backButtonIconBuilder: (BuildContext context) =>
@@ -370,6 +378,14 @@ class ApplicationState extends ConsumerState<Application>
                   brightness: Brightness.dark,
                   primaryColor: themeProps.primaryColor,
                 ).toPureBlack(themeProps.pureBlack),
+                appBarTheme: AppBarTheme(
+                  backgroundColor: _getAppColorScheme(
+                    brightness: Brightness.dark,
+                    primaryColor: themeProps.primaryColor,
+                  ).toPureBlack(themeProps.pureBlack).surface,
+                  surfaceTintColor: Colors.transparent,
+                  scrolledUnderElevation: 0,
+                ),
                 fontFamily: fontFamily,
                 actionIconTheme: ActionIconThemeData(
                   backButtonIconBuilder: (BuildContext context) =>

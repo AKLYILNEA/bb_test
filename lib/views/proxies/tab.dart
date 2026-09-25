@@ -470,35 +470,37 @@ class _ProxyGroupViewState extends ConsumerState<ProxyGroupView> {
 
     return Align(
       alignment: Alignment.topCenter,
-      child: CommonScrollBar(
-        controller: _controller,
-        child: GridView.builder(
-          key: _getPageStorageKey(),
+      child: ScrollFeatherGradientOverlay(
+        child: CommonScrollBar(
           controller: _controller,
-          scrollCacheExtent: const ScrollCacheExtent.viewport(1.0),
-          padding: EdgeInsets.only(
-            top: 16,
-            left: 16,
-            right: 16,
-            bottom: baseBottom + extra,
+          child: GridView.builder(
+            key: _getPageStorageKey(),
+            controller: _controller,
+            scrollCacheExtent: const ScrollCacheExtent.viewport(1.0),
+            padding: EdgeInsets.only(
+              top: 16,
+              left: 16,
+              right: 16,
+              bottom: baseBottom + extra,
+            ),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: widget.columns,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              mainAxisExtent: getItemHeight(widget.cardType),
+            ),
+            itemCount: sortedProxies.length,
+            itemBuilder: (_, index) {
+              final proxy = sortedProxies[index];
+              return ProxyCard(
+                testUrl: widget.group.testUrl,
+                groupType: widget.group.type,
+                type: widget.cardType,
+                proxy: proxy,
+                groupName: widget.group.name,
+              );
+            },
           ),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: widget.columns,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            mainAxisExtent: getItemHeight(widget.cardType),
-          ),
-          itemCount: sortedProxies.length,
-          itemBuilder: (_, index) {
-            final proxy = sortedProxies[index];
-            return ProxyCard(
-              testUrl: widget.group.testUrl,
-              groupType: widget.group.type,
-              type: widget.cardType,
-              proxy: proxy,
-              groupName: widget.group.name,
-            );
-          },
         ),
       ),
     );

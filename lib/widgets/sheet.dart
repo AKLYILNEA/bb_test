@@ -137,6 +137,8 @@ class AdaptiveSheetScaffold extends StatelessWidget {
       titleSpacing: hasLeading ? 0.0 : (bottomSheet ? null : 18.0),
       centerTitle: bottomSheet,
       backgroundColor: backgroundColor,
+      surfaceTintColor: Colors.transparent,
+      scrolledUnderElevation: 0.0,
       title: EmojiText(
         title,
       ),
@@ -172,7 +174,13 @@ class AdaptiveSheetScaffold extends StatelessWidget {
                     ),
                   ),
                   appBar,
-                  Flexible(flex: 1, child: body),
+                  Flexible(
+                    flex: 1,
+                    child: ScrollFeatherGradientOverlay(
+                      surfaceColor: backgroundColor,
+                      child: body,
+                    ),
+                  ),
                 ],
               ),
             ),
