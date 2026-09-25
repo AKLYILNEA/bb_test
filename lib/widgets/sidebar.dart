@@ -232,16 +232,9 @@ class _SidebarOverlay extends StatelessWidget {
                 autofocus: true,
                 child: Material(
                   color: colorScheme.surfaceContainer,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      border: BorderDirectional(
-                        end: BorderSide(color: colorScheme.outlineVariant),
-                      ),
-                    ),
-                    child: AnimatedBuilder(
-                      animation: progress,
-                      builder: (_, _) => builder(progress.value),
-                    ),
+                  child: AnimatedBuilder(
+                    animation: progress,
+                    builder: (_, _) => builder(progress.value),
                   ),
                 ),
               ),
@@ -259,7 +252,6 @@ class _SidebarColors {
       selectedHoverFill = scheme.onSurface.withValues(alpha: 0.12),
       pressedFill = scheme.onSurface.withValues(alpha: 0.08),
       hoverFill = scheme.onSurface.withValues(alpha: 0.06),
-      label = scheme.onSurface,
       icon = scheme.onSurfaceVariant,
       selectedIcon = scheme.onSecondaryContainer,
       indicator = scheme.primary;
@@ -268,7 +260,6 @@ class _SidebarColors {
   final Color selectedHoverFill;
   final Color pressedFill;
   final Color hoverFill;
-  final Color label;
   final Color icon;
   final Color selectedIcon;
   final Color indicator;
@@ -307,9 +298,7 @@ class _SidebarPane extends StatelessWidget {
     final itemHeight =
         _itemSize + MediaQuery.textScalerOf(context).scale(fontSize) - fontSize;
     final rowWidth = expandedWidth - sideInset * 2;
-    final labelStyle = context.textTheme.bodyMedium?.copyWith(
-      color: colors.label,
-    );
+    final labelStyle = context.textTheme.bodyMedium;
     final labelWidth = rowWidth - iconInset - _iconSize - _labelGap * 2;
     String rowTooltip(String label) =>
         expanded &&
@@ -470,6 +459,7 @@ class _SidebarButtonState extends State<_SidebarButton> {
               child: Tooltip(
                 message: widget.tooltip,
                 excludeFromSemantics: !widget.tooltipIsLabel,
+                triggerMode: TooltipTriggerMode.longPress,
                 child: IconTheme.merge(
                   data: IconThemeData(
                     size: _iconSize,
@@ -526,6 +516,7 @@ class _DestinationRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveStyle = style?.copyWith(
+      color: iconColor,
       fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
     );
 
