@@ -82,10 +82,15 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
   @override
   Widget build(BuildContext context) {
     final pageLabel = ref.watch(currentPageLabelProvider);
+    final navItems = ref.watch(currentNavigationItemsStateProvider).value;
+    final isPageInNav = navItems.any((item) => item.label == pageLabel);
+    final effectivePage = isPageInNav
+        ? pageLabel
+        : (navItems.isNotEmpty ? navItems.first.label : PageLabel.dashboard);
     final proxiesType = ref.watch(
       proxiesStyleSettingProvider.select((state) => state.type),
     );
-    final residentPage = switch (pageLabel) {
+    final residentPage = switch (effectivePage) {
       PageLabel.dashboard => PageLabel.dashboard,
       PageLabel.profiles => PageLabel.profiles,
       PageLabel.proxies => proxiesType == ProxiesType.tab

@@ -269,9 +269,6 @@ class AppSidebarContainer extends ConsumerWidget {
     final colorScheme = context.colorScheme;
     return Material(
       color: colorScheme.surfaceContainer,
-      shape: BorderDirectional(
-        end: BorderSide(color: colorScheme.outlineVariant),
-      ),
       child: child,
     );
   }
@@ -304,76 +301,79 @@ class AppSidebarContainer extends ConsumerWidget {
     final canExpand = viewMode == ViewMode.desktop;
     final showLabel = ref.watch(appSettingProvider).showLabel;
 
-    return Row(
-      children: [
-        Stack(
-          alignment: Alignment.topRight,
-          children: [
-            _buildBackground(
-              context: context,
-              child: CallbackShortcuts(
-                bindings: <ShortcutActivator, VoidCallback>{
-                  const SingleActivator(LogicalKeyboardKey.arrowUp): () {
-                    if (currentIndex > 0) {
-                      _handleToPage(
-                        navigationItems,
-                        currentIndex,
-                        currentIndex - 1,
-                      );
-                    }
-                  },
-                  const SingleActivator(LogicalKeyboardKey.arrowDown): () {
-                    if (currentIndex < navigationItems.length - 1) {
-                      _handleToPage(
-                        navigationItems,
-                        currentIndex,
-                        currentIndex + 1,
-                      );
-                    }
-                  },
-                },
-                child: Focus(
-                  autofocus: true,
-                  child: NavigationSidebar(
-                    destinations: navigationItems,
-                    selectedIndex: currentIndex,
-                    expanded: canExpand && showLabel,
-                    windowControls: Size(
-                      system.isMacOS ? 72.0 : 0.0,
-                      system.isMacOS ? 24.0 : 0.0,
-                    ),
-                    onSelected: (index) {
-                      _handleToPage(navigationItems, currentIndex, index);
+    return Container(
+      color: context.colorScheme.surfaceContainer,
+      child: Row(
+        children: [
+          Stack(
+            alignment: Alignment.topRight,
+            children: [
+              _buildBackground(
+                context: context,
+                child: CallbackShortcuts(
+                  bindings: <ShortcutActivator, VoidCallback>{
+                    const SingleActivator(LogicalKeyboardKey.arrowUp): () {
+                      if (currentIndex > 0) {
+                        _handleToPage(
+                          navigationItems,
+                          currentIndex,
+                          currentIndex - 1,
+                        );
+                      }
                     },
-                    onToggle: canExpand
-                        ? () {
-                            ref
-                                .read(appSettingProvider.notifier)
-                                .updateState(
-                                  (state) => state.copyWith(
-                                    showLabel: !state.showLabel,
-                                  ),
-                                );
-                          }
-                        : null,
+                    const SingleActivator(LogicalKeyboardKey.arrowDown): () {
+                      if (currentIndex < navigationItems.length - 1) {
+                        _handleToPage(
+                          navigationItems,
+                          currentIndex,
+                          currentIndex + 1,
+                        );
+                      }
+                    },
+                  },
+                  child: Focus(
+                    autofocus: true,
+                    child: NavigationSidebar(
+                      destinations: navigationItems,
+                      selectedIndex: currentIndex,
+                      expanded: canExpand && showLabel,
+                      windowControls: Size(
+                        system.isMacOS ? 72.0 : 0.0,
+                        system.isMacOS ? 24.0 : 0.0,
+                      ),
+                      onSelected: (index) {
+                        _handleToPage(navigationItems, currentIndex, index);
+                      },
+                      onToggle: canExpand
+                          ? () {
+                              ref
+                                  .read(appSettingProvider.notifier)
+                                  .updateState(
+                                    (state) => state.copyWith(
+                                      showLabel: !state.showLabel,
+                                    ),
+                                  );
+                            }
+                          : null,
+                    ),
                   ),
                 ),
               ),
-            ),
-            _buildLoading(),
-          ],
-        ),
-        Expanded(
-          flex: 1,
-          child: ClipRect(
-            child: MediaQuery.removePadding(
-              context: context,
-              removeLeft: true,
-              child: child,
+              _buildLoading(),
+            ],
+          ),
+          Expanded(
+            flex: 1,
+            child: ClipRect(
+              child: MediaQuery.removePadding(
+                context: context,
+                removeLeft: true,
+                child: child,
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

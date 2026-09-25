@@ -120,12 +120,15 @@ class _NavigationSidebarState extends State<NavigationSidebar>
       textPainter.dispose();
     }
 
-    final compactWidth = math.max(_compactWidth, widget.windowControls.width);
+    final dpr = MediaQuery.devicePixelRatioOf(context);
+    final rawCompactWidth = math.max(_compactWidth, widget.windowControls.width);
+    final compactWidth = (rawCompactWidth * dpr).ceil() / dpr;
     final sideInset = math.min(_maxSideInset, (compactWidth - _itemSize) / 2);
     final iconInset = (compactWidth - sideInset * 2 - _iconSize) / 2;
     final total =
         sideInset * 2 + iconInset + _iconSize + _labelGap * 2 + maxTextWidth;
-    return math.max(104.0, math.min(240.0, total.ceilToDouble()));
+    final clamped = math.max(104.0, math.min(240.0, total));
+    return (clamped * dpr).ceil() / dpr;
   }
 
   @override
@@ -230,9 +233,8 @@ class _SidebarOverlay extends StatelessWidget {
                 autofocus: true,
                 child: Material(
                   color: colorScheme.surfaceContainer,
-                  shape: BorderDirectional(
-                    end: BorderSide(color: colorScheme.outlineVariant),
-                  ),
+                  elevation: 4.0,
+                  shadowColor: Colors.black26,
                   child: AnimatedBuilder(
                     animation: progress,
                     builder: (_, _) => builder(progress.value),
@@ -290,7 +292,9 @@ class _SidebarPane extends StatelessWidget {
     final colors = _SidebarColors(context.colorScheme);
     final fontSize = context.textTheme.bodyMedium?.fontSize ?? 14;
     final labelOpacity = ((progress - 0.4) / 0.6).clamp(0.0, 1.0);
-    final compactWidth = math.max(_compactWidth, windowControls.width);
+    final dpr = MediaQuery.devicePixelRatioOf(context);
+    final rawCompactWidth = math.max(_compactWidth, windowControls.width);
+    final compactWidth = (rawCompactWidth * dpr).ceil() / dpr;
     final sideInset = math.min(_maxSideInset, (compactWidth - _itemSize) / 2);
     final itemWidth = compactWidth - sideInset * 2;
     final iconInset = (itemWidth - _iconSize) / 2;
