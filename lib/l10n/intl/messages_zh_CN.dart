@@ -111,9 +111,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "app": MessageLookupByLibrary.simpleMessage("应用"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("应用访问控制"),
-    "accessControlSetting": MessageLookupByLibrary.simpleMessage(
-      "访问控制设置",
-    ),
+    "accessControlSetting": MessageLookupByLibrary.simpleMessage("访问控制设置"),
     "accessControlShort": MessageLookupByLibrary.simpleMessage("访问控制"),
     "appDesc": MessageLookupByLibrary.simpleMessage("处理应用相关设置"),
     "application": MessageLookupByLibrary.simpleMessage("应用程序"),
@@ -213,6 +211,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "connectionsSort": MessageLookupByLibrary.simpleMessage("连接排序"),
     "connectivity": MessageLookupByLibrary.simpleMessage("连通性："),
     "contactMe": MessageLookupByLibrary.simpleMessage("联系我"),
+    "toggleLabel": MessageLookupByLibrary.simpleMessage("切换标签"),
     "content": MessageLookupByLibrary.simpleMessage("内容"),
     "contentScheme": MessageLookupByLibrary.simpleMessage("内容主题"),
     "continent": MessageLookupByLibrary.simpleMessage("大洲"),
@@ -407,7 +406,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "go": MessageLookupByLibrary.simpleMessage("前往"),
     "goDownload": MessageLookupByLibrary.simpleMessage("前往下载"),
     "customFont": MessageLookupByLibrary.simpleMessage("自定义字体"),
-    "customFontDesc": MessageLookupByLibrary.simpleMessage("默认系统字体，开启后可自定义自己喜欢的字体"),
+    "customFontDesc": MessageLookupByLibrary.simpleMessage(
+      "默认系统字体，开启后可自定义自己喜欢的字体",
+    ),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage("是否缓存修改"),
     "healthCheckTimeout": MessageLookupByLibrary.simpleMessage("超时时间"),
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(
@@ -970,17 +971,21 @@ class MessageLookup extends MessageLookupByLibrary {
     "writeToSystem": MessageLookupByLibrary.simpleMessage("写入系统"),
     "writeToSystemDesc": MessageLookupByLibrary.simpleMessage("需要管理员权限"),
     "years": m15,
-  
+
     "emojiStyle": MessageLookupByLibrary.simpleMessage("Emoji 风格"),
     "emojiStyleDesc": MessageLookupByLibrary.simpleMessage("选择应用内显示的 Emoji 风格"),
     "tabAnimation": MessageLookupByLibrary.simpleMessage("选项卡动画"),
     "tabAnimationDesc": MessageLookupByLibrary.simpleMessage("仅在移动视图有效"),
     "startRunning": MessageLookupByLibrary.simpleMessage("启动"),
     "selectCustomFont": MessageLookupByLibrary.simpleMessage("选择 / 更换字体"),
-    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage("点击选择本地 .ttf 或 .otf 字体文件"),
+    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage(
+      "点击选择本地 .ttf 或 .otf 字体文件",
+    ),
     "customFontApplied": MessageLookupByLibrary.simpleMessage("已应用自定义字体"),
     "customFontDisabled": MessageLookupByLibrary.simpleMessage("已恢复系统默认字体"),
-    "invalidFontFormat": MessageLookupByLibrary.simpleMessage("仅支持 .ttf 或 .otf 格式的字体文件"),
+    "invalidFontFormat": MessageLookupByLibrary.simpleMessage(
+      "仅支持 .ttf 或 .otf 格式的字体文件",
+    ),
     "fadingCube": MessageLookupByLibrary.simpleMessage("渐隐方块"),
     "foldingCube": MessageLookupByLibrary.simpleMessage("折叠魔方"),
     "pumpingHeart": MessageLookupByLibrary.simpleMessage("心跳波动"),
@@ -1055,5 +1060,5 @@ class MessageLookup extends MessageLookupByLibrary {
     "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
       "未检测到可用的局域网，请检查 Wi-Fi",
     ),
-      };
+  };
 }

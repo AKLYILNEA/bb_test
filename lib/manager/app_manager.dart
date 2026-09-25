@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:bett_box/clash/core.dart';
 import 'package:bett_box/common/common.dart';
@@ -273,6 +274,31 @@ class AppSidebarContainer extends ConsumerWidget {
     );
   }
 
+  double _calculateExtendedWidth(
+    BuildContext context,
+    List<NavigationItem> items,
+  ) {
+    final labelStyle =
+        context.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600) ??
+        const TextStyle(fontSize: 14, fontWeight: FontWeight.w600);
+
+    double maxTextWidth = 0.0;
+    final direction = Directionality.maybeOf(context) ?? TextDirection.ltr;
+    for (final item in items) {
+      final text = item.label.localizedName;
+      final textPainter = TextPainter(
+        text: TextSpan(text: text, style: labelStyle),
+        textDirection: direction,
+        maxLines: 1,
+      )..layout();
+      if (textPainter.width > maxTextWidth) {
+        maxTextWidth = textPainter.width;
+      }
+    }
+
+    return math.max(96.0, (72.0 + maxTextWidth + 28.0).ceilToDouble());
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final navigationState = ref.watch(navigationStateProvider);
@@ -283,6 +309,7 @@ class AppSidebarContainer extends ConsumerWidget {
     }
     final currentIndex = navigationState.currentIndex;
     final showLabel = ref.watch(appSettingProvider).showLabel;
+    final extendedWidth = _calculateExtendedWidth(context, navigationItems);
     return Row(
       children: [
         Stack(
@@ -298,11 +325,7 @@ class AppSidebarContainer extends ConsumerWidget {
                 child: Column(
                   children: [
                     if (system.isMacOS) const SizedBox(height: 22),
-                    const SizedBox(height: 16),
-                    if (!system.isMacOS) ...[
-                      const AppIcon(),
-                      const SizedBox(height: 12),
-                    ],
+                    const SizedBox(height: 12),
                     Expanded(
                       child: ScrollConfiguration(
                         behavior: HiddenBarScrollBehavior(),
@@ -347,6 +370,7 @@ class AppSidebarContainer extends ConsumerWidget {
                                     child: Focus(
                                       autofocus: true,
                                       child: NavigationRail(
+                                        minExtendedWidth: extendedWidth,
                                         backgroundColor: Colors.transparent,
                                         indicatorColor: context
                                             .colorScheme
@@ -436,9 +460,7 @@ class AppSidebarContainer extends ConsumerWidget {
                                         },
                                         extended: showLabel,
                                         selectedIndex: currentIndex,
-                                        labelType: showLabel
-                                            ? NavigationRailLabelType.none
-                                            : NavigationRailLabelType.all,
+                                        labelType: NavigationRailLabelType.none,
                                       ),
                                     ),
                                   ),
@@ -449,6 +471,36 @@ class AppSidebarContainer extends ConsumerWidget {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: showLabel ? extendedWidth : 72.0,
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: SizedBox(
+                          width: 72.0,
+                          child: Center(
+                            child: IconButton(
+                              tooltip: context.appLocalizations.toggleLabel,
+                              onPressed: () {
+                                ref
+                                    .read(appSettingProvider.notifier)
+                                    .update(
+                                      (state) => state.copyWith(
+                                        showLabel: !state.showLabel,
+                                      ),
+                                    );
+                              },
+                              icon: SidebarToggleIcon(
+                                expanded: showLabel,
+                                size: 20.0,
+                                color: context.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),

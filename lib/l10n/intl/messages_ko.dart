@@ -123,9 +123,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "app": MessageLookupByLibrary.simpleMessage("앱"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("앱 액세스 제어"),
-    "accessControlSetting": MessageLookupByLibrary.simpleMessage(
-      "액세스 제어 설정",
-    ),
+    "accessControlSetting": MessageLookupByLibrary.simpleMessage("액세스 제어 설정"),
     "accessControlShort": MessageLookupByLibrary.simpleMessage("액세스 제어"),
     "appDesc": MessageLookupByLibrary.simpleMessage("앱 관련 설정 관리"),
     "application": MessageLookupByLibrary.simpleMessage("애플리케이션"),
@@ -245,6 +243,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "connectionsSort": MessageLookupByLibrary.simpleMessage("연결 정렬"),
     "connectivity": MessageLookupByLibrary.simpleMessage("연결 상태:"),
     "contactMe": MessageLookupByLibrary.simpleMessage("문의하기"),
+    "toggleLabel": MessageLookupByLibrary.simpleMessage("라벨 전환"),
     "content": MessageLookupByLibrary.simpleMessage("내용"),
     "contentScheme": MessageLookupByLibrary.simpleMessage("콘텐츠 테마"),
     "continent": MessageLookupByLibrary.simpleMessage("대륙"),
@@ -459,7 +458,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "go": MessageLookupByLibrary.simpleMessage("이동"),
     "goDownload": MessageLookupByLibrary.simpleMessage("다운로드 이동"),
     "customFont": MessageLookupByLibrary.simpleMessage("사용자 정의 글꼴"),
-    "customFontDesc": MessageLookupByLibrary.simpleMessage("기본 시스템 글꼴, 활성화하여 원하는 글꼴 적용"),
+    "customFontDesc": MessageLookupByLibrary.simpleMessage(
+      "기본 시스템 글꼴, 활성화하여 원하는 글꼴 적용",
+    ),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage("수정 사항을 캐시하시겠습니까?"),
     "healthCheckTimeout": MessageLookupByLibrary.simpleMessage("타임아웃 시간"),
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(
@@ -1086,17 +1087,27 @@ class MessageLookup extends MessageLookupByLibrary {
     "writeToSystem": MessageLookupByLibrary.simpleMessage("시스템 적용"),
     "writeToSystemDesc": MessageLookupByLibrary.simpleMessage("관리자 권한이 필요합니다"),
     "years": m15,
-  
+
     "emojiStyle": MessageLookupByLibrary.simpleMessage("이모지 스타일"),
-    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage("앱 내에서 표시할 이모지 스타일 선택"),
+    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage(
+      "앱 내에서 표시할 이모지 스타일 선택",
+    ),
     "tabAnimation": MessageLookupByLibrary.simpleMessage(""),
     "tabAnimationDesc": MessageLookupByLibrary.simpleMessage(""),
     "startRunning": MessageLookupByLibrary.simpleMessage("시작"),
     "selectCustomFont": MessageLookupByLibrary.simpleMessage("글꼴 선택 / 변경"),
-    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage("로컬 .ttf 또는 .otf 글꼴 파일을 선택하려면 탭하세요"),
-    "customFontApplied": MessageLookupByLibrary.simpleMessage("사용자 정의 글꼴이 적용되었습니다"),
-    "customFontDisabled": MessageLookupByLibrary.simpleMessage("시스템 기본 글꼴로 복원되었습니다"),
-    "invalidFontFormat": MessageLookupByLibrary.simpleMessage(".ttf 또는 .otf 형식의 글꼴 파일만 지원됩니다"),
+    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage(
+      "로컬 .ttf 또는 .otf 글꼴 파일을 선택하려면 탭하세요",
+    ),
+    "customFontApplied": MessageLookupByLibrary.simpleMessage(
+      "사용자 정의 글꼴이 적용되었습니다",
+    ),
+    "customFontDisabled": MessageLookupByLibrary.simpleMessage(
+      "시스템 기본 글꼴로 복원되었습니다",
+    ),
+    "invalidFontFormat": MessageLookupByLibrary.simpleMessage(
+      ".ttf 또는 .otf 형식의 글꼴 파일만 지원됩니다",
+    ),
     "fadingCube": MessageLookupByLibrary.simpleMessage("페이딩 큐브"),
     "foldingCube": MessageLookupByLibrary.simpleMessage("접이식 큐브"),
     "pumpingHeart": MessageLookupByLibrary.simpleMessage("심장 박동"),
@@ -1185,5 +1196,5 @@ class MessageLookup extends MessageLookupByLibrary {
     "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
       "사용 가능한 LAN을 찾을 수 없습니다. Wi-Fi를 확인하세요",
     ),
-      };
+  };
 }

@@ -599,6 +599,7 @@
   "systemApp": "System App",
   "noNetworkApp": "No Network App",
   "contactMe": "Contact Me",
+  "toggleLabel": "Toggle labels",
   "recoveryStrategy": "Recovery Strategy",
   "recoveryStrategy_override": "Override",
   "recoveryStrategy_compatible": "Compatible",

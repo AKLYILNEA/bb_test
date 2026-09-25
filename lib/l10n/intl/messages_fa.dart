@@ -296,6 +296,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "connectivity": MessageLookupByLibrary.simpleMessage("وضعیت اتصال:"),
     "contactMe": MessageLookupByLibrary.simpleMessage("تماس با ما"),
+    "toggleLabel": MessageLookupByLibrary.simpleMessage("تغییر برچسب‌ها"),
     "content": MessageLookupByLibrary.simpleMessage("محتوا"),
     "contentScheme": MessageLookupByLibrary.simpleMessage("پوسته محتوا"),
     "continent": MessageLookupByLibrary.simpleMessage("قاره"),
@@ -556,7 +557,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "go": MessageLookupByLibrary.simpleMessage("رفتن"),
     "goDownload": MessageLookupByLibrary.simpleMessage("رفتن به دانلود"),
     "customFont": MessageLookupByLibrary.simpleMessage("فونت سفارشی"),
-    "customFontDesc": MessageLookupByLibrary.simpleMessage("به طور پیش فرض فونت سیستم، برای اعمال فونت دلخواه خود فعال کنید"),
+    "customFontDesc": MessageLookupByLibrary.simpleMessage(
+      "به طور پیش فرض فونت سیستم، برای اعمال فونت دلخواه خود فعال کنید",
+    ),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage(
       "آیا تغییرات ذخیره شوند؟",
     ),
@@ -1375,17 +1378,29 @@ class MessageLookup extends MessageLookupByLibrary {
       "نیازمند دسترسی مدیریت (Admin)",
     ),
     "years": m15,
-  
+
     "emojiStyle": MessageLookupByLibrary.simpleMessage("سبک ایموجی"),
-    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage("سبک ایموجی نمایش داده شده در برنامه را انتخاب کنید"),
+    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage(
+      "سبک ایموجی نمایش داده شده در برنامه را انتخاب کنید",
+    ),
     "tabAnimation": MessageLookupByLibrary.simpleMessage(""),
     "tabAnimationDesc": MessageLookupByLibrary.simpleMessage(""),
     "startRunning": MessageLookupByLibrary.simpleMessage("شروع"),
-    "selectCustomFont": MessageLookupByLibrary.simpleMessage("انتخاب / تغییر فونت"),
-    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage("برای انتخاب فایل فونت .ttf یا .otf محلی ضربه بزنید"),
-    "customFontApplied": MessageLookupByLibrary.simpleMessage("فونت سفارشی اعمال شد"),
-    "customFontDisabled": MessageLookupByLibrary.simpleMessage("به فونت پیش فرض سیستم بازیابی شد"),
-    "invalidFontFormat": MessageLookupByLibrary.simpleMessage("فقط فرمت های فونت .ttf یا .otf پشتیبانی می شوند"),
+    "selectCustomFont": MessageLookupByLibrary.simpleMessage(
+      "انتخاب / تغییر فونت",
+    ),
+    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage(
+      "برای انتخاب فایل فونت .ttf یا .otf محلی ضربه بزنید",
+    ),
+    "customFontApplied": MessageLookupByLibrary.simpleMessage(
+      "فونت سفارشی اعمال شد",
+    ),
+    "customFontDisabled": MessageLookupByLibrary.simpleMessage(
+      "به فونت پیش فرض سیستم بازیابی شد",
+    ),
+    "invalidFontFormat": MessageLookupByLibrary.simpleMessage(
+      "فقط فرمت های فونت .ttf یا .otf پشتیبانی می شوند",
+    ),
     "fadingCube": MessageLookupByLibrary.simpleMessage("مکعب محو شونده"),
     "foldingCube": MessageLookupByLibrary.simpleMessage("مکعب تاشو"),
     "pumpingHeart": MessageLookupByLibrary.simpleMessage("ضربان قلب"),
@@ -1478,5 +1493,5 @@ class MessageLookup extends MessageLookupByLibrary {
     "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
       "شبکه محلی در دسترس یافت نشد، لطفاً Wi-Fi را بررسی کنید",
     ),
-      };
+  };
 }

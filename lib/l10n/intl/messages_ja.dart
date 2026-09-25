@@ -119,9 +119,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "app": MessageLookupByLibrary.simpleMessage("アプリ"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("アプリのアクセス制御"),
-    "accessControlSetting": MessageLookupByLibrary.simpleMessage(
-      "アクセス制御設定",
-    ),
+    "accessControlSetting": MessageLookupByLibrary.simpleMessage("アクセス制御設定"),
     "accessControlShort": MessageLookupByLibrary.simpleMessage("アクセス制御"),
     "appDesc": MessageLookupByLibrary.simpleMessage("アプリ設定を管理"),
     "application": MessageLookupByLibrary.simpleMessage("アプリケーション"),
@@ -235,6 +233,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "connectionsSort": MessageLookupByLibrary.simpleMessage("接続並び替え"),
     "connectivity": MessageLookupByLibrary.simpleMessage("接続性："),
     "contactMe": MessageLookupByLibrary.simpleMessage("お問い合わせ"),
+    "toggleLabel": MessageLookupByLibrary.simpleMessage("ラベルを切り替え"),
     "content": MessageLookupByLibrary.simpleMessage("内容"),
     "contentScheme": MessageLookupByLibrary.simpleMessage("コンテンツテーマ"),
     "continent": MessageLookupByLibrary.simpleMessage("大陸"),
@@ -449,7 +448,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "go": MessageLookupByLibrary.simpleMessage("移動"),
     "goDownload": MessageLookupByLibrary.simpleMessage("ダウンロードへ"),
     "customFont": MessageLookupByLibrary.simpleMessage("カスタムフォント"),
-    "customFontDesc": MessageLookupByLibrary.simpleMessage("デフォルトはシステムフォント、有効にして好みのフォントを適用"),
+    "customFontDesc": MessageLookupByLibrary.simpleMessage(
+      "デフォルトはシステムフォント、有効にして好みのフォントを適用",
+    ),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage("変更をキャッシュしますか？"),
     "healthCheckTimeout": MessageLookupByLibrary.simpleMessage("タイムアウト時間"),
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(
@@ -1076,17 +1077,27 @@ class MessageLookup extends MessageLookupByLibrary {
     "writeToSystem": MessageLookupByLibrary.simpleMessage("システムへ適用"),
     "writeToSystemDesc": MessageLookupByLibrary.simpleMessage("管理者権限が必要です"),
     "years": m15,
-  
+
     "emojiStyle": MessageLookupByLibrary.simpleMessage("絵文字スタイル"),
-    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage("アプリ内で表示する絵文字のスタイルを選択"),
+    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage(
+      "アプリ内で表示する絵文字のスタイルを選択",
+    ),
     "tabAnimation": MessageLookupByLibrary.simpleMessage(""),
     "tabAnimationDesc": MessageLookupByLibrary.simpleMessage(""),
     "startRunning": MessageLookupByLibrary.simpleMessage("開始"),
     "selectCustomFont": MessageLookupByLibrary.simpleMessage("フォントの選択 / 変更"),
-    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage("タップしてローカルの .ttf または .otf フォントを選択"),
-    "customFontApplied": MessageLookupByLibrary.simpleMessage("カスタムフォントを適用しました"),
-    "customFontDisabled": MessageLookupByLibrary.simpleMessage("システムデフォルトのフォントに戻しました"),
-    "invalidFontFormat": MessageLookupByLibrary.simpleMessage(".ttf または .otf 形式のフォントファイルのみサポートされています"),
+    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage(
+      "タップしてローカルの .ttf または .otf フォントを選択",
+    ),
+    "customFontApplied": MessageLookupByLibrary.simpleMessage(
+      "カスタムフォントを適用しました",
+    ),
+    "customFontDisabled": MessageLookupByLibrary.simpleMessage(
+      "システムデフォルトのフォントに戻しました",
+    ),
+    "invalidFontFormat": MessageLookupByLibrary.simpleMessage(
+      ".ttf または .otf 形式のフォントファイルのみサポートされています",
+    ),
     "fadingCube": MessageLookupByLibrary.simpleMessage("フェージングキューブ"),
     "foldingCube": MessageLookupByLibrary.simpleMessage("折りたたみキューブ"),
     "pumpingHeart": MessageLookupByLibrary.simpleMessage("心拍パルス"),
@@ -1175,5 +1186,5 @@ class MessageLookup extends MessageLookupByLibrary {
     "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
       "利用可能なLANが見つかりません。Wi-Fiを確認してください",
     ),
-      };
+  };
 }

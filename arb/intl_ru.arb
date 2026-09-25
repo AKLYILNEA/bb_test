@@ -601,6 +601,7 @@
   "systemApp": "Системные приложения",
   "noNetworkApp": "Приложения без сети",
   "contactMe": "Связаться со мной",
+  "toggleLabel": "Переключить подписи",
   "recoveryStrategy": "Режим восстановления",
   "recoveryStrategy_override": "Перезаписать",
   "recoveryStrategy_compatible": "Совместимость",

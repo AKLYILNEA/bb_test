@@ -600,6 +600,7 @@
   "systemApp": "システムアプリ",
   "noNetworkApp": "非通信アプリ",
   "contactMe": "お問い合わせ",
+  "toggleLabel": "ラベルを切り替え",
   "recoveryStrategy": "復元戦略",
   "recoveryStrategy_override": "上書き",
   "recoveryStrategy_compatible": "互換",

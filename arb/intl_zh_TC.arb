@@ -600,6 +600,7 @@
   "systemApp": "系統應用程式",
   "noNetworkApp": "無網路應用程式",
   "contactMe": "聯絡我",
+  "toggleLabel": "切換標籤",
   "recoveryStrategy": "還原策略",
   "recoveryStrategy_override": "覆蓋",
   "recoveryStrategy_compatible": "相容",

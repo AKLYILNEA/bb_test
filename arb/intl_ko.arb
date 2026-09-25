@@ -600,6 +600,7 @@
   "systemApp": "시스템 앱",
   "noNetworkApp": "네트워크 미사용 앱",
   "contactMe": "문의하기",
+  "toggleLabel": "라벨 전환",
   "recoveryStrategy": "복구 전략",
   "recoveryStrategy_override": "덮어쓰기",
   "recoveryStrategy_compatible": "호환",

@@ -1,6 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import 'intl/messages_all.dart';
 
 // **************************************************************************
@@ -171,14 +172,8 @@ class AppLocalizations {
 
   /// `Traffic`
   String get trafficUsage {
-    return Intl.message(
-      'Traffic',
-      name: 'trafficUsage',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Traffic', name: 'trafficUsage', desc: '', args: []);
   }
-
 
   /// `Core Info`
   String get coreInfo {
@@ -1947,12 +1942,7 @@ class AppLocalizations {
 
   /// `Null`
   String get notAcquired {
-    return Intl.message(
-      'Null',
-      name: 'notAcquired',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Null', name: 'notAcquired', desc: '', args: []);
   }
 
   /// `GeoData`
@@ -2513,12 +2503,7 @@ class AppLocalizations {
 
   /// `Contributor`
   String get contributor {
-    return Intl.message(
-      'Contributor',
-      name: 'contributor',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Contributor', name: 'contributor', desc: '', args: []);
   }
 
   /// `Other Contributors (Random Order)`
@@ -2768,22 +2753,12 @@ class AppLocalizations {
 
   /// `Last edited`
   String get lastEdit {
-    return Intl.message(
-      'Last edited',
-      name: 'lastEdit',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Last edited', name: 'lastEdit', desc: '', args: []);
   }
 
   /// `Start`
   String get startRunning {
-    return Intl.message(
-      'Start',
-      name: 'startRunning',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Start', name: 'startRunning', desc: '', args: []);
   }
 
   /// `Stop`
@@ -4966,6 +4941,16 @@ class AppLocalizations {
     return Intl.message('Contact Me', name: 'contactMe', desc: '', args: []);
   }
 
+  /// `Toggle labels`
+  String get toggleLabel {
+    return Intl.message(
+      'Toggle labels',
+      name: 'toggleLabel',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Recovery Strategy`
   String get recoveryStrategy {
     return Intl.message(
@@ -5778,27 +5763,52 @@ class AppLocalizations {
 
   /// `Select / Change Font`
   String get selectCustomFont {
-    return Intl.message('Select / Change Font', name: 'selectCustomFont', desc: '', args: []);
+    return Intl.message(
+      'Select / Change Font',
+      name: 'selectCustomFont',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Tap to select a local .ttf or .otf font file`
   String get selectCustomFontDesc {
-    return Intl.message('Tap to select a local .ttf or .otf font file', name: 'selectCustomFontDesc', desc: '', args: []);
+    return Intl.message(
+      'Tap to select a local .ttf or .otf font file',
+      name: 'selectCustomFontDesc',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Custom font applied`
   String get customFontApplied {
-    return Intl.message('Custom font applied', name: 'customFontApplied', desc: '', args: []);
+    return Intl.message(
+      'Custom font applied',
+      name: 'customFontApplied',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Restored to system default font`
   String get customFontDisabled {
-    return Intl.message('Restored to system default font', name: 'customFontDisabled', desc: '', args: []);
+    return Intl.message(
+      'Restored to system default font',
+      name: 'customFontDisabled',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Only .ttf and .otf font formats are supported`
   String get invalidFontFormat {
-    return Intl.message('Only .ttf and .otf font formats are supported', name: 'invalidFontFormat', desc: '', args: []);
+    return Intl.message(
+      'Only .ttf and .otf font formats are supported',
+      name: 'invalidFontFormat',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Zoom`
@@ -5913,12 +5923,7 @@ class AppLocalizations {
 
   /// `{count}`
   String itemsCount(Object count) {
-    return Intl.message(
-      '$count',
-      name: 'itemsCount',
-      desc: '',
-      args: [count],
-    );
+    return Intl.message('$count', name: 'itemsCount', desc: '', args: [count]);
   }
 
   /// `Connectivity Test`
@@ -6133,12 +6138,7 @@ class AppLocalizations {
 
   /// `Fading Cube`
   String get fadingCube {
-    return Intl.message(
-      'Fading Cube',
-      name: 'fadingCube',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Fading Cube', name: 'fadingCube', desc: '', args: []);
   }
 
   /// `Folding Cube`
@@ -6223,22 +6223,12 @@ class AppLocalizations {
 
   /// `General`
   String get basicInfo {
-    return Intl.message(
-      'General',
-      name: 'basicInfo',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('General', name: 'basicInfo', desc: '', args: []);
   }
 
   /// `Address`
   String get addressInfo {
-    return Intl.message(
-      'Address',
-      name: 'addressInfo',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Address', name: 'addressInfo', desc: '', args: []);
   }
 
   /// `Traffic`
@@ -6248,12 +6238,7 @@ class AppLocalizations {
 
   /// `Advanced`
   String get advancedInfo {
-    return Intl.message(
-      'Advanced',
-      name: 'advancedInfo',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Advanced', name: 'advancedInfo', desc: '', args: []);
   }
 
   String get chasingDots {

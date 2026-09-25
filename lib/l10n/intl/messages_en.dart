@@ -296,6 +296,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "connectionsSort": MessageLookupByLibrary.simpleMessage("Connections Sort"),
     "connectivity": MessageLookupByLibrary.simpleMessage("Connectivity:"),
     "contactMe": MessageLookupByLibrary.simpleMessage("Contact Me"),
+    "toggleLabel": MessageLookupByLibrary.simpleMessage("Toggle labels"),
     "content": MessageLookupByLibrary.simpleMessage("Content"),
     "contentScheme": MessageLookupByLibrary.simpleMessage("Content"),
     "continent": MessageLookupByLibrary.simpleMessage("Continent"),
@@ -560,7 +561,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "go": MessageLookupByLibrary.simpleMessage("Go"),
     "goDownload": MessageLookupByLibrary.simpleMessage("Download Now"),
     "customFont": MessageLookupByLibrary.simpleMessage("Custom Font"),
-    "customFontDesc": MessageLookupByLibrary.simpleMessage("Use system font by default, enable to customize your favorite font"),
+    "customFontDesc": MessageLookupByLibrary.simpleMessage(
+      "Use system font by default, enable to customize your favorite font",
+    ),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage(
       "Cache modifications?",
     ),
@@ -1194,9 +1197,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "submit": MessageLookupByLibrary.simpleMessage("Submit"),
     "success": MessageLookupByLibrary.simpleMessage("Success"),
     "switchLabel": MessageLookupByLibrary.simpleMessage("Switch"),
-    "switchToDomesticIp": MessageLookupByLibrary.simpleMessage(
-      "Get Direct IP",
-    ),
+    "switchToDomesticIp": MessageLookupByLibrary.simpleMessage("Get Direct IP"),
     "sync": MessageLookupByLibrary.simpleMessage("Sync"),
     "syncAll": MessageLookupByLibrary.simpleMessage("Sync All"),
     "syncFailed": MessageLookupByLibrary.simpleMessage("Sync Failed"),
@@ -1339,21 +1340,37 @@ class MessageLookup extends MessageLookupByLibrary {
       "Requires administrator privileges",
     ),
     "years": m15,
-  
+
     "emojiStyle": MessageLookupByLibrary.simpleMessage("Emoji Style"),
-    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage("Select the Emoji style displayed in the app"),
+    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage(
+      "Select the Emoji style displayed in the app",
+    ),
     "tabAnimation": MessageLookupByLibrary.simpleMessage("Tab Animation"),
-    "tabAnimationDesc": MessageLookupByLibrary.simpleMessage("Only valid in mobile view"),
+    "tabAnimationDesc": MessageLookupByLibrary.simpleMessage(
+      "Only valid in mobile view",
+    ),
     "startRunning": MessageLookupByLibrary.simpleMessage("Start"),
-    "selectCustomFont": MessageLookupByLibrary.simpleMessage("Select / Change Font"),
-    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage("Tap to select a local .ttf or .otf font file"),
-    "customFontApplied": MessageLookupByLibrary.simpleMessage("Custom font applied"),
-    "customFontDisabled": MessageLookupByLibrary.simpleMessage("Restored to system default font"),
-    "invalidFontFormat": MessageLookupByLibrary.simpleMessage("Only .ttf and .otf font formats are supported"),
+    "selectCustomFont": MessageLookupByLibrary.simpleMessage(
+      "Select / Change Font",
+    ),
+    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage(
+      "Tap to select a local .ttf or .otf font file",
+    ),
+    "customFontApplied": MessageLookupByLibrary.simpleMessage(
+      "Custom font applied",
+    ),
+    "customFontDisabled": MessageLookupByLibrary.simpleMessage(
+      "Restored to system default font",
+    ),
+    "invalidFontFormat": MessageLookupByLibrary.simpleMessage(
+      "Only .ttf and .otf font formats are supported",
+    ),
     "fadingCube": MessageLookupByLibrary.simpleMessage("Fading Cube"),
     "foldingCube": MessageLookupByLibrary.simpleMessage("Folding Cube"),
     "pumpingHeart": MessageLookupByLibrary.simpleMessage("Pumping Heart"),
-    "pouringHourGlass": MessageLookupByLibrary.simpleMessage("Pouring Hour Glass"),
+    "pouringHourGlass": MessageLookupByLibrary.simpleMessage(
+      "Pouring Hour Glass",
+    ),
     "squareCircle": MessageLookupByLibrary.simpleMessage("Square Circle"),
     "threeRotatingDots": MessageLookupByLibrary.simpleMessage("Three Rotating"),
     "fourRotatingDots": MessageLookupByLibrary.simpleMessage("Four Rotating"),
@@ -1440,5 +1457,5 @@ class MessageLookup extends MessageLookupByLibrary {
     "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
       "No available LAN detected, please check Wi-Fi",
     ),
-      };
+  };
 }

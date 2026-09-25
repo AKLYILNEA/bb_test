@@ -600,6 +600,7 @@
   "systemApp": "برنامه‌های سیستم",
   "noNetworkApp": "برنامه‌های بدون شبکه",
   "contactMe": "تماس با ما",
+  "toggleLabel": "تغییر برچسب‌ها",
   "recoveryStrategy": "استراتژی بازیابی",
   "recoveryStrategy_override": "جایگزینی",
   "recoveryStrategy_compatible": "سازگار",

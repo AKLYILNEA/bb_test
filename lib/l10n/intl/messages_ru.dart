@@ -152,7 +152,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "accessControlSetting": MessageLookupByLibrary.simpleMessage(
       "Настройки маршрутизации приложений",
     ),
-    "accessControlShort": MessageLookupByLibrary.simpleMessage("Маршрутизация приложений"),
+    "accessControlShort": MessageLookupByLibrary.simpleMessage(
+      "Маршрутизация приложений",
+    ),
     "appDesc": MessageLookupByLibrary.simpleMessage("Настройки приложения"),
     "application": MessageLookupByLibrary.simpleMessage("Приложение"),
     "applicationDesc": MessageLookupByLibrary.simpleMessage(
@@ -305,6 +307,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "connectivity": MessageLookupByLibrary.simpleMessage("Подключение: "),
     "contactMe": MessageLookupByLibrary.simpleMessage("Связаться со мной"),
+    "toggleLabel": MessageLookupByLibrary.simpleMessage("Переключить подписи"),
     "content": MessageLookupByLibrary.simpleMessage("Содержимое"),
     "contentScheme": MessageLookupByLibrary.simpleMessage("Контентная тема"),
     "continent": MessageLookupByLibrary.simpleMessage("Континент"),
@@ -578,8 +581,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("Глобально"),
     "go": MessageLookupByLibrary.simpleMessage("Перейти"),
     "goDownload": MessageLookupByLibrary.simpleMessage("Перейти к загрузке"),
-    "customFont": MessageLookupByLibrary.simpleMessage("Пользовательский шрифт"),
-    "customFontDesc": MessageLookupByLibrary.simpleMessage("По умолчанию системный шрифт, включите для применения своего шрифта"),
+    "customFont": MessageLookupByLibrary.simpleMessage(
+      "Пользовательский шрифт",
+    ),
+    "customFontDesc": MessageLookupByLibrary.simpleMessage(
+      "По умолчанию системный шрифт, включите для применения своего шрифта",
+    ),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage(
       "Кэшировать изменения?",
     ),
@@ -697,7 +704,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("Обновить IP"),
     "maximize": MessageLookupByLibrary.simpleMessage("Развернуть"),
     "mediaUnlock": MessageLookupByLibrary.simpleMessage("Проверка доступности"),
-    "mediaUnlockShort": MessageLookupByLibrary.simpleMessage("Проверка доступности"),
+    "mediaUnlockShort": MessageLookupByLibrary.simpleMessage(
+      "Проверка доступности",
+    ),
     "mediaUnlockColorfulIcons": MessageLookupByLibrary.simpleMessage(
       "Показывать цветные значки по умолчанию",
     ),
@@ -1396,26 +1405,50 @@ class MessageLookup extends MessageLookupByLibrary {
       "Требуются права администратора",
     ),
     "years": m15,
-  
+
     "emojiStyle": MessageLookupByLibrary.simpleMessage("Стиль эмодзи"),
-    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage("Выберите стиль эмодзи в приложении"),
+    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage(
+      "Выберите стиль эмодзи в приложении",
+    ),
     "tabAnimation": MessageLookupByLibrary.simpleMessage("Анимация вкладок"),
-    "tabAnimationDesc": MessageLookupByLibrary.simpleMessage("Действует только в мобильном режиме"),
+    "tabAnimationDesc": MessageLookupByLibrary.simpleMessage(
+      "Действует только в мобильном режиме",
+    ),
     "startRunning": MessageLookupByLibrary.simpleMessage("Запуск"),
-    "selectCustomFont": MessageLookupByLibrary.simpleMessage("Выбрать / изменить шрифт"),
-    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage("Нажмите, чтобы выбрать файл шрифта .ttf или .otf"),
-    "customFontApplied": MessageLookupByLibrary.simpleMessage("Пользовательский шрифт применен"),
-    "customFontDisabled": MessageLookupByLibrary.simpleMessage("Восстановлен системный шрифт по умолчанию"),
-    "invalidFontFormat": MessageLookupByLibrary.simpleMessage("Поддерживаются только файлы шрифтов .ttf или .otf"),
+    "selectCustomFont": MessageLookupByLibrary.simpleMessage(
+      "Выбрать / изменить шрифт",
+    ),
+    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage(
+      "Нажмите, чтобы выбрать файл шрифта .ttf или .otf",
+    ),
+    "customFontApplied": MessageLookupByLibrary.simpleMessage(
+      "Пользовательский шрифт применен",
+    ),
+    "customFontDisabled": MessageLookupByLibrary.simpleMessage(
+      "Восстановлен системный шрифт по умолчанию",
+    ),
+    "invalidFontFormat": MessageLookupByLibrary.simpleMessage(
+      "Поддерживаются только файлы шрифтов .ttf или .otf",
+    ),
     "fadingCube": MessageLookupByLibrary.simpleMessage("Угасающий куб"),
     "foldingCube": MessageLookupByLibrary.simpleMessage("Складывающийся куб"),
     "pumpingHeart": MessageLookupByLibrary.simpleMessage("Пульсирующее сердце"),
-    "pouringHourGlass": MessageLookupByLibrary.simpleMessage("Струящиеся песочные часы"),
+    "pouringHourGlass": MessageLookupByLibrary.simpleMessage(
+      "Струящиеся песочные часы",
+    ),
     "squareCircle": MessageLookupByLibrary.simpleMessage("Квадрат в круг"),
-    "threeRotatingDots": MessageLookupByLibrary.simpleMessage("Три вращающиеся точки"),
-    "fourRotatingDots": MessageLookupByLibrary.simpleMessage("Четыре вращающиеся точки"),
-    "staggeredDotsWave": MessageLookupByLibrary.simpleMessage("Ступенчатая волна"),
-    "dotsTriangle": MessageLookupByLibrary.simpleMessage("Точечный треугольник"),
+    "threeRotatingDots": MessageLookupByLibrary.simpleMessage(
+      "Три вращающиеся точки",
+    ),
+    "fourRotatingDots": MessageLookupByLibrary.simpleMessage(
+      "Четыре вращающиеся точки",
+    ),
+    "staggeredDotsWave": MessageLookupByLibrary.simpleMessage(
+      "Ступенчатая волна",
+    ),
+    "dotsTriangle": MessageLookupByLibrary.simpleMessage(
+      "Точечный треугольник",
+    ),
     "zoom": MessageLookupByLibrary.simpleMessage("Масштаб"),
     "basicInfo": MessageLookupByLibrary.simpleMessage("Основная информация"),
     "addressInfo": MessageLookupByLibrary.simpleMessage("Адресная информация"),
@@ -1501,5 +1534,5 @@ class MessageLookup extends MessageLookupByLibrary {
     "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
       "Доступная локальная сеть не найдена, проверьте Wi-Fi",
     ),
-      };
+  };
 }
