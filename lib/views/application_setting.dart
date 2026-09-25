@@ -1,4 +1,5 @@
 import 'package:bett_box/common/common.dart';
+import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/providers/config.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
