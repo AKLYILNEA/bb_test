@@ -150,11 +150,20 @@ class _ToolViewState extends ConsumerState<ToolsView> {
     return _cachedSearchItems!;
   }
 
-  void _pushPage(BuildContext context, String title, Widget page) {
+  void _pushPage(
+    BuildContext context,
+    String title,
+    Widget page, {
+    bool? showScrollGradient,
+  }) {
     showExtend(
       context,
-      builder: (_, type) =>
-          AdaptiveSheetScaffold(type: type, title: title, body: page),
+      builder: (_, type) => AdaptiveSheetScaffold(
+        type: type,
+        title: title,
+        body: page,
+        showScrollGradient: showScrollGradient,
+      ),
     );
   }
 
@@ -252,6 +261,7 @@ class _ToolViewState extends ConsumerState<ToolsView> {
             context,
             appLocalizations.appAccessControl,
             const AccessView(),
+            showScrollGradient: false,
           ),
         ),
       _SearchItem(
@@ -1556,6 +1566,7 @@ class _AccessItem extends StatelessWidget {
       delegate: NextDelegate(
         title: appLocalizations.appAccessControl,
         builder: (_) => const AccessView(),
+        showScrollGradient: false,
       ),
     );
   }

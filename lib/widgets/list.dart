@@ -71,6 +71,7 @@ class NextDelegate extends Delegate {
   final bool blur;
   final bool wrap;
   final bool forceFull;
+  final bool? showScrollGradient;
 
   const NextDelegate({
     required this.title,
@@ -81,6 +82,7 @@ class NextDelegate extends Delegate {
     this.blur = false,
     this.wrap = true,
     this.forceFull = true,
+    this.showScrollGradient,
   }) : assert(widget != null || builder != null);
 }
 
@@ -360,6 +362,7 @@ class ListItem<T> extends StatelessWidget {
                       type: type,
                       body: child,
                       title: nextDelegate.title,
+                      showScrollGradient: nextDelegate.showScrollGradient,
                     )
                   : child;
             },

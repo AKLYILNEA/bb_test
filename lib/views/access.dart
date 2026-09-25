@@ -408,9 +408,17 @@ class _AccessViewState extends ConsumerState<AccessView>
         ? appLocalizations.accessControlAllowDesc
         : appLocalizations.accessControlNotAllowDesc;
 
-    return Column(
-      mainAxisSize: MainAxisSize.max,
-      children: [
+    return NotificationListener<Notification>(
+      onNotification: (notification) {
+        if (notification is ScrollNotification ||
+            notification is ScrollMetricsNotification) {
+          return true;
+        }
+        return false;
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
         Flexible(
           flex: 0,
           child: Padding(
@@ -644,7 +652,8 @@ class _AccessViewState extends ConsumerState<AccessView>
           ),
         ),
       ],
-    );
+    ),
+  );
   }
 }
 

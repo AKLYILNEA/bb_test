@@ -106,6 +106,7 @@ class AdaptiveSheetScaffold extends StatelessWidget {
   final String title;
   final List<Widget> actions;
   final Widget? leading;
+  final bool? showScrollGradient;
 
   const AdaptiveSheetScaffold({
     super.key,
@@ -114,6 +115,7 @@ class AdaptiveSheetScaffold extends StatelessWidget {
     required this.title,
     this.actions = const [],
     this.leading,
+    this.showScrollGradient,
   });
 
   @override
@@ -176,10 +178,12 @@ class AdaptiveSheetScaffold extends StatelessWidget {
                   appBar,
                   Flexible(
                     flex: 1,
-                    child: ScrollFeatherGradientOverlay(
-                      surfaceColor: backgroundColor,
-                      child: body,
-                    ),
+                    child: (showScrollGradient ?? true)
+                        ? ScrollFeatherGradientOverlay(
+                            surfaceColor: backgroundColor,
+                            child: body,
+                          )
+                        : body,
                   ),
                 ],
               ),
@@ -189,6 +193,7 @@ class AdaptiveSheetScaffold extends StatelessWidget {
             appBar: appBar,
             backgroundColor: backgroundColor,
             body: body,
+            showScrollGradient: showScrollGradient,
           );
 
     final isTv = globalState.isAndroidTV;
