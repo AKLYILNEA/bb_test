@@ -103,6 +103,7 @@ class _NavigationSidebarState extends State<NavigationSidebar>
         context.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600) ??
         const TextStyle(fontSize: 14, fontWeight: FontWeight.w600);
 
+    final textScaler = MediaQuery.textScalerOf(context);
     double maxTextWidth = 0.0;
     final direction = Directionality.maybeOf(context) ?? TextDirection.ltr;
     for (final item in widget.destinations) {
@@ -111,6 +112,7 @@ class _NavigationSidebarState extends State<NavigationSidebar>
         text: TextSpan(text: text, style: labelStyle),
         textDirection: direction,
         maxLines: 1,
+        textScaler: textScaler,
       )..layout();
       if (textPainter.width > maxTextWidth) {
         maxTextWidth = textPainter.width;
@@ -118,8 +120,12 @@ class _NavigationSidebarState extends State<NavigationSidebar>
       textPainter.dispose();
     }
 
-    final total = 4.0 + 8.0 + 24.0 + 12.0 + maxTextWidth + 12.0 + 4.0 + 16.0;
-    return math.max(140.0, math.min(240.0, total.ceilToDouble()));
+    final compactWidth = math.max(_compactWidth, widget.windowControls.width);
+    final sideInset = math.min(_maxSideInset, (compactWidth - _itemSize) / 2);
+    final iconInset = (compactWidth - sideInset * 2 - _iconSize) / 2;
+    final total =
+        sideInset * 2 + iconInset + _iconSize + _labelGap * 2 + maxTextWidth;
+    return math.max(104.0, math.min(240.0, total.ceilToDouble()));
   }
 
   @override
@@ -224,14 +230,19 @@ class _SidebarOverlay extends StatelessWidget {
               },
               child: FocusScope(
                 autofocus: true,
-                child: Material(
-                  color: colorScheme.surfaceContainer,
-                  shape: BorderDirectional(
-                    end: BorderSide(color: colorScheme.outlineVariant),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainer,
+                    border: BorderDirectional(
+                      end: BorderSide(color: colorScheme.outlineVariant),
+                    ),
                   ),
-                  child: AnimatedBuilder(
-                    animation: progress,
-                    builder: (_, _) => builder(progress.value),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: AnimatedBuilder(
+                      animation: progress,
+                      builder: (_, _) => builder(progress.value),
+                    ),
                   ),
                 ),
               ),
@@ -246,21 +257,22 @@ class _SidebarOverlay extends StatelessWidget {
 class _SidebarColors {
   _SidebarColors(ColorScheme scheme)
     : selectedFill = scheme.onSurface.withValues(alpha: 0.08),
+      selectedHoverFill = scheme.onSurface.withValues(alpha: 0.12),
+      pressedFill = scheme.onSurface.withValues(alpha: 0.08),
+      hoverFill = scheme.onSurface.withValues(alpha: 0.06),
       label = scheme.onSurface,
       icon = scheme.onSurfaceVariant,
-      indicator = scheme.primary,
-      overlay = WidgetStateProperty.fromMap({
-        WidgetState.pressed: scheme.onSurface.withValues(alpha: 0.06),
-        WidgetState.focused: scheme.onSurface.withValues(alpha: 0.1),
-        WidgetState.hovered: scheme.onSurface.withValues(alpha: 0.04),
-        WidgetState.any: Colors.transparent,
-      });
+      indicator = scheme.primary.withValues(
+        alpha: scheme.brightness == Brightness.light ? 0.20 : 0.26,
+      );
 
   final Color selectedFill;
+  final Color selectedHoverFill;
+  final Color pressedFill;
+  final Color hoverFill;
   final Color label;
   final Color icon;
   final Color indicator;
-  final WidgetStateProperty<Color> overlay;
 }
 
 class _SidebarPane extends StatelessWidget {
@@ -383,7 +395,7 @@ class _SidebarPane extends StatelessWidget {
   }
 }
 
-class _SidebarButton extends StatelessWidget {
+class _SidebarButton extends StatefulWidget {
   const _SidebarButton({
     super.key,
     required this.colors,
@@ -406,31 +418,63 @@ class _SidebarButton extends StatelessWidget {
   final Widget child;
 
   @override
+  State<_SidebarButton> createState() => _SidebarButtonState();
+}
+
+class _SidebarButtonState extends State<_SidebarButton> {
+  bool _hovered = false;
+  bool _pressed = false;
+
+  Color get _fill {
+    final colors = widget.colors;
+    if (widget.selected == true) {
+      return _hovered ? colors.selectedHoverFill : colors.selectedFill;
+    }
+    if (_pressed) {
+      return colors.pressedFill;
+    }
+    if (_hovered) {
+      return colors.hoverFill;
+    }
+    return Colors.transparent;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: sideInset,
+        horizontal: widget.sideInset,
         vertical: _itemGap / 2,
       ),
       child: Semantics(
         container: true,
         button: true,
-        selected: selected,
+        selected: widget.selected,
         child: Material(
-          color: selected == true ? colors.selectedFill : Colors.transparent,
-          shape: _itemShape,
-          child: InkWell(
-            onTap: onTap,
-            customBorder: _itemShape,
-            mouseCursor: SystemMouseCursors.click,
-            splashFactory: NoSplash.splashFactory,
-            overlayColor: colors.overlay,
-            child: Tooltip(
-              message: tooltip,
-              excludeFromSemantics: !tooltipIsLabel,
-              child: IconTheme.merge(
-                data: IconThemeData(size: _iconSize, color: colors.icon),
-                child: SizedBox(height: height, child: child),
+          color: Colors.transparent,
+          child: DecoratedBox(
+            decoration: ShapeDecoration(color: _fill, shape: _itemShape),
+            child: InkWell(
+              onTap: widget.onTap,
+              onHover: (value) => setState(() => _hovered = value),
+              onHighlightChanged: (value) => setState(() => _pressed = value),
+              canRequestFocus: false,
+              customBorder: _itemShape,
+              mouseCursor: SystemMouseCursors.click,
+              splashFactory: NoSplash.splashFactory,
+              overlayColor: const WidgetStatePropertyAll<Color>(
+                Colors.transparent,
+              ),
+              child: Tooltip(
+                message: widget.tooltip,
+                excludeFromSemantics: !widget.tooltipIsLabel,
+                child: IconTheme.merge(
+                  data: IconThemeData(
+                    size: _iconSize,
+                    color: widget.colors.icon,
+                  ),
+                  child: SizedBox(height: widget.height, child: widget.child),
+                ),
               ),
             ),
           ),

@@ -267,12 +267,14 @@ class AppSidebarContainer extends ConsumerWidget {
     required Widget child,
   }) {
     final colorScheme = context.colorScheme;
-    return Material(
-      color: colorScheme.surfaceContainer,
-      shape: BorderDirectional(
-        end: BorderSide(color: colorScheme.outlineVariant),
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainer,
+        border: BorderDirectional(
+          end: BorderSide(color: colorScheme.outlineVariant),
+        ),
       ),
-      child: child,
+      child: Material(color: Colors.transparent, child: child),
     );
   }
 
