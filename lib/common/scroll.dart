@@ -6,6 +6,8 @@ import 'package:bett_box/widgets/scroll.dart';
 import 'package:flutter/material.dart';
 
 class BaseScrollBehavior extends MaterialScrollBehavior {
+  const BaseScrollBehavior();
+
   @override
   Set<PointerDeviceKind> get dragDevices => {
     PointerDeviceKind.touch,
@@ -18,6 +20,8 @@ class BaseScrollBehavior extends MaterialScrollBehavior {
 }
 
 class HiddenBarScrollBehavior extends BaseScrollBehavior {
+  const HiddenBarScrollBehavior();
+
   @override
   Widget buildScrollbar(
     BuildContext context,
@@ -29,6 +33,8 @@ class HiddenBarScrollBehavior extends BaseScrollBehavior {
 }
 
 class ShowBarScrollBehavior extends BaseScrollBehavior {
+  const ShowBarScrollBehavior();
+
   @override
   Widget buildScrollbar(
     BuildContext context,

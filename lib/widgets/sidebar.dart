@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
 
 import 'package:bett_box/common/common.dart';
+import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/widgets/animated_nav_icon.dart';
 import 'package:bett_box/widgets/sidebar_toggle_icon.dart';
@@ -114,6 +115,7 @@ class _NavigationSidebarState extends State<NavigationSidebar>
       if (textPainter.width > maxTextWidth) {
         maxTextWidth = textPainter.width;
       }
+      textPainter.dispose();
     }
 
     final total = 4.0 + 8.0 + 24.0 + 12.0 + maxTextWidth + 12.0 + 4.0 + 16.0;
@@ -297,6 +299,13 @@ class _SidebarPane extends StatelessWidget {
     final labelStyle = context.textTheme.bodyMedium?.copyWith(
       color: colors.label,
     );
+    final labelWidth = rowWidth - iconInset - _iconSize - _labelGap * 2;
+    String rowTooltip(String label) =>
+        expanded &&
+            progress == 1 &&
+            _fitsOneLine(context, label, labelStyle, labelWidth)
+        ? ''
+        : label;
 
     return SizedBox(
       width: lerpDouble(compactWidth, expandedWidth, progress),
@@ -342,7 +351,7 @@ class _SidebarPane extends StatelessWidget {
                             height: itemHeight,
                             sideInset: sideInset,
                             selected: index == selectedIndex,
-                            tooltip: item.label.localizedName,
+                            tooltip: rowTooltip(item.label.localizedName),
                             onTap: () => onSelected(index),
                             child: _DestinationRow(
                               item: item,
@@ -429,6 +438,24 @@ class _SidebarButton extends StatelessWidget {
       ),
     );
   }
+}
+
+bool _fitsOneLine(
+  BuildContext context,
+  String text,
+  TextStyle? style,
+  double width,
+) {
+  final painter = TextPainter(
+    text: TextSpan(text: text, style: style),
+    maxLines: 1,
+    textDirection: Directionality.of(context),
+    textScaler: MediaQuery.textScalerOf(context),
+    locale: Localizations.maybeLocaleOf(context),
+  )..layout(maxWidth: width);
+  final fits = !painter.didExceedMaxLines;
+  painter.dispose();
+  return fits;
 }
 
 class _DestinationRow extends StatelessWidget {
