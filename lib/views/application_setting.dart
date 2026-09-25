@@ -168,6 +168,31 @@ class ShowStartSwitchItem extends ConsumerWidget {
   }
 }
 
+class ShowCardStartButtonItem extends ConsumerWidget {
+  const ShowCardStartButtonItem({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final showCardStartButton = ref.watch(
+      appSettingProvider.select((state) => state.showCardStartButton),
+    );
+    return ListItem.switchItem(
+      title: Text(appLocalizations.cardStartButton),
+      subtitle: Text(appLocalizations.cardStartButtonDesc),
+      delegate: SwitchDelegate(
+        value: showCardStartButton,
+        onChanged: (value) {
+          ref
+              .read(appSettingProvider.notifier)
+              .updateState(
+                (state) => state.copyWith(showCardStartButton: value),
+              );
+        },
+      ),
+    );
+  }
+}
+
 class AlwaysShowTitleBarItem extends ConsumerWidget {
   const AlwaysShowTitleBarItem({super.key});
 
@@ -256,6 +281,7 @@ class ApplicationSettingView extends StatelessWidget {
           const AlwaysShowTitleBarItem(),
       ],
       const ShowStartSwitchItem(),
+      const ShowCardStartButtonItem(),
       if (system.isAndroid) ...[NavBarHapticFeedbackItem()],
       CloseConnectionsItem(),
       UsageItem(),

@@ -1126,6 +1126,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage(
       "Display independent switch button on the homepage",
     ),
+    "cardStartButton": MessageLookupByLibrary.simpleMessage("Card Switch"),
+    "cardStartButtonDesc": MessageLookupByLibrary.simpleMessage(
+        "Restore default widget-style start button"),
     "shrink": MessageLookupByLibrary.simpleMessage("Compact"),
     "silentLaunch": MessageLookupByLibrary.simpleMessage("Silent Launch"),
     "silentLaunchDesc": MessageLookupByLibrary.simpleMessage(

@@ -26,7 +26,7 @@ final _itemShape = const RoundedSuperellipseBorder(
   borderRadius: BorderRadius.all(Radius.circular(10)),
 );
 
-class NavigationSidebar extends StatefulWidget {
+class NavigationSidebar extends StatelessWidget {
   const NavigationSidebar({
     super.key,
     required this.destinations,
@@ -44,60 +44,6 @@ class NavigationSidebar extends StatefulWidget {
   final VoidCallback? onToggle;
   final Size windowControls;
 
-  @override
-  State<NavigationSidebar> createState() => _NavigationSidebarState();
-}
-
-class _NavigationSidebarState extends State<NavigationSidebar>
-    with SingleTickerProviderStateMixin {
-  final _overlayController = OverlayPortalController();
-  late final AnimationController _overlayExpansion = AnimationController(
-    vsync: this,
-    duration: _expandDuration,
-  );
-  late final CurvedAnimation _overlayProgress = CurvedAnimation(
-    parent: _overlayExpansion,
-    curve: Curves.easeInOutCubic,
-  );
-
-  @override
-  void didUpdateWidget(covariant NavigationSidebar oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.onToggle != null && _overlayController.isShowing) {
-      _overlayExpansion.value = 0;
-      WidgetsBinding.instance.addPostFrameCallback((_) => _hideIfDismissed());
-    }
-  }
-
-  void _handleToggle() {
-    final onToggle = widget.onToggle;
-    if (onToggle != null) {
-      onToggle();
-    } else if (_overlayExpansion.isForwardOrCompleted) {
-      _closeOverlay();
-    } else {
-      _overlayController.show();
-      _overlayExpansion.forward();
-    }
-  }
-
-  void _closeOverlay() {
-    _overlayExpansion.reverse().whenCompleteOrCancel(_hideIfDismissed);
-  }
-
-  void _hideIfDismissed() {
-    if (mounted && _overlayExpansion.isDismissed) {
-      _overlayController.hide();
-    }
-  }
-
-  @override
-  void dispose() {
-    _overlayProgress.dispose();
-    _overlayExpansion.dispose();
-    super.dispose();
-  }
-
   double _calculateExpandedWidth(BuildContext context) {
     final labelStyle =
         context.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600) ??
@@ -106,7 +52,7 @@ class _NavigationSidebarState extends State<NavigationSidebar>
     final textScaler = MediaQuery.textScalerOf(context);
     double maxTextWidth = 0.0;
     final direction = Directionality.maybeOf(context) ?? TextDirection.ltr;
-    for (final item in widget.destinations) {
+    for (final item in destinations) {
       final text = item.label.localizedName;
       final textPainter = TextPainter(
         text: TextSpan(text: text, style: labelStyle),
@@ -121,131 +67,35 @@ class _NavigationSidebarState extends State<NavigationSidebar>
     }
 
     final dpr = MediaQuery.devicePixelRatioOf(context);
-    final rawCompactWidth = math.max(_compactWidth, widget.windowControls.width);
+    final rawCompactWidth = math.max(_compactWidth, windowControls.width);
     final compactWidth = (rawCompactWidth * dpr).ceil() / dpr;
     final sideInset = math.min(_maxSideInset, (compactWidth - _itemSize) / 2);
     final iconInset = (compactWidth - sideInset * 2 - _iconSize) / 2;
     final total =
         sideInset * 2 + iconInset + _iconSize + _labelGap * 2 + maxTextWidth;
-    final clamped = math.max(104.0, math.min(240.0, total));
+    final clamped = math.max(136.0, math.min(240.0, total));
     return (clamped * dpr).ceil() / dpr;
   }
 
   @override
   Widget build(BuildContext context) {
-    final safePadding = MediaQuery.paddingOf(context);
     final expandedWidth = _calculateExpandedWidth(context);
 
-    return OverlayPortal.overlayChildLayoutBuilder(
-      controller: _overlayController,
-      overlayChildBuilder: (context, info) {
-        return _SidebarOverlay(
-          anchor: MatrixUtils.transformRect(
-            info.childPaintTransform,
-            Offset.zero & info.childSize,
-          ),
-          overlayWidth: info.overlaySize.width,
-          progress: _overlayProgress,
-          onDismiss: _closeOverlay,
-          builder: (progress) => Padding(
-            padding: safePadding,
-            child: _SidebarPane(
-              progress: progress,
-              windowControls: widget.windowControls,
-              expandedWidth: expandedWidth,
-              destinations: widget.destinations,
-              selectedIndex: widget.selectedIndex,
-              onSelected: (index) {
-                widget.onSelected(index);
-                _closeOverlay();
-              },
-              onToggle: _closeOverlay,
-            ),
-          ),
-        );
-      },
-      child: SafeArea(
-        child: TweenAnimationBuilder<double>(
-          tween: Tween(end: widget.expanded ? 1.0 : 0.0),
-          duration: _expandDuration,
-          curve: Curves.easeInOutCubic,
-          builder: (context, progress, _) => _SidebarPane(
-            progress: progress,
-            windowControls: widget.windowControls,
-            expandedWidth: expandedWidth,
-            destinations: widget.destinations,
-            selectedIndex: widget.selectedIndex,
-            onSelected: widget.onSelected,
-            onToggle: _handleToggle,
-          ),
+    return SafeArea(
+      child: TweenAnimationBuilder<double>(
+        tween: Tween(end: expanded ? 1.0 : 0.0),
+        duration: _expandDuration,
+        curve: Curves.easeInOutCubic,
+        builder: (context, progress, _) => _SidebarPane(
+          progress: progress,
+          windowControls: windowControls,
+          expandedWidth: expandedWidth,
+          destinations: destinations,
+          selectedIndex: selectedIndex,
+          onSelected: onSelected,
+          onToggle: onToggle ?? () {},
         ),
       ),
-    );
-  }
-}
-
-class _SidebarOverlay extends StatelessWidget {
-  const _SidebarOverlay({
-    required this.anchor,
-    required this.overlayWidth,
-    required this.progress,
-    required this.onDismiss,
-    required this.builder,
-  });
-
-  final Rect anchor;
-  final double overlayWidth;
-  final Animation<double> progress;
-  final VoidCallback onDismiss;
-  final Widget Function(double progress) builder;
-
-  @override
-  Widget build(BuildContext context) {
-    final isLtr = Directionality.of(context) == TextDirection.ltr;
-    final colorScheme = context.colorScheme;
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: onDismiss,
-          ),
-        ),
-        Positioned(
-          left: isLtr ? anchor.left : null,
-          right: isLtr ? null : overlayWidth - anchor.right,
-          top: anchor.top,
-          height: anchor.height,
-          child: Shortcuts(
-            shortcuts: const {
-              SingleActivator(LogicalKeyboardKey.escape): DismissIntent(),
-            },
-            child: Actions(
-              actions: {
-                DismissIntent: CallbackAction<DismissIntent>(
-                  onInvoke: (_) {
-                    onDismiss();
-                    return null;
-                  },
-                ),
-              },
-              child: FocusScope(
-                autofocus: true,
-                child: Material(
-                  color: colorScheme.surfaceContainer,
-                  shape: BorderDirectional(
-                    end: BorderSide(color: colorScheme.outlineVariant),
-                  ),
-                  child: AnimatedBuilder(
-                    animation: progress,
-                    builder: (_, _) => builder(progress.value),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

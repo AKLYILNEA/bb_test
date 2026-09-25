@@ -895,6 +895,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage(
       "ホーム画面に独立したON/OFFボタンを表示",
     ),
+    "cardStartButton": MessageLookupByLibrary.simpleMessage("???????"),
+    "cardStartButtonDesc": MessageLookupByLibrary.simpleMessage(
+        "?????????????????????"),
     "shrink": MessageLookupByLibrary.simpleMessage("コンパクト"),
     "silentLaunch": MessageLookupByLibrary.simpleMessage("サイレント起動"),
     "silentLaunchDesc": MessageLookupByLibrary.simpleMessage(

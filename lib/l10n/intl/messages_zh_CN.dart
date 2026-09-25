@@ -805,6 +805,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "showPanel": MessageLookupByLibrary.simpleMessage("显示窗口"),
     "showStartSwitch": MessageLookupByLibrary.simpleMessage("联动开关"),
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage("首页显示独立的开关按钮"),
+    "cardStartButton": MessageLookupByLibrary.simpleMessage("????"),
+    "cardStartButtonDesc": MessageLookupByLibrary.simpleMessage(
+        "?????????????????"),
     "shrink": MessageLookupByLibrary.simpleMessage("紧凑"),
     "silentLaunch": MessageLookupByLibrary.simpleMessage("静默启动"),
     "silentLaunchDesc": MessageLookupByLibrary.simpleMessage("不打开软件直接在后台启动"),

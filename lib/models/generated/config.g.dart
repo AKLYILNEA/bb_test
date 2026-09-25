@@ -41,6 +41,7 @@ _AppSettingProps _$AppSettingPropsFromJson(
   closeConnections: json['closeConnections'] as bool? ?? true,
   testUrl: json['testUrl'] as String? ?? defaultTestUrl,
   showStartSwitch: json['showStartSwitch'] as bool? ?? false,
+  showCardStartButton: json['showCardStartButton'] as bool? ?? false,
   enableNavBarHapticFeedback:
       json['enableNavBarHapticFeedback'] as bool? ?? true,
   autoCheckUpdate: json['autoCheckUpdate'] as bool? ?? true,
@@ -88,6 +89,7 @@ Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>
       'closeConnections': instance.closeConnections,
       'testUrl': instance.testUrl,
       'showStartSwitch': instance.showStartSwitch,
+      'showCardStartButton': instance.showCardStartButton,
       'enableNavBarHapticFeedback': instance.enableNavBarHapticFeedback,
       'autoCheckUpdate': instance.autoCheckUpdate,
       'showLabel': instance.showLabel,
@@ -133,6 +135,7 @@ const _$DashboardWidgetEnumMap = {
   DashboardWidget.mediaUnlock: 'mediaUnlock',
   DashboardWidget.mediaUnlockSmall: 'mediaUnlockSmall',
   DashboardWidget.currentProfile: 'currentProfile',
+  DashboardWidget.startButton: 'startButton',
 };
 
 const _$MediaPlatformEnumMap = {

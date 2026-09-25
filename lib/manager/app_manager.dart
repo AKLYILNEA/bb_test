@@ -300,8 +300,6 @@ class AppSidebarContainer extends ConsumerWidget {
       return child;
     }
     final currentIndex = navigationState.currentIndex;
-    final viewMode = navigationState.viewMode;
-    final canExpand = viewMode == ViewMode.desktop;
     final showLabel = ref.watch(appSettingProvider).showLabel;
 
     return Container(
@@ -339,7 +337,7 @@ class AppSidebarContainer extends ConsumerWidget {
                     child: NavigationSidebar(
                       destinations: navigationItems,
                       selectedIndex: currentIndex,
-                      expanded: canExpand && showLabel,
+                      expanded: showLabel,
                       windowControls: Size(
                         system.isMacOS ? 72.0 : 0.0,
                         system.isMacOS ? 24.0 : 0.0,
@@ -347,17 +345,15 @@ class AppSidebarContainer extends ConsumerWidget {
                       onSelected: (index) {
                         _handleToPage(navigationItems, currentIndex, index);
                       },
-                      onToggle: canExpand
-                          ? () {
-                              ref
-                                  .read(appSettingProvider.notifier)
-                                  .updateState(
-                                    (state) => state.copyWith(
-                                      showLabel: !state.showLabel,
-                                    ),
-                                  );
-                            }
-                          : null,
+                      onToggle: () {
+                        ref
+                            .read(appSettingProvider.notifier)
+                            .updateState(
+                              (state) => state.copyWith(
+                                showLabel: !state.showLabel,
+                              ),
+                            );
+                      },
                     ),
                   ),
                 ),

@@ -471,6 +471,16 @@ class _ToolViewState extends ConsumerState<ToolsView> {
           const ApplicationSettingView(),
         ),
       ),
+      _SearchItem(
+        title: appLocalizations.cardStartButton,
+        subtitle: appLocalizations.cardStartButtonDesc,
+        category: appCategory,
+        onTap: (context, _) => _pushPage(
+          context,
+          appLocalizations.application,
+          const ApplicationSettingView(),
+        ),
+      ),
       if (system.isAndroid)
         _SearchItem(
           title: appLocalizations.navBarHapticFeedback,

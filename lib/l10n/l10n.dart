@@ -1690,6 +1690,26 @@ class AppLocalizations {
     );
   }
 
+  /// `Card Switch`
+  String get cardStartButton {
+    return Intl.message(
+      'Card Switch',
+      name: 'cardStartButton',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Restore default widget-style start button`
+  String get cardStartButtonDesc {
+    return Intl.message(
+      'Restore default widget-style start button',
+      name: 'cardStartButtonDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Bettbox is based on the powerful and flexible Mihomo (Clash.Meta) proxy kernel, dedicated to a superior user experience. Our vision: Connecting Open Source and AI, Accelerating Innovation`
   String get desc {
     return Intl.message(

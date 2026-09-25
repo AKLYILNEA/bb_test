@@ -1154,6 +1154,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage(
       "نمایش دکمه مستقل روشن/خاموش در صفحه اصلی",
     ),
+    "cardStartButton": MessageLookupByLibrary.simpleMessage("????? ?????"),
+    "cardStartButtonDesc": MessageLookupByLibrary.simpleMessage(
+        "????????? ???? ???? ???? ???????"),
     "shrink": MessageLookupByLibrary.simpleMessage("فشرده"),
     "silentLaunch": MessageLookupByLibrary.simpleMessage("اجرای بی‌صدا"),
     "silentLaunchDesc": MessageLookupByLibrary.simpleMessage(
