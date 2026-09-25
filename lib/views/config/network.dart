@@ -602,21 +602,25 @@ class BypassPrivateRouteItem extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(appLocalizations.bypassPrivateRoute),
-          if (system.isDesktop) ...[
-            const SizedBox(width: 6),
-            Tooltip(
-              message: appLocalizations.edit,
+          Tooltip(
+            message: appLocalizations.edit,
+            child: Material(
+              color: Colors.transparent,
               child: InkResponse(
                 radius: 16,
+                highlightShape: BoxShape.circle,
                 onTap: () => _showEditPage(context, ref),
-                child: Icon(
-                  FluentIcons.settings_24_regular,
-                  size: 18,
-                  color: context.colorScheme.onSurfaceVariant,
+                child: Padding(
+                  padding: const EdgeInsets.all(7),
+                  child: Icon(
+                    FluentIcons.settings_24_regular,
+                    size: 18,
+                    color: context.colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ),
             ),
-          ],
+          ),
         ],
       ),
       subtitle: Text(appLocalizations.bypassPrivateRouteDesc),
