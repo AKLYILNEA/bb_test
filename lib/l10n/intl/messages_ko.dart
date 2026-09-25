@@ -905,9 +905,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage(
       "홈 화면에 독립된 시작/정지 스위치 표시",
     ),
-    "cardStartButton": MessageLookupByLibrary.simpleMessage("?? ???"),
+    "cardStartButton": MessageLookupByLibrary.simpleMessage("카드 스위치"),
     "cardStartButtonDesc": MessageLookupByLibrary.simpleMessage(
-        "?? ??? ?? ???? ??"),
+        "기본 위젯형 시작 버튼으로 복원"),
     "shrink": MessageLookupByLibrary.simpleMessage("축소"),
     "silentLaunch": MessageLookupByLibrary.simpleMessage("백그라운드 시작"),
     "silentLaunchDesc": MessageLookupByLibrary.simpleMessage(

@@ -195,7 +195,11 @@ class _StartButtonState extends ConsumerState<StartButton> {
       return Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Icon(Icons.play_arrow, size: 16, color: context.colorScheme.primary),
+          Icon(
+            Icons.play_arrow_rounded,
+            size: 16,
+            color: context.colorScheme.primary,
+          ),
           const SizedBox(width: 4),
           Expanded(
             child: Text(
@@ -213,7 +217,11 @@ class _StartButtonState extends ConsumerState<StartButton> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Icon(Icons.pause, size: 16, color: context.colorScheme.primary),
+        Icon(
+          Icons.pause_rounded,
+          size: 16,
+          color: context.colorScheme.primary,
+        ),
         const SizedBox(width: 4),
         const Text('  '),
         Expanded(

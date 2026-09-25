@@ -73,7 +73,7 @@ class NavigationSidebar extends StatelessWidget {
     final iconInset = (compactWidth - sideInset * 2 - _iconSize) / 2;
     final total =
         sideInset * 2 + iconInset + _iconSize + _labelGap * 2 + maxTextWidth;
-    final clamped = math.max(136.0, math.min(240.0, total));
+    final clamped = math.max(123.0, math.min(240.0, total));
     return (clamped * dpr).ceil() / dpr;
   }
 
