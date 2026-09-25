@@ -1167,7 +1167,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "cardStartButton": MessageLookupByLibrary.simpleMessage("Переключатель-карточка"),
     "cardStartButtonDesc": MessageLookupByLibrary.simpleMessage(
-        "Восстановить стандартную кнопку запуска в виде карточки"),
+        "Отображать кнопку-карточку переключения на главной странице"),
     "shrink": MessageLookupByLibrary.simpleMessage("Стандарт"),
     "silentLaunch": MessageLookupByLibrary.simpleMessage("Тихий запуск"),
     "silentLaunchDesc": MessageLookupByLibrary.simpleMessage(

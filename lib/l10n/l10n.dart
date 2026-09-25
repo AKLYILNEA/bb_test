@@ -1700,10 +1700,10 @@ class AppLocalizations {
     );
   }
 
-  /// `Restore default widget-style start button`
+  /// `Display card-style switch button on the homepage`
   String get cardStartButtonDesc {
     return Intl.message(
-      'Restore default widget-style start button',
+      'Display card-style switch button on the homepage',
       name: 'cardStartButtonDesc',
       desc: '',
       args: [],

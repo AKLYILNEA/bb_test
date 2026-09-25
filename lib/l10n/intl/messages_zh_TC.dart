@@ -819,7 +819,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage("首頁顯示獨立的開關按鈕"),
     "cardStartButton": MessageLookupByLibrary.simpleMessage("卡片開關"),
     "cardStartButtonDesc": MessageLookupByLibrary.simpleMessage(
-        "開啟後恢復為預設的小部件式啟動按鈕"),
+        "首頁顯示卡片式開關按鈕"),
     "shrink": MessageLookupByLibrary.simpleMessage("緊湊"),
     "silentLaunch": MessageLookupByLibrary.simpleMessage("靜默啟動"),
     "silentLaunchDesc": MessageLookupByLibrary.simpleMessage("不打開軟體直接在背景啟動"),

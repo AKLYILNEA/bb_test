@@ -1128,7 +1128,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "cardStartButton": MessageLookupByLibrary.simpleMessage("Card Switch"),
     "cardStartButtonDesc": MessageLookupByLibrary.simpleMessage(
-        "Restore default widget-style start button"),
+        "Display card-style switch button on the homepage"),
     "shrink": MessageLookupByLibrary.simpleMessage("Compact"),
     "silentLaunch": MessageLookupByLibrary.simpleMessage("Silent Launch"),
     "silentLaunchDesc": MessageLookupByLibrary.simpleMessage(

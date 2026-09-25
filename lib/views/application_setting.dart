@@ -182,11 +182,29 @@ class ShowCardStartButtonItem extends ConsumerWidget {
       delegate: SwitchDelegate(
         value: showCardStartButton,
         onChanged: (value) {
-          ref
-              .read(appSettingProvider.notifier)
-              .updateState(
-                (state) => state.copyWith(showCardStartButton: value),
+          ref.read(appSettingProvider.notifier).updateState((state) {
+            if (value) {
+              final mobile = [
+                ...state.mobileDashboardWidgets.where(
+                  (w) => w != DashboardWidget.startButton,
+                ),
+                DashboardWidget.startButton,
+              ];
+              final desktop = [
+                ...state.desktopDashboardWidgets.where(
+                  (w) => w != DashboardWidget.startButton,
+                ),
+                DashboardWidget.startButton,
+              ];
+              return state.copyWith(
+                showCardStartButton: true,
+                mobileDashboardWidgets: mobile,
+                desktopDashboardWidgets: desktop,
               );
+            } else {
+              return state.copyWith(showCardStartButton: false);
+            }
+          });
         },
       ),
     );

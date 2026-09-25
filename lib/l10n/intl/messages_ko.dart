@@ -907,7 +907,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "cardStartButton": MessageLookupByLibrary.simpleMessage("카드 스위치"),
     "cardStartButtonDesc": MessageLookupByLibrary.simpleMessage(
-        "기본 위젯형 시작 버튼으로 복원"),
+        "홈 화면에 카드형 스위치 버튼 표시"),
     "shrink": MessageLookupByLibrary.simpleMessage("축소"),
     "silentLaunch": MessageLookupByLibrary.simpleMessage("백그라운드 시작"),
     "silentLaunchDesc": MessageLookupByLibrary.simpleMessage(

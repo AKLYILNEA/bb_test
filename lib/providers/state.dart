@@ -299,7 +299,7 @@ DashboardState dashboardState(Ref ref) {
   if (showCardStartButton) {
     widgets = dashboardWidgets.contains(DashboardWidget.startButton)
         ? dashboardWidgets
-        : [DashboardWidget.startButton, ...dashboardWidgets];
+        : [...dashboardWidgets, DashboardWidget.startButton];
   } else {
     widgets = dashboardWidgets
         .where((w) => w != DashboardWidget.startButton)

@@ -107,7 +107,7 @@ class _SidebarColors {
       pressedFill = scheme.onSurface.withValues(alpha: 0.08),
       hoverFill = scheme.onSurface.withValues(alpha: 0.06),
       icon = scheme.onSurfaceVariant,
-      selectedIcon = scheme.onSecondaryContainer,
+      selectedIcon = scheme.primary,
       indicator = scheme.primary;
 
   final Color selectedFill;

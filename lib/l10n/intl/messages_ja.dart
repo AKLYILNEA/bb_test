@@ -897,7 +897,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "cardStartButton": MessageLookupByLibrary.simpleMessage("カードスイッチ"),
     "cardStartButtonDesc": MessageLookupByLibrary.simpleMessage(
-        "デフォルトのウィジェット型起動ボタンに復元"),
+        "ホーム画面にカード型スイッチボタンを表示"),
     "shrink": MessageLookupByLibrary.simpleMessage("コンパクト"),
     "silentLaunch": MessageLookupByLibrary.simpleMessage("サイレント起動"),
     "silentLaunchDesc": MessageLookupByLibrary.simpleMessage(
