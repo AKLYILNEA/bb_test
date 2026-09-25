@@ -245,12 +245,19 @@ class AppSidebarContainer extends ConsumerWidget {
       builder: (_, ref, _) {
         final loading = ref.watch(loadingProvider);
         final isMobileView = ref.watch(isMobileViewProvider);
-        return loading && !isMobileView
-            ? RotatedBox(
-                quarterTurns: 1,
-                child: const LinearProgressIndicator(),
-              )
-            : Container();
+        if (!loading || isMobileView) return const SizedBox.shrink();
+        return const Positioned(
+          top: 0,
+          bottom: 0,
+          right: 0,
+          width: 2.0,
+          child: IgnorePointer(
+            child: RotatedBox(
+              quarterTurns: 1,
+              child: LinearProgressIndicator(),
+            ),
+          ),
+        );
       },
     );
   }
@@ -259,45 +266,29 @@ class AppSidebarContainer extends ConsumerWidget {
     required BuildContext context,
     required Widget child,
   }) {
-    final isLight = context.colorScheme.brightness == Brightness.light;
-    return Container(
-      decoration: BoxDecoration(
-        color: context.colorScheme.surfaceContainerHigh,
-        border: Border(
-          right: BorderSide(
-            color: context.colorScheme.outlineVariant.withValues(
-              alpha: isLight ? 0.6 : 0.45,
-            ),
-          ),
-        ),
+    final colorScheme = context.colorScheme;
+    return Material(
+      color: colorScheme.surfaceContainer,
+      shape: BorderDirectional(
+        end: BorderSide(color: colorScheme.outlineVariant),
       ),
-      child: Material(color: Colors.transparent, child: child),
+      child: child,
     );
   }
 
-  double _calculateExtendedWidth(
-    BuildContext context,
+  void _handleToPage(
     List<NavigationItem> items,
+    int currentIndex,
+    int targetIndex,
   ) {
-    final labelStyle =
-        context.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600) ??
-        const TextStyle(fontSize: 14, fontWeight: FontWeight.w600);
-
-    double maxTextWidth = 0.0;
-    final direction = Directionality.maybeOf(context) ?? TextDirection.ltr;
-    for (final item in items) {
-      final text = item.label.localizedName;
-      final textPainter = TextPainter(
-        text: TextSpan(text: text, style: labelStyle),
-        textDirection: direction,
-        maxLines: 1,
-      )..layout();
-      if (textPainter.width > maxTextWidth) {
-        maxTextWidth = textPainter.width;
+    final label = items[targetIndex].label;
+    if (currentIndex == targetIndex) {
+      final pageContext = GlobalObjectKey(label).currentContext;
+      if (pageContext != null) {
+        Navigator.of(pageContext).popUntil((route) => route.isFirst);
       }
     }
-
-    return math.max(96.0, (72.0 + maxTextWidth + 28.0).ceilToDouble());
+    globalState.appController.toPage(label);
   }
 
   @override
@@ -309,8 +300,10 @@ class AppSidebarContainer extends ConsumerWidget {
       return child;
     }
     final currentIndex = navigationState.currentIndex;
+    final viewMode = navigationState.viewMode;
+    final canExpand = viewMode == ViewMode.desktop;
     final showLabel = ref.watch(appSettingProvider).showLabel;
-    final extendedWidth = _calculateExtendedWidth(context, navigationItems);
+
     return Row(
       children: [
         Stack(
@@ -318,191 +311,52 @@ class AppSidebarContainer extends ConsumerWidget {
           children: [
             _buildBackground(
               context: context,
-              child: SafeArea(
-                left: true,
-                top: true,
-                right: false,
-                bottom: false,
-                child: Column(
-                  children: [
-                    if (system.isMacOS) const SizedBox(height: 22),
-                    const SizedBox(height: 12),
-                    Expanded(
-                      child: ScrollConfiguration(
-                        behavior: HiddenBarScrollBehavior(),
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
-                            return SingleChildScrollView(
-                              child: ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  minHeight: constraints.maxHeight,
-                                ),
-                                child: IntrinsicHeight(
-                                  child: CallbackShortcuts(
-                                    bindings: <ShortcutActivator, VoidCallback>{
-                                      const SingleActivator(
-                                        LogicalKeyboardKey.arrowUp,
-                                      ): () {
-                                        if (currentIndex > 0) {
-                                          globalState.appController.toPage(
-                                            navigationItems[currentIndex - 1]
-                                                .label,
-                                          );
-                                        }
-                                      },
-                                      const SingleActivator(
-                                        LogicalKeyboardKey.arrowDown,
-                                      ): () {
-                                        if (currentIndex <
-                                            navigationItems.length - 1) {
-                                          globalState.appController.toPage(
-                                            navigationItems[currentIndex + 1]
-                                                .label,
-                                          );
-                                        }
-                                      },
-                                      const SingleActivator(
-                                        LogicalKeyboardKey.select,
-                                      ): () {},
-                                      const SingleActivator(
-                                        LogicalKeyboardKey.enter,
-                                      ): () {},
-                                    },
-                                    child: Focus(
-                                      autofocus: true,
-                                      child: NavigationRail(
-                                        minExtendedWidth: extendedWidth,
-                                        backgroundColor: Colors.transparent,
-                                        indicatorColor: context
-                                            .colorScheme
-                                            .primary
-                                            .withValues(
-                                              alpha:
-                                                  context
-                                                          .colorScheme
-                                                          .brightness ==
-                                                      Brightness.light
-                                                  ? 0.20
-                                                  : 0.26,
-                                            ),
-                                        indicatorShape:
-                                            const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(16),
-                                              ),
-                                            ),
-                                        selectedIconTheme: IconThemeData(
-                                          color: context.colorScheme.primary,
-                                        ),
-                                        unselectedIconTheme: IconThemeData(
-                                          color: context
-                                              .colorScheme
-                                              .onSurfaceVariant,
-                                        ),
-                                        selectedLabelTextStyle: context
-                                            .textTheme
-                                            .labelLarge!
-                                            .copyWith(
-                                              color:
-                                                  context.colorScheme.primary,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                        unselectedLabelTextStyle: context
-                                            .textTheme
-                                            .labelLarge!
-                                            .copyWith(
-                                              color: context
-                                                  .colorScheme
-                                                  .onSurfaceVariant,
-                                            ),
-                                        destinations: navigationItems
-                                            .asMap()
-                                            .entries
-                                            .map((entry) {
-                                              final index = entry.key;
-                                              final e = entry.value;
-                                              final isSelected =
-                                                  currentIndex == index;
-                                              return NavigationRailDestination(
-                                                icon: AnimatedNavIcon(
-                                                  label: e.label,
-                                                  selected: isSelected,
-                                                  color: isSelected
-                                                      ? context
-                                                            .colorScheme
-                                                            .primary
-                                                      : context
-                                                            .colorScheme
-                                                            .onSurfaceVariant,
-                                                ),
-                                                label: Text(
-                                                  e.label.localizedName,
-                                                ),
-                                              );
-                                            })
-                                            .toList(),
-                                        onDestinationSelected: (index) {
-                                          final label =
-                                              navigationItems[index].label;
-                                          if (currentIndex == index) {
-                                            final pageContext = GlobalObjectKey(
-                                              label,
-                                            ).currentContext;
-                                            if (pageContext != null) {
-                                              Navigator.of(pageContext)
-                                                  .popUntil(
-                                                    (route) => route.isFirst,
-                                                  );
-                                            }
-                                          }
-                                          globalState.appController.toPage(
-                                            label,
-                                          );
-                                        },
-                                        extended: showLabel,
-                                        selectedIndex: currentIndex,
-                                        labelType: NavigationRailLabelType.none,
-                                      ),
-                                    ),
+              child: CallbackShortcuts(
+                bindings: <ShortcutActivator, VoidCallback>{
+                  const SingleActivator(LogicalKeyboardKey.arrowUp): () {
+                    if (currentIndex > 0) {
+                      _handleToPage(
+                        navigationItems,
+                        currentIndex,
+                        currentIndex - 1,
+                      );
+                    }
+                  },
+                  const SingleActivator(LogicalKeyboardKey.arrowDown): () {
+                    if (currentIndex < navigationItems.length - 1) {
+                      _handleToPage(
+                        navigationItems,
+                        currentIndex,
+                        currentIndex + 1,
+                      );
+                    }
+                  },
+                },
+                child: Focus(
+                  autofocus: true,
+                  child: NavigationSidebar(
+                    destinations: navigationItems,
+                    selectedIndex: currentIndex,
+                    expanded: canExpand && showLabel,
+                    windowControls: Size(
+                      system.isMacOS ? 72.0 : 0.0,
+                      system.isMacOS ? 24.0 : 0.0,
+                    ),
+                    onSelected: (index) {
+                      _handleToPage(navigationItems, currentIndex, index);
+                    },
+                    onToggle: canExpand
+                        ? () {
+                            ref
+                                .read(appSettingProvider.notifier)
+                                .updateState(
+                                  (state) => state.copyWith(
+                                    showLabel: !state.showLabel,
                                   ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      width: showLabel ? extendedWidth : 72.0,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: SizedBox(
-                          width: 72.0,
-                          child: Center(
-                            child: IconButton(
-                              tooltip: appLocalizations.toggleLabel,
-                              onPressed: () {
-                                ref
-                                    .read(appSettingProvider.notifier)
-                                    .updateState(
-                                      (state) => state.copyWith(
-                                        showLabel: !state.showLabel,
-                                      ),
-                                    );
-                              },
-                              icon: SidebarToggleIcon(
-                                expanded: showLabel,
-                                size: 20.0,
-                                color: context.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
+                                );
+                          }
+                        : null,
+                  ),
                 ),
               ),
             ),

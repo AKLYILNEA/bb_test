@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -63,89 +62,34 @@ class PanelLeftTextPainter extends CustomPainter {
       progress != oldDelegate.progress || color != oldDelegate.color;
 }
 
-class SidebarToggleIcon extends StatefulWidget {
-  final bool expanded;
+class SidebarToggleIcon extends StatelessWidget {
+  final double? progress;
+  final bool? expanded;
   final Color? color;
   final double size;
 
   const SidebarToggleIcon({
     super.key,
-    required this.expanded,
+    this.progress,
+    this.expanded,
     this.color,
-    this.size = 20.0,
+    this.size = 24.0,
   });
 
   @override
-  State<SidebarToggleIcon> createState() => _SidebarToggleIconState();
-}
-
-class _SidebarToggleIconState extends State<SidebarToggleIcon>
-    with TickerProviderStateMixin {
-  late final AnimationController _progressController = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 300),
-    value: widget.expanded ? 1.0 : 0.0,
-  );
-  late final CurvedAnimation _progressAnimation = CurvedAnimation(
-    parent: _progressController,
-    curve: Curves.easeInOutCubic,
-  );
-  late final AnimationController _popController = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 300),
-  );
-  late final Listenable _listenable = Listenable.merge([
-    _progressAnimation,
-    _popController,
-  ]);
-
-  @override
-  void didUpdateWidget(covariant SidebarToggleIcon oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.expanded != widget.expanded) {
-      if (widget.expanded) {
-        _progressController.forward();
-      } else {
-        _progressController.reverse();
-      }
-      if (!_popController.isAnimating) {
-        _popController.forward(from: 0.0);
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _progressAnimation.dispose();
-    _progressController.dispose();
-    _popController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final effectiveProgress = progress ?? ((expanded ?? false) ? 1.0 : 0.0);
     final targetColor =
-        widget.color ??
+        color ??
         IconTheme.of(context).color ??
         Theme.of(context).colorScheme.onSurfaceVariant;
 
-    return AnimatedBuilder(
-      animation: _listenable,
-      builder: (context, _) {
-        final pop = _popController.isAnimating
-            ? math.sin(math.pi * _popController.value) * 0.1
-            : 0.0;
-        return Transform.scale(
-          scale: 1.0 + pop,
-          child: CustomPaint(
-            size: Size.square(widget.size),
-            painter: PanelLeftTextPainter(
-              progress: _progressAnimation.value,
-              color: targetColor,
-            ),
-          ),
-        );
-      },
+    return CustomPaint(
+      size: Size.square(size),
+      painter: PanelLeftTextPainter(
+        progress: effectiveProgress,
+        color: targetColor,
+      ),
     );
   }
 }
