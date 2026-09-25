@@ -150,7 +150,6 @@ class _NavigationSidebarState extends State<NavigationSidebar>
               progress: progress,
               windowControls: widget.windowControls,
               expandedWidth: expandedWidth,
-              expanded: true,
               destinations: widget.destinations,
               selectedIndex: widget.selectedIndex,
               onSelected: (index) {
@@ -171,7 +170,6 @@ class _NavigationSidebarState extends State<NavigationSidebar>
             progress: progress,
             windowControls: widget.windowControls,
             expandedWidth: expandedWidth,
-            expanded: widget.expanded,
             destinations: widget.destinations,
             selectedIndex: widget.selectedIndex,
             onSelected: widget.onSelected,
@@ -232,6 +230,9 @@ class _SidebarOverlay extends StatelessWidget {
                 autofocus: true,
                 child: Material(
                   color: colorScheme.surfaceContainer,
+                  shape: BorderDirectional(
+                    end: BorderSide(color: colorScheme.outlineVariant),
+                  ),
                   child: AnimatedBuilder(
                     animation: progress,
                     builder: (_, _) => builder(progress.value),
@@ -270,7 +271,6 @@ class _SidebarPane extends StatelessWidget {
     required this.progress,
     required this.windowControls,
     required this.expandedWidth,
-    required this.expanded,
     required this.destinations,
     required this.selectedIndex,
     required this.onSelected,
@@ -280,7 +280,6 @@ class _SidebarPane extends StatelessWidget {
   final double progress;
   final Size windowControls;
   final double expandedWidth;
-  final bool expanded;
   final List<NavigationItem> destinations;
   final int selectedIndex;
   final ValueChanged<int> onSelected;
@@ -299,13 +298,6 @@ class _SidebarPane extends StatelessWidget {
         _itemSize + MediaQuery.textScalerOf(context).scale(fontSize) - fontSize;
     final rowWidth = expandedWidth - sideInset * 2;
     final labelStyle = context.textTheme.bodyMedium;
-    final labelWidth = rowWidth - iconInset - _iconSize - _labelGap * 2;
-    String rowTooltip(String label) =>
-        expanded &&
-            progress == 1 &&
-            _fitsOneLine(context, label, labelStyle, labelWidth)
-        ? ''
-        : label;
 
     return SizedBox(
       width: lerpDouble(compactWidth, expandedWidth, progress),
@@ -319,8 +311,6 @@ class _SidebarPane extends StatelessWidget {
               colors: colors,
               height: itemHeight,
               sideInset: sideInset,
-              tooltip: appLocalizations.toggleLabel,
-              tooltipIsLabel: true,
               onTap: onToggle,
               child: SizedBox(
                 width: itemWidth,
@@ -351,7 +341,6 @@ class _SidebarPane extends StatelessWidget {
                             height: itemHeight,
                             sideInset: sideInset,
                             selected: index == selectedIndex,
-                            tooltip: rowTooltip(item.label.localizedName),
                             onTap: () => onSelected(index),
                             child: _DestinationRow(
                               item: item,
@@ -392,19 +381,15 @@ class _SidebarButton extends StatefulWidget {
     required this.colors,
     required this.height,
     required this.sideInset,
-    required this.tooltip,
     required this.onTap,
     required this.child,
     this.selected,
-    this.tooltipIsLabel = false,
   });
 
   final _SidebarColors colors;
   final double height;
   final double sideInset;
   final bool? selected;
-  final String tooltip;
-  final bool tooltipIsLabel;
   final VoidCallback onTap;
   final Widget child;
 
@@ -441,32 +426,27 @@ class _SidebarButtonState extends State<_SidebarButton> {
         container: true,
         button: true,
         selected: widget.selected,
-        child: Material(
-          type: MaterialType.transparency,
-          child: DecoratedBox(
-            decoration: ShapeDecoration(color: _fill, shape: _itemShape),
-            child: InkWell(
-              onTap: widget.onTap,
-              onHover: (value) => setState(() => _hovered = value),
-              onHighlightChanged: (value) => setState(() => _pressed = value),
-              canRequestFocus: false,
-              customBorder: _itemShape,
-              mouseCursor: SystemMouseCursors.click,
-              splashFactory: NoSplash.splashFactory,
-              overlayColor: const WidgetStatePropertyAll<Color>(
-                Colors.transparent,
-              ),
-              child: Tooltip(
-                message: widget.tooltip,
-                excludeFromSemantics: !widget.tooltipIsLabel,
-                triggerMode: TooltipTriggerMode.longPress,
-                child: IconTheme.merge(
-                  data: IconThemeData(
-                    size: _iconSize,
-                    color: widget.colors.icon,
-                  ),
-                  child: SizedBox(height: widget.height, child: widget.child),
+        child: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          onEnter: (_) => setState(() => _hovered = true),
+          onExit: (_) => setState(() {
+            _hovered = false;
+            _pressed = false;
+          }),
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: widget.onTap,
+            onTapDown: (_) => setState(() => _pressed = true),
+            onTapUp: (_) => setState(() => _pressed = false),
+            onTapCancel: () => setState(() => _pressed = false),
+            child: DecoratedBox(
+              decoration: ShapeDecoration(color: _fill, shape: _itemShape),
+              child: IconTheme.merge(
+                data: IconThemeData(
+                  size: _iconSize,
+                  color: widget.colors.icon,
                 ),
+                child: SizedBox(height: widget.height, child: widget.child),
               ),
             ),
           ),
@@ -474,24 +454,6 @@ class _SidebarButtonState extends State<_SidebarButton> {
       ),
     );
   }
-}
-
-bool _fitsOneLine(
-  BuildContext context,
-  String text,
-  TextStyle? style,
-  double width,
-) {
-  final painter = TextPainter(
-    text: TextSpan(text: text, style: style),
-    maxLines: 1,
-    textDirection: Directionality.of(context),
-    textScaler: MediaQuery.textScalerOf(context),
-    locale: Localizations.maybeLocaleOf(context),
-  )..layout(maxWidth: width);
-  final fits = !painter.didExceedMaxLines;
-  painter.dispose();
-  return fits;
 }
 
 class _DestinationRow extends StatelessWidget {
