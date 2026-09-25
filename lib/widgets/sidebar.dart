@@ -230,15 +230,14 @@ class _SidebarOverlay extends StatelessWidget {
               },
               child: FocusScope(
                 autofocus: true,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainer,
-                    border: BorderDirectional(
-                      end: BorderSide(color: colorScheme.outlineVariant),
+                child: Material(
+                  color: colorScheme.surfaceContainer,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      border: BorderDirectional(
+                        end: BorderSide(color: colorScheme.outlineVariant),
+                      ),
                     ),
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
                     child: AnimatedBuilder(
                       animation: progress,
                       builder: (_, _) => builder(progress.value),
@@ -262,9 +261,8 @@ class _SidebarColors {
       hoverFill = scheme.onSurface.withValues(alpha: 0.06),
       label = scheme.onSurface,
       icon = scheme.onSurfaceVariant,
-      indicator = scheme.primary.withValues(
-        alpha: scheme.brightness == Brightness.light ? 0.20 : 0.26,
-      );
+      selectedIcon = scheme.onSecondaryContainer,
+      indicator = scheme.primary;
 
   final Color selectedFill;
   final Color selectedHoverFill;
@@ -272,6 +270,7 @@ class _SidebarColors {
   final Color hoverFill;
   final Color label;
   final Color icon;
+  final Color selectedIcon;
   final Color indicator;
 }
 
@@ -372,6 +371,9 @@ class _SidebarPane extends StatelessWidget {
                               iconInset: iconInset,
                               style: labelStyle,
                               labelOpacity: labelOpacity,
+                              iconColor: index == selectedIndex
+                                  ? colors.selectedIcon
+                                  : colors.icon,
                             ),
                           ),
                       ],
@@ -451,7 +453,7 @@ class _SidebarButtonState extends State<_SidebarButton> {
         button: true,
         selected: widget.selected,
         child: Material(
-          color: Colors.transparent,
+          type: MaterialType.transparency,
           child: DecoratedBox(
             decoration: ShapeDecoration(color: _fill, shape: _itemShape),
             child: InkWell(
@@ -510,6 +512,7 @@ class _DestinationRow extends StatelessWidget {
     required this.iconInset,
     required this.style,
     required this.labelOpacity,
+    required this.iconColor,
   });
 
   final NavigationItem item;
@@ -518,11 +521,11 @@ class _DestinationRow extends StatelessWidget {
   final double iconInset;
   final TextStyle? style;
   final double labelOpacity;
+  final Color iconColor;
 
   @override
   Widget build(BuildContext context) {
     final effectiveStyle = style?.copyWith(
-      color: selected ? context.colorScheme.primary : style?.color,
       fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
     );
 
@@ -537,9 +540,7 @@ class _DestinationRow extends StatelessWidget {
             AnimatedNavIcon(
               label: item.label,
               selected: selected,
-              color: selected
-                  ? context.colorScheme.primary
-                  : context.colorScheme.onSurfaceVariant,
+              color: iconColor,
             ),
             const SizedBox(width: _labelGap),
             Expanded(

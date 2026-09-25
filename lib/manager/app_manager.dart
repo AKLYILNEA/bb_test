@@ -254,7 +254,7 @@ class AppSidebarContainer extends ConsumerWidget {
           child: IgnorePointer(
             child: RotatedBox(
               quarterTurns: 1,
-              child: LinearProgressIndicator(),
+              child: LinearProgressIndicator(backgroundColor: Colors.transparent),
             ),
           ),
         );
@@ -267,14 +267,16 @@ class AppSidebarContainer extends ConsumerWidget {
     required Widget child,
   }) {
     final colorScheme = context.colorScheme;
-    return Container(
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainer,
-        border: BorderDirectional(
-          end: BorderSide(color: colorScheme.outlineVariant),
+    return Material(
+      color: colorScheme.surfaceContainer,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: BorderDirectional(
+            end: BorderSide(color: colorScheme.outlineVariant),
+          ),
         ),
+        child: child,
       ),
-      child: Material(color: Colors.transparent, child: child),
     );
   }
 

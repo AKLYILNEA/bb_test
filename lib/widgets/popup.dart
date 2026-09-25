@@ -2,10 +2,12 @@ import 'package:bett_box/common/common.dart';
 import 'package:bett_box/models/common.dart';
 import 'package:flutter/material.dart';
 
+const _anchorX = 12.0;
+const _anchorY = 32.0;
+
 class CommonPopupRoute<T> extends PopupRoute<T> {
   final WidgetBuilder builder;
   ValueNotifier<Offset> offsetNotifier;
-
   CommonPopupRoute({
     required this.barrierLabel,
     required this.builder,
@@ -57,7 +59,7 @@ class CommonPopupRoute<T> extends PopupRoute<T> {
             child: CustomSingleChildLayout(
               delegate: OverflowAwareLayoutDelegate(
                 offset:
-                    value.translate(12, -8) -
+                    value.translate(_anchorX, _anchorY) -
                     Offset(padding.left, padding.top),
               ),
               child: child,
