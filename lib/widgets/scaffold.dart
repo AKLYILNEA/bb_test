@@ -47,6 +47,23 @@ class _ScrollFeatherGradientOverlayState
     super.dispose();
   }
 
+  void _handleScrollMetrics(ScrollMetrics metrics) {
+    if (metrics.axis != Axis.vertical) return;
+    double scrolledUnder = 0.0;
+    if (metrics.axisDirection == AxisDirection.down) {
+      scrolledUnder = metrics.extentBefore;
+    } else if (metrics.axisDirection == AxisDirection.up) {
+      scrolledUnder = metrics.extentAfter;
+    }
+    if (scrolledUnder.isNaN || scrolledUnder.isInfinite || scrolledUnder <= 0) {
+      scrolledUnder = 0.0;
+    }
+    final progress = (scrolledUnder / 16.0).clamp(0.0, 1.0);
+    if (progress != _progressNotifier.value) {
+      _progressNotifier.value = progress;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final surface =
@@ -54,21 +71,9 @@ class _ScrollFeatherGradientOverlayState
     return NotificationListener<Notification>(
       onNotification: (notification) {
         if (notification is ScrollNotification) {
-          if (notification.metrics.axis == Axis.vertical) {
-            final pixels = notification.metrics.pixels;
-            final progress = (pixels / 16.0).clamp(0.0, 1.0);
-            if (progress != _progressNotifier.value) {
-              _progressNotifier.value = progress;
-            }
-          }
+          _handleScrollMetrics(notification.metrics);
         } else if (notification is ScrollMetricsNotification) {
-          if (notification.metrics.axis == Axis.vertical) {
-            final pixels = notification.metrics.pixels;
-            final progress = (pixels / 16.0).clamp(0.0, 1.0);
-            if (progress != _progressNotifier.value) {
-              _progressNotifier.value = progress;
-            }
-          }
+          _handleScrollMetrics(notification.metrics);
         }
         return false;
       },
