@@ -5,6 +5,7 @@ import 'package:bett_box/clash/core.dart';
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/manager/window_manager.dart';
+import 'package:bett_box/models/models.dart';
 import 'package:bett_box/plugins/app.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
@@ -480,11 +481,11 @@ class AppSidebarContainer extends ConsumerWidget {
                           width: 72.0,
                           child: Center(
                             child: IconButton(
-                              tooltip: context.appLocalizations.toggleLabel,
+                              tooltip: appLocalizations.toggleLabel,
                               onPressed: () {
                                 ref
                                     .read(appSettingProvider.notifier)
-                                    .update(
+                                    .updateState(
                                       (state) => state.copyWith(
                                         showLabel: !state.showLabel,
                                       ),
