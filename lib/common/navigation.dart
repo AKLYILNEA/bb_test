@@ -40,7 +40,7 @@ class Navigation {
             ProfilesView(key: const GlobalObjectKey(PageLabel.profiles)),
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.calendar_agenda_24_regular),
+        icon: const Icon(FluentIcons.clock_24_regular),
         label: PageLabel.requests,
         builder: (_) =>
             RequestsView(key: const GlobalObjectKey(PageLabel.requests)),

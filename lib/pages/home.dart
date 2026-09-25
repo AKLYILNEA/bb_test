@@ -36,8 +36,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  bool get isNavFocused =>
-      _navFocusNodes.values.any((node) => node.hasFocus);
+  bool get isNavFocused => _navFocusNodes.values.any((node) => node.hasFocus);
 
   void focusNav() {
     if (!globalState.isAndroidTV || !mounted) return;
@@ -257,9 +256,9 @@ class _HomePageState extends State<HomePage> {
                               ? context.colorScheme.primary.withValues(
                                   alpha:
                                       context.colorScheme.brightness ==
-                                              Brightness.light
-                                          ? 0.20
-                                          : 0.26,
+                                          Brightness.light
+                                      ? 0.20
+                                      : 0.26,
                                 )
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(16),
@@ -274,8 +273,7 @@ class _HomePageState extends State<HomePage> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             AnimatedNavIcon(
-                              regularIcon: item.label.regularNavIcon,
-                              filledIcon: item.label.filledNavIcon,
+                              label: item.label,
                               selected: isSelected,
                               color: isSelected
                                   ? context.colorScheme.primary
@@ -404,7 +402,8 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
 
     // 移动端：仅保留淡入淡出的基础切换动效（不再使用 PageView 水平平移动画）
     if (isMobile) {
-      final targetIndex = (_currentPageIndex >= 0 &&
+      final targetIndex =
+          (_currentPageIndex >= 0 &&
               _currentPageIndex < widget.navigationItems.length)
           ? _currentPageIndex
           : (_pageIndex < 0 ? 0 : _pageIndex);

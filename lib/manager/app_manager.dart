@@ -113,7 +113,8 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
       }
       isMinimized = await window?.isMinimized ?? false;
     }
-    final isPinned = system.isDesktop &&
+    final isPinned =
+        system.isDesktop &&
         ref.read(windowSettingProvider.select((s) => s.isPinned));
     final shouldRun = system.isDesktop
         ? (isPinned || (isVisible && !isMinimized))
@@ -347,17 +348,18 @@ class AppSidebarContainer extends ConsumerWidget {
                                       autofocus: true,
                                       child: NavigationRail(
                                         backgroundColor: Colors.transparent,
-                                        indicatorColor:
-                                            context.colorScheme.primary
-                                                .withValues(
-                                                  alpha:
-                                                      context
-                                                              .colorScheme
-                                                              .brightness ==
-                                                          Brightness.light
-                                                      ? 0.20
-                                                      : 0.26,
-                                                ),
+                                        indicatorColor: context
+                                            .colorScheme
+                                            .primary
+                                            .withValues(
+                                              alpha:
+                                                  context
+                                                          .colorScheme
+                                                          .brightness ==
+                                                      Brightness.light
+                                                  ? 0.20
+                                                  : 0.26,
+                                            ),
                                         indicatorShape:
                                             const RoundedRectangleBorder(
                                               borderRadius: BorderRadius.all(
@@ -368,14 +370,16 @@ class AppSidebarContainer extends ConsumerWidget {
                                           color: context.colorScheme.primary,
                                         ),
                                         unselectedIconTheme: IconThemeData(
-                                          color:
-                                              context.colorScheme.onSurfaceVariant,
+                                          color: context
+                                              .colorScheme
+                                              .onSurfaceVariant,
                                         ),
                                         selectedLabelTextStyle: context
                                             .textTheme
                                             .labelLarge!
                                             .copyWith(
-                                              color: context.colorScheme.primary,
+                                              color:
+                                                  context.colorScheme.primary,
                                               fontWeight: FontWeight.w600,
                                             ),
                                         unselectedLabelTextStyle: context
@@ -389,33 +393,28 @@ class AppSidebarContainer extends ConsumerWidget {
                                         destinations: navigationItems
                                             .asMap()
                                             .entries
-                                            .map(
-                                              (entry) {
-                                                final index = entry.key;
-                                                final e = entry.value;
-                                                final isSelected =
-                                                    currentIndex == index;
-                                                return NavigationRailDestination(
-                                                  icon: AnimatedNavIcon(
-                                                    regularIcon:
-                                                        e.label.regularNavIcon,
-                                                    filledIcon:
-                                                        e.label.filledNavIcon,
-                                                    selected: isSelected,
-                                                    color: isSelected
-                                                        ? context
+                                            .map((entry) {
+                                              final index = entry.key;
+                                              final e = entry.value;
+                                              final isSelected =
+                                                  currentIndex == index;
+                                              return NavigationRailDestination(
+                                                icon: AnimatedNavIcon(
+                                                  label: e.label,
+                                                  selected: isSelected,
+                                                  color: isSelected
+                                                      ? context
                                                             .colorScheme
                                                             .primary
-                                                        : context
+                                                      : context
                                                             .colorScheme
                                                             .onSurfaceVariant,
-                                                  ),
-                                                  label: Text(
-                                                    e.label.localizedName,
-                                                  ),
-                                                );
-                                              },
-                                            )
+                                                ),
+                                                label: Text(
+                                                  e.label.localizedName,
+                                                ),
+                                              );
+                                            })
                                             .toList(),
                                         onDestinationSelected: (index) {
                                           final label =
@@ -425,11 +424,10 @@ class AppSidebarContainer extends ConsumerWidget {
                                               label,
                                             ).currentContext;
                                             if (pageContext != null) {
-                                              Navigator.of(
-                                                pageContext,
-                                              ).popUntil(
-                                                (route) => route.isFirst,
-                                              );
+                                              Navigator.of(pageContext)
+                                                  .popUntil(
+                                                    (route) => route.isFirst,
+                                                  );
                                             }
                                           }
                                           globalState.appController.toPage(

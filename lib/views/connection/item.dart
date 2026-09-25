@@ -393,7 +393,7 @@ class TrackerInfoDetailView extends ConsumerWidget {
   }) {
     final category = utils.classifyIp(ip);
     final IconData icon = switch (category) {
-      IpCategory.tun => FluentIcons.data_trending_24_regular,
+      IpCategory.tun => FluentIcons.protocol_handler_24_regular,
       IpCategory.lan => FluentIcons.arrow_shuffle_24_regular,
       IpCategory.public => FluentIcons.search_24_regular,
     };

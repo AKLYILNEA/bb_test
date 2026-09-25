@@ -42,8 +42,7 @@ class GoogleBottomNavBar extends ConsumerWidget {
       return GButton(
         icon: e.label.regularNavIcon,
         leading: AnimatedNavIcon(
-          regularIcon: e.label.regularNavIcon,
-          filledIcon: e.label.filledNavIcon,
+          label: e.label,
           selected: isSelected,
           color: isSelected
               ? context.colorScheme.primary
@@ -105,8 +104,7 @@ class GoogleBottomNavBar extends ConsumerWidget {
             child: GNav(
               rippleColor: enableHapticFeedback
                   ? context.colorScheme.onSurface.withValues(alpha: 0.15)
-                  : Colors
-                        .transparent, // Disabling ripple may disable haptic feedback
+                  : Colors.transparent, // Disabling ripple may disable haptic feedback
               hoverColor: context.colorScheme.onSurface.withValues(alpha: 0.1),
               haptic: enableHapticFeedback, // Control GNav haptic feedback
               gap: 8,
@@ -115,10 +113,9 @@ class GoogleBottomNavBar extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               duration: const Duration(milliseconds: 250),
               tabBackgroundColor: context.colorScheme.primary.withValues(
-                alpha:
-                    context.colorScheme.brightness == Brightness.light
-                        ? 0.20
-                        : 0.26,
+                alpha: context.colorScheme.brightness == Brightness.light
+                    ? 0.20
+                    : 0.26,
               ),
               color: context.colorScheme.onSurfaceVariant,
               tabs: tabsList,

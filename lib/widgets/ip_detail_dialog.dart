@@ -204,7 +204,7 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
           _buildIpTile(context),
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: const Icon(FluentIcons.data_trending_24_regular),
+            leading: const Icon(FluentIcons.protocol_handler_24_regular),
             title: Text(appLocalizations.tunVirtualAddress),
             subtitle: Text(
               'TUN Virtual Network Adapter',
