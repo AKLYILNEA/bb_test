@@ -620,6 +620,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "networkType": MessageLookupByLibrary.simpleMessage("ネットワーク種別"),
     "neutralScheme": MessageLookupByLibrary.simpleMessage("ニュートラル"),
     "noAnimation": MessageLookupByLibrary.simpleMessage("デフォルト"),
+    "noBackupFileFound": MessageLookupByLibrary.simpleMessage(
+      "バックアップファイルが見つかりません",
+    ),
     "noData": MessageLookupByLibrary.simpleMessage("データがありません"),
     "noHotKey": MessageLookupByLibrary.simpleMessage("ショートカットキーなし"),
     "noIcon": MessageLookupByLibrary.simpleMessage("アイコンなし"),
@@ -883,6 +886,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "パスワードをクリップボードにコピーしました",
     ),
     "selectAll": MessageLookupByLibrary.simpleMessage("すべて選択"),
+    "selectBackupVersion": MessageLookupByLibrary.simpleMessage(
+      "バックアップバージョンの選択",
+    ),
     "selected": MessageLookupByLibrary.simpleMessage("選択済み"),
     "selectedCountTitle": m13,
     "serviceReady": MessageLookupByLibrary.simpleMessage("サービス準備完了"),

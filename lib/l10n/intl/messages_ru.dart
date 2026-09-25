@@ -810,6 +810,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "networkType": MessageLookupByLibrary.simpleMessage("Тип сети"),
     "neutralScheme": MessageLookupByLibrary.simpleMessage("Нейтральный"),
     "noAnimation": MessageLookupByLibrary.simpleMessage("По умолчанию"),
+    "noBackupFileFound": MessageLookupByLibrary.simpleMessage(
+      "Файл резервной копии не найден",
+    ),
     "noData": MessageLookupByLibrary.simpleMessage("Нет данных"),
     "noHotKey": MessageLookupByLibrary.simpleMessage("Нет горячих клавиш"),
     "noIcon": MessageLookupByLibrary.simpleMessage("Без иконок"),
@@ -1153,6 +1156,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Пароль скопирован в буфер обмена",
     ),
     "selectAll": MessageLookupByLibrary.simpleMessage("Выбрать все"),
+    "selectBackupVersion": MessageLookupByLibrary.simpleMessage(
+      "Выберите версию резервной копии",
+    ),
     "selected": MessageLookupByLibrary.simpleMessage("Выбрано"),
     "selectedCountTitle": m13,
     "serviceReady": MessageLookupByLibrary.simpleMessage("Служба готова"),
