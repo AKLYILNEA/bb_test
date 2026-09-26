@@ -208,7 +208,8 @@ class AboutView extends StatelessWidget {
                         children: [
                           Text(
                             appName,
-                            style: Theme.of(context).textTheme.headlineSmall,
+                            style: Theme.of(context).textTheme.headlineSmall
+                                ?.copyWith(fontWeight: FontWeight.bold),
                           ),
                           Text(
                             '${globalState.packageInfo.version}+${globalState.packageInfo.buildNumber}',

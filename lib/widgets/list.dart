@@ -295,6 +295,12 @@ class ListItem<T> extends StatelessWidget {
       }
 
       return OpenContainer(
+        closedColor: context.colorScheme.surfaceContainer,
+        openColor: context.colorScheme.surface,
+        closedShape: const RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        openShape: const RoundedSuperellipseBorder(),
         closedBuilder: (_, action) {
           openAction() {
             final isMobile = globalState.appState.viewMode == ViewMode.mobile;

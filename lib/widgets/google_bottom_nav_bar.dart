@@ -95,7 +95,7 @@ class GoogleBottomNavBar extends ConsumerWidget {
                 filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 10.0,
+                    horizontal: 9.0,
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(

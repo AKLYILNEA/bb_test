@@ -16,6 +16,7 @@ export 'keep_scope.dart';
 export 'line_chart.dart';
 export 'list.dart';
 export 'null_status.dart';
+export 'drag_back.dart';
 export 'open_container.dart';
 export 'popup.dart';
 export 'scaffold.dart';
