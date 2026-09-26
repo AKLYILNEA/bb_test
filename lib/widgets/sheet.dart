@@ -86,6 +86,9 @@ Future<T?> showSheet<T>({
   SheetProps props = const SheetProps(),
 }) {
   final isMobile = globalState.appState.viewMode == ViewMode.mobile;
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  final defaultBarrierColor =
+      isDark ? const Color(0x66000000) : const Color(0x33000000);
   return switch (isMobile) {
     true => () {
         final navigator = Navigator.of(context);
@@ -101,8 +104,7 @@ Future<T?> showSheet<T>({
                 localizations.scrimOnTapHint(localizations.bottomSheetLabel),
             backgroundColor: Colors.transparent,
             elevation: 0,
-            modalBarrierColor: props.barrierColor ??
-                Theme.of(context).bottomSheetTheme.modalBarrierColor,
+            modalBarrierColor: props.barrierColor ?? defaultBarrierColor,
             showDragHandle: false,
             useSafeArea: props.useSafeArea,
             filter: props.blur ? commonFilter : null,
@@ -112,7 +114,7 @@ Future<T?> showSheet<T>({
     false => showModalSideSheet<T>(
         useSafeArea: props.useSafeArea,
         isScrollControlled: props.isScrollControlled,
-        barrierColor: props.barrierColor,
+        barrierColor: props.barrierColor ?? defaultBarrierColor,
         context: context,
         constraints: BoxConstraints(maxWidth: props.maxWidth ?? 360),
         filter: props.blur ? commonFilter : null,
@@ -129,10 +131,14 @@ Future<T?> showExtend<T>(
   ExtendProps props = const ExtendProps(),
 }) {
   final isMobile = globalState.appState.viewMode == ViewMode.mobile;
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  final defaultBarrierColor =
+      isDark ? const Color(0x66000000) : const Color(0x33000000);
   return switch (isMobile || props.forceFull) {
     true => BaseNavigator.push(context, builder(context, SheetType.page)),
     false => showModalSideSheet<T>(
         useSafeArea: props.useSafeArea,
+        barrierColor: defaultBarrierColor,
         context: context,
         constraints: BoxConstraints(maxWidth: props.maxWidth ?? 360),
         filter: props.blur ? commonFilter : null,

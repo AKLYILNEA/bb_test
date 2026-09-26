@@ -264,11 +264,8 @@ class _ResidentFabShell extends StatelessWidget {
               DecoratedBox(
                 decoration: getCommonFabDecoration(context),
                 child: FloatingActionButton.extended(
-                  isExtended: content.isExtended,
-                  extendedPadding: EdgeInsetsDirectional.only(
-                    start: 16.0,
-                    end: content.isExtended ? 20.0 : 16.0,
-                  ),
+                  extendedIconLabelSpacing: 0.0,
+                  extendedPadding: const EdgeInsets.symmetric(horizontal: 16.0),
                   elevation: 0,
                   hoverElevation: 0,
                   highlightElevation: 0,
@@ -303,14 +300,19 @@ class _ResidentFabShell extends StatelessWidget {
                           ? startFabWidthAnimationDuration
                           : Duration.zero,
                       curve: Curves.easeOut,
-                      width: content.labelWidth,
+                      width: content.isExtended
+                          ? (content.labelWidth + 12.0)
+                          : 0.0,
                       alignment: content.isRunTime
                           ? Alignment.centerLeft
                           : Alignment.center,
-                      padding: content.isRunTime
-                          ? const EdgeInsets.only(left: 6.0)
-                          : EdgeInsets.zero,
-                      clipBehavior: Clip.none,
+                      padding: EdgeInsets.only(
+                        left: content.isExtended
+                            ? (content.isRunTime ? 14.0 : 8.0)
+                            : 0.0,
+                        right: content.isExtended ? 4.0 : 0.0,
+                      ),
+                      clipBehavior: Clip.hardEdge,
                       child: OverflowBox(
                         fit: OverflowBoxFit.deferToChild,
                         alignment: content.isRunTime

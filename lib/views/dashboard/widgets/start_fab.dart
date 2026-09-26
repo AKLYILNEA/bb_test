@@ -268,11 +268,8 @@ Widget buildStartFabBody(BuildContext context, StartFabData data) {
         DecoratedBox(
           decoration: getCommonFabDecoration(context),
           child: FloatingActionButton.extended(
-            isExtended: data.isExtended,
-            extendedPadding: EdgeInsetsDirectional.only(
-              start: 16.0,
-              end: data.isExtended ? 20.0 : 16.0,
-            ),
+            extendedIconLabelSpacing: 0.0,
+            extendedPadding: const EdgeInsets.symmetric(horizontal: 16.0),
             elevation: 0,
             hoverElevation: 0,
             highlightElevation: 0,
@@ -289,22 +286,33 @@ Widget buildStartFabBody(BuildContext context, StartFabData data) {
               child: AnimatedContainer(
                 duration: startFabWidthAnimationDuration,
                 curve: Curves.easeOut,
-                width: data.labelWidth,
+                width: data.isExtended ? (data.labelWidth + 12.0) : 0.0,
                 alignment: data.isRunTime
                     ? Alignment.centerLeft
                     : Alignment.center,
-                padding: data.isRunTime
-                    ? const EdgeInsets.only(left: 6.0)
-                    : EdgeInsets.zero,
-                clipBehavior: Clip.none,
-                child: Text(
-                  data.labelText,
-                  maxLines: 1,
-                  textAlign: data.isRunTime
-                      ? TextAlign.left
-                      : TextAlign.center,
-                  overflow: TextOverflow.visible,
-                  style: startFabLabelStyle(context),
+                padding: EdgeInsets.only(
+                  left: data.isExtended ? (data.isRunTime ? 14.0 : 8.0) : 0.0,
+                  right: data.isExtended ? 4.0 : 0.0,
+                ),
+                clipBehavior: Clip.hardEdge,
+                child: OverflowBox(
+                  fit: OverflowBoxFit.deferToChild,
+                  alignment: data.isRunTime
+                      ? Alignment.centerLeft
+                      : Alignment.center,
+                  minWidth: 0,
+                  maxWidth: double.infinity,
+                  minHeight: 0,
+                  maxHeight: double.infinity,
+                  child: Text(
+                    data.labelText,
+                    maxLines: 1,
+                    textAlign: data.isRunTime
+                        ? TextAlign.left
+                        : TextAlign.center,
+                    overflow: TextOverflow.visible,
+                    style: startFabLabelStyle(context),
+                  ),
                 ),
               ),
             ),
