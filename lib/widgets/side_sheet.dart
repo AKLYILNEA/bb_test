@@ -1,11 +1,12 @@
 import 'dart:ui';
 
 import 'package:bett_box/common/color.dart';
+import 'package:bett_box/common/constant.dart' as constants;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 const Duration _bottomSheetEnterDuration = Duration(milliseconds: 300);
-const Duration _bottomSheetExitDuration = Duration(milliseconds: 200);
+const Duration _bottomSheetExitDuration = Duration(milliseconds: 300);
 const Curve _modalBottomSheetCurve = Easing.standardDecelerate;
 const double _defaultScrollControlDisabledMaxHeightRatio = 9.0 / 16.0;
 
@@ -357,22 +358,33 @@ class ModalSideSheetRoute<T> extends PopupRoute<T> {
         semanticsOnTapHint: barrierOnTapHint,
       );
     }
-    final blurFilter = _filter;
-    if (blurFilter == null) {
+    if (_filter == null) {
       return barrier;
     }
-    // 高斯模糊层保持恒定子树（遮罩动画放在它上面），并随动画淡入，避免每帧重算整屏模糊
+    // 模糊强度直接由动画驱动（sigma 0 → 目标值）：观感等同淡入，
+    // 但省掉了 FadeTransition 每帧一次的整屏 saveLayer（侧边抽屉展开时的主要卡顿来源）
+    final anim = animation!;
     return Stack(
       fit: StackFit.expand,
       alignment: Alignment.topLeft,
       clipBehavior: Clip.none,
       children: [
-        FadeTransition(
-          opacity: animation!.drive(CurveTween(curve: barrierCurve)),
-          child: BackdropFilter(
-            filter: blurFilter,
-            child: const SizedBox.expand(),
-          ),
+        AnimatedBuilder(
+          animation: anim,
+          builder: (context, child) {
+            final sigma =
+                constants.CommonFilters.blurSigma *
+                barrierCurve.transform(anim.value);
+            return BackdropFilter(
+              filter: ImageFilter.blur(
+                sigmaX: sigma,
+                sigmaY: sigma,
+                tileMode: TileMode.clamp,
+              ),
+              child: child,
+            );
+          },
+          child: const SizedBox.expand(),
         ),
         barrier,
       ],

@@ -120,9 +120,11 @@ const presetNtpServers = [
 ];
 
 class CommonFilters {
+  static const double blurSigma = 5;
+
   static final ImageFilter blur = ImageFilter.blur(
-    sigmaX: 5,
-    sigmaY: 5,
+    sigmaX: blurSigma,
+    sigmaY: blurSigma,
     tileMode: TileMode.clamp,
   );
 }

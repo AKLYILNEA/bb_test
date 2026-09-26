@@ -121,7 +121,8 @@ class GoogleBottomNavBar extends ConsumerWidget {
                       alpha: 0.1,
                     ),
                     haptic: enableHapticFeedback, // Control GNav haptic feedback
-                    gap: 8,
+                    // gap 取与胶囊左右内边距相同（16），文字才会正好落在图标右侧与胶囊右缘的中线上
+                    gap: 16,
                     activeColor: context.colorScheme.primary,
                     iconSize: 24,
                     padding: const EdgeInsets.symmetric(
