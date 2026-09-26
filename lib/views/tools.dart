@@ -73,6 +73,10 @@ class _ToolViewState extends ConsumerState<ToolsView> {
   }
 
   Widget _buildNavigationMenuItem(NavigationItem navigationItem) {
+    // 请求 / 连接是整页型的页签页面，套上下展开不自然，保留 bettbox 原版推入动画
+    final isFullPage =
+        navigationItem.label == PageLabel.requests ||
+        navigationItem.label == PageLabel.connections;
     return ListItem.open(
       leading: navigationItem.icon,
       title: Text(Intl.message(navigationItem.label.name)),
@@ -83,6 +87,7 @@ class _ToolViewState extends ConsumerState<ToolsView> {
         title: Intl.message(navigationItem.label.name),
         builder: (_) => _buildNavigationPage(navigationItem),
         wrap: false,
+        expand: !isFullPage,
       ),
     );
   }

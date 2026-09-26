@@ -57,7 +57,7 @@ class OpenContainer<T extends Object?> extends StatefulWidget {
 }
 
 class _OpenContainerState<T> extends State<OpenContainer<T?>> {
-  final GlobalKey _sourceKey = GlobalKey();
+  final GlobalKey<_HideableState> _sourceKey = GlobalKey<_HideableState>();
 
   Future<void> openContainer() async {
     final Color middleColor =
@@ -73,6 +73,7 @@ class _OpenContainerState<T> extends State<OpenContainer<T?>> {
             middleColor: middleColor,
             closedShape: widget.closedShape,
             openShape: widget.openShape,
+            closedBuilder: widget.closedBuilder,
             openBuilder: widget.openBuilder,
             sourceKey: _sourceKey,
             transitionDuration: widget.transitionDuration,
@@ -89,15 +90,68 @@ class _OpenContainerState<T> extends State<OpenContainer<T?>> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return _Hideable(
       key: _sourceKey,
-      onTap: widget.tappable ? openContainer : null,
-      child: Material(
-        color: Colors.transparent,
-        clipBehavior: widget.clipBehavior,
-        shape: widget.closedShape,
-        child: widget.closedBuilder(context, openContainer),
+      child: GestureDetector(
+        onTap: widget.tappable ? openContainer : null,
+        child: Material(
+          color: Colors.transparent,
+          clipBehavior: widget.clipBehavior,
+          shape: widget.closedShape,
+          child: widget.closedBuilder(context, openContainer),
+        ),
       ),
+    );
+  }
+}
+
+class _Hideable extends StatefulWidget {
+  const _Hideable({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  State<_Hideable> createState() => _HideableState();
+}
+
+class _HideableState extends State<_Hideable> {
+  Size? get placeholderSize => _placeholderSize;
+  Size? _placeholderSize;
+
+  set placeholderSize(Size? value) {
+    if (_placeholderSize == value) {
+      return;
+    }
+    setState(() {
+      _placeholderSize = value;
+    });
+  }
+
+  bool get isVisible => _visible;
+  bool _visible = true;
+
+  set isVisible(bool value) {
+    if (_visible == value) {
+      return;
+    }
+    setState(() {
+      _visible = value;
+    });
+  }
+
+  bool get isInTree => _placeholderSize == null;
+
+  @override
+  Widget build(BuildContext context) {
+    if (_placeholderSize != null) {
+      return SizedBox.fromSize(size: _placeholderSize);
+    }
+    return Visibility(
+      visible: _visible,
+      maintainSize: true,
+      maintainState: true,
+      maintainAnimation: true,
+      child: widget.child,
     );
   }
 }
@@ -107,6 +161,7 @@ class _OpenContainerRoute<T> extends ModalRoute<T> with DragBackRouteMixin<T> {
     required this.closedColor,
     required this.openColor,
     required this.middleColor,
+    required this.closedBuilder,
     required ShapeBorder? closedShape,
     required this.openShape,
     required this.openBuilder,
@@ -116,7 +171,8 @@ class _OpenContainerRoute<T> extends ModalRoute<T> with DragBackRouteMixin<T> {
     required this.curve,
     required this.useRootNavigator,
     required RouteSettings? routeSettings,
-  }) : _openOpacityTween = _getOpenOpacityTween(transitionType),
+  }) : _closedOpacityTween = _getClosedOpacityTween(transitionType),
+       _openOpacityTween = _getOpenOpacityTween(transitionType),
        _shapeTween = ShapeBorderTween(begin: closedShape, end: openShape),
        super(settings: routeSettings);
 
@@ -128,7 +184,7 @@ class _OpenContainerRoute<T> extends ModalRoute<T> with DragBackRouteMixin<T> {
   }) {
     switch (transitionType) {
       case ContainerTransitionType.fade:
-        // 起止都透明：展开时让列表里那一行原样透出来，关闭时正好收拢回该行
+        // 起止都透明：展开时让源行副本浮在容器里，关闭时正好收拢回该行
         return _FlippableTweenSequence<Color?>(<TweenSequenceItem<Color?>>[
           TweenSequenceItem<Color?>(
             tween: ColorTween(
@@ -154,6 +210,36 @@ class _OpenContainerRoute<T> extends ModalRoute<T> with DragBackRouteMixin<T> {
           ),
           TweenSequenceItem<Color?>(
             tween: ColorTween(begin: middleColor, end: openColor),
+            weight: 4 / 5,
+          ),
+        ]);
+    }
+  }
+
+  static _FlippableTweenSequence<double> _getClosedOpacityTween(
+    ContainerTransitionType transitionType,
+  ) {
+    switch (transitionType) {
+      case ContainerTransitionType.fade:
+        // 行内容随容器上沿一起上移，页面盖住它之前淡出
+        return _FlippableTweenSequence<double>(<TweenSequenceItem<double>>[
+          TweenSequenceItem<double>(
+            tween: Tween<double>(begin: 1.0, end: 0.0),
+            weight: 0.55,
+          ),
+          TweenSequenceItem<double>(
+            tween: ConstantTween<double>(0.0),
+            weight: 0.45,
+          ),
+        ]);
+      case ContainerTransitionType.fadeThrough:
+        return _FlippableTweenSequence<double>(<TweenSequenceItem<double>>[
+          TweenSequenceItem<double>(
+            tween: Tween<double>(begin: 1.0, end: 0.0),
+            weight: 1 / 5,
+          ),
+          TweenSequenceItem<double>(
+            tween: ConstantTween<double>(0.0),
             weight: 4 / 5,
           ),
         ]);
@@ -197,9 +283,10 @@ class _OpenContainerRoute<T> extends ModalRoute<T> with DragBackRouteMixin<T> {
   final Color? closedColor;
   final Color? openColor;
   final Color middleColor;
+  final CloseContainerBuilder closedBuilder;
   final ShapeBorder? openShape;
   final OpenContainerBuilder<T> openBuilder;
-  final GlobalKey sourceKey;
+  final GlobalKey<_HideableState> sourceKey;
 
   @override
   final Duration transitionDuration;
@@ -208,11 +295,13 @@ class _OpenContainerRoute<T> extends ModalRoute<T> with DragBackRouteMixin<T> {
 
   final bool useRootNavigator;
 
+  final _FlippableTweenSequence<double> _closedOpacityTween;
   final _FlippableTweenSequence<double> _openOpacityTween;
   final ShapeBorderTween _shapeTween;
   late _FlippableTweenSequence<Color?> _colorTween;
   final GlobalKey _openBuilderKey = GlobalKey();
   final RectTween _rectTween = RectTween();
+  Rect? _sourceRect;
 
   AnimationStatus? _lastAnimationStatus;
   AnimationStatus? _currentAnimationStatus;
@@ -224,6 +313,17 @@ class _OpenContainerRoute<T> extends ModalRoute<T> with DragBackRouteMixin<T> {
     animation!.addStatusListener((AnimationStatus status) {
       _lastAnimationStatus = _currentAnimationStatus;
       _currentAnimationStatus = status;
+      switch (status) {
+        case AnimationStatus.dismissed:
+          _toggleHideable(hide: false);
+          break;
+        case AnimationStatus.completed:
+          _toggleHideable(hide: true);
+          break;
+        case AnimationStatus.forward:
+        case AnimationStatus.reverse:
+          break;
+      }
     });
 
     return super.didPush();
@@ -239,6 +339,24 @@ class _OpenContainerRoute<T> extends ModalRoute<T> with DragBackRouteMixin<T> {
       delayForSourceRoute: true,
     );
     return super.didPop(result);
+  }
+
+  @override
+  void dispose() {
+    if (sourceKey.currentState?.isVisible == false) {
+      SchedulerBinding.instance.addPostFrameCallback(
+        (Duration d) => _toggleHideable(hide: false),
+      );
+    }
+    super.dispose();
+  }
+
+  void _toggleHideable({required bool hide}) {
+    if (sourceKey.currentState != null) {
+      sourceKey.currentState!
+        ..placeholderSize = null
+        ..isVisible = !hide;
+    }
   }
 
   void _takeMeasurements({
@@ -259,6 +377,8 @@ class _OpenContainerRoute<T> extends ModalRoute<T> with DragBackRouteMixin<T> {
         return;
       }
       final Rect source = _getRect(sourceKey, navigator);
+      _sourceRect = source;
+      sourceKey.currentState!.placeholderSize = source.size;
       // 只做纵向展开：容器从第一帧起就是整屏宽，杜绝横向 / 斜向观感
       _rectTween.begin = Rect.fromLTRB(
         0,
@@ -369,19 +489,22 @@ class _OpenContainerRoute<T> extends ModalRoute<T> with DragBackRouteMixin<T> {
             reverseCurve: _transitionWasInterrupted ? null : curve.flipped,
           );
           TweenSequence<Color?>? colorTween;
-          TweenSequence<double>? openOpacityTween;
+          TweenSequence<double>? closedOpacityTween, openOpacityTween;
           switch (animation.status) {
             case AnimationStatus.dismissed:
             case AnimationStatus.forward:
+              closedOpacityTween = _closedOpacityTween;
               openOpacityTween = _openOpacityTween;
               colorTween = _colorTween;
               break;
             case AnimationStatus.reverse:
               if (_transitionWasInterrupted) {
+                closedOpacityTween = _closedOpacityTween;
                 openOpacityTween = _openOpacityTween;
                 colorTween = _colorTween;
                 break;
               }
+              closedOpacityTween = _closedOpacityTween.flipped;
               openOpacityTween = _openOpacityTween.flipped;
               colorTween = _colorTween.flipped;
               break;
@@ -390,9 +513,11 @@ class _OpenContainerRoute<T> extends ModalRoute<T> with DragBackRouteMixin<T> {
               break;
           }
           assert(colorTween != null);
+          assert(closedOpacityTween != null);
           assert(openOpacityTween != null);
 
           final Rect rect = _rectTween.evaluate(curvedAnimation)!;
+          final Rect sourceRect = _sourceRect ?? _rectTween.begin ?? Rect.zero;
           final Rect endRect = _rectTween.end ?? (Offset.zero & Size.zero);
 
           return SizedBox.expand(
@@ -408,17 +533,51 @@ class _OpenContainerRoute<T> extends ModalRoute<T> with DragBackRouteMixin<T> {
                     animationDuration: Duration.zero,
                     color: colorTween!.evaluate(animation),
                     shape: _shapeTween.evaluate(curvedAnimation),
-                    // 页面锚定屏幕坐标：不跟着容器左上角斜着滑动，只由容器裁剪逐层露出
-                    child: Transform.translate(
-                      offset: Offset(-rect.left, -rect.top),
-                      child: SizedBox(
-                        width: endRect.width,
-                        height: endRect.height,
-                        child: FadeTransition(
-                          opacity: openOpacityTween!.animate(animation),
-                          child: RepaintBoundary(child: child),
+                    child: Stack(
+                      fit: StackFit.passthrough,
+                      children: <Widget>[
+                        // 源行副本：1:1 尺寸、跟着容器上沿整体上移，页面盖住它之前淡出
+                        Align(
+                          alignment: Alignment.topLeft,
+                          child: Transform.translate(
+                            offset: Offset(sourceRect.left - rect.left, 0),
+                            child: SizedBox(
+                              width: sourceRect.width,
+                              height: sourceRect.height,
+                              child:
+                                  (sourceKey.currentState?.isInTree ?? false)
+                                  ? null
+                                  : FadeTransition(
+                                      opacity: closedOpacityTween!.animate(
+                                        animation,
+                                      ),
+                                      child: Builder(
+                                        builder: (BuildContext context) {
+                                          // Use dummy "open container" callback
+                                          // since we are in the process of opening.
+                                          return closedBuilder(context, () {});
+                                        },
+                                      ),
+                                    ),
+                            ),
+                          ),
                         ),
-                      ),
+                        // 打开页锚定屏幕坐标：不跟着容器左上角斜着滑动，只由容器裁剪逐层露出
+                        Align(
+                          alignment: Alignment.topLeft,
+                          child: Transform.translate(
+                            offset: Offset(-rect.left, -rect.top),
+                            child: SizedBox(
+                              width: endRect.width,
+                              height: endRect.height,
+                              child: FadeTransition(
+                                opacity: openOpacityTween!.animate(animation),
+                                child: RepaintBoundary(child: child),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -431,23 +590,17 @@ class _OpenContainerRoute<T> extends ModalRoute<T> with DragBackRouteMixin<T> {
   }
 
   @override
+  void didStartDragBack() => _toggleHideable(hide: false);
+
+  @override
   Widget buildTransitions(
     BuildContext context,
     Animation<double> animation,
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    return SlideTransition(
-      // 本页之上再压新页面时，本页要像普通页面一样被推走（旧页面左移，与 Cupertino 路由一致）
-      position: secondaryAnimation.drive(
-        Tween<Offset>(
-          begin: Offset.zero,
-          end: const Offset(-0.25, 0.0),
-        ).chain(CurveTween(curve: Curves.fastOutSlowIn)),
-      ),
-      child: dragBackDetector(
-        isDragBackActive ? dragBackSlide(context, animation, child) : child,
-      ),
+    return dragBackDetector(
+      isDragBackActive ? dragBackSlide(context, animation, child) : child,
     );
   }
 
