@@ -755,7 +755,7 @@ class GlobalState {
     rawConfig['tun']['disable-icmp-forwarding'] =
         realPatchConfig.tun.disableIcmpForwarding;
     rawConfig['tun']['mtu'] = realPatchConfig.tun.mtu;
-    rawConfig['geodata-loader'] = realPatchConfig.geodataLoader.name;
+    rawConfig['geodata-loader'] = 'memconservative';
     rawConfig['geodata-mode'] = false;
     if (rawConfig['sniffer']?['sniff'] != null) {
       for (final value in (rawConfig['sniffer']?['sniff'] as Map).values) {
@@ -814,6 +814,9 @@ class GlobalState {
       rawConfig['hosts'] = <String, dynamic>{};
     }
     for (final host in realPatchConfig.hosts.entries) {
+      if (!system.isAndroid && host.key == 'services.googleapis.cn') {
+        continue;
+      }
       rawConfig['hosts'][host.key] = host.value.splitByMultipleSeparators;
     }
 
