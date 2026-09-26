@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart' show CupertinoPageTransition;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:bett_box/widgets/drag_back.dart';
@@ -165,11 +166,11 @@ class _OpenContainerRoute<T> extends ModalRoute<T> with DragBackRouteMixin<T> {
   ) {
     switch (transitionType) {
       case ContainerTransitionType.fade:
-        // 容器长大到一定程度后再淡入页面，避免半程就露出页面的局部内容
+        // 页面随纵向拉开同步显现，撑开过程本身就是要看的动效
         return _FlippableTweenSequence<double>(<TweenSequenceItem<double>>[
           TweenSequenceItem<double>(
             tween: ConstantTween<double>(0.0),
-            weight: 0.30,
+            weight: 0.18,
           ),
           TweenSequenceItem<double>(
             tween: Tween<double>(begin: 0.0, end: 1.0),
@@ -177,7 +178,7 @@ class _OpenContainerRoute<T> extends ModalRoute<T> with DragBackRouteMixin<T> {
           ),
           TweenSequenceItem<double>(
             tween: ConstantTween<double>(1.0),
-            weight: 0.35,
+            weight: 0.47,
           ),
         ]);
       case ContainerTransitionType.fadeThrough:
@@ -258,8 +259,14 @@ class _OpenContainerRoute<T> extends ModalRoute<T> with DragBackRouteMixin<T> {
       if (!navigator.attached || sourceKey.currentContext == null) {
         return;
       }
-      // 源行始终留在列表里，展开时由容器覆盖它、关闭时由容器收回它
-      _rectTween.begin = _getRect(sourceKey, navigator);
+      final Rect source = _getRect(sourceKey, navigator);
+      // 只做纵向展开：容器从第一帧起就是整屏宽，杜绝横向 / 斜向观感
+      _rectTween.begin = Rect.fromLTRB(
+        0,
+        source.top,
+        navSize.width,
+        source.bottom,
+      );
     }
 
     if (delayForSourceRoute) {
@@ -431,8 +438,13 @@ class _OpenContainerRoute<T> extends ModalRoute<T> with DragBackRouteMixin<T> {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    return dragBackDetector(
-      isDragBackActive ? dragBackSlide(context, animation, child) : child,
+    return CupertinoPageTransition(
+      // 本页之上再压新页面时，本页要像普通页面一样被推走（旧页面左移、新页面左移推入）
+      primaryRouteAnimation: const AlwaysStoppedAnimation<double>(1.0),
+      secondaryRouteAnimation: secondaryAnimation,
+      child: dragBackDetector(
+        isDragBackActive ? dragBackSlide(context, animation, child) : child,
+      ),
     );
   }
 
