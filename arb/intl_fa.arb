@@ -1,4 +1,4 @@
-﻿{
+{
   "rule": "قوانین",
   "global": "سراسر جهان",
   "direct": "مستقیم",
@@ -689,7 +689,6 @@
   "ageKeyPairGeneratedSuccess": "جفت کلید X25519 با موفقیت ساخته شد. لطفاً آن را ذخیره کنید",
   "agePrivateKeyRequired": "لطفا ابتدا کلید خصوصی Age صحیح را وارد کنید",
   "lineWrap": "شکستن خطوط",
-  "autoStickyHeader": "چسبندگی خودکار سربرگ",
   "showHiddenItems": "نمایش موارد پنهان",
   "blockComment": "کامنت",
   "locate": "موقعیت",

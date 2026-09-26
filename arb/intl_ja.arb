@@ -1,4 +1,4 @@
-﻿{
+{
   "rule": "ルール",
   "global": "グローバル",
   "direct": "ダイレクト",
@@ -689,7 +689,6 @@
   "ageKeyPairGeneratedSuccess": "X25519鍵ペアを生成しました。大切に保管してください",
   "agePrivateKeyRequired": "正しいAge秘密鍵を先に入力してください",
   "lineWrap": "折り返し",
-  "autoStickyHeader": "自動固定ヘッダー",
   "showHiddenItems": "非表示項目を表示",
   "blockComment": "コメント",
   "locate": "位置",

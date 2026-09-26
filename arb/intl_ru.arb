@@ -1,4 +1,4 @@
-﻿{
+{
   "rule": "По правилам",
   "global": "Глобально",
   "direct": "Напрямую",
@@ -691,7 +691,6 @@
   "ageKeyPairGeneratedSuccess": "Пара ключей X25519 создана, сохраните её в надёжном месте",
   "agePrivateKeyRequired": "Пожалуйста, сначала введите корректный приватный ключ Age",
   "lineWrap": "Перенос строк",
-  "autoStickyHeader": "Автозакрепление заголовка",
   "showHiddenItems": "Показать скрытые",
   "blockComment": "Комментарий",
   "locate": "Найти",

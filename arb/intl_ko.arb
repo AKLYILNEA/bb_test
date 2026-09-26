@@ -1,4 +1,4 @@
-﻿{
+{
   "rule": "규칙",
   "global": "글로벌",
   "direct": "직접 연결",
@@ -689,7 +689,6 @@
   "ageKeyPairGeneratedSuccess": "X25519 키 쌍이 생성되었습니다. 잘 보관하세요",
   "agePrivateKeyRequired": "올바른 Age 개인키를 먼저 입력하세요",
   "lineWrap": "자동 줄바꿈",
-  "autoStickyHeader": "헤더 자동 고정",
   "showHiddenItems": "숨겨진 항목 표시",
   "blockComment": "주석",
   "locate": "위치",

@@ -1,4 +1,4 @@
-﻿{
+{
   "rule": "Rule",
   "global": "Global",
   "direct": "Direct",
@@ -688,7 +688,6 @@
   "ageKeyPairGeneratedSuccess": "X25519 Key pair generated, please keep it safe",
   "agePrivateKeyRequired": "Please enter a correct Age private key first",
   "lineWrap": "Wrap Lines",
-  "autoStickyHeader": "Auto Sticky Header",
   "showHiddenItems": "Show Hidden Items",
   "blockComment": "Comment",
   "locate": "Locate",
