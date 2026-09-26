@@ -323,7 +323,12 @@ class _AddDashboardWidgetModal extends StatelessWidget {
                       onAdd: () {
                         onAdd(item);
                       },
-                      child: child,
+                      // 这里的预览全是"活"的小部件（图表 / 转圈该动的都在动）。
+                      // 不冻结 + 不隔离的话，每个预览的重绘都会把整块抽屉标记为脏，
+                      // 抽屉滑入时整块面板每帧重绘 → 全程掉帧（info / 当前配置这类纯内容抽屉就不会）。
+                      child: RepaintBoundary(
+                        child: TickerMode(enabled: false, child: child),
+                      ),
                     );
                   },
                 ),
