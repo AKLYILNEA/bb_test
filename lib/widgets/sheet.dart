@@ -218,16 +218,20 @@ class AdaptiveSheetScaffold extends StatelessWidget {
     final canPop = ModalRoute.of(context)?.canPop ?? false;
     final implyLeading = !bottomSheet && (!(actions.isEmpty && sideSheet));
     final hasLeading = leading != null || (implyLeading && canPop);
+    final effectiveLeading =
+        leading ?? (implyLeading && canPop ? const BackButton() : null);
     final appBar = AppBar(
-      leading: leading != null
+      leading: effectiveLeading != null
           ? Padding(
               padding: const EdgeInsets.only(left: 2.0),
-              child: leading,
+              child: Center(
+                child: effectiveLeading,
+              ),
             )
           : null,
       leadingWidth: hasLeading ? 58.0 : null,
       forceMaterialTransparency: bottomSheet ? true : false,
-      automaticallyImplyLeading: implyLeading,
+      automaticallyImplyLeading: false,
       titleSpacing: hasLeading ? 0.0 : (bottomSheet ? null : 18.0),
       centerTitle: bottomSheet,
       backgroundColor: backgroundColor,

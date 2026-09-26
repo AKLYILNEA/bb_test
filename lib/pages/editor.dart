@@ -391,7 +391,9 @@ class _EditorPageState extends ConsumerState<EditorPage> {
             appBar: AppBar(
               leading: const Padding(
                 padding: EdgeInsets.only(left: 2.0),
-                child: BackButton(),
+                child: Center(
+                  child: BackButton(),
+                ),
               ),
               leadingWidth: 58.0,
               titleSpacing: 0.0,

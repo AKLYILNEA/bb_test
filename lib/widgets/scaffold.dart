@@ -312,10 +312,8 @@ class CommonScaffoldState extends State<CommonScaffold> {
       return widget.leading;
     }
     if (canPop) {
-      return IconButton(
+      return BackButton(
         onPressed: () => Navigator.maybePop(context),
-        icon: const Icon(FluentIcons.arrow_left_24_regular),
-        tooltip: appLocalizations.back,
       );
     }
     return null;
@@ -428,7 +426,9 @@ class CommonScaffoldState extends State<CommonScaffold> {
                       leading: leading != null
                           ? Padding(
                               padding: const EdgeInsets.only(left: 2.0),
-                              child: leading,
+                              child: Center(
+                                child: leading,
+                              ),
                             )
                           : null,
                       leadingWidth: hasLeading ? 58.0 : null,
