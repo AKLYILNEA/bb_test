@@ -574,13 +574,19 @@ class ModalSideSheetRoute<T> extends PopupRoute<T> {
     if (blurFilter == null) {
       return barrier;
     }
-    // 高斯模糊层保持恒定子树（遮罩动画放在它上面），避免每帧重算整屏模糊
+    // 高斯模糊层保持恒定子树（遮罩动画放在它上面），并随动画淡入，避免每帧重算整屏模糊
     return Stack(
       fit: StackFit.expand,
       alignment: Alignment.topLeft,
       clipBehavior: Clip.none,
       children: [
-        BackdropFilter(filter: blurFilter, child: const SizedBox.expand()),
+        FadeTransition(
+          opacity: animation!.drive(CurveTween(curve: barrierCurve)),
+          child: BackdropFilter(
+            filter: blurFilter,
+            child: const SizedBox.expand(),
+          ),
+        ),
         barrier,
       ],
     );
