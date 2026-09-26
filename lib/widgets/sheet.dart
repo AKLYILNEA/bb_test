@@ -130,9 +130,9 @@ class AdaptiveSheetScaffold extends StatelessWidget {
     final frostedColor = (isLight
             ? context.colorScheme.surface
             : context.colorScheme.surfaceContainer)
-        .withValues(alpha: isLight ? 0.80 : 0.72);
+        .withValues(alpha: isLight ? 0.94 : 0.88);
     final borderColor = isLight
-        ? context.colorScheme.outlineVariant.withValues(alpha: 0.45)
+        ? context.colorScheme.outlineVariant.withValues(alpha: 0.35)
         : Colors.white.withValues(alpha: 0.14);
     final backgroundColor = context.colorScheme.surface;
     final bottomSheet = type == SheetType.bottomSheet;
@@ -171,7 +171,7 @@ class AdaptiveSheetScaffold extends StatelessWidget {
               top: Radius.circular(35.0),
             ),
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
               child: Container(
                 decoration: BoxDecoration(
                   color: frostedColor,
@@ -200,19 +200,14 @@ class AdaptiveSheetScaffold extends StatelessWidget {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(2),
                               color: context.colorScheme.onSurfaceVariant
-                                  .withValues(alpha: 0.7),
+                                  .withValues(alpha: 0.6),
                             ),
                           ),
                         ),
                         appBar,
                         Flexible(
                           flex: 1,
-                          child: (showScrollGradient ?? true)
-                              ? ScrollFeatherGradientOverlay(
-                                  surfaceColor: frostedColor,
-                                  child: body,
-                                )
-                              : body,
+                          child: body,
                         ),
                       ],
                     ),
@@ -224,7 +219,7 @@ class AdaptiveSheetScaffold extends StatelessWidget {
         : sideSheet
             ? ClipRect(
                 child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                   child: Container(
                     decoration: BoxDecoration(
                       color: frostedColor,
@@ -237,7 +232,7 @@ class AdaptiveSheetScaffold extends StatelessWidget {
                       backgroundColor: Colors.transparent,
                       surfaceColor: frostedColor,
                       body: body,
-                      showScrollGradient: showScrollGradient,
+                      showScrollGradient: false,
                     ),
                   ),
                 ),
