@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -60,6 +61,7 @@ class GoogleBottomNavBar extends ConsumerWidget {
       onTabChange(index);
     }
 
+    final isLight = context.colorScheme.brightness == Brightness.light;
     final viewBottom = MediaQuery.viewPaddingOf(context).bottom;
     return RepaintBoundary(
       child: Padding(
@@ -68,59 +70,75 @@ class GoogleBottomNavBar extends ConsumerWidget {
           color: Colors.transparent,
           padding: const EdgeInsets.only(left: 16, right: 16, top: 8),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8),
             decoration: BoxDecoration(
-              color: context.colorScheme.surfaceContainer,
               borderRadius: BorderRadius.circular(36),
-              border: Border.all(
-                color: context.colorScheme.outlineVariant.withValues(
-                  alpha: context.colorScheme.brightness == Brightness.light
-                      ? 0.5
-                      : 0.4,
-                ),
-                width: 1,
-              ),
               boxShadow: [
                 BoxShadow(
-                  blurRadius: 30,
-                  offset: const Offset(0, 10),
+                  blurRadius: 28,
+                  offset: const Offset(0, 8),
                   color: Colors.black.withValues(
-                    alpha: context.colorScheme.brightness == Brightness.light
-                        ? 0.08
-                        : 0.18,
+                    alpha: isLight ? 0.08 : 0.22,
                   ),
                 ),
                 BoxShadow(
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                   color: Colors.black.withValues(
-                    alpha: context.colorScheme.brightness == Brightness.light
-                        ? 0.04
-                        : 0.1,
+                    alpha: isLight ? 0.04 : 0.10,
                   ),
                 ),
               ],
             ),
-            child: GNav(
-              rippleColor: enableHapticFeedback
-                  ? context.colorScheme.onSurface.withValues(alpha: 0.15)
-                  : Colors.transparent, // Disabling ripple may disable haptic feedback
-              hoverColor: context.colorScheme.onSurface.withValues(alpha: 0.1),
-              haptic: enableHapticFeedback, // Control GNav haptic feedback
-              gap: 8,
-              activeColor: context.colorScheme.primary,
-              iconSize: 24,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              duration: const Duration(milliseconds: 250),
-              tabBackgroundColor: context.colorScheme.primary.withValues(
-                alpha: context.colorScheme.brightness == Brightness.light
-                    ? 0.20
-                    : 0.26,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(36),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10.0,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: (isLight
+                            ? context.colorScheme.surface
+                            : context.colorScheme.surfaceContainer)
+                        .withValues(alpha: isLight ? 0.80 : 0.72),
+                    borderRadius: BorderRadius.circular(36),
+                    border: Border.all(
+                      color: isLight
+                          ? context.colorScheme.outlineVariant.withValues(
+                              alpha: 0.45,
+                            )
+                          : Colors.white.withValues(alpha: 0.14),
+                      width: 1,
+                    ),
+                  ),
+                  child: GNav(
+                    rippleColor: enableHapticFeedback
+                        ? context.colorScheme.onSurface.withValues(alpha: 0.15)
+                        : Colors.transparent, // Disabling ripple may disable haptic feedback
+                    hoverColor: context.colorScheme.onSurface.withValues(
+                      alpha: 0.1,
+                    ),
+                    haptic: enableHapticFeedback, // Control GNav haptic feedback
+                    gap: 8,
+                    activeColor: context.colorScheme.primary,
+                    iconSize: 24,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                    duration: const Duration(milliseconds: 250),
+                    tabBackgroundColor: context.colorScheme.primary.withValues(
+                      alpha: isLight ? 0.20 : 0.26,
+                    ),
+                    color: context.colorScheme.onSurfaceVariant,
+                    tabs: tabsList,
+                    selectedIndex: selectedIndex,
+                    onTabChange: handleTabChange,
+                  ),
+                ),
               ),
-              color: context.colorScheme.onSurfaceVariant,
-              tabs: tabsList,
-              selectedIndex: selectedIndex,
-              onTabChange: handleTabChange,
             ),
           ),
         ),
