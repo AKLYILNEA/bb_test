@@ -73,21 +73,16 @@ class _ToolViewState extends ConsumerState<ToolsView> {
   }
 
   Widget _buildNavigationMenuItem(NavigationItem navigationItem) {
-    // 请求 / 连接是整页型的页签页面，套上下展开不自然，保留 bettbox 原版推入动画
-    final isFullPage =
-        navigationItem.label == PageLabel.requests ||
-        navigationItem.label == PageLabel.connections;
-    return ListItem.open(
+    return ListItem.next(
       leading: navigationItem.icon,
       title: Text(Intl.message(navigationItem.label.name)),
       subtitle: navigationItem.description != null
           ? Text(Intl.message(navigationItem.description!))
           : null,
-      delegate: OpenDelegate(
+      delegate: NextDelegate(
         title: Intl.message(navigationItem.label.name),
         builder: (_) => _buildNavigationPage(navigationItem),
         wrap: false,
-        expand: !isFullPage,
       ),
     );
   }
@@ -1503,11 +1498,11 @@ class _ThemeItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListItem.open(
+    return ListItem.next(
       leading: const Icon(FluentIcons.color_24_regular),
       title: Text(appLocalizations.theme),
       subtitle: Text(appLocalizations.themeDesc),
-      delegate: OpenDelegate(
+      delegate: NextDelegate(
         title: appLocalizations.theme,
         builder: (_) => const ThemeView(),
       ),
@@ -1520,11 +1515,11 @@ class _BackupItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListItem.open(
+    return ListItem.next(
       leading: const Icon(FluentIcons.cloud_sync_24_regular),
       title: Text(appLocalizations.backupAndRecovery),
       subtitle: Text(appLocalizations.backupAndRecoveryDesc),
-      delegate: OpenDelegate(
+      delegate: NextDelegate(
         title: appLocalizations.backupAndRecovery,
         builder: (_) => const BackupAndRecovery(),
       ),
@@ -1537,11 +1532,11 @@ class _HotkeyItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListItem.open(
+    return ListItem.next(
       leading: const Icon(FluentIcons.keyboard_24_regular),
       title: Text(appLocalizations.hotkeyManagement),
       subtitle: Text(appLocalizations.hotkeyManagementDesc),
-      delegate: OpenDelegate(
+      delegate: NextDelegate(
         title: appLocalizations.hotkeyManagement,
         builder: (_) => const HotKeyView(),
       ),
@@ -1574,13 +1569,14 @@ class _AccessItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListItem.open(
+    return ListItem.next(
       leading: const Icon(FluentIcons.shield_checkmark_24_regular),
       title: Text(appLocalizations.accessControl),
       subtitle: Text(appLocalizations.accessControlDesc),
-      delegate: OpenDelegate(
+      delegate: NextDelegate(
         title: appLocalizations.appAccessControl,
         builder: (_) => const AccessView(),
+        showScrollGradient: false,
       ),
     );
   }
@@ -1591,11 +1587,11 @@ class _ConfigItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListItem.open(
+    return ListItem.next(
       leading: const Icon(FluentIcons.settings_24_regular),
       title: Text(appLocalizations.basicConfig),
       subtitle: Text(appLocalizations.basicConfigDesc),
-      delegate: OpenDelegate(
+      delegate: NextDelegate(
         title: appLocalizations.basicConfig,
         builder: (_) => const ConfigView(),
       ),
@@ -1608,11 +1604,11 @@ class _OtherSettingItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListItem.open(
+    return ListItem.next(
       leading: const Icon(FluentIcons.wand_24_regular),
       title: Text(appLocalizations.otherSettings),
       subtitle: Text(appLocalizations.otherSettingsDesc),
-      delegate: OpenDelegate(
+      delegate: NextDelegate(
         title: appLocalizations.otherSettings,
         builder: (_) => const OtherSettingView(),
       ),
@@ -1625,11 +1621,11 @@ class _SettingItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListItem.open(
+    return ListItem.next(
       leading: const Icon(FluentIcons.wrench_screwdriver_24_regular),
       title: Text(appLocalizations.application),
       subtitle: Text(appLocalizations.applicationDesc),
-      delegate: OpenDelegate(
+      delegate: NextDelegate(
         title: appLocalizations.application,
         builder: (_) => const ApplicationSettingView(),
       ),
@@ -1661,10 +1657,10 @@ class _InfoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListItem.open(
+    return ListItem.next(
       leading: const Icon(FluentIcons.info_24_regular),
       title: Text(appLocalizations.about),
-      delegate: OpenDelegate(
+      delegate: NextDelegate(
         title: appLocalizations.about,
         builder: (_) => const AboutView(),
       ),
@@ -1677,10 +1673,10 @@ class _DeveloperItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListItem.open(
+    return ListItem.next(
       leading: const Icon(FluentIcons.window_dev_tools_24_regular),
       title: Text(appLocalizations.developerMode),
-      delegate: OpenDelegate(
+      delegate: NextDelegate(
         title: appLocalizations.developerMode,
         builder: (_) => const DeveloperView(),
       ),

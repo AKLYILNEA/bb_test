@@ -49,7 +49,6 @@ class OpenDelegate extends Delegate {
   final bool blur;
   final bool wrap;
   final bool forceFull;
-  final bool expand;
 
   const OpenDelegate({
     required this.title,
@@ -60,7 +59,6 @@ class OpenDelegate extends Delegate {
     this.blur = false,
     this.wrap = true,
     this.forceFull = true,
-    this.expand = true,
   }) : assert(widget != null || builder != null);
 }
 
@@ -296,42 +294,36 @@ class ListItem<T> extends StatelessWidget {
         return openDelegate.builder?.call(context) ?? openDelegate.widget!;
       }
 
-      void openExtend() {
-        showExtend(
-          context,
-          props: ExtendProps(
-            blur: openDelegate.blur,
-            maxWidth: openDelegate.maxWidth,
-            forceFull: openDelegate.forceFull,
-          ),
-          builder: (_, type) {
-            final child = buildChild(context);
-            return openDelegate.wrap
-                ? AdaptiveSheetScaffold(
-                    actions: openDelegate.actions,
-                    type: type,
-                    body: child,
-                    title: openDelegate.title,
-                  )
-                : child;
-          },
-        );
-      }
-
-      // 桌面走抽屉；整页型入口（请求 / 连接等）不套容器展开，保留原版推入动画
-      if (system.isDesktop || !openDelegate.expand) {
-        return _buildListTile(context, onTap: openExtend);
-      }
-
       return OpenContainer(
-        closedColor: context.colorScheme.surfaceContainer,
-        openColor: context.colorScheme.surface,
-        closedShape: RoundedSuperellipseBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        openShape: const RoundedSuperellipseBorder(),
         closedBuilder: (_, action) {
-          return _buildListTile(context, onTap: action);
+          openAction() {
+            final isMobile = globalState.appState.viewMode == ViewMode.mobile;
+            if (!isMobile || system.isDesktop) {
+              showExtend(
+                context,
+                props: ExtendProps(
+                  blur: openDelegate.blur,
+                  maxWidth: openDelegate.maxWidth,
+                  forceFull: openDelegate.forceFull,
+                ),
+                builder: (_, type) {
+                  final child = buildChild(context);
+                  return openDelegate.wrap
+                      ? AdaptiveSheetScaffold(
+                          actions: openDelegate.actions,
+                          type: type,
+                          body: child,
+                          title: openDelegate.title,
+                        )
+                      : child;
+                },
+              );
+              return;
+            }
+            action();
+          }
+
+          return _buildListTile(context, onTap: openAction);
         },
         openBuilder: (context, action) {
           final child = buildChild(context);
@@ -352,54 +344,29 @@ class ListItem<T> extends StatelessWidget {
         return nextDelegate.builder?.call(context) ?? nextDelegate.widget!;
       }
 
-      void openExtend() {
-        showExtend(
-          context,
-          props: ExtendProps(
-            blur: nextDelegate.blur,
-            maxWidth: nextDelegate.maxWidth,
-            forceFull: nextDelegate.forceFull,
-          ),
-          builder: (_, type) {
-            final child = buildChild(context);
-            return nextDelegate.wrap
-                ? AdaptiveSheetScaffold(
-                    actions: nextDelegate.actions,
-                    type: type,
-                    body: child,
-                    title: nextDelegate.title,
-                    showScrollGradient: nextDelegate.showScrollGradient,
-                  )
-                : child;
-          },
-        );
-      }
-
-      if (system.isDesktop) {
-        return _buildListTile(context, onTap: openExtend);
-      }
-
-      return OpenContainer(
-        closedColor: context.colorScheme.surfaceContainer,
-        openColor: context.colorScheme.surface,
-        closedShape: RoundedSuperellipseBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        openShape: const RoundedSuperellipseBorder(),
-        closedBuilder: (_, action) {
-          return _buildListTile(context, onTap: action);
-        },
-        openBuilder: (context, action) {
-          final child = buildChild(context);
-          return nextDelegate.wrap
-              ? AdaptiveSheetScaffold(
-                  type: SheetType.page,
-                  title: nextDelegate.title,
-                  body: child,
-                  actions: nextDelegate.actions,
-                  showScrollGradient: nextDelegate.showScrollGradient,
-                )
-              : child;
+      return _buildListTile(
+        context,
+        onTap: () {
+          showExtend(
+            context,
+            props: ExtendProps(
+              blur: nextDelegate.blur,
+              maxWidth: nextDelegate.maxWidth,
+              forceFull: nextDelegate.forceFull,
+            ),
+            builder: (_, type) {
+              final child = buildChild(context);
+              return nextDelegate.wrap
+                  ? AdaptiveSheetScaffold(
+                      actions: nextDelegate.actions,
+                      type: type,
+                      body: child,
+                      title: nextDelegate.title,
+                      showScrollGradient: nextDelegate.showScrollGradient,
+                    )
+                  : child;
+            },
+          );
         },
       );
     }

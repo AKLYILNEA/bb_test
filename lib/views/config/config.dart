@@ -26,21 +26,23 @@ class _ConfigViewState extends State<ConfigView> {
   @override
   Widget build(BuildContext context) {
     List<Widget> items = [
-      ListItem.open(
+      ListItem.next(
         title: Text(appLocalizations.general),
         subtitle: Text(appLocalizations.generalDesc),
         leading: const Icon(FluentIcons.note_edit_24_regular),
-        delegate: OpenDelegate(
+        delegate: NextDelegate(
           title: appLocalizations.general,
           builder: (_) => const GeneralListView(),
+          blur: false,
         ),
       ),
-      ListItem.open(
+      ListItem.next(
         title: Text(appLocalizations.network),
         subtitle: Text(appLocalizations.networkDesc),
         leading: const Icon(FluentIcons.sound_source_24_regular),
-        delegate: OpenDelegate(
+        delegate: NextDelegate(
           title: appLocalizations.network,
+          blur: false,
           actions: [
             Consumer(
               builder: (_, ref, _) {
@@ -79,11 +81,11 @@ class _ConfigViewState extends State<ConfigView> {
           builder: (_) => const NetworkListView(),
         ),
       ),
-      ListItem.open(
+      ListItem.next(
         title: const Text('DNS'),
         subtitle: Text(appLocalizations.dnsDesc),
         leading: const Icon(FluentIcons.server_24_regular),
-        delegate: OpenDelegate(
+        delegate: NextDelegate(
           title: 'DNS',
           actions: [
             Consumer(
@@ -110,13 +112,14 @@ class _ConfigViewState extends State<ConfigView> {
             ),
           ],
           builder: (_) => const DnsListView(),
+          blur: false,
         ),
       ),
-      ListItem.open(
+      ListItem.next(
         title: const Text('NTP'),
         subtitle: Text(appLocalizations.ntpDesc),
         leading: const Icon(FluentIcons.access_time_24_regular),
-        delegate: OpenDelegate(
+        delegate: NextDelegate(
           title: 'NTP',
           actions: [
             Consumer(
@@ -143,13 +146,15 @@ class _ConfigViewState extends State<ConfigView> {
             ),
           ],
           builder: (_) => const NtpListView(),
+          blur: false,
         ),
       ),
-      ListItem.open(
+      ListItem.next(
         title: const Text('Hosts'),
         subtitle: Text(appLocalizations.hostsDesc),
         leading: const Icon(FluentIcons.receipt_24_regular),
-        delegate: OpenDelegate(
+        delegate: NextDelegate(
+          blur: false,
           title: 'Hosts',
           builder: (_) => Consumer(
             builder: (_, ref, _) {
@@ -180,11 +185,11 @@ class _ConfigViewState extends State<ConfigView> {
           ),
         ),
       ),
-      ListItem.open(
+      ListItem.next(
         title: Text(appLocalizations.sniffer),
         subtitle: Text(appLocalizations.snifferDesc),
         leading: const Icon(FluentIcons.scan_object_24_regular),
-        delegate: OpenDelegate(
+        delegate: NextDelegate(
           title: appLocalizations.sniffer,
           actions: [
             Consumer(
@@ -211,13 +216,14 @@ class _ConfigViewState extends State<ConfigView> {
             ),
           ],
           builder: (_) => const SnifferListView(),
+          blur: false,
         ),
       ),
-      ListItem.open(
+      ListItem.next(
         title: Text(appLocalizations.tunnel),
         subtitle: Text(appLocalizations.tunnelDesc),
         leading: const Icon(FluentIcons.arrows_bidirectional_24_regular),
-        delegate: OpenDelegate(
+        delegate: NextDelegate(
           title: appLocalizations.tunnel,
           actions: [
             Consumer(
@@ -244,13 +250,14 @@ class _ConfigViewState extends State<ConfigView> {
             ),
           ],
           builder: (_) => const TunnelListView(),
+          blur: false,
         ),
       ),
-      ListItem.open(
+      ListItem.next(
         title: Text(appLocalizations.experimental),
         subtitle: Text(appLocalizations.experimentalDesc),
         leading: const Icon(FluentIcons.beaker_24_regular),
-        delegate: OpenDelegate(
+        delegate: NextDelegate(
           title: appLocalizations.experimental,
           actions: [
             Consumer(

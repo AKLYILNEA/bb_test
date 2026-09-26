@@ -136,6 +136,12 @@ const Map<PageLabel, FluentSvgPair> _fluentSvgMap = {
   ),
 };
 
+const double _opticalSize = 19.5;
+
+final Expando<Rect> _pathBoundsCache = Expando<Rect>();
+
+Rect _boundsOf(Path path) => _pathBoundsCache[path] ??= path.getBounds();
+
 class FluentSvgPainter extends CustomPainter {
   final Path regularPath;
   final Path filledPath;
@@ -153,6 +159,17 @@ class FluentSvgPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     canvas.save();
     canvas.scale(size.width / 24.0, size.height / 24.0);
+
+    // 各图标墨迹范围不同（主页 18×19，更多 20×20），统一按包围盒归一 + 居中，
+    // 否则底栏每个图标看起来大小与居中程度不一致
+    final Rect bounds = _boundsOf(regularPath);
+    final double maxDim = math.max(bounds.width, bounds.height);
+    if (maxDim > 0) {
+      final double scale = _opticalSize / maxDim;
+      canvas.translate(12.0, 12.0);
+      canvas.scale(scale, scale);
+      canvas.translate(-bounds.center.dx, -bounds.center.dy);
+    }
 
     final paint = Paint()
       ..color = color

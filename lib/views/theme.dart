@@ -449,7 +449,7 @@ class _PrueBlackItem extends ConsumerWidget {
       themeSettingProvider.select((state) => state.pureBlack),
     );
     return ListItem.switchItem(
-      leading: Icon(FluentIcons.circle_half_fill_24_regular),
+      leading: const Icon(Icons.indeterminate_check_box_outlined),
       horizontalTitleGap: 12,
       title: Text(
         appLocalizations.pureBlackMode,
