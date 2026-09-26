@@ -1,4 +1,6 @@
 
+import 'dart:ui';
+
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
@@ -70,6 +72,8 @@ Future<T?> showSheet<T>({
       useSafeArea: props.useSafeArea,
       isScrollControlled: props.isScrollControlled,
       barrierColor: props.barrierColor,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
       context: context,
       constraints: BoxConstraints(maxWidth: props.maxWidth ?? 360),
       filter: props.blur ? commonFilter : null,
@@ -90,6 +94,8 @@ Future<T?> showExtend<T>(
     true => BaseNavigator.push(context, builder(context, SheetType.page)),
     false => showModalSideSheet<T>(
       useSafeArea: props.useSafeArea,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
       context: context,
       constraints: BoxConstraints(maxWidth: props.maxWidth ?? 360),
       filter: props.blur ? commonFilter : null,
@@ -120,6 +126,14 @@ class AdaptiveSheetScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = context.colorScheme.brightness == Brightness.light;
+    final frostedColor = (isLight
+            ? context.colorScheme.surface
+            : context.colorScheme.surfaceContainer)
+        .withValues(alpha: isLight ? 0.80 : 0.72);
+    final borderColor = isLight
+        ? context.colorScheme.outlineVariant.withValues(alpha: 0.45)
+        : Colors.white.withValues(alpha: 0.14);
     final backgroundColor = context.colorScheme.surface;
     final bottomSheet = type == SheetType.bottomSheet;
     final sideSheet = type == SheetType.sideSheet;
@@ -134,11 +148,13 @@ class AdaptiveSheetScaffold extends StatelessWidget {
             )
           : null,
       leadingWidth: hasLeading ? 58.0 : null,
-      forceMaterialTransparency: bottomSheet ? true : false,
+      forceMaterialTransparency: (bottomSheet || sideSheet) ? true : false,
       automaticallyImplyLeading: implyLeading,
       titleSpacing: hasLeading ? 0.0 : (bottomSheet ? null : 18.0),
       centerTitle: bottomSheet,
-      backgroundColor: backgroundColor,
+      backgroundColor: (bottomSheet || sideSheet)
+          ? Colors.transparent
+          : backgroundColor,
       surfaceTintColor: Colors.transparent,
       scrolledUnderElevation: 0.0,
       title: EmojiText(
@@ -150,51 +166,88 @@ class AdaptiveSheetScaffold extends StatelessWidget {
       ]),
     );
     final content = bottomSheet
-        ? Material(
-            color: backgroundColor,
-            clipBehavior: Clip.antiAlias,
-            shape: RoundedSuperellipseBorder(
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(35.0),
-              ),
+        ? ClipRRect(
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(35.0),
             ),
-            child: SafeArea(
-              top: false,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: 16),
-                    child: Container(
-                      alignment: Alignment.center,
-                      height: 4,
-                      width: 32,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(2),
-                        color: context.colorScheme.onSurfaceVariant,
-                      ),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: frostedColor,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(35.0),
+                  ),
+                  border: Border(
+                    top: BorderSide(color: borderColor, width: 1),
+                    left: BorderSide(color: borderColor, width: 1),
+                    right: BorderSide(color: borderColor, width: 1),
+                  ),
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: SafeArea(
+                    top: false,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16),
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: 4,
+                            width: 32,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(2),
+                              color: context.colorScheme.onSurfaceVariant
+                                  .withValues(alpha: 0.7),
+                            ),
+                          ),
+                        ),
+                        appBar,
+                        Flexible(
+                          flex: 1,
+                          child: (showScrollGradient ?? true)
+                              ? ScrollFeatherGradientOverlay(
+                                  surfaceColor: frostedColor,
+                                  child: body,
+                                )
+                              : body,
+                        ),
+                      ],
                     ),
                   ),
-                  appBar,
-                  Flexible(
-                    flex: 1,
-                    child: (showScrollGradient ?? true)
-                        ? ScrollFeatherGradientOverlay(
-                            surfaceColor: backgroundColor,
-                            child: body,
-                          )
-                        : body,
-                  ),
-                ],
+                ),
               ),
             ),
           )
-        : CommonScaffold(
-            appBar: appBar,
-            backgroundColor: backgroundColor,
-            body: body,
-            showScrollGradient: showScrollGradient,
-          );
+        : sideSheet
+            ? ClipRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: frostedColor,
+                      border: Border(
+                        left: BorderSide(color: borderColor, width: 1),
+                      ),
+                    ),
+                    child: CommonScaffold(
+                      appBar: appBar,
+                      backgroundColor: Colors.transparent,
+                      surfaceColor: frostedColor,
+                      body: body,
+                      showScrollGradient: showScrollGradient,
+                    ),
+                  ),
+                ),
+              )
+            : CommonScaffold(
+                appBar: appBar,
+                backgroundColor: backgroundColor,
+                body: body,
+                showScrollGradient: showScrollGradient,
+              );
 
     final isTv = globalState.isAndroidTV;
     return PopScope(
