@@ -122,11 +122,13 @@ class GoogleBottomNavBar extends ConsumerWidget {
                     ),
                     haptic: enableHapticFeedback, // Control GNav haptic feedback
                     // gap 取与胶囊左右内边距相同（16），文字才会正好落在图标右侧与胶囊右缘的中线上
+                    // gap + 左右内边距总和保持不变（16 + 12×2 = 8 + 16×2），
+                    // 胶囊长度不变，但文字被推到图标右侧与胶囊右缘的中线附近，左右留白相等
                     gap: 16,
                     activeColor: context.colorScheme.primary,
                     iconSize: 24,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
+                      horizontal: 12,
                       vertical: 10,
                     ),
                     duration: const Duration(milliseconds: 250),

@@ -361,30 +361,51 @@ class ModalSideSheetRoute<T> extends PopupRoute<T> {
     if (_filter == null) {
       return barrier;
     }
-    // 模糊强度直接由动画驱动（sigma 0 → 目标值）：观感等同淡入，
-    // 但省掉了 FadeTransition 每帧一次的整屏 saveLayer（侧边抽屉展开时的主要卡顿来源）
+    // 模糊强度由动画驱动（sigma 0 → 目标值，观感等同淡入，省掉 FadeTransition 每帧的整屏 saveLayer）；
+    // 并且只模糊「面板还没盖住的那一条」：面板完全不透明，被盖住的区域不需要模糊，
+    // 于是模糊面积随面板推进不断缩小，展开全程的合成开销大幅下降。
     final anim = animation!;
+    final panelWidth = constraints?.maxWidth ?? 360;
     return Stack(
       fit: StackFit.expand,
       alignment: Alignment.topLeft,
       clipBehavior: Clip.none,
       children: [
-        AnimatedBuilder(
-          animation: anim,
-          builder: (context, child) {
-            final sigma =
-                constants.CommonFilters.blurSigma *
-                barrierCurve.transform(anim.value);
-            return BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: sigma,
-                sigmaY: sigma,
-                tileMode: TileMode.clamp,
-              ),
-              child: child,
+        LayoutBuilder(
+          builder: (context, box) {
+            final fullWidth = box.maxWidth;
+            final covered = panelWidth.clamp(0.0, fullWidth);
+            return AnimatedBuilder(
+              animation: anim,
+              builder: (context, child) {
+                final t = _modalBottomSheetCurve.transform(anim.value);
+                final sigma = constants.CommonFilters.blurSigma * t;
+                if (sigma <= 0.05) {
+                  return const SizedBox.expand();
+                }
+                final visible = ((fullWidth - covered * t) / fullWidth).clamp(
+                  0.0,
+                  1.0,
+                );
+                return Align(
+                  alignment: Alignment.centerLeft,
+                  child: FractionallySizedBox(
+                    widthFactor: visible,
+                    heightFactor: 1,
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(
+                        sigmaX: sigma,
+                        sigmaY: sigma,
+                        tileMode: TileMode.clamp,
+                      ),
+                      child: child,
+                    ),
+                  ),
+                );
+              },
+              child: const SizedBox.expand(),
             );
           },
-          child: const SizedBox.expand(),
         ),
         barrier,
       ],
