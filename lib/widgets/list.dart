@@ -297,7 +297,7 @@ class ListItem<T> extends StatelessWidget {
       return OpenContainer(
         closedColor: context.colorScheme.surfaceContainer,
         openColor: context.colorScheme.surface,
-        closedShape: const RoundedSuperellipseBorder(
+        closedShape: RoundedSuperellipseBorder(
           borderRadius: BorderRadius.circular(16),
         ),
         openShape: const RoundedSuperellipseBorder(),
