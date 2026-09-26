@@ -68,6 +68,7 @@ class _ScrollFeatherGradientOverlayState
   Widget build(BuildContext context) {
     final surface =
         widget.surfaceColor ?? Theme.of(context).colorScheme.surface;
+    final isRtl = Directionality.maybeOf(context) == TextDirection.rtl;
     return NotificationListener<Notification>(
       onNotification: (notification) {
         if (notification is ScrollNotification) {
@@ -92,19 +93,46 @@ class _ScrollFeatherGradientOverlayState
                 child: IgnorePointer(
                   child: Opacity(
                     opacity: progress,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            surface,
-                            surface.withValues(alpha: 0.85),
-                            surface.withValues(alpha: 0.50),
-                            surface.withValues(alpha: 0.18),
-                            surface.withValues(alpha: 0.0),
+                    child: ShaderMask(
+                      blendMode: BlendMode.dstIn,
+                      shaderCallback: (bounds) {
+                        // 让出滑动指示条所在的一侧（LTR 右侧 / RTL 左侧），羽化不糊指示条
+                        final width = bounds.width;
+                        final clear = width > 0
+                            ? (16.0 / width).clamp(0.0, 0.40).toDouble()
+                            : 0.0;
+                        final fade = width > 0
+                            ? (26.0 / width).clamp(clear + 0.01, 0.5).toDouble()
+                            : 0.0;
+                        return LinearGradient(
+                          begin: isRtl
+                              ? Alignment.centerLeft
+                              : Alignment.centerRight,
+                          end: isRtl
+                              ? Alignment.centerRight
+                              : Alignment.centerLeft,
+                          colors: const [
+                            Colors.transparent,
+                            Colors.transparent,
+                            Colors.white,
                           ],
-                          stops: const [0.0, 0.25, 0.55, 0.80, 1.0],
+                          stops: [0.0, clear, fade],
+                        ).createShader(bounds);
+                      },
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              surface,
+                              surface.withValues(alpha: 0.85),
+                              surface.withValues(alpha: 0.50),
+                              surface.withValues(alpha: 0.18),
+                              surface.withValues(alpha: 0.0),
+                            ],
+                            stops: const [0.0, 0.25, 0.55, 0.80, 1.0],
+                          ),
                         ),
                       ),
                     ),
