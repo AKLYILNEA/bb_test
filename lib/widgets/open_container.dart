@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart' show CupertinoPageTransition;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:bett_box/widgets/drag_back.dart';
@@ -438,10 +437,14 @@ class _OpenContainerRoute<T> extends ModalRoute<T> with DragBackRouteMixin<T> {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    return CupertinoPageTransition(
-      // 本页之上再压新页面时，本页要像普通页面一样被推走（旧页面左移、新页面左移推入）
-      primaryRouteAnimation: const AlwaysStoppedAnimation<double>(1.0),
-      secondaryRouteAnimation: secondaryAnimation,
+    return SlideTransition(
+      // 本页之上再压新页面时，本页要像普通页面一样被推走（旧页面左移，与 Cupertino 路由一致）
+      position: secondaryAnimation.drive(
+        Tween<Offset>(
+          begin: Offset.zero,
+          end: const Offset(-0.25, 0.0),
+        ).chain(CurveTween(curve: Curves.fastOutSlowIn)),
+      ),
       child: dragBackDetector(
         isDragBackActive ? dragBackSlide(context, animation, child) : child,
       ),
