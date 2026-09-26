@@ -6,11 +6,16 @@ import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/state.dart';
 import 'package:flutter/material.dart';
 
+import 'scaffold.dart';
+
 class CommonScrollBar extends StatelessWidget {
   final ScrollController? controller;
   final Widget child;
   final bool trackVisibility;
   final bool thumbVisibility;
+
+  /// 把羽化层放进滚动条内侧：指示条画在羽化之上，不被羽化糊住
+  final bool feather;
 
   const CommonScrollBar({
     super.key,
@@ -18,6 +23,7 @@ class CommonScrollBar extends StatelessWidget {
     required this.controller,
     this.trackVisibility = false,
     this.thumbVisibility = false,
+    this.feather = false,
   });
 
   @override
@@ -30,7 +36,9 @@ class CommonScrollBar extends StatelessWidget {
       thickness: 8,
       radius: const Radius.circular(8),
       interactive: hasController,
-      child: child,
+      child: feather
+          ? ScrollFeatherGradientOverlay(clearScrollBar: false, child: child)
+          : child,
     );
   }
 }

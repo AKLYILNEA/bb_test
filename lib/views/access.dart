@@ -576,7 +576,9 @@ class _AccessViewState extends ConsumerState<AccessView>
                   flex: 1,
                   child: Padding(
                     padding: const EdgeInsets.only(top: 8),
-                    child: ScrollFeatherGradientOverlay(
+                    child: CommonScrollBar(
+                      controller: _controller,
+                      feather: true,
                       child: FutureBuilder(
                         future: _completer.future,
                         builder: (_, snapshot) {

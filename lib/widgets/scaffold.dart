@@ -25,11 +25,15 @@ class ScrollFeatherGradientOverlay extends StatefulWidget {
   final double height;
   final Color? surfaceColor;
 
+  /// 是否给滑动指示条让位（仅用于无法把滚动条提到羽化之上的场景）
+  final bool clearScrollBar;
+
   const ScrollFeatherGradientOverlay({
     super.key,
     required this.child,
     this.height = 28.0,
     this.surfaceColor,
+    this.clearScrollBar = true,
   });
 
   @override
@@ -85,6 +89,22 @@ class _ScrollFeatherGradientOverlayState
             valueListenable: _progressNotifier,
             builder: (context, progress, _) {
               if (progress <= 0) return const SizedBox.shrink();
+              final gradientBox = DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      surface,
+                      surface.withValues(alpha: 0.85),
+                      surface.withValues(alpha: 0.50),
+                      surface.withValues(alpha: 0.18),
+                      surface.withValues(alpha: 0.0),
+                    ],
+                    stops: const [0.0, 0.25, 0.55, 0.80, 1.0],
+                  ),
+                ),
+              );
               return Positioned(
                 top: 0,
                 left: 0,
@@ -93,49 +113,38 @@ class _ScrollFeatherGradientOverlayState
                 child: IgnorePointer(
                   child: Opacity(
                     opacity: progress,
-                    child: ShaderMask(
-                      blendMode: BlendMode.dstIn,
-                      shaderCallback: (bounds) {
-                        // 让出滑动指示条所在的一侧（LTR 右侧 / RTL 左侧），羽化不糊指示条
-                        final width = bounds.width;
-                        final clear = width > 0
-                            ? (16.0 / width).clamp(0.0, 0.40).toDouble()
-                            : 0.0;
-                        final fade = width > 0
-                            ? (26.0 / width).clamp(clear + 0.01, 0.5).toDouble()
-                            : 0.0;
-                        return LinearGradient(
-                          begin: isRtl
-                              ? Alignment.centerLeft
-                              : Alignment.centerRight,
-                          end: isRtl
-                              ? Alignment.centerRight
-                              : Alignment.centerLeft,
-                          colors: const [
-                            Colors.transparent,
-                            Colors.transparent,
-                            Colors.white,
-                          ],
-                          stops: [0.0, clear, fade],
-                        ).createShader(bounds);
-                      },
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              surface,
-                              surface.withValues(alpha: 0.85),
-                              surface.withValues(alpha: 0.50),
-                              surface.withValues(alpha: 0.18),
-                              surface.withValues(alpha: 0.0),
-                            ],
-                            stops: const [0.0, 0.25, 0.55, 0.80, 1.0],
-                          ),
-                        ),
-                      ),
-                    ),
+                    child: widget.clearScrollBar
+                        ? ShaderMask(
+                            blendMode: BlendMode.dstIn,
+                            shaderCallback: (bounds) {
+                              // 让出滑动指示条那一侧（LTR 右侧 / RTL 左侧）最外 10px，再 10px 平滑过渡
+                              final width = bounds.width;
+                              final clear = width > 0
+                                  ? (10.0 / width).clamp(0.0, 0.40).toDouble()
+                                  : 0.0;
+                              final fade = width > 0
+                                  ? (20.0 / width)
+                                        .clamp(clear + 0.01, 0.5)
+                                        .toDouble()
+                                  : 0.0;
+                              return LinearGradient(
+                                begin: isRtl
+                                    ? Alignment.centerLeft
+                                    : Alignment.centerRight,
+                                end: isRtl
+                                    ? Alignment.centerRight
+                                    : Alignment.centerLeft,
+                                colors: const [
+                                  Colors.transparent,
+                                  Colors.transparent,
+                                  Colors.white,
+                                ],
+                                stops: [0.0, clear, fade],
+                              ).createShader(bounds);
+                            },
+                            child: gradientBox,
+                          )
+                        : gradientBox,
                   ),
                 ),
               );

@@ -254,7 +254,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
       actions: _buildActions(),
       title: appLocalizations.proxies,
       searchState: AppBarSearchState(onSearch: _onSearch),
-      showScrollGradient: proxiesType == ProxiesType.list,
+      showScrollGradient: false,
       body: switch (hasGroups) {
         false => NullStatus(
             label: appLocalizations.noProxy,

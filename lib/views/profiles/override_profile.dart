@@ -117,6 +117,7 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
           _currentMaxWidth = constraints.maxWidth - 104;
           return CommonScrollBar(
             controller: _controller,
+            feather: true,
             child: CustomScrollView(
               controller: _controller,
               // ignore: deprecated_member_use
@@ -222,6 +223,7 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
               child: CommonScaffold(
                 resizeToAvoidBottomInset: false,
                 title: appLocalizations.override,
+                showScrollGradient: false,
                 body: _buildContent(),
                 actions: [
                   if (hasUnsavedChanges)

@@ -327,6 +327,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
 
         return CommonScrollBar(
           controller: _scrollController,
+          feather: true,
           child: CustomScrollView(
             key: const PageStorageKey<String>('proxies_list'),
             controller: _scrollController,
