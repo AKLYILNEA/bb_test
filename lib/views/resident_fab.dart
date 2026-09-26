@@ -157,6 +157,7 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
           labelText: startData.labelText,
           labelWidth: startData.labelWidth,
           isRunTime: startData.isRunTime,
+          isExtended: startData.isExtended,
           onPressed: startData.onPressed,
           onLongPress: startData.onLongPress,
           contentOpacity: startData.showLoading ? 0.0 : 1.0,
@@ -169,6 +170,7 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
           labelText: appLocalizations.addProfile,
           labelWidth: startFabTextWidth(context, appLocalizations.addProfile),
           isRunTime: false,
+          isExtended: true,
           onPressed: showAddProfileExtend,
         );
       case PageLabel.proxies:
@@ -178,6 +180,7 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
           labelText: appLocalizations.startTest,
           labelWidth: startFabTextWidth(context, appLocalizations.startTest),
           isRunTime: false,
+          isExtended: true,
           onPressed: (delayTestCoordinator.isTesting || _groupName.isEmpty)
               ? null
               : () => _handleProxyTest(proxyTestAction),
@@ -193,6 +196,7 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
           labelText: startData.labelText,
           labelWidth: startData.labelWidth,
           isRunTime: startData.isRunTime,
+          isExtended: startData.isExtended,
           onPressed: startData.onPressed,
           onLongPress: startData.onLongPress,
           contentOpacity: startData.showLoading ? 0.0 : 1.0,
@@ -211,6 +215,7 @@ class _FabContent {
     required this.labelText,
     required this.labelWidth,
     this.isRunTime = false,
+    this.isExtended = true,
     this.onPressed,
     this.onLongPress,
     this.contentOpacity = 1.0,
@@ -223,6 +228,7 @@ class _FabContent {
   final String labelText;
   final double labelWidth;
   final bool isRunTime;
+  final bool isExtended;
   final VoidCallback? onPressed;
   final VoidCallback? onLongPress;
   final double contentOpacity;
@@ -258,6 +264,11 @@ class _ResidentFabShell extends StatelessWidget {
               DecoratedBox(
                 decoration: getCommonFabDecoration(context),
                 child: FloatingActionButton.extended(
+                  isExtended: content.isExtended,
+                  extendedPadding: EdgeInsetsDirectional.only(
+                    start: 16.0,
+                    end: content.isExtended ? 20.0 : 16.0,
+                  ),
                   elevation: 0,
                   hoverElevation: 0,
                   highlightElevation: 0,

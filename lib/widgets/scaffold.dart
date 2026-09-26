@@ -133,14 +133,12 @@ class CommonScaffold extends StatefulWidget {
   final OnKeywordsUpdateCallback? onKeywordsUpdate;
   final bool? resizeToAvoidBottomInset;
   final bool? showScrollGradient;
-  final Color? surfaceColor;
 
   const CommonScaffold({
     super.key,
     this.appBar,
     required this.body,
     this.backgroundColor,
-    this.surfaceColor,
     this.leading,
     this.title,
     this.actions,
@@ -486,7 +484,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
           Expanded(
             child: (widget.showScrollGradient ?? true)
                 ? ScrollFeatherGradientOverlay(
-                    surfaceColor: widget.surfaceColor ?? widget.backgroundColor,
+                    surfaceColor: widget.backgroundColor,
                     child: widget.body,
                   )
                 : widget.body,

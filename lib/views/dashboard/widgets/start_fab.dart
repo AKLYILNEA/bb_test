@@ -54,6 +54,7 @@ class StartFabData {
     required this.labelWidth,
     required this.showLoading,
     this.isRunTime = false,
+    this.isExtended = true,
     this.onPressed,
     this.onLongPress,
   });
@@ -63,6 +64,7 @@ class StartFabData {
   final double labelWidth;
   final bool showLoading;
   final bool isRunTime;
+  final bool isExtended;
   final VoidCallback? onPressed;
   final VoidCallback? onLongPress;
 }
@@ -210,17 +212,16 @@ class _StartFabDataProviderState extends ConsumerState<StartFabDataProvider> {
             icon: displayStart
                 ? FluentIcons.align_space_around_vertical_20_filled
                 : FluentIcons.play_24_filled,
-            labelText: displayStart
-                ? _formatRunTime(runTime)
-                : appLocalizations.startRunning,
+            labelText: displayStart ? _formatRunTime(runTime) : '',
             labelWidth: displayStart
                 ? _getRunTimeTextWidth(
                     context,
                     hasThreeDigitHours: hasThreeDigitHours,
                   )
-                : startFabLabelWidth(context, appLocalizations.startRunning),
+                : 0.0,
             showLoading: showLoading,
             isRunTime: displayStart,
+            isExtended: displayStart,
             onPressed: !canPress
                 ? null
                 : state.hasProfile
@@ -267,6 +268,11 @@ Widget buildStartFabBody(BuildContext context, StartFabData data) {
         DecoratedBox(
           decoration: getCommonFabDecoration(context),
           child: FloatingActionButton.extended(
+            isExtended: data.isExtended,
+            extendedPadding: EdgeInsetsDirectional.only(
+              start: 16.0,
+              end: data.isExtended ? 20.0 : 16.0,
+            ),
             elevation: 0,
             hoverElevation: 0,
             highlightElevation: 0,
