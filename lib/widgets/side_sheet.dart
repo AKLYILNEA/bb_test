@@ -2,18 +2,12 @@ import 'dart:ui';
 
 import 'package:bett_box/common/color.dart';
 import 'package:bett_box/common/constant.dart' as constants;
-import 'package:flutter/foundation.dart'
-    show TargetPlatform, defaultTargetPlatform;
+import 'package:flutter/foundation.dart' show TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 const Duration _bottomSheetEnterDuration = Duration(milliseconds: 300);
 const Duration _bottomSheetExitDuration = Duration(milliseconds: 300);
-
-final bool _blurDisabledPlatform =
-    defaultTargetPlatform == TargetPlatform.windows ||
-    defaultTargetPlatform == TargetPlatform.linux ||
-    defaultTargetPlatform == TargetPlatform.macOS;
 const Curve _modalBottomSheetCurve = Easing.standardDecelerate;
 const double _defaultScrollControlDisabledMaxHeightRatio = 9.0 / 16.0;
 
@@ -366,11 +360,6 @@ class ModalSideSheetRoute<T> extends PopupRoute<T> {
       );
     }
     if (_filter == null) {
-      return barrier;
-    }
-    // 桌面端（Windows/Linux/macOS）的 Flutter 没有 Impeller，BackdropFilter 每帧都要回读整块
-    // backdrop 再做高斯，大窗口下必然掉帧 —— 侧边抽屉在桌面端只保留压暗，不做实时模糊。
-    if (_blurDisabledPlatform) {
       return barrier;
     }
     // 模糊强度由动画驱动（sigma 0 → 目标值，观感等同淡入，省掉 FadeTransition 每帧的整屏 saveLayer）；

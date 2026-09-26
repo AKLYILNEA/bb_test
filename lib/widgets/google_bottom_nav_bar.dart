@@ -123,13 +123,13 @@ class GoogleBottomNavBar extends ConsumerWidget {
                     haptic: enableHapticFeedback, // Control GNav haptic feedback
                     // 只把文字往右推一点点：图标位置与胶囊总长都不能变。
                     // 原来 = 左16 + 图标 + gap8 + 文字 + 右16；
-                    // 现在 = 左16 + 图标 + gap12 + 文字 + 右12（总和不变的 40）。
-                    gap: 12,
+                    // 现在 = 左16 + 图标 + gap10 + 文字 + 右14（总和不变的 40）。
+                    gap: 10,
                     activeColor: context.colorScheme.primary,
                     iconSize: 24,
                     padding: const EdgeInsets.only(
                       left: 16,
-                      right: 12,
+                      right: 14,
                       top: 10,
                       bottom: 10,
                     ),
