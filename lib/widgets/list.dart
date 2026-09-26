@@ -303,8 +303,7 @@ class ListItem<T> extends StatelessWidget {
         openShape: const RoundedSuperellipseBorder(),
         closedBuilder: (_, action) {
           openAction() {
-            final isMobile = globalState.appState.viewMode == ViewMode.mobile;
-            if (!isMobile || system.isDesktop) {
+            if (system.isDesktop) {
               showExtend(
                 context,
                 props: ExtendProps(
@@ -350,29 +349,54 @@ class ListItem<T> extends StatelessWidget {
         return nextDelegate.builder?.call(context) ?? nextDelegate.widget!;
       }
 
-      return _buildListTile(
-        context,
-        onTap: () {
-          showExtend(
-            context,
-            props: ExtendProps(
-              blur: nextDelegate.blur,
-              maxWidth: nextDelegate.maxWidth,
-              forceFull: nextDelegate.forceFull,
-            ),
-            builder: (_, type) {
-              final child = buildChild(context);
-              return nextDelegate.wrap
-                  ? AdaptiveSheetScaffold(
-                      actions: nextDelegate.actions,
-                      type: type,
-                      body: child,
-                      title: nextDelegate.title,
-                      showScrollGradient: nextDelegate.showScrollGradient,
-                    )
-                  : child;
-            },
-          );
+      void openExtend() {
+        showExtend(
+          context,
+          props: ExtendProps(
+            blur: nextDelegate.blur,
+            maxWidth: nextDelegate.maxWidth,
+            forceFull: nextDelegate.forceFull,
+          ),
+          builder: (_, type) {
+            final child = buildChild(context);
+            return nextDelegate.wrap
+                ? AdaptiveSheetScaffold(
+                    actions: nextDelegate.actions,
+                    type: type,
+                    body: child,
+                    title: nextDelegate.title,
+                    showScrollGradient: nextDelegate.showScrollGradient,
+                  )
+                : child;
+          },
+        );
+      }
+
+      if (system.isDesktop) {
+        return _buildListTile(context, onTap: openExtend);
+      }
+
+      return OpenContainer(
+        closedColor: context.colorScheme.surfaceContainer,
+        openColor: context.colorScheme.surface,
+        closedShape: RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        openShape: const RoundedSuperellipseBorder(),
+        closedBuilder: (_, action) {
+          return _buildListTile(context, onTap: action);
+        },
+        openBuilder: (context, action) {
+          final child = buildChild(context);
+          return nextDelegate.wrap
+              ? AdaptiveSheetScaffold(
+                  type: SheetType.page,
+                  title: nextDelegate.title,
+                  body: child,
+                  actions: nextDelegate.actions,
+                  showScrollGradient: nextDelegate.showScrollGradient,
+                )
+              : child;
         },
       );
     }

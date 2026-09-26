@@ -84,6 +84,9 @@ class AboutView extends StatelessWidget {
     );
   }
 
+  static final int _contributorShuffleSeed =
+      DateTime.now().microsecondsSinceEpoch;
+
   List<Widget> _buildContributorsSection(BuildContext context) {
     final contributors = [
       const Contributor(
@@ -152,7 +155,7 @@ class AboutView extends StatelessWidget {
         avatar: 'assets/images/avatars/aaANDkk.png',
         name: 'aaANDkk',
       ),
-    ]..shuffle();
+    ]..shuffle(Random(_contributorShuffleSeed));
 
     return generateSection(
       separated: false,
