@@ -271,8 +271,8 @@ class AdaptiveSheetScaffold extends StatelessWidget {
                   Flexible(
                     flex: 1,
                     child: (showScrollGradient ?? true)
-                        ? ScrollFeatherGradientOverlay(
-                            surfaceColor: backgroundColor,
+                        ? ScrollConfiguration(
+                            behavior: const FeatherBarScrollBehavior(),
                             child: body,
                           )
                         : body,

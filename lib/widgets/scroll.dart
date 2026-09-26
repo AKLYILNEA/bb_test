@@ -14,7 +14,7 @@ class CommonScrollBar extends StatelessWidget {
   final bool trackVisibility;
   final bool thumbVisibility;
 
-  /// 把羽化层放进滚动条内侧：指示条画在羽化之上，不被羽化糊住
+  /// 把羽化层放进滚动条内侧：滑动指示条画在羽化之上，且羽化保持满宽
   final bool feather;
 
   const CommonScrollBar({
@@ -23,7 +23,7 @@ class CommonScrollBar extends StatelessWidget {
     required this.controller,
     this.trackVisibility = false,
     this.thumbVisibility = false,
-    this.feather = false,
+    this.feather = true,
   });
 
   @override
@@ -37,7 +37,7 @@ class CommonScrollBar extends StatelessWidget {
       radius: const Radius.circular(8),
       interactive: hasController,
       child: feather
-          ? ScrollFeatherGradientOverlay(clearScrollBar: false, child: child)
+          ? FeatherScope(child: ScrollFeatherGradientOverlay(child: child))
           : child,
     );
   }

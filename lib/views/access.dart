@@ -601,6 +601,7 @@ class _AccessViewState extends ConsumerState<AccessView>
                                 )
                               : CommonScrollBar(
                                   controller: _controller,
+                                  feather: false,
                                   child: ListView.separated(
                                     controller: _controller,
                                     itemCount: packages.length,
