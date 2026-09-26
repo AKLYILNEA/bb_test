@@ -574,77 +574,87 @@ class _AccessViewState extends ConsumerState<AccessView>
                 ),
                 Expanded(
                   flex: 1,
-                  child: FutureBuilder(
-                    future: _completer.future,
-                    builder: (_, snapshot) {
-                      if (snapshot.connectionState != ConnectionState.done) {
-                        return Center(
-                          child: SpinKitFadingCircle(
-                            color: context.colorScheme.primary,
-                            size: 36,
-                          ),
-                        );
-                      }
-                      if (_packageListPermissionDenied) {
-                        return _buildPackageListPermissionDeniedView();
-                      }
-                      return packages.isEmpty
-                          ? NullStatus(
-                              label: appLocalizations.noData,
-                              illustration: NullStatusIllustration.apps,
-                            )
-                          : CommonScrollBar(
-                              controller: _controller,
-                              child: ListView.separated(
-                                controller: _controller,
-                                itemCount: packages.length,
-                                padding: const EdgeInsets.only(
-                                  bottom: 24,
-                                  top: 4,
-                                ),
-                                itemBuilder: (_, index) {
-                                  final package = packages[index];
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                    ),
-                                    child: PackageListItem(
-                                      key: Key(package.packageName),
-                                      package: package,
-                                      value: valueList.contains(
-                                        package.packageName,
-                                      ),
-                                      isActive: accessControl.enable,
-                                      onChanged: (value) {
-                                        _handleSelected(
-                                          valueList,
-                                          package,
-                                          value,
-                                        );
-                                      },
-                                    ),
-                                  );
-                                },
-                                separatorBuilder: (context, _) => Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                  ),
-                                  child: Divider(
-                                    height: 1,
-                                    thickness: 1,
-                                    color: context.colorScheme.outlineVariant
-                                        .withValues(
-                                          alpha:
-                                              context.colorScheme.brightness ==
-                                                  Brightness.light
-                                              ? 0.3
-                                              : 0.2,
-                                        ),
-                                  ),
-                                ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: ScrollFeatherGradientOverlay(
+                      child: FutureBuilder(
+                        future: _completer.future,
+                        builder: (_, snapshot) {
+                          if (snapshot.connectionState !=
+                              ConnectionState.done) {
+                            return Center(
+                              child: SpinKitFadingCircle(
+                                color: context.colorScheme.primary,
+                                size: 36,
                               ),
                             );
-                    },
+                          }
+                          if (_packageListPermissionDenied) {
+                            return _buildPackageListPermissionDeniedView();
+                          }
+                          return packages.isEmpty
+                              ? NullStatus(
+                                  label: appLocalizations.noData,
+                                  illustration: NullStatusIllustration.apps,
+                                )
+                              : CommonScrollBar(
+                                  controller: _controller,
+                                  child: ListView.separated(
+                                    controller: _controller,
+                                    itemCount: packages.length,
+                                    padding: const EdgeInsets.only(
+                                      bottom: 24,
+                                      top: 4,
+                                    ),
+                                    itemBuilder: (_, index) {
+                                      final package = packages[index];
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                        ),
+                                        child: PackageListItem(
+                                          key: Key(package.packageName),
+                                          package: package,
+                                          value: valueList.contains(
+                                            package.packageName,
+                                          ),
+                                          isActive: accessControl.enable,
+                                          onChanged: (value) {
+                                            _handleSelected(
+                                              valueList,
+                                              package,
+                                              value,
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    },
+                                    separatorBuilder: (context, _) => Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                      ),
+                                      child: Divider(
+                                        height: 1,
+                                        thickness: 1,
+                                        color: context
+                                            .colorScheme
+                                            .outlineVariant
+                                            .withValues(
+                                              alpha:
+                                                  context
+                                                          .colorScheme
+                                                          .brightness ==
+                                                      Brightness.light
+                                                  ? 0.3
+                                                  : 0.2,
+                                            ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                        },
+                      ),
+                    ),
                   ),
                 ),
               ],
