@@ -2,6 +2,8 @@ import 'dart:ui';
 
 import 'package:bett_box/common/color.dart';
 import 'package:bett_box/common/constant.dart' as constants;
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
