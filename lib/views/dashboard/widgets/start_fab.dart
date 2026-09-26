@@ -295,24 +295,25 @@ Widget buildStartFabBody(BuildContext context, StartFabData data) {
                   left: data.isExtended ? (data.isRunTime ? 14.0 : 8.0) : 0.0,
                   right: data.isExtended ? 4.0 : 0.0,
                 ),
-                clipBehavior: Clip.hardEdge,
-                child: OverflowBox(
-                  fit: OverflowBoxFit.deferToChild,
-                  alignment: data.isRunTime
-                      ? Alignment.centerLeft
-                      : Alignment.center,
-                  minWidth: 0,
-                  maxWidth: double.infinity,
-                  minHeight: 0,
-                  maxHeight: double.infinity,
-                  child: Text(
-                    data.labelText,
-                    maxLines: 1,
-                    textAlign: data.isRunTime
-                        ? TextAlign.left
-                        : TextAlign.center,
-                    overflow: TextOverflow.visible,
-                    style: startFabLabelStyle(context),
+                child: ClipRect(
+                  child: OverflowBox(
+                    fit: OverflowBoxFit.deferToChild,
+                    alignment: data.isRunTime
+                        ? Alignment.centerLeft
+                        : Alignment.center,
+                    minWidth: 0,
+                    maxWidth: double.infinity,
+                    minHeight: 0,
+                    maxHeight: double.infinity,
+                    child: Text(
+                      data.labelText,
+                      maxLines: 1,
+                      textAlign: data.isRunTime
+                          ? TextAlign.left
+                          : TextAlign.center,
+                      overflow: TextOverflow.visible,
+                      style: startFabLabelStyle(context),
+                    ),
                   ),
                 ),
               ),

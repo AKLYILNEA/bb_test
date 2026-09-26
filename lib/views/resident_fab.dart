@@ -312,43 +312,44 @@ class _ResidentFabShell extends StatelessWidget {
                             : 0.0,
                         right: content.isExtended ? 4.0 : 0.0,
                       ),
-                      clipBehavior: Clip.hardEdge,
-                      child: OverflowBox(
-                        fit: OverflowBoxFit.deferToChild,
-                        alignment: content.isRunTime
-                            ? Alignment.centerLeft
-                            : Alignment.center,
-                        minWidth: 0,
-                        maxWidth: double.infinity,
-                        minHeight: 0,
-                        maxHeight: double.infinity,
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 160),
-                          switchInCurve: Curves.easeOut,
-                          switchOutCurve: Curves.easeIn,
-                          layoutBuilder: (currentChild, previousChildren) =>
-                              Stack(
-                                clipBehavior: Clip.none,
-                                alignment: content.isRunTime
-                                    ? Alignment.centerLeft
-                                    : Alignment.center,
-                                children: [
-                                  ...previousChildren,
-                                  if (currentChild != null) currentChild,
-                                ],
+                      child: ClipRect(
+                        child: OverflowBox(
+                          fit: OverflowBoxFit.deferToChild,
+                          alignment: content.isRunTime
+                              ? Alignment.centerLeft
+                              : Alignment.center,
+                          minWidth: 0,
+                          maxWidth: double.infinity,
+                          minHeight: 0,
+                          maxHeight: double.infinity,
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 160),
+                            switchInCurve: Curves.easeOut,
+                            switchOutCurve: Curves.easeIn,
+                            layoutBuilder: (currentChild, previousChildren) =>
+                                Stack(
+                                  clipBehavior: Clip.none,
+                                  alignment: content.isRunTime
+                                      ? Alignment.centerLeft
+                                      : Alignment.center,
+                                  children: [
+                                    ...previousChildren,
+                                    if (currentChild != null) currentChild,
+                                  ],
+                                ),
+                            transitionBuilder: (child, animation) =>
+                                FadeTransition(opacity: animation, child: child),
+                            child: KeyedSubtree(
+                              key: ValueKey(content.page),
+                              child: Text(
+                                content.labelText,
+                                maxLines: 1,
+                                textAlign: content.isRunTime
+                                    ? TextAlign.left
+                                    : TextAlign.center,
+                                overflow: TextOverflow.visible,
+                                style: startFabLabelStyle(context),
                               ),
-                          transitionBuilder: (child, animation) =>
-                              FadeTransition(opacity: animation, child: child),
-                          child: KeyedSubtree(
-                            key: ValueKey(content.page),
-                            child: Text(
-                              content.labelText,
-                              maxLines: 1,
-                              textAlign: content.isRunTime
-                                  ? TextAlign.left
-                                  : TextAlign.center,
-                              overflow: TextOverflow.visible,
-                              style: startFabLabelStyle(context),
                             ),
                           ),
                         ),
