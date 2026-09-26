@@ -107,7 +107,10 @@ Future<T?> showSheet<T>({
             modalBarrierColor: props.barrierColor ?? defaultBarrierColor,
             showDragHandle: false,
             useSafeArea: props.useSafeArea,
-            filter: props.blur ? commonFilter : null,
+            filter: resolveSheetFilter(
+              context,
+              props.blur ? commonFilter : null,
+            ),
           ),
         );
       }(),

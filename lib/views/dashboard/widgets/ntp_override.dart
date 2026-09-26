@@ -26,7 +26,6 @@ class NtpOverride extends StatelessWidget {
                 body: const NtpListView(),
               );
             },
-            props: const ExtendProps(blur: false),
           );
         },
         child: Container(

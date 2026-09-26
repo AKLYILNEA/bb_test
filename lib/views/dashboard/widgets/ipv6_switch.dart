@@ -29,7 +29,6 @@ class Ipv6Switch extends StatelessWidget {
                 body: generateListView(generalItems),
               );
             },
-            props: const ExtendProps(blur: false),
           );
         },
         child: Container(

@@ -430,8 +430,8 @@ class ModalSideSheetRoute<T> extends PopupRoute<T> {
     this.transitionAnimationController,
     this.anchorPoint,
     this.useSafeArea = false,
-    super.filter,
-  });
+    ImageFilter? filter,
+  }) : _filter = filter;
 
   final WidgetBuilder builder;
 
@@ -462,6 +462,8 @@ class ModalSideSheetRoute<T> extends PopupRoute<T> {
   final bool useSafeArea;
 
   final String? barrierOnTapHint;
+
+  final ImageFilter? _filter;
 
   final ValueNotifier<EdgeInsets> _clipDetailsNotifier =
       ValueNotifier<EdgeInsets>(EdgeInsets.zero);
@@ -542,6 +544,7 @@ class ModalSideSheetRoute<T> extends PopupRoute<T> {
 
   @override
   Widget buildModalBarrier() {
+    final Widget barrier;
     if (barrierColor.a != 0 && !offstage) {
       assert(barrierColor != barrierColor.opacity0);
       final Animation<Color?> color = animation!.drive(
@@ -550,7 +553,7 @@ class ModalSideSheetRoute<T> extends PopupRoute<T> {
           end: barrierColor,
         ).chain(CurveTween(curve: barrierCurve)),
       );
-      return AnimatedModalBarrier(
+      barrier = AnimatedModalBarrier(
         color: color,
         dismissible: barrierDismissible,
         semanticsLabel: barrierLabel,
@@ -559,7 +562,7 @@ class ModalSideSheetRoute<T> extends PopupRoute<T> {
         semanticsOnTapHint: barrierOnTapHint,
       );
     } else {
-      return ModalBarrier(
+      barrier = ModalBarrier(
         dismissible: barrierDismissible,
         semanticsLabel: barrierLabel,
         barrierSemanticsDismissible: semanticsDismissible,
@@ -567,7 +570,35 @@ class ModalSideSheetRoute<T> extends PopupRoute<T> {
         semanticsOnTapHint: barrierOnTapHint,
       );
     }
+    final blurFilter = _filter;
+    if (blurFilter == null) {
+      return barrier;
+    }
+    // 高斯模糊层保持恒定子树（遮罩动画放在它上面），避免每帧重算整屏模糊
+    return Stack(
+      fit: StackFit.expand,
+      alignment: Alignment.topLeft,
+      clipBehavior: Clip.none,
+      children: [
+        BackdropFilter(filter: blurFilter, child: const SizedBox.expand()),
+        barrier,
+      ],
+    );
   }
+}
+
+/// 抽屉/侧边弹层只保留最底层那一层背景模糊：下面已经有模糊路由（另一层弹层或弹窗）时不再叠加。
+ImageFilter? resolveSheetFilter(BuildContext context, ImageFilter? filter) {
+  if (filter == null) return null;
+  final route = ModalRoute.of(context);
+  if (route == null) return filter;
+  if (route is ModalBottomSheetRoute ||
+      route is ModalSideSheetRoute ||
+      route is RawDialogRoute) {
+    return null;
+  }
+  if (route.filter != null) return null;
+  return filter;
 }
 
 Future<T?> showModalSideSheet<T>({
@@ -602,7 +633,7 @@ Future<T?> showModalSideSheet<T>({
   return navigator.push(
     ModalSideSheetRoute<T>(
       builder: builder,
-      filter: filter,
+      filter: resolveSheetFilter(context, filter),
       capturedThemes: InheritedTheme.capture(
         from: context,
         to: navigator.context,

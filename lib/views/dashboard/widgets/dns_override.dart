@@ -59,7 +59,6 @@ class DnsOverride extends StatelessWidget {
                 body: const DnsListView(),
               );
             },
-            props: const ExtendProps(blur: false),
           );
         },
         onLongPress: () async {

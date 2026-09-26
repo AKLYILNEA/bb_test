@@ -26,7 +26,6 @@ class SnifferOverride extends StatelessWidget {
                 body: const SnifferListView(),
               );
             },
-            props: const ExtendProps(blur: false),
           );
         },
         child: Container(
