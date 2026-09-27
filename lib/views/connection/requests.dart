@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bett_box/clash/clash.dart';
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/providers/providers.dart';
@@ -17,7 +18,8 @@ class RequestsView extends ConsumerStatefulWidget {
   ConsumerState<RequestsView> createState() => _RequestsViewState();
 }
 
-class _RequestsViewState extends ConsumerState<RequestsView> {
+class _RequestsViewState extends ConsumerState<RequestsView>
+    with WidgetsBindingObserver {
   late final ScrollController _scrollController;
   late List<TrackerInfo> _pending;
   var _autoScrollToEnd = false;
@@ -29,6 +31,26 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
     super.initState();
     _scrollController = ReverseScrollController();
     _pending = ref.read(filteredRequestsProvider);
+    WidgetsBinding.instance.addObserver(this);
+    _initRequests();
+  }
+
+  void _initRequests() async {
+    clashCore.startTrackRequests();
+    final history = await clashCore.getRequests();
+    if (!mounted) return;
+    if (history.isNotEmpty) {
+      ref.read(requestsProvider.notifier).setRequests(history);
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
+      clashCore.stopTrackRequests();
+    } else if (state == AppLifecycleState.resumed) {
+      _initRequests();
+    }
   }
 
   @override
@@ -46,6 +68,8 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    clashCore.stopTrackRequests();
     _scrollController.dispose();
     super.dispose();
   }
@@ -85,6 +109,7 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
         IconButton(
           onPressed: () {
             ref.read(requestsProvider.notifier).clearRequests();
+            clashCore.clearRequests();
           },
           tooltip: appLocalizations.clear,
           icon: const Icon(FluentIcons.delete_dismiss_24_regular),
