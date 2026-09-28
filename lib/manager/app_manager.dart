@@ -26,7 +26,6 @@ class AppStateManager extends ConsumerStatefulWidget {
 class _AppStateManagerState extends ConsumerState<AppStateManager>
     with WidgetsBindingObserver {
   bool _isRefreshActive = false;
-  bool _wasPaused = false;
   Timer? _dashboardRefreshDebounceTimer;
   Timer? _missedUpdateCheckTimer;
   DateTime? _lastMissedUpdateCheck;
@@ -165,11 +164,6 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
 
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.hidden) {
-      _wasPaused = true;
-    }
-
     final isBackgroundState =
         state == AppLifecycleState.paused ||
         state == AppLifecycleState.hidden ||
@@ -187,20 +181,11 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
       _scheduleMissedUpdateCheck();
       final isInit = await clashCore.isInit;
       if (isInit) {
-        globalState.appController.updateGroupsDebounce();
+        await globalState.appController.updateGroups();
       }
 
-      if (_wasPaused) {
-        _wasPaused = false;
-        final hasDetection = ref
-            .read(dashboardStateProvider)
-            .dashboardWidgets
-            .contains(DashboardWidget.networkDetection);
-        if (hasDetection) {
-          detectionState.tryStartCheck();
-        }
-        mediaUnlockState.tryStartCheck();
-      }
+      detectionState.checkOnForegroundResume();
+      mediaUnlockState.checkOnForegroundResume();
     }
     if (state == AppLifecycleState.resumed && system.isAndroid) {
       final hidden = ref.read(appSettingProvider.select((s) => s.hidden));
