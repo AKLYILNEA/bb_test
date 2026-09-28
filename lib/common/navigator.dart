@@ -1,3 +1,4 @@
+import 'package:bett_box/common/page_transition.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/app.dart';
 import 'package:bett_box/state.dart';
@@ -41,6 +42,22 @@ class _CleanCupertinoPageRoute<T> extends CupertinoPageRoute<T> {
 
   @override
   Color? get barrierColor => null;
+
+  @override
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return buildPageTransition<T>(
+      this,
+      context,
+      animation,
+      secondaryAnimation,
+      child,
+    );
+  }
 }
 
 class CommonDesktopRoute<T> extends PageRoute<T> {

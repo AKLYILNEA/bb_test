@@ -36,10 +36,10 @@ class ApplicationState extends ConsumerState<Application>
 
   final _pageTransitionsTheme = const PageTransitionsTheme(
     builders: <TargetPlatform, PageTransitionsBuilder>{
-      TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-      TargetPlatform.windows: CupertinoPageTransitionsBuilder(),
-      TargetPlatform.linux: CupertinoPageTransitionsBuilder(),
-      TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+      TargetPlatform.android: PageTransitionBuilder(),
+      TargetPlatform.windows: PageTransitionBuilder(),
+      TargetPlatform.linux: PageTransitionBuilder(),
+      TargetPlatform.macOS: PageTransitionBuilder(),
     },
   );
 
@@ -74,6 +74,7 @@ class ApplicationState extends ConsumerState<Application>
       globalState.appController = AppController(currentContext, ref);
     }
     await globalState.appController.init();
+    unawaited(loadScreenCornerRadius());
     if (!appPath.isPortable) {
       try {
         await ExternalControl.start();
