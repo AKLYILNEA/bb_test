@@ -30,11 +30,6 @@ class EditProfileView extends StatefulWidget {
   State<EditProfileView> createState() => EditProfileViewState();
 }
 
-/// Profile files whose info has already been read once in this session. Only
-/// decides whether the first read waits for the route transition; the read
-/// itself still runs on every entry, so a changed file is never stale.
-final Set<String> _readProfileFiles = <String>{};
-
 class EditProfileViewState extends State<EditProfileView> {
   late TextEditingController labelController;
   late TextEditingController urlController;
@@ -72,20 +67,8 @@ class EditProfileViewState extends State<EditProfileView> {
         });
       });
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!mounted) return;
-      final path = await appPath.getProfilePath(widget.profile.id);
-      if (!mounted) return;
-      // The first read of a profile file pays an IO spike that would eat the
-      // transition frames; an already read file loads immediately.
-      if (!_readProfileFiles.contains(path)) {
-        await waitRouteSettled(context);
-        if (!mounted) return;
-      }
-      final info = await _getFileInfo(path);
-      if (!mounted) return;
-      fileInfoNotifier.value = info;
-      _readProfileFiles.add(path);
+    appPath.getProfilePath(widget.profile.id).then((path) async {
+      fileInfoNotifier.value = await _getFileInfo(path);
     });
   }
 
