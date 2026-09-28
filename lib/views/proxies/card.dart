@@ -128,7 +128,11 @@ class ProxyCard extends StatelessWidget {
             );
           }
 
-          return FadeBox(alignment: Alignment.center, child: child);
+          return FadeBox(
+            alignment: Alignment.centerRight,
+            sequential: true,
+            child: child,
+          );
         },
       ),
     );

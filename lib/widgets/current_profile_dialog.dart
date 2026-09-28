@@ -1,8 +1,11 @@
 import 'package:bett_box/common/common.dart';
+import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,209 +15,279 @@ Future<void> showCurrentProfileDialog() async {
   );
 }
 
-class CurrentProfileDialog extends ConsumerWidget {
+class CurrentProfileDialog extends ConsumerStatefulWidget {
   const CurrentProfileDialog({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CurrentProfileDialog> createState() =>
+      _CurrentProfileDialogState();
+}
+
+class _CurrentProfileDialogState extends ConsumerState<CurrentProfileDialog> {
+  static const _panelHeight = 110.0;
+  static const _pickerHeight = 160.0;
+
+  late final FixedExtentScrollController _scrollController;
+  String? _selectedId;
+  int _targetIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    final profiles = ref.read(profilesProvider);
+    _selectedId = ref.read(currentProfileIdProvider);
+    final index = profiles.indexWhere((item) => item.id == _selectedId);
+    _targetIndex = index >= 0 ? index : 0;
+    _scrollController = FixedExtentScrollController(initialItem: _targetIndex);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _handlePointerScroll(PointerScrollEvent event) {
+    if (event.scrollDelta.dy == 0) return;
+    final profiles = ref.read(profilesProvider);
+    if (profiles.isEmpty) return;
+    final direction = event.scrollDelta.dy > 0 ? 1 : -1;
+    final current = _scrollController.hasClients
+        ? _scrollController.selectedItem
+        : _targetIndex;
+    final nextIndex = (current + direction).clamp(0, profiles.length - 1);
+    if (nextIndex != _targetIndex || current != nextIndex) {
+      _targetIndex = nextIndex;
+      _scrollController.animateToItem(
+        _targetIndex,
+        duration: const Duration(milliseconds: 160),
+        curve: Curves.easeOutCubic,
+      );
+    }
+  }
+
+  // 只有点确定才真正切换配置，滚轮/滚动只改选中项。
+  void _handleConfirm() {
+    final profileId = _selectedId;
+    if (profileId != null && profileId != ref.read(currentProfileIdProvider)) {
+      ref.read(currentProfileIdProvider.notifier).value = profileId;
+    }
+    Navigator.of(context).pop();
+  }
+
+  void _handleCancel() {
+    Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final profiles = ref.watch(profilesProvider);
-    final currentProfileId = ref.watch(currentProfileIdProvider);
-    final profile = ref.watch(currentProfileProvider);
+    final index = profiles.indexWhere((item) => item.id == _selectedId);
+    final panelProfile = index >= 0
+        ? profiles[index]
+        : ref.watch(currentProfileProvider);
 
     return CommonDialog(
       title: appLocalizations.currentProfile,
       overrideScroll: true,
       actions: [
         TextButton(
-          onPressed: () {
-            Navigator.of(context, rootNavigator: true).pop();
-          },
+          onPressed: _handleCancel,
+          child: Text(appLocalizations.cancel),
+        ),
+        TextButton(
+          onPressed: _handleConfirm,
           child: Text(appLocalizations.confirm),
         ),
       ],
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          profiles.isEmpty
-              ? const _EmptySubscriptionPanel()
-              : _SubscriptionPanel(profile: profile),
+          SizedBox(
+            height: _panelHeight,
+            child: _ProfilePanel(profile: panelProfile),
+          ),
           const SizedBox(height: 16),
-          Flexible(
-            child: SingleChildScrollView(
-              child: profiles.isEmpty
-                  ? SizedBox(
-                      height: 72,
-                      child: Center(
-                        child: EmojiText(
-                          appLocalizations.nullProfileDesc,
-                          textAlign: TextAlign.center,
-                          style: context.textTheme.bodySmall?.toLight,
+          SizedBox(
+            height: _pickerHeight,
+            child: profiles.isEmpty
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: EmojiText(
+                        appLocalizations.nullProfileDesc,
+                        textAlign: TextAlign.center,
+                        style: context.textTheme.bodySmall?.toLight,
+                      ),
+                    ),
+                  )
+                : Stack(
+                    children: [
+                      Positioned.fill(child: _buildPicker(profiles)),
+                      Positioned.fill(
+                        child: Listener(
+                          behavior: HitTestBehavior.translucent,
+                          onPointerSignal: (pointerSignal) {
+                            if (pointerSignal is PointerScrollEvent) {
+                              GestureBinding.instance.pointerSignalResolver
+                                  .register(pointerSignal, (event) {
+                                    if (event is PointerScrollEvent) {
+                                      _handlePointerScroll(event);
+                                    }
+                                  });
+                            }
+                          },
                         ),
                       ),
-                    )
-                  : Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        for (final item in profiles)
-                          _ProfileRadioItem(
-                            profile: item,
-                            currentProfileId: currentProfileId,
-                            onChanged: (value) {
-                              ref
-                                  .read(currentProfileIdProvider.notifier)
-                                  .value = value;
-                            },
-                          ),
-                      ],
-                    ),
-            ),
+                    ],
+                  ),
           ),
         ],
       ),
     );
   }
-}
 
-class _ProfileRadioItem extends StatelessWidget {
-  final Profile profile;
-  final String? currentProfileId;
-  final ValueChanged<String?> onChanged;
-
-  const _ProfileRadioItem({
-    required this.profile,
-    required this.currentProfileId,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final expireDesc = profile.subscriptionInfo?.expireDesc;
-    return ListItem<String>.radio(
-      key: ValueKey(profile.id),
-      title: EmojiText(
-        profile.label ?? profile.id,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: context.textTheme.bodyMedium,
+  Widget _buildPicker(List<Profile> profiles) {
+    return ScrollConfiguration(
+      behavior: ScrollConfiguration.of(context).copyWith(
+        dragDevices: const {
+          PointerDeviceKind.touch,
+          PointerDeviceKind.mouse,
+          PointerDeviceKind.trackpad,
+          PointerDeviceKind.stylus,
+        },
       ),
-      subtitle: expireDesc == null || expireDesc.isEmpty
-          ? null
-          : EmojiText(
-              expireDesc,
+      child: CupertinoPicker(
+        scrollController: _scrollController,
+        itemExtent: 40.0,
+        magnification: 1.15,
+        useMagnifier: true,
+        squeeze: 1.15,
+        diameterRatio: 1.25,
+        selectionOverlay: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: ShapeDecoration(
+            color: context.colorScheme.primary.withValues(alpha: 0.08),
+            shape: RoundedSuperellipseBorder(
+              borderRadius: BorderRadius.circular(10),
+              side: BorderSide(
+                color: context.colorScheme.primary.withValues(alpha: 0.25),
+                width: 1,
+              ),
+            ),
+          ),
+        ),
+        onSelectedItemChanged: (int index) {
+          setState(() {
+            _selectedId = profiles[index].id;
+            _targetIndex = index;
+          });
+        },
+        children: profiles.map((item) {
+          final isSelected = item.id == _selectedId;
+          return Center(
+            child: EmojiText(
+              item.label ?? item.id,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: context.textTheme.labelSmall?.toLight,
+              style: context.textTheme.bodyMedium?.copyWith(
+                fontSize: isSelected ? 16 : 14,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                color: isSelected
+                    ? context.colorScheme.primary
+                    : context.colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.7,
+                      ),
+              ),
             ),
-      delegate: RadioDelegate<String>(
-        value: profile.id,
-        groupValue: currentProfileId ?? '',
-        onChanged: onChanged,
+          );
+        }).toList(),
       ),
     );
   }
 }
 
-class _EmptySubscriptionPanel extends StatelessWidget {
-  const _EmptySubscriptionPanel();
-
-  @override
-  Widget build(BuildContext context) {
-    return _PanelContainer(
-      child: EmojiText(
-        appLocalizations.notAcquired,
-        textAlign: TextAlign.center,
-        style: context.textTheme.bodySmall?.toLight,
-      ),
-    );
-  }
-}
-
-class _SubscriptionPanel extends StatelessWidget {
+// 与配置卡片同款三行（只是不显示配置名）：到期/本地文件 · 进度条 · 用量 · 上次更新。
+class _ProfilePanel extends StatelessWidget {
   final Profile? profile;
 
-  const _SubscriptionPanel({this.profile});
+  const _ProfilePanel({this.profile});
 
-  String _buildTrafficText(SubscriptionInfo? info) {
-    if (info == null) {
-      return appLocalizations.notAcquired;
-    }
+  String get _updateTimeDesc {
+    return profile?.lastUpdateDate?.lastUpdateTimeDesc ??
+        appLocalizations.notAcquired;
+  }
+
+  String _trafficText(SubscriptionInfo? info) {
+    if (info == null) return 'Unlimited';
     final use = info.upload + info.download;
     final total = info.total;
-    if (use == 0 && total == 0) {
-      return appLocalizations.notAcquired;
-    }
+    if (use == 0 && total == 0) return 'Unlimited';
     final useShow = TrafficValue(value: use).show;
-    if (total <= 0) {
-      return useShow;
-    }
+    if (total == 0) return '$useShow / Unlimited';
     return '$useShow / ${TrafficValue(value: total).show}';
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final info = profile?.subscriptionInfo;
-    final lastUpdateDate = profile?.lastUpdateDate;
-    final hasUsageBar =
-        info != null && (info.upload + info.download > 0 || info.total > 0);
-    final lineStyle = context.textTheme.bodySmall;
-
-    return _PanelContainer(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          EmojiText(
-            '${appLocalizations.expirationTime} · '
-            '${info?.expireDesc ?? appLocalizations.notAcquired}',
-            textAlign: TextAlign.center,
-            style: lineStyle,
-          ),
-          const SizedBox(height: 12),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              EmojiText(
-                '${appLocalizations.trafficUsage} · '
-                '${_buildTrafficText(info)}',
-                textAlign: TextAlign.center,
-                style: lineStyle,
-              ),
-              if (hasUsageBar)
-                SubscriptionInfoView(subscriptionInfo: info)
-              else
-                Padding(
-                  padding: const EdgeInsets.only(top: 6),
-                  child: EmojiText(
-                    appLocalizations.noUsageData,
-                    textAlign: TextAlign.center,
-                    style: context.textTheme.labelSmall?.toLight,
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          EmojiText(
-            '${appLocalizations.updateTime} · '
-            '${lastUpdateDate?.lastUpdateTimeDesc ?? appLocalizations.notAcquired}',
-            textAlign: TextAlign.center,
-            style: lineStyle,
-          ),
-        ],
+  Widget _line(String text, TextStyle? style) {
+    return SizedBox(
+      height: globalState.measure.labelMediumHeight,
+      child: Center(
+        child: EmojiText(
+          text,
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: style,
+        ),
       ),
     );
   }
-}
 
-class _PanelContainer extends StatelessWidget {
-  final Widget child;
+  Widget _barSlot(Widget child) {
+    return SizedBox(height: 14, child: Center(child: child));
+  }
 
-  const _PanelContainer({required this.child});
+  Widget _noUsageText(BuildContext context) {
+    return EmojiText(
+      appLocalizations.noUsageData,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: context.textTheme.labelSmall?.toLight.copyWith(height: 1.0),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final profile = this.profile;
+    final info = profile?.subscriptionInfo;
+    final hasUsage =
+        info != null && (info.upload + info.download > 0 || info.total > 0);
+    final lineStyle = context.textTheme.labelMedium?.toLight;
+
+    final List<Widget> rows;
+
+    if (profile == null) {
+      rows = [_line(appLocalizations.noInfo, lineStyle)];
+    } else if (profile.type == ProfileType.file) {
+      rows = [
+        _line(appLocalizations.localFile, lineStyle),
+        _barSlot(_noUsageText(context)),
+        _line('${appLocalizations.lastEdit} · $_updateTimeDesc', lineStyle),
+      ];
+    } else {
+      rows = [
+        _line(info?.expireDesc ?? appLocalizations.notAcquired, lineStyle),
+        _barSlot(
+          hasUsage && info != null
+              ? _UsageBar(subscriptionInfo: info)
+              : _noUsageText(context),
+        ),
+        _line('${_trafficText(info)} · $_updateTimeDesc', lineStyle),
+      ];
+    }
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: ShapeDecoration(
         color: context.colorScheme.surfaceContainerHighest.withValues(
           alpha: 0.45,
@@ -226,7 +299,33 @@ class _PanelContainer extends StatelessWidget {
           ),
         ),
       ),
-      child: child,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 10,
+          children: rows,
+        ),
+      ),
+    );
+  }
+}
+
+class _UsageBar extends StatelessWidget {
+  final SubscriptionInfo subscriptionInfo;
+
+  const _UsageBar({required this.subscriptionInfo});
+
+  @override
+  Widget build(BuildContext context) {
+    // Nothing is painted in the trailing 6px padding of the bar.
+    return SizedBox(
+      height: 5,
+      child: OverflowBox(
+        alignment: Alignment.topCenter,
+        minHeight: 11,
+        maxHeight: 11,
+        child: SubscriptionInfoView(subscriptionInfo: subscriptionInfo),
+      ),
     );
   }
 }

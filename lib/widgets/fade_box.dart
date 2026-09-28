@@ -4,19 +4,43 @@ import 'package:flutter/material.dart';
 
 class FadeBox extends StatelessWidget {
   final Widget child;
-  final Alignment? alignment;
+  final AlignmentGeometry? alignment;
+  final StackFit fit;
+  // 先淡出旧内容再淡入新内容，避免两者同时可见（默认是交叉淡入淡出）。
+  final bool sequential;
 
-  const FadeBox({super.key, required this.child, this.alignment});
+  const FadeBox({
+    super.key,
+    required this.child,
+    this.alignment,
+    this.fit = StackFit.loose,
+    this.sequential = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return PageTransitionSwitcher(
-      transitionBuilder: (child, animation, secondaryAnimation) {
-        return Container(
-          alignment: alignment ?? Alignment.centerLeft,
-          child: FadeTransition(opacity: animation, child: child),
-        );
-      },
+    final realAlignment = alignment ?? Alignment.centerLeft;
+    return AnimatedSwitcher(
+      duration: commonDuration,
+      switchInCurve: sequential
+          ? const Interval(0.5, 1.0, curve: Curves.easeOut)
+          : Curves.easeOut,
+      switchOutCurve: sequential
+          ? const Interval(0.5, 1.0, curve: Curves.easeIn)
+          : Curves.easeIn,
+      transitionBuilder: (child, animation) =>
+          FadeTransition(opacity: animation, child: child),
+      layoutBuilder: (currentChild, previousChildren) => Align(
+        alignment: realAlignment,
+        child: Stack(
+          alignment: realAlignment,
+          fit: fit,
+          children: <Widget>[
+            ...previousChildren,
+            if (currentChild != null) currentChild,
+          ],
+        ),
+      ),
       child: child,
     );
   }
