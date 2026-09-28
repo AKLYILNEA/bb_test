@@ -89,7 +89,7 @@ class _ProfileRadioItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final expireDesc = profile.subscriptionInfo?.expireDesc;
-    return ListItem.radio<String>(
+    return ListItem<String>.radio(
       key: ValueKey(profile.id),
       title: EmojiText(
         profile.label ?? profile.id,
@@ -107,7 +107,7 @@ class _ProfileRadioItem extends StatelessWidget {
             ),
       delegate: RadioDelegate<String>(
         value: profile.id,
-        groupValue: currentProfileId,
+        groupValue: currentProfileId ?? '',
         onChanged: onChanged,
       ),
     );
