@@ -379,7 +379,11 @@ class ModalSideSheetRoute<T> extends PopupRoute<T> {
             return AnimatedBuilder(
               animation: anim,
               builder: (context, child) {
-                final t = _modalBottomSheetCurve.transform(anim.value);
+                // Reverse must follow the same flipped curve as the panel, otherwise the
+                // blur keeps full strength while the panel slides away, then snaps off.
+                final t = anim.status == AnimationStatus.reverse
+                    ? _modalBottomSheetCurve.flipped.transform(anim.value)
+                    : _modalBottomSheetCurve.transform(anim.value);
                 final sigma = constants.CommonFilters.blurSigma * t;
                 if (sigma <= 0.05) {
                   return const SizedBox.expand();
