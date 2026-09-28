@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:bett_box/common/system.dart';
 import 'package:bett_box/plugins/app.dart';
 import 'package:flutter/cupertino.dart' show CupertinoRouteTransitionMixin;
@@ -6,8 +8,6 @@ import 'package:flutter/material.dart';
 const _duration = Duration(milliseconds: 500);
 const double _dimAmount = 0.55;
 const double _fallbackCornerRadius = 28.0;
-final Curve _dimCurve = Curves.linearToEaseOut; // push
-// reverse fades out earlier so the dim is gone by the time the old page is back
 
 double _screenCornerRadius = 0;
 
@@ -27,6 +27,25 @@ Future<void> loadScreenCornerRadius() async {
   _screenCornerRadius = radiusPx / views.first.devicePixelRatio;
 }
 
+/// Step response of an underdamped spring (response 0.8, damping 0.95).
+class PageTransitionCurve extends Curve {
+  const PageTransitionCurve();
+
+  static const double _response = 0.8;
+  static const double _damping = 0.95;
+
+  static final double _omega = 2 * math.pi / _response;
+  static final double _k = _omega * _omega;
+  static final double _c = _damping * 4 * math.pi / _response;
+  static final double _w = math.sqrt(4 * _k - _c * _c) / 2;
+  static final double _r = -_c / 2;
+  static final double _c2 = _r / _w;
+
+  @override
+  double transformInternal(double t) =>
+      math.exp(_r * t) * (-math.cos(_w * t) + _c2 * math.sin(_w * t)) + 1;
+}
+
 /// Cupertino transition + leading corner rounding + covered page dimming.
 Widget buildPageTransition<T>(
   PageRoute<T> route,
@@ -44,38 +63,43 @@ Widget buildPageTransition<T>(
     ),
     child: child,
   );
-  // The covered page is kept still: only the dim follows the real progress.
-  final Widget transition = CupertinoRouteTransitionMixin.buildPageTransitions<T>(
+  // The covered page is kept still: the slide owns the movement only.
+  final Widget slide = CupertinoRouteTransitionMixin.buildPageTransitions<T>(
     route,
     context,
     animation,
     kAlwaysDismissedAnimation,
     clipped,
   );
-  return _DimTransition(animation: secondaryAnimation, child: transition);
+  return Stack(
+    fit: StackFit.expand,
+    children: <Widget>[
+      _DimScrim(animation: animation),
+      slide,
+    ],
+  );
 }
 
-class _DimTransition extends AnimatedWidget {
-  const _DimTransition({
-    required this.animation,
-    required this.child,
-  }) : super(listenable: animation);
+/// Dims the page below while this route is moving. Driven by the route's own
+/// animation, so it never follows a proxy animation that swaps mid-flight.
+class _DimScrim extends AnimatedWidget {
+  const _DimScrim({required this.animation}) : super(listenable: animation);
+
+  static const Curve _enterCurve = PageTransitionCurve();
 
   final Animation<double> animation;
-  final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    final Curve curve =
-        animation.status == AnimationStatus.reverse ? Curves.easeInCubic : _dimCurve;
-    final double progress = curve.transform(animation.value);
-    if (progress <= 0) return child;
-    return DecoratedBox(
-      position: DecorationPosition.foreground,
-      decoration: BoxDecoration(
+    if (!animation.isAnimating) return const SizedBox.shrink();
+    final double progress = animation.status == AnimationStatus.reverse
+        ? Curves.easeInCubic.transform(animation.value)
+        : _enterCurve.transform(animation.value);
+    if (progress <= 0) return const SizedBox.shrink();
+    return IgnorePointer(
+      child: ColoredBox(
         color: Colors.black.withValues(alpha: _dimAmount * progress),
       ),
-      child: child,
     );
   }
 }
