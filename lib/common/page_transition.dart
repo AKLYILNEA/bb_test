@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 const _duration = Duration(milliseconds: 500);
 const double _dimAmount = 0.55;
 const double _fallbackCornerRadius = 28.0;
-final Curve _dimCurve = Curves.linearToEaseOut;
+final Curve _dimCurve = Curves.linearToEaseOut; // push
+// reverse fades out earlier so the dim is gone by the time the old page is back
 
 double _screenCornerRadius = 0;
 
@@ -43,11 +44,12 @@ Widget buildPageTransition<T>(
     ),
     child: child,
   );
+  // The covered page is kept still: only the dim follows the real progress.
   final Widget transition = CupertinoRouteTransitionMixin.buildPageTransitions<T>(
     route,
     context,
     animation,
-    secondaryAnimation,
+    kAlwaysDismissedAnimation,
     clipped,
   );
   return _DimTransition(animation: secondaryAnimation, child: transition);
@@ -64,7 +66,9 @@ class _DimTransition extends AnimatedWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double progress = _dimCurve.transform(animation.value);
+    final Curve curve =
+        animation.status == AnimationStatus.reverse ? Curves.easeInCubic : _dimCurve;
+    final double progress = curve.transform(animation.value);
     if (progress <= 0) return child;
     return DecoratedBox(
       position: DecorationPosition.foreground,
