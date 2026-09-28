@@ -1,3 +1,5 @@
+import 'dart:ui' show FontVariation;
+
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
@@ -207,7 +209,7 @@ class _CurrentProfileDialogState extends ConsumerState<CurrentProfileDialog> {
   }
 }
 
-// 与配置卡片同款三行（只是不显示配置名）：到期/本地文件 · 进度条 · 用量 · 上次更新。
+// 与配置卡片同款三行：名字 + 到期/本地文件 · 进度条/无用量统计 · 用量 · 上次更新。
 class _ProfilePanel extends StatelessWidget {
   final Profile? profile;
 
@@ -247,6 +249,41 @@ class _ProfilePanel extends StatelessWidget {
     return SizedBox(height: 14, child: Center(child: child));
   }
 
+  // 第一行 = 配置卡片标题行（名字放大加粗 + · + 到期/本地文件），整行居中。
+  Widget _titleRow(BuildContext context, String name, String subtitle) {
+    final labelStyle = context.textTheme.labelMedium?.toLight;
+    return SizedBox(
+      height: globalState.measure.titleMediumHeight,
+      child: Center(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: EmojiText(
+                name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontVariations: const [FontVariation('wght', 700)],
+                ),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text('·', style: labelStyle),
+            const SizedBox(width: 6),
+            Text(
+              subtitle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: labelStyle,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _noUsageText(BuildContext context) {
     return EmojiText(
       appLocalizations.noUsageData,
@@ -268,26 +305,30 @@ class _ProfilePanel extends StatelessWidget {
 
     if (profile == null) {
       rows = [_line(appLocalizations.noInfo, lineStyle)];
-    } else if (profile.type == ProfileType.file) {
-      rows = [
-        _line(appLocalizations.localFile, lineStyle),
-        _barSlot(_noUsageText(context)),
-        _line('${appLocalizations.lastEdit} · $_updateTimeDesc', lineStyle),
-      ];
     } else {
+      final isFile = profile.type == ProfileType.file;
+      final subtitle = isFile
+          ? appLocalizations.localFile
+          : (info?.expireDesc ?? appLocalizations.notAcquired);
       rows = [
-        _line(info?.expireDesc ?? appLocalizations.notAcquired, lineStyle),
+        _titleRow(context, profile.label ?? profile.id, subtitle),
         _barSlot(
           hasUsage && info != null
               ? _UsageBar(subscriptionInfo: info)
               : _noUsageText(context),
         ),
-        _line('${_trafficText(info)} · $_updateTimeDesc', lineStyle),
+        _line(
+          isFile
+              ? '${appLocalizations.lastEdit} · $_updateTimeDesc'
+              : '${_trafficText(info)} · $_updateTimeDesc',
+          lineStyle,
+        ),
       ];
     }
 
     return Container(
       width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: ShapeDecoration(
         color: context.colorScheme.surfaceContainerHighest.withValues(
           alpha: 0.45,
