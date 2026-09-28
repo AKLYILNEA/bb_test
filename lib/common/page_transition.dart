@@ -55,10 +55,11 @@ Widget buildPageTransition<T>(
 
 class _DimTransition extends AnimatedWidget {
   const _DimTransition({
-    required Animation<double> animation,
+    required this.animation,
     required this.child,
   }) : super(listenable: animation);
 
+  final Animation<double> animation;
   final Widget child;
 
   @override

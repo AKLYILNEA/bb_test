@@ -1,8 +1,7 @@
-import 'package:bett_box/common/page_transition.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/app.dart';
 import 'package:bett_box/state.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class BaseNavigator {
   static Future<T?> push<T>(
@@ -20,42 +19,12 @@ class BaseNavigator {
         ),
       );
     }
-    return await Navigator.of(
-      context,
-    ).push<T>(
-      _CleanCupertinoPageRoute(
+    return await Navigator.of(context).push<T>(
+      MaterialPageRoute<T>(
         builder: (context) => child,
         maintainState: maintainState,
+        allowSnapshotting: false,
       ),
-    );
-  }
-}
-
-class _CleanCupertinoPageRoute<T> extends CupertinoPageRoute<T> {
-  _CleanCupertinoPageRoute({
-    required super.builder,
-    super.title,
-    super.settings,
-    super.fullscreenDialog,
-    super.maintainState,
-  }) : super(allowSnapshotting: false);
-
-  @override
-  Color? get barrierColor => null;
-
-  @override
-  Widget buildTransitions(
-    BuildContext context,
-    Animation<double> animation,
-    Animation<double> secondaryAnimation,
-    Widget child,
-  ) {
-    return buildPageTransition<T>(
-      this,
-      context,
-      animation,
-      secondaryAnimation,
-      child,
     );
   }
 }
