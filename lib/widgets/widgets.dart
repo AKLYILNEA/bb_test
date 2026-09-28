@@ -40,3 +40,4 @@ export 'qr_code.dart';
 export 'delay_animation_dialog.dart';
 export 'sidebar_toggle_icon.dart';
 export 'sidebar.dart';
+export 'theme_palette_warmer.dart';

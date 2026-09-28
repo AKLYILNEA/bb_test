@@ -67,8 +67,14 @@ class EditProfileViewState extends State<EditProfileView> {
         });
       });
     }
-    appPath.getProfilePath(widget.profile.id).then((path) async {
-      fileInfoNotifier.value = await _getFileInfo(path);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      await waitRouteSettled(context);
+      if (!mounted) return;
+      final path = await appPath.getProfilePath(widget.profile.id);
+      final info = await _getFileInfo(path);
+      if (!mounted) return;
+      fileInfoNotifier.value = info;
     });
   }
 

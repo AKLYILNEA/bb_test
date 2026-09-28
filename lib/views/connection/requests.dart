@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/providers/providers.dart';
@@ -17,12 +19,29 @@ class RequestsView extends ConsumerStatefulWidget {
 
 class _RequestsViewState extends ConsumerState<RequestsView> {
   late final ScrollController _scrollController;
+  late List<TrackerInfo> _pending;
   var _autoScrollToEnd = false;
+  var _settled = false;
+  var _settleWatchStarted = false;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ReverseScrollController();
+    _pending = ref.read(filteredRequestsProvider);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_settleWatchStarted) return;
+    _settleWatchStarted = true;
+    unawaited(
+      waitRouteSettled(context).then((_) {
+        if (!mounted) return;
+        setState(() => _settled = true);
+      }),
+    );
   }
 
   @override
@@ -55,7 +74,9 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
 
   @override
   Widget build(BuildContext context) {
-    final requests = ref.watch(filteredRequestsProvider);
+    final requests = _settled
+        ? ref.watch(filteredRequestsProvider)
+        : _pending;
     final hasRequests = requests.isNotEmpty;
 
     return CommonScaffold(

@@ -52,7 +52,10 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
         unawaited(_syncUpdateTimer());
       }
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      await waitRouteSettled(context);
+      if (!mounted) return;
       unawaited(_syncUpdateTimer());
     });
   }

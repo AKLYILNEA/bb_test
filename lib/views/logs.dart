@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/providers/providers.dart';
@@ -18,12 +20,29 @@ class LogsView extends ConsumerStatefulWidget {
 
 class _LogsViewState extends ConsumerState<LogsView> {
   late final ScrollController _scrollController;
+  late List<Log> _pending;
   var _autoScrollToEnd = false;
+  var _settled = false;
+  var _settleWatchStarted = false;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ReverseScrollController();
+    _pending = ref.read(filteredLogsProvider);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_settleWatchStarted) return;
+    _settleWatchStarted = true;
+    unawaited(
+      waitRouteSettled(context).then((_) {
+        if (!mounted) return;
+        setState(() => _settled = true);
+      }),
+    );
   }
 
   @override
@@ -98,7 +117,7 @@ class _LogsViewState extends ConsumerState<LogsView> {
 
   @override
   Widget build(BuildContext context) {
-    final logs = ref.watch(filteredLogsProvider);
+    final logs = _settled ? ref.watch(filteredLogsProvider) : _pending;
     final hasLogs = logs.isNotEmpty;
     return CommonScaffold(
       actions: [

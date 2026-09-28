@@ -226,20 +226,26 @@ class ApplicationState extends ConsumerState<Application>
               builder: (_, child) {
                 return Directionality(
                   textDirection: TextDirection.ltr,
-                  child: ValueListenableBuilder<bool>(
-                    valueListenable: globalState.animationEnabled,
-                    builder: (_, enabled, _) {
-                      return TickerMode(
-                        enabled: enabled,
-                        child: AppEnvManager(
-                          child: _buildApp(
-                            AppSidebarContainer(
-                              child: _buildPlatformApp(child!),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: <Widget>[
+                      ValueListenableBuilder<bool>(
+                        valueListenable: globalState.animationEnabled,
+                        builder: (_, enabled, _) {
+                          return TickerMode(
+                            enabled: enabled,
+                            child: AppEnvManager(
+                              child: _buildApp(
+                                AppSidebarContainer(
+                                  child: _buildPlatformApp(child!),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      );
-                    },
+                          );
+                        },
+                      ),
+                      const ThemePaletteWarmer(),
+                    ],
                   ),
                 );
               },

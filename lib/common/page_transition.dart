@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:bett_box/common/system.dart';
@@ -25,6 +26,26 @@ Future<void> loadScreenCornerRadius() async {
   final views = WidgetsBinding.instance.platformDispatcher.views;
   if (radiusPx <= 0 || views.isEmpty) return;
   _screenCornerRadius = radiusPx / views.first.devicePixelRatio;
+}
+
+/// Completes once the enclosing route finished its enter transition.
+Future<void> waitRouteSettled(BuildContext context) {
+  final animation = ModalRoute.of(context)?.animation;
+  if (animation == null || animation.status == AnimationStatus.completed) {
+    return Future.value();
+  }
+  final completer = Completer<void>();
+
+  void listener(AnimationStatus status) {
+    if (!status.isCompleted && !status.isDismissed) return;
+    animation.removeStatusListener(listener);
+    if (!completer.isCompleted) {
+      completer.complete();
+    }
+  }
+
+  animation.addStatusListener(listener);
+  return completer.future;
 }
 
 /// Step response of an underdamped spring (response 0.8, damping 0.95).
