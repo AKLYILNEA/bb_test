@@ -31,6 +31,8 @@ class EditProfileView extends StatefulWidget {
 }
 
 class EditProfileViewState extends State<EditProfileView> {
+  static bool _deferredFirstEntry = false;
+
   late TextEditingController labelController;
   late TextEditingController urlController;
   late TextEditingController autoUpdateDurationController;
@@ -69,8 +71,14 @@ class EditProfileViewState extends State<EditProfileView> {
     }
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
-      await waitRouteSettled(context);
-      if (!mounted) return;
+      final deferFirstEntry = !_deferredFirstEntry;
+      _deferredFirstEntry = true;
+      if (deferFirstEntry) {
+        // The first entry pays a file IO spike that would eat the transition
+        // frames; later entries are warm and load immediately.
+        await waitRouteSettled(context);
+        if (!mounted) return;
+      }
       final path = await appPath.getProfilePath(widget.profile.id);
       final info = await _getFileInfo(path);
       if (!mounted) return;

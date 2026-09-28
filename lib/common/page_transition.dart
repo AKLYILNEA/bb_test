@@ -103,36 +103,24 @@ Widget buildPageTransition<T>(
 
 /// Dims the page below while this route is moving. Driven by the route's own
 /// animation, so it never follows a proxy animation that swaps mid-flight.
-class _DimScrim extends StatefulWidget {
+class _DimScrim extends StatelessWidget {
   const _DimScrim({required this.animation});
 
   final Animation<double> animation;
 
-  @override
-  State<_DimScrim> createState() => _DimScrimState();
-}
-
-class _DimScrimState extends State<_DimScrim> {
   static const Curve _curve = PageTransitionCurve();
-  late final CurvedAnimation _progress = CurvedAnimation(
-    parent: widget.animation,
-    curve: _curve,
-    reverseCurve: _curve.flipped,
-  );
-
-  @override
-  void dispose() {
-    _progress.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _progress,
+      animation: animation,
       builder: (context, _) {
-        if (!widget.animation.isAnimating) return const SizedBox.shrink();
-        final double progress = _progress.value;
+        if (!animation.isAnimating) return const SizedBox.shrink();
+        // Reverse fades out earlier, so the dim is gone by the time the previous
+        // page is fully back; forward keeps the spring curve.
+        final double progress = animation.status == AnimationStatus.reverse
+            ? Curves.easeInCubic.transform(animation.value)
+            : _curve.transform(animation.value);
         if (progress <= 0) return const SizedBox.shrink();
         return IgnorePointer(
           child: ColoredBox(
