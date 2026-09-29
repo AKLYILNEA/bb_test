@@ -16,9 +16,9 @@ import 'card.dart';
 import 'common.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-const _listRevealMinDuration = Duration(milliseconds: 106);
-const _listRevealMaxDuration = Duration(milliseconds: 183);
-const _listRevealSpeed = 0.353;
+const _listRevealMinDuration = Duration(milliseconds: 133);
+const _listRevealMaxDuration = Duration(milliseconds: 229);
+const _listRevealSpeed = 0.441;
 const _listFadeFraction = 1.0;
 
 Duration listRevealDuration(double contentExtent) {
@@ -758,7 +758,7 @@ class _GroupHeader extends ConsumerWidget {
   static const _actionsGap = 6.0;
   static const _actionsRightOffset = _expandButtonWidth + _actionsGap;
 
-  static const _actionsDuration = Duration(milliseconds: 128);
+  static const _actionsDuration = Duration(milliseconds: 160);
 
   Widget _buildActionTransition(double value, Widget? child) {
     return Opacity(
