@@ -467,11 +467,26 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
         ..stop()
         ..value = 0;
     }
-    if (!identical(widget.rows, oldWidget.rows) ||
+    if (!_sameRows(widget.rows, oldWidget.rows) ||
         widget.columns != oldWidget.columns ||
-        widget.cardType != oldWidget.cardType) {
+        widget.cardType != oldWidget.cardType ||
+        widget.group.type != oldWidget.group.type ||
+        widget.group.testUrl != oldWidget.group.testUrl) {
       _syncList();
     }
+  }
+
+  bool _sameRows(List<List<Proxy>> a, List<List<Proxy>> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      final rowA = a[i];
+      final rowB = b[i];
+      if (rowA.length != rowB.length) return false;
+      for (var j = 0; j < rowA.length; j++) {
+        if (!identical(rowA[j], rowB[j])) return false;
+      }
+    }
+    return true;
   }
 
   void _handleStatus(AnimationStatus status) {

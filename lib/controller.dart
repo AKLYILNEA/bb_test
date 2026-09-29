@@ -1640,25 +1640,23 @@ class AppController {
   }
 
   List<Proxy> _sortOfName(List<Proxy> proxies) {
-    return List.of(proxies)..sort(
-      (a, b) =>
-          utils.sortByChar(utils.getPinyin(a.name), utils.getPinyin(b.name)),
-    );
+    final keys = <String, String>{};
+    String key(Proxy proxy) =>
+        keys[proxy.name] ??= utils.getPinyin(proxy.name);
+    return List.of(proxies)
+      ..sort((a, b) => utils.sortByChar(key(a), key(b)));
   }
 
   int _delayValue(int? delay) =>
       (delay == null || delay == -1) ? 1 << 30 : delay;
 
   List<Proxy> _sortOfDelay({required List<Proxy> proxies, String? testUrl}) {
-    return List.of(proxies)..sort((a, b) {
-      final aDelay = _ref.read(
-        getDelayProvider(proxyName: a.name, testUrl: testUrl),
-      );
-      final bDelay = _ref.read(
-        getDelayProvider(proxyName: b.name, testUrl: testUrl),
-      );
-      return _delayValue(aDelay).compareTo(_delayValue(bDelay));
-    });
+    final keys = <String, int>{};
+    int key(Proxy proxy) =>
+        keys[proxy.name] ??= _delayValue(
+          _ref.read(getDelayProvider(proxyName: proxy.name, testUrl: testUrl)),
+        );
+    return List.of(proxies)..sort((a, b) => key(a).compareTo(key(b)));
   }
 
   List<Proxy> getSortProxies({
