@@ -245,7 +245,6 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     required Group group,
     required bool isExpand,
     required bool enterAnimated,
-    required bool isLast,
     required int columns,
     required ProxyCardType cardType,
   }) {
@@ -284,8 +283,6 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
             columns: columns,
             cardType: cardType,
             enterAnimated: enterAnimated,
-            revealSpace: !isLast,
-            clipContent: !isLast,
             collapseRequested: isCollapsing,
             onCollapsed: () {
               if (!mounted) return;
@@ -335,7 +332,6 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
                     widget.groups[i].name,
                   ),
                     enterAnimated: _enterGroups.contains(widget.groups[i].name),
-                    isLast: i == widget.groups.length - 1,
                     columns: widget.columns,
                     cardType: widget.cardType,
                   ),
