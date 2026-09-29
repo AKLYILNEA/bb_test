@@ -774,9 +774,22 @@ class _GroupHeader extends ConsumerWidget {
     minimumSize: const Size(32, 32),
   );
 
-  static const _actionsWidth = 66.0;
-
-  Widget _buildActionScale({required Widget child, required String key}) {
+  Widget _wrapAction({required Widget child, required String key}) {
+    if (collapsing) {
+      return TweenAnimationBuilder<double>(
+        tween: Tween<double>(begin: 1.0, end: 0.0),
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.fastOutSlowIn,
+        child: child,
+        builder: (_, scale, c) {
+          return Transform.scale(
+            scale: scale,
+            alignment: Alignment.center,
+            child: c,
+          );
+        },
+      );
+    }
     if (!enterAnimated) return child;
     return TweenAnimationBuilder<double>(
       key: ValueKey(key),
@@ -791,33 +804,6 @@ class _GroupHeader extends ConsumerWidget {
         );
       },
       child: child,
-    );
-  }
-
-  Widget _buildCollapsingActions(Widget child) {
-    if (!collapsing) return child;
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 1.0, end: 0.0),
-      duration: const Duration(milliseconds: 150),
-      curve: Curves.fastOutSlowIn,
-      child: child,
-      builder: (_, value, c) {
-        return ClipRect(
-          child: SizedBox(
-            width: _actionsWidth * value,
-            child: OverflowBox(
-              alignment: Alignment.centerLeft,
-              minWidth: 0,
-              maxWidth: double.infinity,
-              child: Transform.scale(
-                scale: value,
-                alignment: Alignment.centerLeft,
-                child: c,
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 
@@ -838,6 +824,53 @@ class _GroupHeader extends ConsumerWidget {
 
     final selectedProxyIcon = ref.watch(
       proxyIconProvider(selectedProxyName),
+    );
+
+    final actions = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _wrapAction(
+          key: 'locate_${group.name}',
+          child: IconButton(
+            key: ValueKey('locate_${group.name}'),
+            style: _circleButtonStyle,
+            iconSize: 19,
+            icon: const Icon(FluentIcons.target_arrow_24_regular),
+            onPressed: onScrollToSelected,
+            tooltip: appLocalizations.locate,
+          ),
+        ),
+        const SizedBox(width: 2),
+        _wrapAction(
+          key: 'delay_${group.name}',
+          child: AnimatedBuilder(
+            key: ValueKey('delay_test_${group.name}'),
+            animation: delayTestCoordinator,
+            builder: (_, _) {
+              final isTestingThisGroup = delayTestCoordinator.isTestingGroup(
+                group.name,
+              );
+              return IconButton(
+                style: _circleButtonStyle,
+                iconSize: 20,
+                icon: isTestingThisGroup
+                    ? SizedBox.square(
+                        dimension: 18,
+                        child: SpinKitFadingCircle(
+                          color: context.colorScheme.primary,
+                          size: 18,
+                        ),
+                      )
+                    : const Icon(FluentIcons.top_speed_24_regular),
+                onPressed: delayTestCoordinator.isTesting
+                    ? null
+                    : () => _delayTest(context),
+                tooltip: appLocalizations.startTest,
+              );
+            },
+          ),
+        ),
+      ],
     );
 
     return CommonCard(
@@ -895,56 +928,19 @@ class _GroupHeader extends ConsumerWidget {
                 ],
               ),
             ),
-            if (isExpand || collapsing) ...[
-              _buildCollapsingActions(
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildActionScale(
-                      key: 'locate_${group.name}',
-                      child: IconButton(
-                        key: ValueKey('locate_${group.name}'),
-                        style: _circleButtonStyle,
-                        iconSize: 19,
-                        icon: const Icon(FluentIcons.target_arrow_24_regular),
-                        onPressed: onScrollToSelected,
-                        tooltip: appLocalizations.locate,
-                      ),
-                    ),
-                    const SizedBox(width: 2),
-                    _buildActionScale(
-                      key: 'delay_${group.name}',
-                      child: AnimatedBuilder(
-                        key: ValueKey('delay_test_${group.name}'),
-                        animation: delayTestCoordinator,
-                        builder: (_, _) {
-                          final isTestingThisGroup = delayTestCoordinator
-                              .isTestingGroup(group.name);
-                          return IconButton(
-                            style: _circleButtonStyle,
-                            iconSize: 20,
-                            icon: isTestingThisGroup
-                                ? SizedBox.square(
-                                    dimension: 18,
-                                    child: SpinKitFadingCircle(
-                                      color: context.colorScheme.primary,
-                                      size: 18,
-                                    ),
-                                  )
-                                : const Icon(FluentIcons.top_speed_24_regular),
-                            onPressed: delayTestCoordinator.isTesting
-                                ? null
-                                : () => _delayTest(context),
-                            tooltip: appLocalizations.startTest,
-                          );
-                        },
-                      ),
-                    ),
-                  ],
+            if (isExpand && !collapsing) ...[
+              actions,
+              const SizedBox(width: 6),
+            ] else if (collapsing)
+              SizedBox(
+                width: 6,
+                child: OverflowBox(
+                  alignment: Alignment.centerRight,
+                  minWidth: 0,
+                  maxWidth: double.infinity,
+                  child: actions,
                 ),
               ),
-              const SizedBox(width: 6),
-            ],
             IconButton.filledTonal(
               key: ValueKey('expand_${group.name}'),
               style: _circleFilledTonalStyle,
