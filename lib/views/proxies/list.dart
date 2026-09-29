@@ -434,11 +434,7 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
         widget.maxVisibleRows * _staggerRowStepMs +
         widget.columns * _staggerColStepMs;
     final totalWindow = _cardDuration + Duration(milliseconds: maxDelayMs);
-    _controller = AnimationController(
-      vsync: this,
-      duration: totalWindow,
-      reverseDuration: _listRevealDuration,
-    );
+    _controller = AnimationController(vsync: this, duration: totalWindow);
     _heightController = AnimationController(
       vsync: this,
       duration: _listRevealDuration,
@@ -449,6 +445,7 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       reverseCurve: Curves.easeOutCubic.flipped,
     );
     _controller.addStatusListener(_handleStatus);
+    _heightController.addStatusListener(_handleHeightStatus);
     _delegate = _buildDelegate();
     if (widget.enterAnimated) {
       _controller.forward();
@@ -463,19 +460,11 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
   void didUpdateWidget(covariant _GroupProxyListSliver oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.collapseRequested && !oldWidget.collapseRequested) {
-      _isAnimationCompleted = false;
-      _delegate = _buildDelegate();
-      _controller.value = 1;
-      _controller.reverse();
       _heightController.forward();
     } else if (!widget.collapseRequested && oldWidget.collapseRequested) {
-      _controller.stop();
-      _controller.value = 0;
       _heightController
         ..stop()
         ..value = 0;
-      _isAnimationCompleted = true;
-      _delegate = _buildDelegate();
     }
     if (widget.rows.length != oldWidget.rows.length ||
         widget.columns != oldWidget.columns ||
@@ -485,17 +474,19 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     }
   }
 
+  void _handleHeightStatus(AnimationStatus status) {
+    if (!mounted) return;
+    if (status == AnimationStatus.completed && widget.collapseRequested) {
+      widget.onCollapsed?.call();
+    }
+  }
+
   void _handleStatus(AnimationStatus status) {
     if (!mounted) return;
-    if (status == AnimationStatus.completed &&
-        !widget.collapseRequested &&
-        !_isAnimationCompleted) {
+    if (status == AnimationStatus.completed && !_isAnimationCompleted) {
       _isAnimationCompleted = true;
       _delegate = _buildDelegate();
       setState(() {});
-    } else if (status == AnimationStatus.dismissed &&
-        widget.collapseRequested) {
-      widget.onCollapsed?.call();
     }
   }
 
@@ -663,21 +654,24 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
     );
   }
 
+  static const _edgeGap = 8.0;
+
   @override
   void paint(PaintingContext context, Offset offset) {
     if (child == null) {
       layer = null;
       return;
     }
-    if (_factor >= 1.0) {
+    final paintExtent = geometry?.paintExtent ?? 0.0;
+    final coreExtent = max(paintExtent - _edgeGap, 0.0);
+    if (coreExtent >= paintExtent) {
       layer = null;
       super.paint(context, offset);
       return;
     }
-    final paintExtent = geometry?.paintExtent ?? 0.0;
     final size = constraints.axis == Axis.vertical
-        ? Size(constraints.crossAxisExtent, paintExtent)
-        : Size(paintExtent, constraints.crossAxisExtent);
+        ? Size(constraints.crossAxisExtent, coreExtent)
+        : Size(coreExtent, constraints.crossAxisExtent);
     layer = context.pushClipRect(
       needsCompositing,
       offset,
