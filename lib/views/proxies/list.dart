@@ -930,19 +930,18 @@ class _GroupHeader extends ConsumerWidget {
       onPressed: onToggle,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        child: collapsing
-            ? Stack(
-                children: [
-                  headerRow,
-                  Positioned(
-                    top: 0,
-                    bottom: 0,
-                    right: _actionsRightOffset,
-                    child: Center(child: actions),
-                  ),
-                ],
-              )
-            : headerRow,
+        child: Stack(
+          children: [
+            headerRow,
+            if (collapsing)
+              Positioned(
+                top: 0,
+                bottom: 0,
+                right: _actionsRightOffset,
+                child: Center(child: actions),
+              ),
+          ],
+        ),
       ),
     );
   }
