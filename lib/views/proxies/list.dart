@@ -245,6 +245,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     required Group group,
     required bool isExpand,
     required bool enterAnimated,
+    required bool isLast,
     required int columns,
     required ProxyCardType cardType,
   }) {
@@ -283,6 +284,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
             columns: columns,
             cardType: cardType,
             enterAnimated: enterAnimated,
+            tail: isLast,
             collapseRequested: isCollapsing,
             onCollapsed: () {
               if (!mounted) return;
@@ -332,6 +334,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
                     widget.groups[i].name,
                   ),
                     enterAnimated: _enterGroups.contains(widget.groups[i].name),
+                    isLast: i == widget.groups.length - 1,
                     columns: widget.columns,
                     cardType: widget.cardType,
                   ),
@@ -357,8 +360,7 @@ class _GroupProxyListSliver extends StatefulWidget {
   final int columns;
   final ProxyCardType cardType;
   final bool enterAnimated;
-  final bool revealSpace;
-  final bool clipContent;
+  final bool tail;
   final bool collapseRequested;
   final VoidCallback? onCollapsed;
   final VoidCallback? onEntered;
@@ -370,8 +372,7 @@ class _GroupProxyListSliver extends StatefulWidget {
     required this.columns,
     required this.cardType,
     this.enterAnimated = true,
-    this.revealSpace = true,
-    this.clipContent = true,
+    this.tail = false,
     this.collapseRequested = false,
     this.onCollapsed,
     this.onEntered,
@@ -401,7 +402,15 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       curve: Curves.easeInOutCubic,
       reverseCurve: Curves.easeInOutCubic.flipped,
     );
-    _rowFade = Tween<double>(begin: 1.0, end: 0.0).animate(_controller);
+    _rowFade = widget.tail
+        ? Tween<double>(begin: 1.0, end: 0.0).animate(
+            CurvedAnimation(
+              parent: _controller,
+              curve: const Interval(0.0, 0.6, curve: Curves.easeOutCubic),
+              reverseCurve: const Interval(0.4, 1.0, curve: Curves.easeOutCubic),
+            ),
+          )
+        : Tween<double>(begin: 1.0, end: 0.0).animate(_controller);
     _controller.addStatusListener(_handleStatus);
     _syncList();
     if (widget.enterAnimated) {
@@ -523,11 +532,11 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       animation: _controller,
       child: _list,
       builder: (context, list) {
-        final animateSpace = widget.revealSpace || widget.collapseRequested;
+        final animateSpace = !widget.tail || widget.collapseRequested;
         final factor = animateSpace ? 1 - _reveal.value : 1.0;
         final extentSliver = _AnimatedExtentSliver(
           factor: factor,
-          clipContent: widget.clipContent,
+          clipContent: !widget.tail,
           child: list!,
         );
         return SliverFadeTransition(
