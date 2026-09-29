@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -89,60 +88,46 @@ class GoogleBottomNavBar extends ConsumerWidget {
                 ),
               ],
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(36),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 9.0,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: (isLight
-                            ? context.colorScheme.surface
-                            : context.colorScheme.surfaceContainer)
-                        .withValues(alpha: isLight ? 0.80 : 0.72),
-                    borderRadius: BorderRadius.circular(36),
-                    border: Border.all(
-                      color: isLight
-                          ? context.colorScheme.outlineVariant.withValues(
-                              alpha: 0.45,
-                            )
-                          : Colors.white.withValues(alpha: 0.14),
-                      width: 1,
-                    ),
-                  ),
-                  child: GNav(
-                    rippleColor: enableHapticFeedback
-                        ? context.colorScheme.onSurface.withValues(alpha: 0.15)
-                        : Colors.transparent, // Disabling ripple may disable haptic feedback
-                    hoverColor: context.colorScheme.onSurface.withValues(
-                      alpha: 0.1,
-                    ),
-                    haptic: enableHapticFeedback, // Control GNav haptic feedback
-                    // 只把文字往右推一点点：图标位置与胶囊总长都不能变。
-                    // 原来 = 左16 + 图标 + gap8 + 文字 + 右16；
-                    // 现在 = 左16 + 图标 + gap10 + 文字 + 右14（总和不变的 40）。
-                    gap: 10,
-                    activeColor: context.colorScheme.primary,
-                    iconSize: 24,
-                    padding: const EdgeInsets.only(
-                      left: 16,
-                      right: 14,
-                      top: 10,
-                      bottom: 10,
-                    ),
-                    duration: const Duration(milliseconds: 250),
-                    tabBackgroundColor: context.colorScheme.primary.withValues(
-                      alpha: isLight ? 0.20 : 0.26,
-                    ),
-                    color: context.colorScheme.onSurfaceVariant,
-                    tabs: tabsList,
-                    selectedIndex: selectedIndex,
-                    onTabChange: handleTabChange,
-                  ),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 9.0, vertical: 8),
+              decoration: BoxDecoration(
+                color: context.colorScheme.surfaceContainer,
+                borderRadius: BorderRadius.circular(36),
+                border: Border.all(
+                  color: isLight
+                      ? context.colorScheme.outlineVariant.withValues(alpha: 0.45)
+                      : Colors.white.withValues(alpha: 0.14),
+                  width: 1,
                 ),
+              ),
+              child: GNav(
+                rippleColor: enableHapticFeedback
+                    ? context.colorScheme.onSurface.withValues(alpha: 0.15)
+                    : Colors.transparent, // Disabling ripple may disable haptic feedback
+                hoverColor: context.colorScheme.onSurface.withValues(
+                  alpha: 0.1,
+                ),
+                haptic: enableHapticFeedback, // Control GNav haptic feedback
+                // 只把文字往右推一点点：图标位置与胶囊总长都不能变。
+                // 原来 = 左16 + 图标 + gap8 + 文字 + 右16；
+                // 现在 = 左16 + 图标 + gap10 + 文字 + 右14（总和不变的 40）。
+                gap: 10,
+                activeColor: context.colorScheme.primary,
+                iconSize: 24,
+                padding: const EdgeInsets.only(
+                  left: 16,
+                  right: 14,
+                  top: 10,
+                  bottom: 10,
+                ),
+                duration: const Duration(milliseconds: 250),
+                tabBackgroundColor: context.colorScheme.primary.withValues(
+                  alpha: isLight ? 0.20 : 0.26,
+                ),
+                color: context.colorScheme.onSurfaceVariant,
+                tabs: tabsList,
+                selectedIndex: selectedIndex,
+                onTabChange: handleTabChange,
               ),
             ),
           ),
