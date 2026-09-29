@@ -16,9 +16,9 @@ import 'card.dart';
 import 'common.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-const _listRevealMinDuration = Duration(milliseconds: 230);
-const _listRevealMaxDuration = Duration(milliseconds: 398);
-const _listRevealSpeed = 0.765;
+const _listRevealMinDuration = Duration(milliseconds: 184);
+const _listRevealMaxDuration = Duration(milliseconds: 318);
+const _listRevealSpeed = 0.612;
 const _listFadeFraction = 0.55;
 
 Duration listRevealDuration(double contentExtent) {
@@ -83,37 +83,11 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   double _containerHeight = 0;
   final Set<String> _enterGroups = <String>{};
   final Set<String> _collapsingGroups = <String>{};
-  final List<Timer> _revealScrollTimers = <Timer>[];
-  bool _userScrolled = false;
 
   @override
   void dispose() {
-    _cancelRevealScrolls();
     _scrollController.dispose();
     super.dispose();
-  }
-
-  void _cancelRevealScrolls() {
-    for (final timer in _revealScrollTimers) {
-      timer.cancel();
-    }
-    _revealScrollTimers.clear();
-  }
-
-  void _scheduleRevealScrolls(String groupName) {
-    _cancelRevealScrolls();
-    final delays = [
-      const Duration(milliseconds: 120),
-      _listRevealMaxDuration,
-    ];
-    for (final delay in delays) {
-      _revealScrollTimers.add(
-        Timer(delay, () {
-          if (!mounted || _userScrolled) return;
-          _autoScrollToGroup(groupName);
-        }),
-      );
-    }
   }
 
   void _handleToggle(String groupName) {
@@ -121,16 +95,13 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     final isExpanding = !tempUnfoldSet.contains(groupName);
     if (isExpanding) {
       tempUnfoldSet.add(groupName);
-      _userScrolled = false;
       _enterGroups.add(groupName);
       if (_collapsingGroups.remove(groupName)) {
         setState(() {});
       }
       _autoScrollToGroup(groupName);
-      _scheduleRevealScrolls(groupName);
     } else {
       tempUnfoldSet.remove(groupName);
-      _cancelRevealScrolls();
       _enterGroups.remove(groupName);
       setState(() {
         _collapsingGroups.add(groupName);
@@ -184,6 +155,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     required double start,
     required double end,
     double padding = 16.0,
+    bool animated = true,
   }) {
     final visibleStart = pixels;
     final visibleEnd = pixels + containerHeight;
@@ -209,7 +181,21 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
       }
     }
 
-    _animateToOffset(targetScrollOffset);
+    if (animated) {
+      _animateToOffset(targetScrollOffset);
+    } else {
+      _jumpToOffset(targetScrollOffset);
+    }
+  }
+
+  void _jumpToOffset(double targetOffset) {
+    if (!mounted || !_scrollController.hasClients) return;
+    final clampedTarget = targetOffset.clamp(
+      _scrollController.position.minScrollExtent,
+      _scrollController.position.maxScrollExtent,
+    );
+    if ((clampedTarget - _scrollController.offset).abs() < 1.0) return;
+    _scrollController.jumpTo(clampedTarget);
   }
 
   void _autoScrollToGroup(String groupName) {
@@ -231,6 +217,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
       start: offset,
       end: offset + headerExtent,
       padding: 16.0,
+      animated: false,
     );
   }
 
@@ -240,9 +227,6 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
         .read(getSelectedProxyNameProvider(groupName))
         .getSafeValue('');
     if (selectedName.isEmpty) return;
-
-    _userScrolled = false;
-    _cancelRevealScrolls();
 
     final group = widget.groups.getGroup(groupName);
     if (group == null) return;
@@ -376,33 +360,19 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
         return CommonScrollBar(
           controller: _scrollController,
           feather: true,
-          child: NotificationListener<ScrollNotification>(
-            onNotification: (notification) {
-              var isUserScroll = notification is UserScrollNotification;
-              if (notification is ScrollStartNotification) {
-                isUserScroll = isUserScroll || notification.dragDetails != null;
-              } else if (notification is ScrollUpdateNotification) {
-                isUserScroll = isUserScroll || notification.dragDetails != null;
-              }
-              if (isUserScroll) {
-                _userScrolled = true;
-                _cancelRevealScrolls();
-              }
-              return false;
-            },
-            child: CustomScrollView(
-              key: const PageStorageKey<String>('proxies_list'),
-              controller: _scrollController,
-              cacheExtent: 250.0,
-              slivers: [
-                const SliverToBoxAdapter(child: SizedBox(height: 16)),
-                for (var i = 0; i < widget.groups.length; i++)
-                  _buildGroup(
-                    context,
-                    group: widget.groups[i],
-                    isExpand: widget.currentUnfoldSet.contains(
-                      widget.groups[i].name,
-                    ),
+          child: CustomScrollView(
+            key: const PageStorageKey<String>('proxies_list'),
+            controller: _scrollController,
+            cacheExtent: 250.0,
+            slivers: [
+              const SliverToBoxAdapter(child: SizedBox(height: 16)),
+              for (var i = 0; i < widget.groups.length; i++)
+                _buildGroup(
+                  context,
+                  group: widget.groups[i],
+                  isExpand: widget.currentUnfoldSet.contains(
+                    widget.groups[i].name,
+                  ),
                     enterAnimated: _enterGroups.contains(widget.groups[i].name),
                     isLast: i == widget.groups.length - 1,
                     columns: widget.columns,
@@ -418,7 +388,6 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
                 ),
               ],
             ),
-          ),
         );
       },
     );
