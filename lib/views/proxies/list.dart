@@ -512,14 +512,11 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       }
     }
 
-    return FadeTransition(
-      opacity: _rowFade,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-        child: SizedBox(
-          height: getItemHeight(widget.cardType),
-          child: Row(children: rowChildren),
-        ),
+    return Padding(
+      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+      child: SizedBox(
+        height: getItemHeight(widget.cardType),
+        child: Row(children: rowChildren),
       ),
     );
   }
@@ -531,10 +528,15 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       child: _list,
       builder: (context, list) {
         final animateSpace = widget.revealSpace || widget.collapseRequested;
-        return _AnimatedExtentSliver(
-          factor: animateSpace ? 1 - _reveal.value : 1.0,
+        final factor = animateSpace ? 1 - _reveal.value : 1.0;
+        final extentSliver = _AnimatedExtentSliver(
+          factor: factor,
           clipContent: widget.clipContent,
           child: list!,
+        );
+        return SliverFadeTransition(
+          opacity: _rowFade,
+          sliver: extentSliver,
         );
       },
     );
@@ -590,7 +592,6 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
     if (_factor == next) return;
     _factor = next;
     markNeedsLayout();
-    markNeedsPaint();
   }
 
   @override
@@ -603,6 +604,14 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
     child.layout(constraints, parentUsesSize: true);
     final childGeometry = child.geometry ?? SliverGeometry.zero;
     final factor = _factor;
+    if (factor >= 1.0) {
+      geometry = childGeometry;
+      return;
+    }
+    if (factor <= 0.0) {
+      geometry = SliverGeometry.zero;
+      return;
+    }
     final maxPaintExtent = childGeometry.maxPaintExtent * factor;
     final scrollExtent = childGeometry.scrollExtent * factor;
     final paintExtent = max(
@@ -627,7 +636,7 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
       maxScrollObstructionExtent: childGeometry.maxScrollObstructionExtent,
       visible: childGeometry.visible,
       hitTestExtent: hitTestExtent,
-      hasVisualOverflow: childGeometry.hasVisualOverflow || factor < 1.0,
+      hasVisualOverflow: true,
       scrollOffsetCorrection: childGeometry.scrollOffsetCorrection,
     );
   }
@@ -636,6 +645,12 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
   void paint(PaintingContext context, Offset offset) {
     if (child == null) {
       layer = null;
+      return;
+    }
+    final factor = _factor;
+    if (!_clipContent || factor >= 1.0) {
+      layer = null;
+      super.paint(context, offset);
       return;
     }
     final paintExtent = geometry?.paintExtent ?? 0.0;
@@ -649,18 +664,13 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
     final coreSize = isVertical
         ? Size(crossExtent, coreExtent)
         : Size(coreExtent, crossExtent);
-    if (_clipContent && _factor < 1.0) {
-      layer = context.pushClipRect(
-        needsCompositing,
-        offset,
-        Offset.zero & coreSize,
-        (context, offset) => super.paint(context, offset),
-        oldLayer: layer as ClipRectLayer?,
-      );
-    } else {
-      layer = null;
-      super.paint(context, offset);
-    }
+    layer = context.pushClipRect(
+      needsCompositing,
+      offset,
+      Offset.zero & coreSize,
+      (context, offset) => super.paint(context, offset),
+      oldLayer: layer as ClipRectLayer?,
+    );
   }
 }
 
