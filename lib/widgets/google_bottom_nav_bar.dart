@@ -63,6 +63,8 @@ class GoogleBottomNavBar extends ConsumerWidget {
 
     final isLight = context.colorScheme.brightness == Brightness.light;
     final viewBottom = MediaQuery.viewPaddingOf(context).bottom;
+    final dpr = MediaQuery.of(context).devicePixelRatio;
+    final blurSigma = min(16.0, 20.0 / dpr);
     return RepaintBoundary(
       child: Padding(
         padding: EdgeInsets.only(bottom: max(viewBottom, 12.0)),
@@ -92,7 +94,7 @@ class GoogleBottomNavBar extends ConsumerWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(36),
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 9.0,
