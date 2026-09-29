@@ -18,6 +18,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 const _staggerRowStepMs = 26;
 const _staggerColStepMs = 8;
 const _cardDuration = Duration(milliseconds: 320);
+const _listRevealDuration = Duration(milliseconds: 240);
 
 class ProxiesListView extends ConsumerWidget {
   const ProxiesListView({super.key});
@@ -71,11 +72,13 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   double _containerHeight = 0;
   String? _enterGroupName;
   Timer? _enterTimer;
+  Timer? _revealScrollTimer;
   final Set<String> _collapsingGroups = <String>{};
 
   @override
   void dispose() {
     _enterTimer?.cancel();
+    _revealScrollTimer?.cancel();
     _scrollController.dispose();
     super.dispose();
   }
@@ -99,19 +102,28 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     });
   }
 
+  void _scheduleRevealScroll(String groupName) {
+    _revealScrollTimer?.cancel();
+    _revealScrollTimer = Timer(_listRevealDuration, () {
+      if (!mounted) return;
+      _autoScrollToGroup(groupName);
+    });
+  }
+
   void _handleToggle(String groupName) {
     final tempUnfoldSet = Set<String>.from(widget.currentUnfoldSet);
     final isExpanding = !tempUnfoldSet.contains(groupName);
     if (isExpanding) {
       tempUnfoldSet.add(groupName);
       _startEnterAnimated(groupName);
-      _autoScrollToGroup(groupName);
+      _scheduleRevealScroll(groupName);
       if (_collapsingGroups.remove(groupName)) {
         setState(() {});
       }
     } else {
       tempUnfoldSet.remove(groupName);
       _enterTimer?.cancel();
+      _revealScrollTimer?.cancel();
       _enterGroupName = null;
       setState(() {
         _collapsingGroups.add(groupName);
@@ -406,13 +418,13 @@ class _GroupProxyListSliver extends StatefulWidget {
 
 class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     with TickerProviderStateMixin {
-  static const _collapseDuration = Duration(milliseconds: 220);
-  static const _collapseSlide = 18.0;
-
   late final AnimationController _controller;
-  late final AnimationController _collapseController;
-  late final Animation<double> _collapseProgress;
+  late final AnimationController _heightController;
+  late final Animation<double> _heightProgress;
+  late SliverChildBuilderDelegate _delegate;
   bool _isAnimationCompleted = false;
+
+  double get _rowExtent => getItemHeight(widget.cardType) + 8.0;
 
   @override
   void initState() {
@@ -421,24 +433,26 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
         widget.maxVisibleRows * _staggerRowStepMs +
         widget.columns * _staggerColStepMs;
     final totalWindow = _cardDuration + Duration(milliseconds: maxDelayMs);
-    _controller = AnimationController(vsync: this, duration: totalWindow);
-    _collapseController = AnimationController(
+    _controller = AnimationController(
       vsync: this,
-      duration: _collapseDuration,
+      duration: totalWindow,
+      reverseDuration: _listRevealDuration,
     );
-    _collapseProgress = CurvedAnimation(
-      parent: _collapseController,
+    _heightController = AnimationController(
+      vsync: this,
+      duration: _listRevealDuration,
+    );
+    _heightProgress = CurvedAnimation(
+      parent: _heightController,
       curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeOutCubic.flipped,
     );
+    _controller.addStatusListener(_handleStatus);
+    _delegate = _buildDelegate();
     if (widget.enterAnimated) {
-      _controller.addStatusListener((status) {
-        if (status == AnimationStatus.completed && mounted) {
-          setState(() {
-            _isAnimationCompleted = true;
-          });
-        }
-      });
       _controller.forward();
+      _heightController.value = 1;
+      _heightController.reverse();
     } else {
       _isAnimationCompleted = true;
     }
@@ -448,24 +462,69 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
   void didUpdateWidget(covariant _GroupProxyListSliver oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.collapseRequested && !oldWidget.collapseRequested) {
-      _controller.stop();
-      _collapseController.forward(from: 0).whenComplete(_handleCollapsed);
+      _isAnimationCompleted = false;
+      _delegate = _buildDelegate();
+      _controller.value = 1;
+      _controller.reverse();
+      _heightController.forward();
     } else if (!widget.collapseRequested && oldWidget.collapseRequested) {
-      _collapseController.stop();
-      _collapseController.value = 0;
+      _controller.stop();
+      _controller.value = 0;
+      _heightController
+        ..stop()
+        ..value = 0;
+      _isAnimationCompleted = true;
+      _delegate = _buildDelegate();
+    }
+    if (widget.rows.length != oldWidget.rows.length ||
+        widget.columns != oldWidget.columns ||
+        widget.cardType != oldWidget.cardType ||
+        widget.maxVisibleRows != oldWidget.maxVisibleRows) {
+      _delegate = _buildDelegate();
     }
   }
 
-  void _handleCollapsed() {
-    if (!mounted || !widget.collapseRequested) return;
-    widget.onCollapsed?.call();
+  void _handleStatus(AnimationStatus status) {
+    if (!mounted) return;
+    if (status == AnimationStatus.completed &&
+        !widget.collapseRequested &&
+        !_isAnimationCompleted) {
+      _isAnimationCompleted = true;
+      _delegate = _buildDelegate();
+      setState(() {});
+    } else if (status == AnimationStatus.dismissed &&
+        widget.collapseRequested) {
+      widget.onCollapsed?.call();
+    }
   }
 
   @override
   void dispose() {
     _controller.dispose();
-    _collapseController.dispose();
+    _heightController.dispose();
     super.dispose();
+  }
+
+  SliverChildBuilderDelegate _buildDelegate() {
+    return SliverChildBuilderDelegate(
+      (context, index) => AnimatedBuilder(
+        animation: _heightProgress,
+        child: _buildProxyRow(context, index),
+        builder: (context, child) {
+          final progress = _heightProgress.value;
+          return ClipRect(
+            clipBehavior: progress > 0 ? Clip.hardEdge : Clip.none,
+            child: OverflowBox(
+              alignment: Alignment.topCenter,
+              minHeight: _rowExtent,
+              maxHeight: _rowExtent,
+              child: child,
+            ),
+          );
+        },
+      ),
+      childCount: widget.rows.length,
+    );
   }
 
   Widget _buildProxyRow(BuildContext context, int rowIndex) {
@@ -531,41 +590,15 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     );
   }
 
-  Widget _buildCollapsingRow(Widget row, double progress) {
-    final rowExtent = getItemHeight(widget.cardType) + 8.0;
-    return ClipRect(
-      child: OverflowBox(
-        alignment: Alignment.topCenter,
-        minHeight: rowExtent,
-        maxHeight: rowExtent,
-        child: Opacity(
-          opacity: (1 - progress).clamp(0.0, 1.0),
-          child: Transform.translate(
-            offset: Offset(0, -_collapseSlide * progress),
-            child: row,
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _collapseProgress,
+      animation: _heightProgress,
       builder: (context, _) {
-        final progress = _collapseProgress.value;
-        final rowExtent = getItemHeight(widget.cardType) + 8.0;
+        final progress = _heightProgress.value;
         return SliverFixedExtentList(
-          itemExtent: max(rowExtent * (1 - progress), 0.01),
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              final row = _buildProxyRow(context, index);
-              if (progress <= 0) return row;
-              return _buildCollapsingRow(row, progress);
-            },
-            childCount: widget.rows.length,
-          ),
+          itemExtent: progress <= 0 ? _rowExtent : max(_rowExtent * (1 - progress), 0.01),
+          delegate: _delegate,
         );
       },
     );

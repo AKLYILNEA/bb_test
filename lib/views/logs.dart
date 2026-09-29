@@ -200,9 +200,6 @@ class _LogsViewState extends ConsumerState<LogsView>
                     shrinkWrap: logs.length < 20,
                     controller: _scrollController,
                     padding: const EdgeInsets.only(bottom: 16, top: 8),
-                    itemExtentBuilder: (index, _) {
-                      return LogItem.height + 8;
-                    },
                     itemBuilder: (context, index) {
                       final log = logs[index];
                       return LogItem(
@@ -231,16 +228,6 @@ class LogItem extends StatelessWidget {
   final int index;
   final int count;
   final bool reversed;
-
-  static double get height {
-    final measure = globalState.measure;
-    return measure.bodyLargeHeight * 2 +
-        8 +
-        24 +
-        measure.labelMediumHeight +
-        16 +
-        16;
-  }
 
   const LogItem({
     super.key,
