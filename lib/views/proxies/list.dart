@@ -193,17 +193,6 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
 
   final Map<String, _GroupRows> _rowsCache = <String, _GroupRows>{};
 
-  @override
-  void didUpdateWidget(covariant _ProxyGroupsList oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (!identical(oldWidget.groups, widget.groups)) {
-      _enterGroups.clear();
-      _collapsingGroups.removeWhere(
-        (name) => !widget.groups.any((group) => group.name == name),
-      );
-    }
-  }
-
   List<List<Proxy>> _rowsOf({
     required Group group,
     required int columns,
