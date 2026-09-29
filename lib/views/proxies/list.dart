@@ -19,7 +19,6 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 const _listRevealMinDuration = Duration(milliseconds: 133);
 const _listRevealMaxDuration = Duration(milliseconds: 229);
 const _listRevealSpeed = 0.441;
-const _listFadeFraction = 1.0;
 
 Duration listRevealDuration(double contentExtent) {
   final milliseconds = ((180 + contentExtent * 0.35) * _listRevealSpeed)
@@ -390,6 +389,7 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _reveal;
+  late final Animation<double> _rowFade;
   late Widget _list;
 
   @override
@@ -405,6 +405,7 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       curve: Curves.easeInOutCubic,
       reverseCurve: Curves.easeInOutCubic.flipped,
     );
+    _rowFade = Tween<double>(begin: 1.0, end: 0.0).animate(_controller);
     _controller.addStatusListener(_handleStatus);
     _syncList();
     if (widget.enterAnimated) {
@@ -511,11 +512,14 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       }
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-      child: SizedBox(
-        height: getItemHeight(widget.cardType),
-        child: Row(children: rowChildren),
+    return FadeTransition(
+      opacity: _rowFade,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+        child: SizedBox(
+          height: getItemHeight(widget.cardType),
+          child: Row(children: rowChildren),
+        ),
       ),
     );
   }
@@ -526,17 +530,10 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       animation: _controller,
       child: _list,
       builder: (context, list) {
-        final collapsing = widget.collapseRequested;
-        final progress = collapsing
-            ? _controller.value
-            : 1 - _controller.value;
-        final fade = (progress / _listFadeFraction).clamp(0.0, 1.0);
-        final animateSpace = widget.revealSpace || collapsing;
+        final animateSpace = widget.revealSpace || widget.collapseRequested;
         return _AnimatedExtentSliver(
           factor: animateSpace ? 1 - _reveal.value : 1.0,
-          hidden: collapsing ? fade : 1 - fade,
           clipContent: widget.clipContent,
-          surfaceColor: context.colorScheme.surface,
           child: list!,
         );
       },
@@ -546,26 +543,17 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
 
 class _AnimatedExtentSliver extends SingleChildRenderObjectWidget {
   final double factor;
-  final double hidden;
   final bool clipContent;
-  final Color surfaceColor;
 
   const _AnimatedExtentSliver({
     required super.child,
     required this.factor,
-    required this.hidden,
     required this.clipContent,
-    required this.surfaceColor,
   });
 
   @override
   _RenderAnimatedExtentSliver createRenderObject(BuildContext context) {
-    return _RenderAnimatedExtentSliver(
-      factor,
-      hidden,
-      clipContent,
-      surfaceColor,
-    );
+    return _RenderAnimatedExtentSliver(factor, clipContent);
   }
 
   @override
@@ -575,28 +563,17 @@ class _AnimatedExtentSliver extends SingleChildRenderObjectWidget {
   ) {
     renderObject
       ..factor = factor
-      ..hidden = hidden
-      ..clipContent = clipContent
-      ..surfaceColor = surfaceColor;
+      ..clipContent = clipContent;
   }
 }
 
 class _RenderAnimatedExtentSliver extends RenderProxySliver {
-  _RenderAnimatedExtentSliver(
-    this._factor,
-    this._hidden,
-    this._clipContent,
-    this._surfaceColor,
-  );
+  _RenderAnimatedExtentSliver(this._factor, this._clipContent);
 
   static const _edgeGap = 8.0;
 
-  final Paint _washPaint = Paint();
-
   double _factor;
-  double _hidden;
   bool _clipContent;
-  Color _surfaceColor;
 
   bool get clipContent => _clipContent;
 
@@ -613,23 +590,6 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
     if (_factor == next) return;
     _factor = next;
     markNeedsLayout();
-    markNeedsPaint();
-  }
-
-  double get hidden => _hidden;
-
-  set hidden(double value) {
-    final next = value.clamp(0.0, 1.0);
-    if (_hidden == next) return;
-    _hidden = next;
-    markNeedsPaint();
-  }
-
-  Color get surfaceColor => _surfaceColor;
-
-  set surfaceColor(Color value) {
-    if (_surfaceColor == value) return;
-    _surfaceColor = value;
     markNeedsPaint();
   }
 
@@ -689,8 +649,7 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
     final coreSize = isVertical
         ? Size(crossExtent, coreExtent)
         : Size(coreExtent, crossExtent);
-    final hidden = _hidden;
-    if (_clipContent && (hidden > 0 || _factor < 1.0)) {
+    if (_clipContent && _factor < 1.0) {
       layer = context.pushClipRect(
         needsCompositing,
         offset,
@@ -702,17 +661,6 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
       layer = null;
       super.paint(context, offset);
     }
-    if (hidden <= 0) return;
-    final washExtent = _clipContent
-        ? coreExtent
-        : max(coreExtent, child?.geometry?.paintExtent ?? 0.0);
-    final washSize = isVertical
-        ? Size(crossExtent, washExtent)
-        : Size(washExtent, crossExtent);
-    context.canvas.drawRect(
-      (Offset.zero & washSize).shift(offset),
-      _washPaint..color = _surfaceColor.withValues(alpha: hidden),
-    );
   }
 }
 
