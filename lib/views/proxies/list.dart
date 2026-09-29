@@ -276,6 +276,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     required Group group,
     required bool isExpand,
     required bool enterAnimated,
+    required bool isLast,
     required int columns,
     required ProxyCardType cardType,
   }) {
@@ -327,6 +328,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
             columns: columns,
             cardType: cardType,
             enterAnimated: enterAnimated,
+            revealSpace: !isLast,
             collapseRequested: isCollapsing,
             onCollapsed: () {
               if (!mounted) return;
@@ -364,12 +366,15 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
               const SliverToBoxAdapter(
                 child: SizedBox(height: 16),
               ),
-              for (final group in widget.groups)
+              for (var i = 0; i < widget.groups.length; i++)
                 _buildGroup(
                   context,
-                  group: group,
-                  isExpand: widget.currentUnfoldSet.contains(group.name),
-                  enterAnimated: _enterGroupName == group.name,
+                  group: widget.groups[i],
+                  isExpand: widget.currentUnfoldSet.contains(
+                    widget.groups[i].name,
+                  ),
+                  enterAnimated: _enterGroupName == widget.groups[i].name,
+                  isLast: i == widget.groups.length - 1,
                   columns: widget.columns,
                   cardType: widget.cardType,
                 ),
@@ -395,6 +400,7 @@ class _GroupProxyListSliver extends StatefulWidget {
   final int columns;
   final ProxyCardType cardType;
   final bool enterAnimated;
+  final bool revealSpace;
   final bool collapseRequested;
   final VoidCallback? onCollapsed;
 
@@ -405,6 +411,7 @@ class _GroupProxyListSliver extends StatefulWidget {
     required this.columns,
     required this.cardType,
     this.enterAnimated = true,
+    this.revealSpace = true,
     this.collapseRequested = false,
     this.onCollapsed,
   });
@@ -531,8 +538,9 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
             ? _controller.value
             : 1 - _controller.value;
         final fade = (progress / _listFadeFraction).clamp(0.0, 1.0);
+        final animateSpace = widget.revealSpace || collapsing;
         return _AnimatedExtentSliver(
-          factor: 1 - _reveal.value,
+          factor: animateSpace ? 1 - _reveal.value : 1.0,
           hidden: collapsing ? fade : 1 - fade,
           surfaceColor: context.colorScheme.surface,
           child: SliverFixedExtentList(
