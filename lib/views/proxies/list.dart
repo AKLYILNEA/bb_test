@@ -16,9 +16,9 @@ import 'card.dart';
 import 'common.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-const _listRevealMinDuration = Duration(milliseconds: 184);
-const _listRevealMaxDuration = Duration(milliseconds: 318);
-const _listRevealSpeed = 0.612;
+const _listRevealMinDuration = Duration(milliseconds: 166);
+const _listRevealMaxDuration = Duration(milliseconds: 286);
+const _listRevealSpeed = 0.551;
 const _listFadeFraction = 0.55;
 
 Duration listRevealDuration(double contentExtent) {
@@ -99,7 +99,6 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
       if (_collapsingGroups.remove(groupName)) {
         setState(() {});
       }
-      _autoScrollToGroup(groupName);
     } else {
       tempUnfoldSet.remove(groupName);
       _enterGroups.remove(groupName);
@@ -149,78 +148,6 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     );
   }
 
-  void _scrollToMakeVisibleWithPadding({
-    required double containerHeight,
-    required double pixels,
-    required double start,
-    required double end,
-    double padding = 16.0,
-    bool animated = true,
-  }) {
-    final visibleStart = pixels;
-    final visibleEnd = pixels + containerHeight;
-
-    final isElementVisible = start >= visibleStart && end <= visibleEnd;
-    if (isElementVisible) {
-      return;
-    }
-
-    double targetScrollOffset;
-
-    if (end <= visibleStart) {
-      targetScrollOffset = start - padding;
-    } else if (start >= visibleEnd) {
-      targetScrollOffset = end - containerHeight + padding;
-    } else {
-      final visibleTopPart = end - visibleStart;
-      final visibleBottomPart = visibleEnd - start;
-      if (visibleTopPart.abs() >= visibleBottomPart.abs()) {
-        targetScrollOffset = end - containerHeight + padding;
-      } else {
-        targetScrollOffset = start - padding;
-      }
-    }
-
-    if (animated) {
-      _animateToOffset(targetScrollOffset);
-    } else {
-      _jumpToOffset(targetScrollOffset);
-    }
-  }
-
-  void _jumpToOffset(double targetOffset) {
-    if (!mounted || !_scrollController.hasClients) return;
-    final clampedTarget = targetOffset.clamp(
-      _scrollController.position.minScrollExtent,
-      _scrollController.position.maxScrollExtent,
-    );
-    if ((clampedTarget - _scrollController.offset).abs() < 1.0) return;
-    _scrollController.jumpTo(clampedTarget);
-  }
-
-  void _autoScrollToGroup(String groupName) {
-    if (!_scrollController.hasClients || _containerHeight <= 0) return;
-    final offsets = _getGroupOffsets(
-      groups: widget.groups,
-      columns: widget.columns,
-      currentUnfoldSet: widget.currentUnfoldSet,
-      cardType: widget.cardType,
-    );
-    _groupOffsets = offsets;
-    if (offsets.groupOf(groupName) == null) return;
-    final pixels = _scrollController.position.pixels;
-    final offset = offsets.offsetOf(groupName);
-    const headerExtent = 72.0;
-    _scrollToMakeVisibleWithPadding(
-      containerHeight: _containerHeight,
-      pixels: pixels,
-      start: offset,
-      end: offset + headerExtent,
-      padding: 16.0,
-      animated: false,
-    );
-  }
-
   void _scrollToSelected(String groupName) {
     if (!_scrollController.hasClients) return;
     final selectedName = ref
@@ -265,6 +192,55 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     _animateToOffset(targetOffset);
   }
 
+  final Map<String, _GroupRows> _rowsCache = <String, _GroupRows>{};
+
+  List<List<Proxy>> _rowsOf({
+    required Group group,
+    required int columns,
+  }) {
+    final input = group.all;
+    final sortType = widget.sortType;
+    final testUrl = group.testUrl;
+    final sortNum = widget.sortNum;
+    final cached = _rowsCache[group.name];
+    if (cached != null &&
+        cached.columns == columns &&
+        cached.sortType == sortType &&
+        cached.testUrl == testUrl &&
+        cached.sortNum == sortNum &&
+        _sameProxies(cached.input, input)) {
+      return cached.rows;
+    }
+    final sorted = globalState.appController.getSortProxies(
+      proxies: input,
+      sortType: sortType,
+      testUrl: testUrl,
+    );
+    final rows = <List<Proxy>>[];
+    for (var i = 0; i < sorted.length; i += columns) {
+      final end = i + columns < sorted.length ? i + columns : sorted.length;
+      rows.add(sorted.sublist(i, end));
+    }
+    _rowsCache[group.name] = _GroupRows(
+      input: input,
+      sortType: sortType,
+      testUrl: testUrl,
+      columns: columns,
+      sortNum: sortNum,
+      rows: rows,
+    );
+    return rows;
+  }
+
+  bool _sameProxies(List<Proxy> a, List<Proxy> b) {
+    if (identical(a, b)) return true;
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (!identical(a[i], b[i])) return false;
+    }
+    return true;
+  }
+
   Widget _buildGroup(
     BuildContext context, {
     required Group group,
@@ -276,23 +252,9 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   }) {
     final isCollapsing = _collapsingGroups.contains(group.name);
     final showList = isExpand || isCollapsing;
-    final sortedProxies = showList
-        ? globalState.appController.getSortProxies(
-            proxies: group.all,
-            sortType: widget.sortType,
-            testUrl: group.testUrl,
-          )
-        : const <Proxy>[];
-
-    final rows = <List<Proxy>>[];
-    if (showList) {
-      for (var i = 0; i < sortedProxies.length; i += columns) {
-        final end = (i + columns < sortedProxies.length)
-            ? i + columns
-            : sortedProxies.length;
-        rows.add(sortedProxies.sublist(i, end));
-      }
-    }
+    final rows = showList
+        ? _rowsOf(group: group, columns: columns)
+        : const <List<Proxy>>[];
 
     return SliverMainAxisGroup(
       slivers: [
@@ -480,6 +442,7 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
   }
 
   bool _sameRows(List<List<Proxy>> a, List<List<Proxy>> b) {
+    if (identical(a, b)) return true;
     if (a.length != b.length) return false;
     for (var i = 0; i < a.length; i++) {
       final rowA = a[i];
@@ -804,7 +767,7 @@ class _GroupHeader extends ConsumerWidget {
     return Opacity(
       opacity: value,
       child: Transform.scale(
-        scale: value,
+        scale: 0.7 + 0.3 * value,
         alignment: Alignment.center,
         child: child,
       ),
@@ -1032,4 +995,22 @@ class _GroupHeader extends ConsumerWidget {
   Future<void> _delayTest(BuildContext context) async {
     await delayTest(group.all, testUrl: group.testUrl, groupName: group.name);
   }
+}
+
+class _GroupRows {
+  final List<Proxy> input;
+  final ProxiesSortType sortType;
+  final String? testUrl;
+  final int columns;
+  final num sortNum;
+  final List<List<Proxy>> rows;
+
+  const _GroupRows({
+    required this.input,
+    required this.sortType,
+    required this.testUrl,
+    required this.columns,
+    required this.sortNum,
+    required this.rows,
+  });
 }
