@@ -16,9 +16,9 @@ import 'card.dart';
 import 'common.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-const _listRevealMinDuration = Duration(milliseconds: 255);
-const _listRevealMaxDuration = Duration(milliseconds: 442);
-const _listRevealSpeed = 0.85;
+const _listRevealMinDuration = Duration(milliseconds: 230);
+const _listRevealMaxDuration = Duration(milliseconds: 398);
+const _listRevealSpeed = 0.765;
 const _listFadeFraction = 0.45;
 
 Duration listRevealDuration(double contentExtent) {
@@ -362,35 +362,39 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
         return CommonScrollBar(
           controller: _scrollController,
           feather: true,
-          child: CustomScrollView(
-            key: const PageStorageKey<String>('proxies_list'),
-            controller: _scrollController,
-            cacheExtent: 500.0,
-            slivers: [
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 16),
-              ),
-              for (var i = 0; i < widget.groups.length; i++)
-                _buildGroup(
-                  context,
-                  group: widget.groups[i],
-                  isExpand: widget.currentUnfoldSet.contains(
-                    widget.groups[i].name,
+          child: NotificationListener<UserScrollNotification>(
+            onNotification: (_) {
+              _revealScrollTimer?.cancel();
+              return false;
+            },
+            child: CustomScrollView(
+              key: const PageStorageKey<String>('proxies_list'),
+              controller: _scrollController,
+              cacheExtent: 500.0,
+              slivers: [
+                const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                for (var i = 0; i < widget.groups.length; i++)
+                  _buildGroup(
+                    context,
+                    group: widget.groups[i],
+                    isExpand: widget.currentUnfoldSet.contains(
+                      widget.groups[i].name,
+                    ),
+                    enterAnimated: _enterGroupName == widget.groups[i].name,
+                    isLast: i == widget.groups.length - 1,
+                    columns: widget.columns,
+                    cardType: widget.cardType,
                   ),
-                  enterAnimated: _enterGroupName == widget.groups[i].name,
-                  isLast: i == widget.groups.length - 1,
-                  columns: widget.columns,
-                  cardType: widget.cardType,
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: (globalState.isAndroidTV ? 48.0 : 16.0) +
+                        (isMobileView
+                            ? getFloatingBottomBarReserveHeight(context)
+                            : 0),
+                  ),
                 ),
-              SliverToBoxAdapter(
-                child: SizedBox(
-                  height: (globalState.isAndroidTV ? 48.0 : 16.0) +
-                      (isMobileView
-                          ? getFloatingBottomBarReserveHeight(context)
-                          : 0),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -611,6 +615,7 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
   double _hidden;
   bool _clipContent;
   Color _surfaceColor;
+  SliverConstraints? _childConstraints;
 
   bool get clipContent => _clipContent;
 
@@ -654,7 +659,10 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
       geometry = SliverGeometry.zero;
       return;
     }
-    child.layout(constraints, parentUsesSize: true);
+    if (child.needsLayout || _childConstraints != constraints) {
+      child.layout(constraints, parentUsesSize: true);
+      _childConstraints = constraints;
+    }
     final childGeometry = child.geometry ?? SliverGeometry.zero;
     final factor = _factor;
     final maxPaintExtent = childGeometry.maxPaintExtent * factor;
@@ -768,31 +776,46 @@ class _GroupHeader extends ConsumerWidget {
     minimumSize: const Size(32, 32),
   );
 
-  Widget _buildActionScale({
-    required Widget child,
-    required String key,
-  }) {
+  static const _actionsWidth = 66.0;
+
+  Widget _buildActions(Widget actions) {
     final double begin;
     if (collapsing) {
       begin = 1.0;
     } else if (enterAnimated) {
       begin = 0.0;
     } else {
-      return child;
+      return actions;
     }
     return TweenAnimationBuilder<double>(
-      key: ValueKey(key),
       tween: Tween<double>(begin: begin, end: collapsing ? 0.0 : 1.0),
-      duration: const Duration(milliseconds: 170),
+      duration: const Duration(milliseconds: 150),
       curve: Curves.fastOutSlowIn,
-      builder: (_, scale, c) {
-        return Transform.scale(
-          scale: scale,
-          alignment: Alignment.center,
-          child: c,
+      child: actions,
+      builder: (_, value, child) {
+        if (!collapsing) {
+          return Transform.scale(
+            scale: value,
+            alignment: Alignment.center,
+            child: child,
+          );
+        }
+        return ClipRect(
+          child: SizedBox(
+            width: _actionsWidth * value,
+            child: OverflowBox(
+              alignment: Alignment.centerLeft,
+              minWidth: 0,
+              maxWidth: double.infinity,
+              child: Transform.scale(
+                scale: value,
+                alignment: Alignment.centerLeft,
+                child: child,
+              ),
+            ),
+          ),
         );
       },
-      child: child,
     );
   }
 
@@ -871,44 +894,45 @@ class _GroupHeader extends ConsumerWidget {
               ),
             ),
             if (isExpand || collapsing) ...[
-              _buildActionScale(
-                key: 'locate_${group.name}',
-                child: IconButton(
-                  key: ValueKey('locate_${group.name}'),
-                  style: _circleButtonStyle,
-                  iconSize: 19,
-                  icon: const Icon(FluentIcons.target_arrow_24_regular),
-                  onPressed: onScrollToSelected,
-                  tooltip: appLocalizations.locate,
-                ),
-              ),
-              const SizedBox(width: 2),
-              _buildActionScale(
-                key: 'delay_${group.name}',
-                child: AnimatedBuilder(
-                  key: ValueKey('delay_test_${group.name}'),
-                  animation: delayTestCoordinator,
-                  builder: (_, _) {
-                    final isTestingThisGroup = delayTestCoordinator
-                        .isTestingGroup(group.name);
-                    return IconButton(
+              _buildActions(
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      key: ValueKey('locate_${group.name}'),
                       style: _circleButtonStyle,
-                      iconSize: 20,
-                      icon: isTestingThisGroup
-                          ? SizedBox.square(
-                              dimension: 18,
-                              child: SpinKitFadingCircle(
-                                color: context.colorScheme.primary,
-                                size: 18,
-                              ),
-                            )
-                          : const Icon(FluentIcons.top_speed_24_regular),
-                      onPressed: delayTestCoordinator.isTesting
-                          ? null
-                          : () => _delayTest(context),
-                      tooltip: appLocalizations.startTest,
-                    );
-                  },
+                      iconSize: 19,
+                      icon: const Icon(FluentIcons.target_arrow_24_regular),
+                      onPressed: onScrollToSelected,
+                      tooltip: appLocalizations.locate,
+                    ),
+                    const SizedBox(width: 2),
+                    AnimatedBuilder(
+                      key: ValueKey('delay_test_${group.name}'),
+                      animation: delayTestCoordinator,
+                      builder: (_, _) {
+                        final isTestingThisGroup = delayTestCoordinator
+                            .isTestingGroup(group.name);
+                        return IconButton(
+                          style: _circleButtonStyle,
+                          iconSize: 20,
+                          icon: isTestingThisGroup
+                              ? SizedBox.square(
+                                  dimension: 18,
+                                  child: SpinKitFadingCircle(
+                                    color: context.colorScheme.primary,
+                                    size: 18,
+                                  ),
+                                )
+                              : const Icon(FluentIcons.top_speed_24_regular),
+                          onPressed: delayTestCoordinator.isTesting
+                              ? null
+                              : () => _delayTest(context),
+                          tooltip: appLocalizations.startTest,
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(width: 6),
