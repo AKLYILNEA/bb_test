@@ -16,9 +16,9 @@ import 'card.dart';
 import 'common.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-const _listRevealMinDuration = Duration(milliseconds: 180);
-const _listRevealMaxDuration = Duration(milliseconds: 280);
-const _listRevealSpeed = 0.35;
+const _listRevealMinDuration = Duration(milliseconds: 153);
+const _listRevealMaxDuration = Duration(milliseconds: 238);
+const _listRevealSpeed = 0.298;
 
 Duration listRevealDuration(double contentExtent) {
   final milliseconds = ((180 + contentExtent * 0.35) * _listRevealSpeed)
@@ -192,6 +192,17 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   }
 
   final Map<String, _GroupRows> _rowsCache = <String, _GroupRows>{};
+
+  @override
+  void didUpdateWidget(covariant _ProxyGroupsList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.groups, widget.groups)) {
+      _enterGroups.clear();
+      _collapsingGroups.removeWhere(
+        (name) => !widget.groups.any((group) => group.name == name),
+      );
+    }
+  }
 
   List<List<Proxy>> _rowsOf({
     required Group group,
@@ -402,15 +413,7 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       curve: Curves.easeInOutCubic,
       reverseCurve: Curves.easeInOutCubic.flipped,
     );
-    _rowFade = widget.tail
-        ? Tween<double>(begin: 1.0, end: 0.0).animate(
-            CurvedAnimation(
-              parent: _controller,
-              curve: const Interval(0.0, 0.6, curve: Curves.easeOutCubic),
-              reverseCurve: const Interval(0.4, 1.0, curve: Curves.easeOutCubic),
-            ),
-          )
-        : Tween<double>(begin: 1.0, end: 0.0).animate(_controller);
+    _rowFade = Tween<double>(begin: 1.0, end: 0.0).animate(_controller);
     _controller.addStatusListener(_handleStatus);
     _syncList();
     if (widget.enterAnimated) {
@@ -422,6 +425,11 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
   @override
   void didUpdateWidget(covariant _GroupProxyListSliver oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.enterAnimated &&
+        _controller.value == 1 &&
+        !_controller.isAnimating) {
+      _controller.reverse();
+    }
     if (widget.collapseRequested && !oldWidget.collapseRequested) {
       _controller.forward();
     } else if (!widget.collapseRequested && oldWidget.collapseRequested) {
