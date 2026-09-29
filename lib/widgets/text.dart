@@ -5,6 +5,22 @@ import 'package:flutter/material.dart';
 
 import '../state.dart';
 
+final _firstEmojiRegex = emojiRegex();
+
+String getFirstEmoji(String text) {
+  return _firstEmojiRegex.firstMatch(text)?.group(0) ?? '';
+}
+
+String removeLeadingEmoji(String text) {
+  var value = text;
+  var match = _firstEmojiRegex.matchAsPrefix(value);
+  while (match != null) {
+    value = value.substring(match.end).trimLeft();
+    match = _firstEmojiRegex.matchAsPrefix(value);
+  }
+  return value;
+}
+
 class TooltipText extends StatelessWidget {
   final Widget text;
 

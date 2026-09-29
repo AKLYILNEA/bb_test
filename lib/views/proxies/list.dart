@@ -71,6 +71,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   double _containerHeight = 0;
   String? _enterGroupName;
   Timer? _enterTimer;
+  final Set<String> _collapsingGroups = <String>{};
 
   @override
   void dispose() {
@@ -105,10 +106,16 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
       tempUnfoldSet.add(groupName);
       _startEnterAnimated(groupName);
       _autoScrollToGroup(groupName);
+      if (_collapsingGroups.remove(groupName)) {
+        setState(() {});
+      }
     } else {
       tempUnfoldSet.remove(groupName);
       _enterTimer?.cancel();
       _enterGroupName = null;
+      setState(() {
+        _collapsingGroups.add(groupName);
+      });
     }
     globalState.appController.updateCurrentUnfoldSet(tempUnfoldSet);
   }
@@ -258,7 +265,9 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     required ProxyCardType cardType,
     required int maxVisibleRows,
   }) {
-    final sortedProxies = isExpand
+    final isCollapsing = _collapsingGroups.contains(group.name);
+    final showList = isExpand || isCollapsing;
+    final sortedProxies = showList
         ? globalState.appController.getSortProxies(
             proxies: group.all,
             sortType: widget.sortType,
@@ -267,7 +276,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
         : const <Proxy>[];
 
     final rows = <List<Proxy>>[];
-    if (isExpand) {
+    if (showList) {
       for (var i = 0; i < sortedProxies.length; i += columns) {
         final end = (i + columns < sortedProxies.length)
             ? i + columns
@@ -296,7 +305,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
             ),
           ),
         ),
-        if (isExpand)
+        if (showList)
           _GroupProxyListSliver(
             key: ValueKey('expanded_group_${group.name}'),
             group: group,
@@ -305,6 +314,13 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
             cardType: cardType,
             maxVisibleRows: maxVisibleRows,
             enterAnimated: enterAnimated,
+            collapseRequested: isCollapsing,
+            onCollapsed: () {
+              if (!mounted) return;
+              setState(() {
+                _collapsingGroups.remove(group.name);
+              });
+            },
           ),
       ],
     );
@@ -369,6 +385,8 @@ class _GroupProxyListSliver extends StatefulWidget {
   final ProxyCardType cardType;
   final int maxVisibleRows;
   final bool enterAnimated;
+  final bool collapseRequested;
+  final VoidCallback? onCollapsed;
 
   const _GroupProxyListSliver({
     super.key,
@@ -378,6 +396,8 @@ class _GroupProxyListSliver extends StatefulWidget {
     required this.cardType,
     required this.maxVisibleRows,
     this.enterAnimated = true,
+    this.collapseRequested = false,
+    this.onCollapsed,
   });
 
   @override
@@ -385,8 +405,13 @@ class _GroupProxyListSliver extends StatefulWidget {
 }
 
 class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
+  static const _collapseDuration = Duration(milliseconds: 220);
+  static const _collapseSlide = 18.0;
+
   late final AnimationController _controller;
+  late final AnimationController _collapseController;
+  late final Animation<double> _collapseProgress;
   bool _isAnimationCompleted = false;
 
   @override
@@ -397,6 +422,14 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
         widget.columns * _staggerColStepMs;
     final totalWindow = _cardDuration + Duration(milliseconds: maxDelayMs);
     _controller = AnimationController(vsync: this, duration: totalWindow);
+    _collapseController = AnimationController(
+      vsync: this,
+      duration: _collapseDuration,
+    );
+    _collapseProgress = CurvedAnimation(
+      parent: _collapseController,
+      curve: Curves.easeOutCubic,
+    );
     if (widget.enterAnimated) {
       _controller.addStatusListener((status) {
         if (status == AnimationStatus.completed && mounted) {
@@ -412,8 +445,26 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
   }
 
   @override
+  void didUpdateWidget(covariant _GroupProxyListSliver oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.collapseRequested && !oldWidget.collapseRequested) {
+      _controller.stop();
+      _collapseController.forward(from: 0).whenComplete(_handleCollapsed);
+    } else if (!widget.collapseRequested && oldWidget.collapseRequested) {
+      _collapseController.stop();
+      _collapseController.value = 0;
+    }
+  }
+
+  void _handleCollapsed() {
+    if (!mounted || !widget.collapseRequested) return;
+    widget.onCollapsed?.call();
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
+    _collapseController.dispose();
     super.dispose();
   }
 
@@ -480,14 +531,43 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     );
   }
 
+  Widget _buildCollapsingRow(Widget row, double progress) {
+    final rowExtent = getItemHeight(widget.cardType) + 8.0;
+    return ClipRect(
+      child: OverflowBox(
+        alignment: Alignment.topCenter,
+        minHeight: rowExtent,
+        maxHeight: rowExtent,
+        child: Opacity(
+          opacity: (1 - progress).clamp(0.0, 1.0),
+          child: Transform.translate(
+            offset: Offset(0, -_collapseSlide * progress),
+            child: row,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SliverFixedExtentList(
-      itemExtent: getItemHeight(widget.cardType) + 8.0,
-      delegate: SliverChildBuilderDelegate(
-        (context, index) => _buildProxyRow(context, index),
-        childCount: widget.rows.length,
-      ),
+    return AnimatedBuilder(
+      animation: _collapseProgress,
+      builder: (context, _) {
+        final progress = _collapseProgress.value;
+        final rowExtent = getItemHeight(widget.cardType) + 8.0;
+        return SliverFixedExtentList(
+          itemExtent: max(rowExtent * (1 - progress), 0.01),
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              final row = _buildProxyRow(context, index);
+              if (progress <= 0) return row;
+              return _buildCollapsingRow(row, progress);
+            },
+            childCount: widget.rows.length,
+          ),
+        );
+      },
     );
   }
 }
@@ -555,6 +635,11 @@ class _GroupHeader extends ConsumerWidget {
       proxiesStyleSettingProvider.select((s) => s.iconStyle),
     );
     final icon = ref.watch(proxyIconProvider(group.name));
+    final nameEmoji = getFirstEmoji(group.name);
+    final useEmojiIcon =
+        iconStyle != ProxiesIconStyle.none &&
+        icon.isEmpty &&
+        nameEmoji.isNotEmpty;
     final selectedProxyName = ref
         .watch(getSelectedProxyNameProvider(group.name))
         .getSafeValue('');
@@ -571,13 +656,21 @@ class _GroupHeader extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Row(
           children: [
-            _buildIcon(context, iconStyle, icon),
+            _buildIcon(
+              context,
+              iconStyle,
+              icon,
+              emoji: useEmojiIcon ? nameEmoji : '',
+            ),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  EmojiText(group.name, style: context.textTheme.titleMedium),
+                  EmojiText(
+                    useEmojiIcon ? removeLeadingEmoji(group.name) : group.name,
+                    style: context.textTheme.titleMedium,
+                  ),
                   const SizedBox(height: 4),
                   Row(
                     children: [
@@ -666,7 +759,19 @@ class _GroupHeader extends ConsumerWidget {
     );
   }
 
-  Widget _buildIcon(BuildContext context, ProxiesIconStyle style, String icon) {
+  Widget _buildEmojiIcon(String emoji, double size) {
+    return EmojiText(
+      emoji,
+      style: TextStyle(fontSize: size * 0.75, height: 1.2),
+    );
+  }
+
+  Widget _buildIcon(
+    BuildContext context,
+    ProxiesIconStyle style,
+    String icon, {
+    String emoji = '',
+  }) {
     if (style == ProxiesIconStyle.none) return const SizedBox();
     const iconSize = 40.0;
     if (style == ProxiesIconStyle.standard) {
@@ -683,7 +788,9 @@ class _GroupHeader extends ConsumerWidget {
           color: context.colorScheme.secondaryContainer,
         ),
         clipBehavior: Clip.antiAlias,
-        child: CommonTargetIcon(src: icon, size: iconSize - 12),
+        child: emoji.isNotEmpty
+            ? _buildEmojiIcon(emoji, iconSize - 12)
+            : CommonTargetIcon(src: icon, size: iconSize - 12),
       );
     }
     return Container(
@@ -691,7 +798,9 @@ class _GroupHeader extends ConsumerWidget {
       width: iconSize,
       height: iconSize,
       alignment: Alignment.center,
-      child: CommonTargetIcon(src: icon, size: iconSize - 8),
+      child: emoji.isNotEmpty
+          ? _buildEmojiIcon(emoji, iconSize - 8)
+          : CommonTargetIcon(src: icon, size: iconSize - 8),
     );
   }
 
