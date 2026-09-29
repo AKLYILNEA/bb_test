@@ -16,9 +16,6 @@ import 'card.dart';
 import 'common.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-const _staggerRowStepMs = 26;
-const _staggerColStepMs = 8;
-const _cardDuration = Duration(milliseconds: 320);
 const _listRevealDuration = Duration(milliseconds: 240);
 
 class ProxiesListView extends ConsumerWidget {
@@ -84,17 +81,10 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     super.dispose();
   }
 
-  int _calculateMaxVisibleRows() {
-    final screenHeight = MediaQuery.sizeOf(context).height;
-    final rowHeight = getItemHeight(widget.cardType) + 8.0;
-    return (screenHeight / rowHeight).ceil() + 2;
-  }
-
   void _startEnterAnimated(String groupName) {
     _enterTimer?.cancel();
     _enterGroupName = groupName;
-    const enterWindow = Duration(milliseconds: 600);
-    _enterTimer = Timer(enterWindow, () {
+    _enterTimer = Timer(_listRevealDuration, () {
       if (mounted) {
         setState(() {
           _enterGroupName = null;
@@ -276,7 +266,6 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     required bool enterAnimated,
     required int columns,
     required ProxyCardType cardType,
-    required int maxVisibleRows,
   }) {
     final isCollapsing = _collapsingGroups.contains(group.name);
     final showList = isExpand || isCollapsing;
@@ -325,7 +314,6 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
             rows: rows,
             columns: columns,
             cardType: cardType,
-            maxVisibleRows: maxVisibleRows,
             enterAnimated: enterAnimated,
             collapseRequested: isCollapsing,
             onCollapsed: () {
@@ -342,7 +330,6 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   @override
   Widget build(BuildContext context) {
     final isMobileView = ref.watch(isMobileViewProvider);
-    final maxVisibleRows = _calculateMaxVisibleRows();
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -360,7 +347,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
           child: CustomScrollView(
             key: const PageStorageKey<String>('proxies_list'),
             controller: _scrollController,
-            cacheExtent: 1000.0,
+            cacheExtent: 500.0,
             slivers: [
               const SliverToBoxAdapter(
                 child: SizedBox(height: 16),
@@ -373,7 +360,6 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
                   enterAnimated: _enterGroupName == group.name,
                   columns: widget.columns,
                   cardType: widget.cardType,
-                  maxVisibleRows: maxVisibleRows,
                 ),
               SliverToBoxAdapter(
                 child: SizedBox(
@@ -396,7 +382,6 @@ class _GroupProxyListSliver extends StatefulWidget {
   final List<List<Proxy>> rows;
   final int columns;
   final ProxyCardType cardType;
-  final int maxVisibleRows;
   final bool enterAnimated;
   final bool collapseRequested;
   final VoidCallback? onCollapsed;
@@ -407,7 +392,6 @@ class _GroupProxyListSliver extends StatefulWidget {
     required this.rows,
     required this.columns,
     required this.cardType,
-    required this.maxVisibleRows,
     this.enterAnimated = true,
     this.collapseRequested = false,
     this.onCollapsed,
@@ -417,42 +401,28 @@ class _GroupProxyListSliver extends StatefulWidget {
   State<_GroupProxyListSliver> createState() => _GroupProxyListSliverState();
 }
 
-class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
-    with TickerProviderStateMixin {
+class _GroupProxyListSliverState extends State<_GroupProxyListSliver> {
   late final AnimationController _controller;
-  late final AnimationController _heightController;
-  late final Animation<double> _heightProgress;
+  late final Animation<double> _reveal;
   late SliverChildBuilderDelegate _delegate;
-  bool _isAnimationCompleted = false;
-
-  double get _rowExtent => getItemHeight(widget.cardType) + 8.0;
 
   @override
   void initState() {
     super.initState();
-    final maxDelayMs =
-        widget.maxVisibleRows * _staggerRowStepMs +
-        widget.columns * _staggerColStepMs;
-    final totalWindow = _cardDuration + Duration(milliseconds: maxDelayMs);
-    _controller = AnimationController(vsync: this, duration: totalWindow);
-    _heightController = AnimationController(
+    _controller = AnimationController(
       vsync: this,
       duration: _listRevealDuration,
     );
-    _heightProgress = CurvedAnimation(
-      parent: _heightController,
+    _reveal = CurvedAnimation(
+      parent: _controller,
       curve: Curves.easeOutCubic,
       reverseCurve: Curves.easeOutCubic.flipped,
     );
     _controller.addStatusListener(_handleStatus);
-    _heightController.addStatusListener(_handleHeightStatus);
     _delegate = _buildDelegate();
     if (widget.enterAnimated) {
-      _controller.forward();
-      _heightController.value = 1;
-      _heightController.reverse();
-    } else {
-      _isAnimationCompleted = true;
+      _controller.value = 1;
+      _controller.reverse();
     }
   }
 
@@ -460,40 +430,29 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
   void didUpdateWidget(covariant _GroupProxyListSliver oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.collapseRequested && !oldWidget.collapseRequested) {
-      _heightController.forward();
+      _controller.forward();
     } else if (!widget.collapseRequested && oldWidget.collapseRequested) {
-      _heightController
+      _controller
         ..stop()
         ..value = 0;
     }
     if (widget.rows.length != oldWidget.rows.length ||
         widget.columns != oldWidget.columns ||
-        widget.cardType != oldWidget.cardType ||
-        widget.maxVisibleRows != oldWidget.maxVisibleRows) {
+        widget.cardType != oldWidget.cardType) {
       _delegate = _buildDelegate();
     }
   }
 
-  void _handleHeightStatus(AnimationStatus status) {
+  void _handleStatus(AnimationStatus status) {
     if (!mounted) return;
     if (status == AnimationStatus.completed && widget.collapseRequested) {
       widget.onCollapsed?.call();
     }
   }
 
-  void _handleStatus(AnimationStatus status) {
-    if (!mounted) return;
-    if (status == AnimationStatus.completed && !_isAnimationCompleted) {
-      _isAnimationCompleted = true;
-      _delegate = _buildDelegate();
-      setState(() {});
-    }
-  }
-
   @override
   void dispose() {
     _controller.dispose();
-    _heightController.dispose();
     super.dispose();
   }
 
@@ -507,44 +466,23 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
   Widget _buildProxyRow(BuildContext context, int rowIndex) {
     final proxies = widget.rows[rowIndex];
     final groupName = widget.group.name;
-    final totalWindowMs = _controller.duration!.inMilliseconds;
     final cardWidgets = <Widget>[];
 
     for (var i = 0; i < widget.columns; i++) {
       if (i < proxies.length) {
         final proxy = proxies[i];
-        final card = ProxyCard(
-          key: ValueKey('$groupName.${proxy.name}'),
-          proxy: proxy,
-          groupName: groupName,
-          type: widget.cardType,
-          groupType: widget.group.type,
-          testUrl: widget.group.testUrl,
+        cardWidgets.add(
+          Expanded(
+            child: ProxyCard(
+              key: ValueKey('$groupName.${proxy.name}'),
+              proxy: proxy,
+              groupName: groupName,
+              type: widget.cardType,
+              groupType: widget.group.type,
+              testUrl: widget.group.testUrl,
+            ),
+          ),
         );
-        if (_isAnimationCompleted || rowIndex >= widget.maxVisibleRows) {
-          cardWidgets.add(Expanded(child: card));
-        } else {
-          final delayMs = rowIndex * _staggerRowStepMs + i * _staggerColStepMs;
-          final start = delayMs / totalWindowMs;
-          final end = (delayMs + _cardDuration.inMilliseconds) / totalWindowMs;
-          final itemAnimation = CurvedAnimation(
-            parent: _controller,
-            curve: Interval(
-              start.clamp(0.0, 1.0),
-              end.clamp(0.0, 1.0),
-              curve: Curves.linear,
-            ),
-          );
-          cardWidgets.add(
-            Expanded(
-              child: FadeSlideEnterTransition(
-                animation: itemAnimation,
-                distance: 18.0,
-                child: card,
-              ),
-            ),
-          );
-        }
       } else {
         cardWidgets.add(const Expanded(child: SizedBox()));
       }
@@ -558,11 +496,13 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       }
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-      child: SizedBox(
-        height: getItemHeight(widget.cardType),
-        child: Row(children: rowChildren),
+    return RepaintBoundary(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+        child: SizedBox(
+          height: getItemHeight(widget.cardType),
+          child: Row(children: rowChildren),
+        ),
       ),
     );
   }
@@ -570,26 +510,35 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _heightProgress,
-      builder: (context, _) => _AnimatedExtentSliver(
-        factor: 1 - _heightProgress.value,
-        child: SliverFixedExtentList(
-          itemExtent: _rowExtent,
-          delegate: _delegate,
-        ),
-      ),
+      animation: _reveal,
+      builder: (context, _) {
+        final factor = 1 - _reveal.value;
+        return _AnimatedExtentSliver(
+          factor: factor,
+          surfaceColor: context.colorScheme.surface,
+          child: SliverFixedExtentList(
+            itemExtent: getItemHeight(widget.cardType) + 8.0,
+            delegate: _delegate,
+          ),
+        );
+      },
     );
   }
 }
 
 class _AnimatedExtentSliver extends SingleChildRenderObjectWidget {
   final double factor;
+  final Color surfaceColor;
 
-  const _AnimatedExtentSliver({required super.child, required this.factor});
+  const _AnimatedExtentSliver({
+    required super.child,
+    required this.factor,
+    required this.surfaceColor,
+  });
 
   @override
   _RenderAnimatedExtentSliver createRenderObject(BuildContext context) {
-    return _RenderAnimatedExtentSliver(factor);
+    return _RenderAnimatedExtentSliver(factor, surfaceColor);
   }
 
   @override
@@ -597,14 +546,20 @@ class _AnimatedExtentSliver extends SingleChildRenderObjectWidget {
     BuildContext context,
     _RenderAnimatedExtentSliver renderObject,
   ) {
-    renderObject.factor = factor;
+    renderObject
+      ..factor = factor
+      ..surfaceColor = surfaceColor;
   }
 }
 
 class _RenderAnimatedExtentSliver extends RenderProxySliver {
-  _RenderAnimatedExtentSliver(this._factor);
+  _RenderAnimatedExtentSliver(this._factor, this._surfaceColor);
+
+  static const _edgeGap = 8.0;
+  static const _featherExtent = 28.0;
 
   double _factor;
+  Color _surfaceColor;
 
   double get factor => _factor;
 
@@ -613,6 +568,15 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
     if (_factor == next) return;
     _factor = next;
     markNeedsLayout();
+    markNeedsPaint();
+  }
+
+  Color get surfaceColor => _surfaceColor;
+
+  set surfaceColor(Color value) {
+    if (_surfaceColor == value) return;
+    _surfaceColor = value;
+    markNeedsPaint();
   }
 
   @override
@@ -654,8 +618,6 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
     );
   }
 
-  static const _edgeGap = 8.0;
-
   @override
   void paint(PaintingContext context, Offset offset) {
     if (child == null) {
@@ -664,21 +626,60 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
     }
     final paintExtent = geometry?.paintExtent ?? 0.0;
     final coreExtent = max(paintExtent - _edgeGap, 0.0);
-    if (coreExtent >= paintExtent) {
+    if (coreExtent <= 0) {
       layer = null;
-      super.paint(context, offset);
       return;
     }
-    final size = constraints.axis == Axis.vertical
-        ? Size(constraints.crossAxisExtent, coreExtent)
-        : Size(coreExtent, constraints.crossAxisExtent);
-    layer = context.pushClipRect(
-      needsCompositing,
-      offset,
-      Offset.zero & size,
-      (context, offset) => super.paint(context, offset),
-      oldLayer: layer as ClipRectLayer?,
+    final crossExtent = constraints.crossAxisExtent;
+    final isVertical = constraints.axis == Axis.vertical;
+    final coreSize = isVertical
+        ? Size(crossExtent, coreExtent)
+        : Size(coreExtent, crossExtent);
+    final hidden = (1 - _factor).clamp(0.0, 1.0);
+    if (coreExtent < paintExtent || hidden > 0) {
+      layer = context.pushClipRect(
+        needsCompositing,
+        offset,
+        Offset.zero & coreSize,
+        (context, offset) => super.paint(context, offset),
+        oldLayer: layer as ClipRectLayer?,
+      );
+    } else {
+      layer = null;
+      super.paint(context, offset);
+    }
+    if (hidden <= 0) return;
+    final canvas = context.canvas;
+    final coreRect = (Offset.zero & coreSize).shift(offset);
+    canvas.drawRect(
+      coreRect,
+      Paint()..color = _surfaceColor.withValues(alpha: hidden),
     );
+    final featherExtent = min(_featherExtent, coreExtent);
+    if (featherExtent > 0) {
+      final featherRect = isVertical
+          ? Rect.fromLTWH(
+              0,
+              coreExtent - featherExtent,
+              crossExtent,
+              featherExtent,
+            ).shift(offset)
+          : Rect.fromLTWH(
+              coreExtent - featherExtent,
+              0,
+              featherExtent,
+              crossExtent,
+            ).shift(offset);
+      final shader = Gradient.linear(
+        isVertical ? featherRect.topCenter : featherRect.centerLeft,
+        isVertical ? featherRect.bottomCenter : featherRect.centerRight,
+        [
+          _surfaceColor.withValues(alpha: 0),
+          _surfaceColor.withValues(alpha: hidden),
+        ],
+      );
+      canvas.drawRect(featherRect, Paint()..shader = shader);
+    }
   }
 }
 
