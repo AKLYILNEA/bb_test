@@ -194,6 +194,7 @@
   "systemProxy": "系统代理",
   "project": "项目",
   "core": "内核",
+  "basic": "基础",
   "showStartSwitch": "联动开关",
   "showStartSwitchDesc": "首页显示独立的开关按钮",
   "desc": "Bettbox 基于强大灵活的 Mihomo (Clash.Meta) 代理内核，致力于更好的体验，我们的愿景: Connecting Open Source and AI，Accelerating Innovation",

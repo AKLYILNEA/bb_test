@@ -252,6 +252,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "copyLink": MessageLookupByLibrary.simpleMessage("リンクをコピー"),
     "copySuccess": MessageLookupByLibrary.simpleMessage("コピー成功"),
     "core": MessageLookupByLibrary.simpleMessage("カーネル"),
+    "basic": MessageLookupByLibrary.simpleMessage("基本"),
     "coreConnected": MessageLookupByLibrary.simpleMessage("接続済み"),
     "coreInfo": MessageLookupByLibrary.simpleMessage("カーネル情報"),
     "coreStatus": MessageLookupByLibrary.simpleMessage("コア負荷詳細"),

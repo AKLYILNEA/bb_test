@@ -741,7 +741,7 @@ class _SecretDialogState extends ConsumerState<_SecretDialog> {
 
 List<Widget> get generalItems => [
   ...generateSection(
-    title: appLocalizations.options,
+    title: appLocalizations.basic,
     items: [
       const LogLevelItem(),
       const UaItem(),
@@ -750,7 +750,7 @@ List<Widget> get generalItems => [
     ],
   ),
   ...generateSection(
-    title: appLocalizations.network,
+    title: appLocalizations.connections,
     items: const [Ipv6Item(), AllowLanItem(), PortItem()],
   ),
   ...generateSection(

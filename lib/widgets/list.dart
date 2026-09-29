@@ -647,12 +647,7 @@ class ContinuousListItem extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: Material(
           type: MaterialType.transparency,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              if (!constraints.hasTightHeight) return child;
-              return Align(alignment: Alignment.center, child: child);
-            },
-          ),
+          child: child,
         ),
       );
     }

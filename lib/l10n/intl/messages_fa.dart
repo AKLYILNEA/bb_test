@@ -319,6 +319,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "copyLink": MessageLookupByLibrary.simpleMessage("کپی لینک"),
     "copySuccess": MessageLookupByLibrary.simpleMessage("با موفقیت کپی شد"),
     "core": MessageLookupByLibrary.simpleMessage("هسته"),
+    "basic": MessageLookupByLibrary.simpleMessage("پایه"),
     "coreConnected": MessageLookupByLibrary.simpleMessage("متصل شد"),
     "coreInfo": MessageLookupByLibrary.simpleMessage("اطلاعات هسته"),
     "coreStatus": MessageLookupByLibrary.simpleMessage("وضعیت هسته"),

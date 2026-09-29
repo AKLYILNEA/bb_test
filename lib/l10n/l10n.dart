@@ -1690,6 +1690,11 @@ class AppLocalizations {
     return Intl.message('Core', name: 'core', desc: '', args: []);
   }
 
+  /// `Basic`
+  String get basic {
+    return Intl.message('Basic', name: 'basic', desc: '', args: []);
+  }
+
   /// `Linkage Switch`
   String get showStartSwitch {
     return Intl.message(

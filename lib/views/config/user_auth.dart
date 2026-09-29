@@ -163,7 +163,7 @@ class _UserAuthDialogState extends ConsumerState<UserAuthDialog> {
                   controller: _entries[i].usernameController,
                   decoration: InputDecoration(
                     labelText: appLocalizations.username,
-                    prefixIcon: const Icon(FluentIcons.person_24_regular),
+                    prefixIcon: const Icon(FluentIcons.person_circle_24_regular),
                     isDense: true,
                   ),
                   validator: (value) {
@@ -192,7 +192,7 @@ class _UserAuthDialogState extends ConsumerState<UserAuthDialog> {
                   obscureText: _entries[i].obscurePassword,
                   decoration: InputDecoration(
                     labelText: appLocalizations.password,
-                    prefixIcon: const Icon(FluentIcons.lock_closed_24_regular),
+                    prefixIcon: const Icon(FluentIcons.password_24_regular),
                     isDense: true,
                     suffixIcon: IconButton(
                       icon: Icon(

@@ -321,6 +321,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "copyLink": MessageLookupByLibrary.simpleMessage("Copy Link"),
     "copySuccess": MessageLookupByLibrary.simpleMessage("Copy Successful"),
     "core": MessageLookupByLibrary.simpleMessage("Core"),
+    "basic": MessageLookupByLibrary.simpleMessage("Basic"),
     "coreConnected": MessageLookupByLibrary.simpleMessage("Connected"),
     "coreInfo": MessageLookupByLibrary.simpleMessage("Core Info"),
     "coreStatus": MessageLookupByLibrary.simpleMessage("Core Status"),

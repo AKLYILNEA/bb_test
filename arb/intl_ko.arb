@@ -194,6 +194,7 @@
   "systemProxy": "시스템 프록시",
   "project": "프로젝트",
   "core": "코어",
+  "basic": "기본",
   "showStartSwitch": "스위치 버튼 표시",
   "showStartSwitchDesc": "홈 화면에 독립된 시작/정지 스위치 표시",
   "desc": "Bettbox는 강력하고 유연한 Mihomo(Clash.Meta) 코어를 기반으로 개발된 사용자 친화적 프록시 클라이언트입니다. 우리의 비전: Connecting Open Source and AI, Accelerating Innovation",

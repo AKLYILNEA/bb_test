@@ -194,6 +194,7 @@
   "systemProxy": "システムプロキシ",
   "project": "プロジェクト",
   "core": "カーネル",
+  "basic": "基本",
   "showStartSwitch": "単独スイッチ表示",
   "showStartSwitchDesc": "ホーム画面に独立したON/OFFボタンを表示",
   "desc": "Bettboxは柔軟で強力なMihomo(Clash.Meta)カーネルを搭載した、快適性を追求したプロキシクライアントです。私たちのビジョン：Connecting Open Source and AI, Accelerating Innovation",

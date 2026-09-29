@@ -262,6 +262,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "copyLink": MessageLookupByLibrary.simpleMessage("링크 복사"),
     "copySuccess": MessageLookupByLibrary.simpleMessage("복사 성공"),
     "core": MessageLookupByLibrary.simpleMessage("코어"),
+    "basic": MessageLookupByLibrary.simpleMessage("기본"),
     "coreConnected": MessageLookupByLibrary.simpleMessage("연결됨"),
     "coreInfo": MessageLookupByLibrary.simpleMessage("코어 정보"),
     "coreStatus": MessageLookupByLibrary.simpleMessage("코어 부하 상세"),

@@ -230,6 +230,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "copyLink": MessageLookupByLibrary.simpleMessage("複製連結"),
     "copySuccess": MessageLookupByLibrary.simpleMessage("複製成功"),
     "core": MessageLookupByLibrary.simpleMessage("內核"),
+    "basic": MessageLookupByLibrary.simpleMessage("基礎"),
     "coreConnected": MessageLookupByLibrary.simpleMessage("已連線"),
     "coreInfo": MessageLookupByLibrary.simpleMessage("內核資訊"),
     "coreStatus": MessageLookupByLibrary.simpleMessage("核心負載詳情"),
