@@ -16,19 +16,10 @@ import 'card.dart';
 import 'common.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-const _listRevealMinDuration = Duration(milliseconds: 153);
-const _listRevealMaxDuration = Duration(milliseconds: 238);
-const _listRevealSpeed = 0.298;
-
-Duration listRevealDuration(double contentExtent) {
-  final milliseconds = ((180 + contentExtent * 0.35) * _listRevealSpeed)
-      .clamp(
-        _listRevealMinDuration.inMilliseconds.toDouble(),
-        _listRevealMaxDuration.inMilliseconds.toDouble(),
-      )
-      .round();
-  return Duration(milliseconds: milliseconds);
-}
+/// 展开 / 收起时长：**固定值**，与节点数量无关。
+/// 可见内容量由视口决定（任何组同屏都只有约 10~13 行），按"总节点数"拉长时长没有依据，
+/// 只会让大组显得慢；要调整手感只改这一个常量。
+const _listRevealDuration = Duration(milliseconds: 153);
 
 class ProxiesListView extends ConsumerWidget {
   const ProxiesListView({super.key});
@@ -392,10 +383,9 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
   @override
   void initState() {
     super.initState();
-    final extent = widget.rows.length * (getItemHeight(widget.cardType) + 8.0);
     _controller = AnimationController(
       vsync: this,
-      duration: listRevealDuration(extent),
+      duration: _listRevealDuration,
     );
     _reveal = CurvedAnimation(
       parent: _controller,
