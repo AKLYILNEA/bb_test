@@ -526,9 +526,14 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
+        final collapsing = widget.collapseRequested;
+        final progress = collapsing
+            ? _controller.value
+            : 1 - _controller.value;
+        final fade = (progress / _listFadeFraction).clamp(0.0, 1.0);
         return _AnimatedExtentSliver(
           factor: 1 - _reveal.value,
-          hidden: (_controller.value / _listFadeFraction).clamp(0.0, 1.0),
+          hidden: collapsing ? fade : 1 - fade,
           surfaceColor: context.colorScheme.surface,
           child: SliverFixedExtentList(
             itemExtent: getItemHeight(widget.cardType) + 8.0,
@@ -662,7 +667,7 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
         ? Size(crossExtent, coreExtent)
         : Size(coreExtent, crossExtent);
     final hidden = _hidden;
-    if (coreExtent < paintExtent || hidden > 0) {
+    if (hidden > 0 || _factor < 1.0) {
       layer = context.pushClipRect(
         needsCompositing,
         offset,
