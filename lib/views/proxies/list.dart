@@ -16,9 +16,9 @@ import 'card.dart';
 import 'common.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-const _listRevealMinDuration = Duration(milliseconds: 133);
-const _listRevealMaxDuration = Duration(milliseconds: 229);
-const _listRevealSpeed = 0.441;
+const _listRevealMinDuration = Duration(milliseconds: 180);
+const _listRevealMaxDuration = Duration(milliseconds: 280);
+const _listRevealSpeed = 0.35;
 
 Duration listRevealDuration(double contentExtent) {
   final milliseconds = ((180 + contentExtent * 0.35) * _listRevealSpeed)
@@ -612,20 +612,11 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
       geometry = SliverGeometry.zero;
       return;
     }
-    final maxPaintExtent = childGeometry.maxPaintExtent * factor;
+    final paintExtent = childGeometry.paintExtent * factor;
+    final layoutExtent = childGeometry.layoutExtent * factor;
     final scrollExtent = childGeometry.scrollExtent * factor;
-    final paintExtent = max(
-      0.0,
-      min(childGeometry.paintExtent, maxPaintExtent - constraints.scrollOffset),
-    );
-    final layoutExtent = max(
-      0.0,
-      min(childGeometry.layoutExtent, childGeometry.paintOrigin + paintExtent),
-    );
-    final hitTestExtent = max(
-      0.0,
-      min(childGeometry.hitTestExtent, childGeometry.paintOrigin + paintExtent),
-    );
+    final maxPaintExtent = childGeometry.maxPaintExtent * factor;
+    final hitTestExtent = childGeometry.hitTestExtent * factor;
     geometry = SliverGeometry(
       paintOrigin: childGeometry.paintOrigin,
       scrollExtent: scrollExtent,
