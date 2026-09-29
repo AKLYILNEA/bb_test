@@ -166,7 +166,7 @@ class _RequestsViewState extends ConsumerState<RequestsView>
                       );
                     },
                     itemExtentBuilder: (index, _) {
-                      return TrackerInfoItem.height + 1;
+                      return TrackerInfoItem.height + 8;
                     },
                     itemCount: requests.length,
                   ),

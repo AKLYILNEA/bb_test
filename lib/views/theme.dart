@@ -306,7 +306,7 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
         return true;
       },
       child: ItemCard(
-        info: Info(label: appLocalizations.themeColor, iconData: FluentIcons.paint_brush_24_regular),
+        info: Info(label: appLocalizations.themeColor, iconData: FluentIcons.color_24_regular),
         actions: genActions([
           if (_removablePrimaryColor == null)
             FilledButton(

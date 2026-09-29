@@ -201,7 +201,7 @@ class _LogsViewState extends ConsumerState<LogsView>
                     controller: _scrollController,
                     padding: const EdgeInsets.only(bottom: 16, top: 8),
                     itemExtentBuilder: (index, _) {
-                      return LogItem.height + 1;
+                      return LogItem.height + 8;
                     },
                     itemBuilder: (context, index) {
                       final log = logs[index];
@@ -258,6 +258,7 @@ class LogItem extends StatelessWidget {
         index: index,
         count: count,
         reversed: reversed,
+        standalone: true,
         child: ListItem(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           onTap: () {

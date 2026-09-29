@@ -254,15 +254,23 @@ class Request {
   Future<Map<String, dynamic>?> checkForUpdate() async {
     try {
       final t = DateTime.now().millisecondsSinceEpoch;
-      final response = await _dio.get(
-        'https://github.com/$repository/releases/latest?t=$t',
-        options: Options(
-          followRedirects: false,
-          validateStatus: (status) =>
-              status != null && status >= 300 && status < 400,
-        ),
-      );
-      final location = response.headers['location']?.firstOrNull;
+      String? location;
+      var url = 'https://github.com/$repository/releases/latest?t=$t';
+      for (var i = 0; i < 3; i++) {
+        final response = await _dio.get(
+          url,
+          options: Options(
+            followRedirects: false,
+            validateStatus: (status) =>
+                status != null && status >= 300 && status < 400,
+          ),
+        );
+        location = response.headers['location']?.firstOrNull;
+        if (location == null || location.contains('/releases/tag/')) {
+          break;
+        }
+        url = location;
+      }
       if (location != null && location.contains('/releases/tag/')) {
         final remoteVersion = location.split('/').last.trim();
         if (remoteVersion.isNotEmpty) {

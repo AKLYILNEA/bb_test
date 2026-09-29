@@ -203,6 +203,7 @@ class TrackerInfoItem extends ConsumerWidget {
         index: index,
         count: count,
         reversed: reversed,
+        standalone: true,
         child: listItem,
       ),
     );

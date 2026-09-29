@@ -621,6 +621,7 @@ class ContinuousListItem extends StatelessWidget {
   final int count;
   final bool reversed;
   final double radius;
+  final bool standalone;
 
   const ContinuousListItem({
     super.key,
@@ -629,10 +630,33 @@ class ContinuousListItem extends StatelessWidget {
     required this.count,
     this.reversed = false,
     this.radius = 20.0,
+    this.standalone = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    if (standalone) {
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        decoration: ShapeDecoration(
+          color: context.colorScheme.surfaceContainer,
+          shape: RoundedSuperellipseBorder(
+            borderRadius: BorderRadius.circular(radius),
+          ),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Material(
+          type: MaterialType.transparency,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (!constraints.hasTightHeight) return child;
+              return Align(alignment: Alignment.center, child: child);
+            },
+          ),
+        ),
+      );
+    }
+
     final isFirst = reversed ? index == count - 1 : index == 0;
     final isLast = reversed ? index == 0 : index == count - 1;
     final dividerColor = context.colorScheme.outlineVariant.withValues(

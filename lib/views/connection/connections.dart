@@ -274,7 +274,7 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
                 );
               },
               itemExtentBuilder: (index, _) {
-                return TrackerInfoItem.height + 1;
+                return TrackerInfoItem.height + 8;
               },
               itemCount: connections.length,
             ),
