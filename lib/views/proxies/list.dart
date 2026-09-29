@@ -8,6 +8,7 @@ import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -507,22 +508,7 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
 
   SliverChildBuilderDelegate _buildDelegate() {
     return SliverChildBuilderDelegate(
-      (context, index) => AnimatedBuilder(
-        animation: _heightProgress,
-        child: _buildProxyRow(context, index),
-        builder: (context, child) {
-          final progress = _heightProgress.value;
-          return ClipRect(
-            clipBehavior: progress > 0 ? Clip.hardEdge : Clip.none,
-            child: OverflowBox(
-              alignment: Alignment.topCenter,
-              minHeight: _rowExtent,
-              maxHeight: _rowExtent,
-              child: child,
-            ),
-          );
-        },
-      ),
+      (context, index) => _buildProxyRow(context, index),
       childCount: widget.rows.length,
     );
   }
@@ -594,13 +580,110 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _heightProgress,
-      builder: (context, _) {
-        final progress = _heightProgress.value;
-        return SliverFixedExtentList(
-          itemExtent: progress <= 0 ? _rowExtent : max(_rowExtent * (1 - progress), 0.01),
+      builder: (context, _) => _AnimatedExtentSliver(
+        factor: 1 - _heightProgress.value,
+        child: SliverFixedExtentList(
+          itemExtent: _rowExtent,
           delegate: _delegate,
-        );
-      },
+        ),
+      ),
+    );
+  }
+}
+
+class _AnimatedExtentSliver extends SingleChildRenderObjectWidget {
+  final double factor;
+
+  const _AnimatedExtentSliver({required super.child, required this.factor});
+
+  @override
+  _RenderAnimatedExtentSliver createRenderObject(BuildContext context) {
+    return _RenderAnimatedExtentSliver(factor);
+  }
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    _RenderAnimatedExtentSliver renderObject,
+  ) {
+    renderObject.factor = factor;
+  }
+}
+
+class _RenderAnimatedExtentSliver extends RenderProxySliver {
+  _RenderAnimatedExtentSliver(this._factor);
+
+  double _factor;
+
+  double get factor => _factor;
+
+  set factor(double value) {
+    final next = value.clamp(0.0, 1.0);
+    if (_factor == next) return;
+    _factor = next;
+    markNeedsLayout();
+  }
+
+  @override
+  void performLayout() {
+    final child = this.child;
+    if (child == null) {
+      geometry = SliverGeometry.zero;
+      return;
+    }
+    child.layout(constraints, parentUsesSize: true);
+    final childGeometry = child.geometry ?? SliverGeometry.zero;
+    final factor = _factor;
+    final maxPaintExtent = childGeometry.maxPaintExtent * factor;
+    final scrollExtent = childGeometry.scrollExtent * factor;
+    final paintExtent = max(
+      0.0,
+      min(childGeometry.paintExtent, maxPaintExtent - constraints.scrollOffset),
+    );
+    final layoutExtent = max(
+      0.0,
+      min(childGeometry.layoutExtent, childGeometry.paintOrigin + paintExtent),
+    );
+    final hitTestExtent = max(
+      0.0,
+      min(childGeometry.hitTestExtent, childGeometry.paintOrigin + paintExtent),
+    );
+    geometry = SliverGeometry(
+      paintOrigin: childGeometry.paintOrigin,
+      scrollExtent: scrollExtent,
+      paintExtent: paintExtent,
+      layoutExtent: layoutExtent,
+      maxPaintExtent: maxPaintExtent,
+      cacheExtent: childGeometry.cacheExtent,
+      maxScrollObstructionExtent: childGeometry.maxScrollObstructionExtent,
+      visible: childGeometry.visible,
+      hitTestExtent: hitTestExtent,
+      hasVisualOverflow: childGeometry.hasVisualOverflow || factor < 1.0,
+      scrollOffsetCorrection: childGeometry.scrollOffsetCorrection,
+    );
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    if (child == null) {
+      layer = null;
+      return;
+    }
+    if (_factor >= 1.0) {
+      layer = null;
+      super.paint(context, offset);
+      return;
+    }
+    final paintExtent = geometry?.paintExtent ?? 0.0;
+    final size = constraints.axis == Axis.vertical
+        ? Size(constraints.crossAxisExtent, paintExtent)
+        : Size(paintExtent, constraints.crossAxisExtent);
+    layer = context.pushClipRect(
+      needsCompositing,
+      offset,
+      Offset.zero & size,
+      (context, offset) => super.paint(context, offset),
+      oldLayer: layer as ClipRectLayer?,
     );
   }
 }
