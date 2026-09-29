@@ -16,10 +16,10 @@ import 'card.dart';
 import 'common.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-const _listRevealMinDuration = Duration(milliseconds: 166);
-const _listRevealMaxDuration = Duration(milliseconds: 286);
-const _listRevealSpeed = 0.551;
-const _listFadeFraction = 0.55;
+const _listRevealMinDuration = Duration(milliseconds: 106);
+const _listRevealMaxDuration = Duration(milliseconds: 183);
+const _listRevealSpeed = 0.353;
+const _listFadeFraction = 1.0;
 
 Duration listRevealDuration(double contentExtent) {
   final milliseconds = ((180 + contentExtent * 0.35) * _listRevealSpeed)
@@ -409,10 +409,7 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     _syncList();
     if (widget.enterAnimated) {
       _controller.value = 1;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted || widget.collapseRequested) return;
-        _controller.reverse();
-      });
+      _controller.reverse();
     }
   }
 
@@ -761,7 +758,7 @@ class _GroupHeader extends ConsumerWidget {
   static const _actionsGap = 6.0;
   static const _actionsRightOffset = _expandButtonWidth + _actionsGap;
 
-  static const _actionsDuration = Duration(milliseconds: 200);
+  static const _actionsDuration = Duration(milliseconds: 128);
 
   Widget _buildActionTransition(double value, Widget? child) {
     return Opacity(
