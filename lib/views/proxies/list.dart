@@ -16,7 +16,18 @@ import 'card.dart';
 import 'common.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-const _listRevealDuration = Duration(milliseconds: 240);
+const _listRevealMinDuration = Duration(milliseconds: 260);
+const _listRevealMaxDuration = Duration(milliseconds: 380);
+
+Duration listRevealDuration(double contentExtent) {
+  final milliseconds = (140 + contentExtent * 0.3)
+      .clamp(
+        _listRevealMinDuration.inMilliseconds.toDouble(),
+        _listRevealMaxDuration.inMilliseconds.toDouble(),
+      )
+      .round();
+  return Duration(milliseconds: milliseconds);
+}
 
 class ProxiesListView extends ConsumerWidget {
   const ProxiesListView({super.key});
@@ -84,7 +95,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   void _startEnterAnimated(String groupName) {
     _enterTimer?.cancel();
     _enterGroupName = groupName;
-    _enterTimer = Timer(_listRevealDuration, () {
+    _enterTimer = Timer(_listRevealMaxDuration, () {
       if (mounted) {
         setState(() {
           _enterGroupName = null;
@@ -95,7 +106,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
 
   void _scheduleRevealScroll(String groupName) {
     _revealScrollTimer?.cancel();
-    _revealScrollTimer = Timer(_listRevealDuration, () {
+    _revealScrollTimer = Timer(_listRevealMaxDuration, () {
       if (!mounted) return;
       _autoScrollToGroup(groupName);
     });
@@ -410,9 +421,10 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
   @override
   void initState() {
     super.initState();
+    final extent = widget.rows.length * (getItemHeight(widget.cardType) + 8.0);
     _controller = AnimationController(
       vsync: this,
-      duration: _listRevealDuration,
+      duration: listRevealDuration(extent),
     );
     _reveal = CurvedAnimation(
       parent: _controller,
@@ -511,11 +523,11 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _reveal,
+      animation: _controller,
       builder: (context, _) {
-        final factor = 1 - _reveal.value;
         return _AnimatedExtentSliver(
-          factor: factor,
+          factor: 1 - _reveal.value,
+          hidden: _controller.value,
           surfaceColor: context.colorScheme.surface,
           child: SliverFixedExtentList(
             itemExtent: getItemHeight(widget.cardType) + 8.0,
@@ -529,17 +541,19 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
 
 class _AnimatedExtentSliver extends SingleChildRenderObjectWidget {
   final double factor;
+  final double hidden;
   final Color surfaceColor;
 
   const _AnimatedExtentSliver({
     required super.child,
     required this.factor,
+    required this.hidden,
     required this.surfaceColor,
   });
 
   @override
   _RenderAnimatedExtentSliver createRenderObject(BuildContext context) {
-    return _RenderAnimatedExtentSliver(factor, surfaceColor);
+    return _RenderAnimatedExtentSliver(factor, hidden, surfaceColor);
   }
 
   @override
@@ -549,17 +563,19 @@ class _AnimatedExtentSliver extends SingleChildRenderObjectWidget {
   ) {
     renderObject
       ..factor = factor
+      ..hidden = hidden
       ..surfaceColor = surfaceColor;
   }
 }
 
 class _RenderAnimatedExtentSliver extends RenderProxySliver {
-  _RenderAnimatedExtentSliver(this._factor, this._surfaceColor);
+  _RenderAnimatedExtentSliver(this._factor, this._hidden, this._surfaceColor);
 
   static const _edgeGap = 8.0;
-  static const _featherExtent = 28.0;
+  static const _featherExtent = 96.0;
 
   double _factor;
+  double _hidden;
   Color _surfaceColor;
 
   double get factor => _factor;
@@ -569,6 +585,15 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
     if (_factor == next) return;
     _factor = next;
     markNeedsLayout();
+    markNeedsPaint();
+  }
+
+  double get hidden => _hidden;
+
+  set hidden(double value) {
+    final next = value.clamp(0.0, 1.0);
+    if (_hidden == next) return;
+    _hidden = next;
     markNeedsPaint();
   }
 
@@ -636,7 +661,7 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
     final coreSize = isVertical
         ? Size(crossExtent, coreExtent)
         : Size(coreExtent, crossExtent);
-    final hidden = (1 - _factor).clamp(0.0, 1.0);
+    final hidden = _hidden;
     if (coreExtent < paintExtent || hidden > 0) {
       layer = context.pushClipRect(
         needsCompositing,
@@ -656,31 +681,17 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
       coreRect,
       Paint()..color = _surfaceColor.withValues(alpha: hidden),
     );
-    final featherExtent = min(_featherExtent, coreExtent);
-    if (featherExtent > 0) {
-      final featherRect = isVertical
-          ? Rect.fromLTWH(
-              0,
-              coreExtent - featherExtent,
-              crossExtent,
-              featherExtent,
-            ).shift(offset)
-          : Rect.fromLTWH(
-              coreExtent - featherExtent,
-              0,
-              featherExtent,
-              crossExtent,
-            ).shift(offset);
-      final shader = LinearGradient(
-        begin: isVertical ? Alignment.topCenter : Alignment.centerLeft,
-        end: isVertical ? Alignment.bottomCenter : Alignment.centerRight,
-        colors: [
-          _surfaceColor.withValues(alpha: 0),
-          _surfaceColor.withValues(alpha: hidden),
-        ],
-      ).createShader(featherRect);
-      canvas.drawRect(featherRect, Paint()..shader = shader);
-    }
+    final band = min(_featherExtent * hidden, coreExtent);
+    if (band <= 0) return;
+    final featherRect = isVertical
+        ? Rect.fromLTWH(0, coreExtent - band, crossExtent, band).shift(offset)
+        : Rect.fromLTWH(coreExtent - band, 0, band, crossExtent).shift(offset);
+    final shader = LinearGradient(
+      begin: isVertical ? Alignment.topCenter : Alignment.centerLeft,
+      end: isVertical ? Alignment.bottomCenter : Alignment.centerRight,
+      colors: [_surfaceColor.withValues(alpha: 0), _surfaceColor],
+    ).createShader(featherRect);
+    canvas.drawRect(featherRect, Paint()..shader = shader);
   }
 }
 
