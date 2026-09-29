@@ -324,7 +324,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
           child: CustomScrollView(
             key: const PageStorageKey<String>('proxies_list'),
             controller: _scrollController,
-            cacheExtent: 250.0,
+            cacheExtent: 150.0,
             slivers: [
               const SliverToBoxAdapter(child: SizedBox(height: 16)),
               for (var i = 0; i < widget.groups.length; i++)
