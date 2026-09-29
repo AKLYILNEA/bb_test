@@ -401,7 +401,8 @@ class _GroupProxyListSliver extends StatefulWidget {
   State<_GroupProxyListSliver> createState() => _GroupProxyListSliverState();
 }
 
-class _GroupProxyListSliverState extends State<_GroupProxyListSliver> {
+class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _reveal;
   late SliverChildBuilderDelegate _delegate;
@@ -670,14 +671,14 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
               featherExtent,
               crossExtent,
             ).shift(offset);
-      final shader = Gradient.linear(
-        isVertical ? featherRect.topCenter : featherRect.centerLeft,
-        isVertical ? featherRect.bottomCenter : featherRect.centerRight,
-        [
+      final shader = LinearGradient(
+        begin: isVertical ? Alignment.topCenter : Alignment.centerLeft,
+        end: isVertical ? Alignment.bottomCenter : Alignment.centerRight,
+        colors: [
           _surfaceColor.withValues(alpha: 0),
           _surfaceColor.withValues(alpha: hidden),
         ],
-      );
+      ).createShader(featherRect);
       canvas.drawRect(featherRect, Paint()..shader = shader);
     }
   }
