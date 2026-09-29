@@ -16,11 +16,12 @@ import 'card.dart';
 import 'common.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-const _listRevealMinDuration = Duration(milliseconds: 260);
-const _listRevealMaxDuration = Duration(milliseconds: 380);
+const _listRevealMinDuration = Duration(milliseconds: 300);
+const _listRevealMaxDuration = Duration(milliseconds: 520);
+const _listFadeFraction = 0.45;
 
 Duration listRevealDuration(double contentExtent) {
-  final milliseconds = (140 + contentExtent * 0.3)
+  final milliseconds = (180 + contentExtent * 0.35)
       .clamp(
         _listRevealMinDuration.inMilliseconds.toDouble(),
         _listRevealMaxDuration.inMilliseconds.toDouble(),
@@ -428,8 +429,8 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     );
     _reveal = CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeOutCubic,
-      reverseCurve: Curves.easeOutCubic.flipped,
+      curve: Curves.easeInOutCubic,
+      reverseCurve: Curves.easeInOutCubic.flipped,
     );
     _controller.addStatusListener(_handleStatus);
     _delegate = _buildDelegate();
@@ -527,7 +528,7 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       builder: (context, _) {
         return _AnimatedExtentSliver(
           factor: 1 - _reveal.value,
-          hidden: _controller.value,
+          hidden: (_controller.value / _listFadeFraction).clamp(0.0, 1.0),
           surfaceColor: context.colorScheme.surface,
           child: SliverFixedExtentList(
             itemExtent: getItemHeight(widget.cardType) + 8.0,
@@ -572,7 +573,6 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
   _RenderAnimatedExtentSliver(this._factor, this._hidden, this._surfaceColor);
 
   static const _edgeGap = 8.0;
-  static const _featherExtent = 96.0;
 
   double _factor;
   double _hidden;
@@ -675,23 +675,10 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
       super.paint(context, offset);
     }
     if (hidden <= 0) return;
-    final canvas = context.canvas;
-    final coreRect = (Offset.zero & coreSize).shift(offset);
-    canvas.drawRect(
-      coreRect,
+    context.canvas.drawRect(
+      (Offset.zero & coreSize).shift(offset),
       Paint()..color = _surfaceColor.withValues(alpha: hidden),
     );
-    final band = min(_featherExtent * hidden, coreExtent);
-    if (band <= 0) return;
-    final featherRect = isVertical
-        ? Rect.fromLTWH(0, coreExtent - band, crossExtent, band).shift(offset)
-        : Rect.fromLTWH(coreExtent - band, 0, band, crossExtent).shift(offset);
-    final shader = LinearGradient(
-      begin: isVertical ? Alignment.topCenter : Alignment.centerLeft,
-      end: isVertical ? Alignment.bottomCenter : Alignment.centerRight,
-      colors: [_surfaceColor.withValues(alpha: 0), _surfaceColor],
-    ).createShader(featherRect);
-    canvas.drawRect(featherRect, Paint()..shader = shader);
   }
 }
 
