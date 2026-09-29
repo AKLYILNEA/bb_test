@@ -16,12 +16,13 @@ import 'card.dart';
 import 'common.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-const _listRevealMinDuration = Duration(milliseconds: 300);
-const _listRevealMaxDuration = Duration(milliseconds: 520);
+const _listRevealMinDuration = Duration(milliseconds: 255);
+const _listRevealMaxDuration = Duration(milliseconds: 442);
+const _listRevealSpeed = 0.85;
 const _listFadeFraction = 0.45;
 
 Duration listRevealDuration(double contentExtent) {
-  final milliseconds = (180 + contentExtent * 0.35)
+  final milliseconds = ((180 + contentExtent * 0.35) * _listRevealSpeed)
       .clamp(
         _listRevealMinDuration.inMilliseconds.toDouble(),
         _listRevealMaxDuration.inMilliseconds.toDouble(),
@@ -312,6 +313,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
                 group: group,
                 isExpand: isExpand,
                 enterAnimated: enterAnimated,
+                collapsing: isCollapsing,
                 onToggle: () => _handleToggle(group.name),
                 cardType: cardType,
                 columns: columns,
@@ -329,6 +331,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
             cardType: cardType,
             enterAnimated: enterAnimated,
             revealSpace: !isLast,
+            clipContent: !isLast,
             collapseRequested: isCollapsing,
             onCollapsed: () {
               if (!mounted) return;
@@ -401,6 +404,7 @@ class _GroupProxyListSliver extends StatefulWidget {
   final ProxyCardType cardType;
   final bool enterAnimated;
   final bool revealSpace;
+  final bool clipContent;
   final bool collapseRequested;
   final VoidCallback? onCollapsed;
 
@@ -412,6 +416,7 @@ class _GroupProxyListSliver extends StatefulWidget {
     required this.cardType,
     this.enterAnimated = true,
     this.revealSpace = true,
+    this.clipContent = true,
     this.collapseRequested = false,
     this.onCollapsed,
   });
@@ -542,6 +547,7 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
         return _AnimatedExtentSliver(
           factor: animateSpace ? 1 - _reveal.value : 1.0,
           hidden: collapsing ? fade : 1 - fade,
+          clipContent: widget.clipContent,
           surfaceColor: context.colorScheme.surface,
           child: SliverFixedExtentList(
             itemExtent: getItemHeight(widget.cardType) + 8.0,
@@ -556,18 +562,25 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
 class _AnimatedExtentSliver extends SingleChildRenderObjectWidget {
   final double factor;
   final double hidden;
+  final bool clipContent;
   final Color surfaceColor;
 
   const _AnimatedExtentSliver({
     required super.child,
     required this.factor,
     required this.hidden,
+    required this.clipContent,
     required this.surfaceColor,
   });
 
   @override
   _RenderAnimatedExtentSliver createRenderObject(BuildContext context) {
-    return _RenderAnimatedExtentSliver(factor, hidden, surfaceColor);
+    return _RenderAnimatedExtentSliver(
+      factor,
+      hidden,
+      clipContent,
+      surfaceColor,
+    );
   }
 
   @override
@@ -578,18 +591,33 @@ class _AnimatedExtentSliver extends SingleChildRenderObjectWidget {
     renderObject
       ..factor = factor
       ..hidden = hidden
+      ..clipContent = clipContent
       ..surfaceColor = surfaceColor;
   }
 }
 
 class _RenderAnimatedExtentSliver extends RenderProxySliver {
-  _RenderAnimatedExtentSliver(this._factor, this._hidden, this._surfaceColor);
+  _RenderAnimatedExtentSliver(
+    this._factor,
+    this._hidden,
+    this._clipContent,
+    this._surfaceColor,
+  );
 
   static const _edgeGap = 8.0;
 
   double _factor;
   double _hidden;
+  bool _clipContent;
   Color _surfaceColor;
+
+  bool get clipContent => _clipContent;
+
+  set clipContent(bool value) {
+    if (_clipContent == value) return;
+    _clipContent = value;
+    markNeedsPaint();
+  }
 
   double get factor => _factor;
 
@@ -675,7 +703,7 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
         ? Size(crossExtent, coreExtent)
         : Size(coreExtent, crossExtent);
     final hidden = _hidden;
-    if (hidden > 0 || _factor < 1.0) {
+    if (_clipContent && (hidden > 0 || _factor < 1.0)) {
       layer = context.pushClipRect(
         needsCompositing,
         offset,
@@ -688,8 +716,14 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
       super.paint(context, offset);
     }
     if (hidden <= 0) return;
+    final washExtent = _clipContent
+        ? coreExtent
+        : max(coreExtent, child?.geometry?.paintExtent ?? 0.0);
+    final washSize = isVertical
+        ? Size(crossExtent, washExtent)
+        : Size(washExtent, crossExtent);
     context.canvas.drawRect(
-      (Offset.zero & coreSize).shift(offset),
+      (Offset.zero & washSize).shift(offset),
       Paint()..color = _surfaceColor.withValues(alpha: hidden),
     );
   }
@@ -699,6 +733,7 @@ class _GroupHeader extends ConsumerWidget {
   final Group group;
   final bool isExpand;
   final bool enterAnimated;
+  final bool collapsing;
   final VoidCallback onToggle;
   final ProxyCardType cardType;
   final int columns;
@@ -709,6 +744,7 @@ class _GroupHeader extends ConsumerWidget {
     required this.group,
     required this.isExpand,
     this.enterAnimated = false,
+    this.collapsing = false,
     required this.onToggle,
     required this.cardType,
     required this.columns,
@@ -735,11 +771,18 @@ class _GroupHeader extends ConsumerWidget {
     required Widget child,
     required String key,
   }) {
-    if (!enterAnimated) return child;
+    final double begin;
+    if (collapsing) {
+      begin = 1.0;
+    } else if (enterAnimated) {
+      begin = 0.0;
+    } else {
+      return child;
+    }
     return TweenAnimationBuilder<double>(
       key: ValueKey(key),
-      tween: Tween<double>(begin: 0.0, end: 1.0),
-      duration: const Duration(milliseconds: 200),
+      tween: Tween<double>(begin: begin, end: collapsing ? 0.0 : 1.0),
+      duration: const Duration(milliseconds: 170),
       curve: Curves.fastOutSlowIn,
       builder: (_, scale, c) {
         return Transform.scale(
@@ -826,7 +869,7 @@ class _GroupHeader extends ConsumerWidget {
                 ],
               ),
             ),
-            if (isExpand) ...[
+            if (isExpand || collapsing) ...[
               _buildActionScale(
                 key: 'locate_${group.name}',
                 child: IconButton(
