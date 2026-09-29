@@ -434,7 +434,7 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _reveal;
-  late SliverChildBuilderDelegate _delegate;
+  late Widget _list;
 
   @override
   void initState() {
@@ -450,7 +450,7 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       reverseCurve: Curves.easeInOutCubic.flipped,
     );
     _controller.addStatusListener(_handleStatus);
-    _delegate = _buildDelegate();
+    _syncList();
     if (widget.enterAnimated) {
       _controller.value = 1;
       _controller.reverse();
@@ -467,10 +467,10 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
         ..stop()
         ..value = 0;
     }
-    if (widget.rows.length != oldWidget.rows.length ||
+    if (!identical(widget.rows, oldWidget.rows) ||
         widget.columns != oldWidget.columns ||
         widget.cardType != oldWidget.cardType) {
-      _delegate = _buildDelegate();
+      _syncList();
     }
   }
 
@@ -487,10 +487,14 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     super.dispose();
   }
 
-  SliverChildBuilderDelegate _buildDelegate() {
-    return SliverChildBuilderDelegate(
-      (context, index) => _buildProxyRow(context, index),
-      childCount: widget.rows.length,
+  void _syncList() {
+    _list = SliverFixedExtentList(
+      itemExtent: getItemHeight(widget.cardType) + 8.0,
+      delegate: SliverChildBuilderDelegate(
+        (context, index) => _buildProxyRow(context, index),
+        childCount: widget.rows.length,
+        addAutomaticKeepAlives: false,
+      ),
     );
   }
 
@@ -527,13 +531,11 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       }
     }
 
-    return RepaintBoundary(
-      child: Padding(
-        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-        child: SizedBox(
-          height: getItemHeight(widget.cardType),
-          child: Row(children: rowChildren),
-        ),
+    return Padding(
+      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+      child: SizedBox(
+        height: getItemHeight(widget.cardType),
+        child: Row(children: rowChildren),
       ),
     );
   }
@@ -542,7 +544,8 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _controller,
-      builder: (context, _) {
+      child: _list,
+      builder: (context, list) {
         final collapsing = widget.collapseRequested;
         final progress = collapsing
             ? _controller.value
@@ -554,10 +557,7 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
           hidden: collapsing ? fade : 1 - fade,
           clipContent: widget.clipContent,
           surfaceColor: context.colorScheme.surface,
-          child: SliverFixedExtentList(
-            itemExtent: getItemHeight(widget.cardType) + 8.0,
-            delegate: _delegate,
-          ),
+          child: list!,
         );
       },
     );
@@ -610,6 +610,8 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
   );
 
   static const _edgeGap = 8.0;
+
+  final Paint _washPaint = Paint();
 
   double _factor;
   double _hidden;
@@ -729,7 +731,7 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
         : Size(washExtent, crossExtent);
     context.canvas.drawRect(
       (Offset.zero & washSize).shift(offset),
-      Paint()..color = _surfaceColor.withValues(alpha: hidden),
+      _washPaint..color = _surfaceColor.withValues(alpha: hidden),
     );
   }
 }
@@ -774,28 +776,32 @@ class _GroupHeader extends ConsumerWidget {
 
   static const _actionsWidth = 66.0;
 
-  Widget _buildActions(Widget actions) {
-    final double begin;
-    if (collapsing) {
-      begin = 1.0;
-    } else if (enterAnimated) {
-      begin = 0.0;
-    } else {
-      return actions;
-    }
+  Widget _buildActionScale({required Widget child, required String key}) {
+    if (!enterAnimated) return child;
     return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: begin, end: collapsing ? 0.0 : 1.0),
+      key: ValueKey(key),
+      tween: Tween<double>(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.fastOutSlowIn,
+      builder: (_, scale, c) {
+        return Transform.scale(
+          scale: scale,
+          alignment: Alignment.center,
+          child: c,
+        );
+      },
+      child: child,
+    );
+  }
+
+  Widget _buildCollapsingActions(Widget child) {
+    if (!collapsing) return child;
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 1.0, end: 0.0),
       duration: const Duration(milliseconds: 150),
       curve: Curves.fastOutSlowIn,
-      child: actions,
-      builder: (_, value, child) {
-        if (!collapsing) {
-          return Transform.scale(
-            scale: value,
-            alignment: Alignment.center,
-            child: child,
-          );
-        }
+      child: child,
+      builder: (_, value, c) {
         return ClipRect(
           child: SizedBox(
             width: _actionsWidth * value,
@@ -806,7 +812,7 @@ class _GroupHeader extends ConsumerWidget {
               child: Transform.scale(
                 scale: value,
                 alignment: Alignment.centerLeft,
-                child: child,
+                child: c,
               ),
             ),
           ),
@@ -890,43 +896,49 @@ class _GroupHeader extends ConsumerWidget {
               ),
             ),
             if (isExpand || collapsing) ...[
-              _buildActions(
+              _buildCollapsingActions(
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    IconButton(
-                      key: ValueKey('locate_${group.name}'),
-                      style: _circleButtonStyle,
-                      iconSize: 19,
-                      icon: const Icon(FluentIcons.target_arrow_24_regular),
-                      onPressed: onScrollToSelected,
-                      tooltip: appLocalizations.locate,
+                    _buildActionScale(
+                      key: 'locate_${group.name}',
+                      child: IconButton(
+                        key: ValueKey('locate_${group.name}'),
+                        style: _circleButtonStyle,
+                        iconSize: 19,
+                        icon: const Icon(FluentIcons.target_arrow_24_regular),
+                        onPressed: onScrollToSelected,
+                        tooltip: appLocalizations.locate,
+                      ),
                     ),
                     const SizedBox(width: 2),
-                    AnimatedBuilder(
-                      key: ValueKey('delay_test_${group.name}'),
-                      animation: delayTestCoordinator,
-                      builder: (_, _) {
-                        final isTestingThisGroup = delayTestCoordinator
-                            .isTestingGroup(group.name);
-                        return IconButton(
-                          style: _circleButtonStyle,
-                          iconSize: 20,
-                          icon: isTestingThisGroup
-                              ? SizedBox.square(
-                                  dimension: 18,
-                                  child: SpinKitFadingCircle(
-                                    color: context.colorScheme.primary,
-                                    size: 18,
-                                  ),
-                                )
-                              : const Icon(FluentIcons.top_speed_24_regular),
-                          onPressed: delayTestCoordinator.isTesting
-                              ? null
-                              : () => _delayTest(context),
-                          tooltip: appLocalizations.startTest,
-                        );
-                      },
+                    _buildActionScale(
+                      key: 'delay_${group.name}',
+                      child: AnimatedBuilder(
+                        key: ValueKey('delay_test_${group.name}'),
+                        animation: delayTestCoordinator,
+                        builder: (_, _) {
+                          final isTestingThisGroup = delayTestCoordinator
+                              .isTestingGroup(group.name);
+                          return IconButton(
+                            style: _circleButtonStyle,
+                            iconSize: 20,
+                            icon: isTestingThisGroup
+                                ? SizedBox.square(
+                                    dimension: 18,
+                                    child: SpinKitFadingCircle(
+                                      color: context.colorScheme.primary,
+                                      size: 18,
+                                    ),
+                                  )
+                                : const Icon(FluentIcons.top_speed_24_regular),
+                            onPressed: delayTestCoordinator.isTesting
+                                ? null
+                                : () => _delayTest(context),
+                            tooltip: appLocalizations.startTest,
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),
