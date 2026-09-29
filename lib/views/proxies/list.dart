@@ -829,35 +829,36 @@ class _GroupHeader extends ConsumerWidget {
   static const _actionsGap = 6.0;
   static const _actionsRightOffset = _expandButtonWidth + _actionsGap;
 
+  static const _actionsDuration = Duration(milliseconds: 200);
+
+  Widget _buildActionTransition(double value, Widget? child) {
+    return Opacity(
+      opacity: value,
+      child: Transform.scale(
+        scale: value,
+        alignment: Alignment.center,
+        child: child,
+      ),
+    );
+  }
+
   Widget _wrapAction({required Widget child, required String key}) {
     if (collapsing) {
       return TweenAnimationBuilder<double>(
         tween: Tween<double>(begin: 1.0, end: 0.0),
-        duration: const Duration(milliseconds: 200),
+        duration: _actionsDuration,
         curve: Curves.fastOutSlowIn,
         child: child,
-        builder: (_, scale, c) {
-          return Transform.scale(
-            scale: scale,
-            alignment: Alignment.center,
-            child: c,
-          );
-        },
+        builder: (_, value, c) => _buildActionTransition(value, c),
       );
     }
     if (!enterAnimated) return child;
     return TweenAnimationBuilder<double>(
       key: ValueKey(key),
       tween: Tween<double>(begin: 0.0, end: 1.0),
-      duration: const Duration(milliseconds: 200),
+      duration: _actionsDuration,
       curve: Curves.fastOutSlowIn,
-      builder: (_, scale, c) {
-        return Transform.scale(
-          scale: scale,
-          alignment: Alignment.center,
-          child: c,
-        );
-      },
+      builder: (_, value, c) => _buildActionTransition(value, c),
       child: child,
     );
   }
