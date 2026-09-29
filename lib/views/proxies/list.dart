@@ -120,6 +120,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     if (isExpanding) {
       tempUnfoldSet.add(groupName);
       _startEnterAnimated(groupName);
+      _autoScrollToGroup(groupName);
       _scheduleRevealScroll(groupName);
       if (_collapsingGroups.remove(groupName)) {
         setState(() {});
