@@ -13,6 +13,8 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:bett_box/widgets/animated_nav_icon.dart';
 
 class GoogleBottomNavBar extends ConsumerWidget {
+  static const double _blurSigma = 8.0;
+
   final List<NavigationItem> navigationItems;
   final int selectedIndex;
   final ValueChanged<int> onTabChange;
@@ -63,8 +65,6 @@ class GoogleBottomNavBar extends ConsumerWidget {
 
     final isLight = context.colorScheme.brightness == Brightness.light;
     final viewBottom = MediaQuery.viewPaddingOf(context).bottom;
-    final dpr = MediaQuery.of(context).devicePixelRatio;
-    final blurSigma = min(16.0, 20.0 / dpr);
     return RepaintBoundary(
       child: Padding(
         padding: EdgeInsets.only(bottom: max(viewBottom, 12.0)),
@@ -94,7 +94,10 @@ class GoogleBottomNavBar extends ConsumerWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(36),
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
+                filter: ImageFilter.blur(
+                  sigmaX: _blurSigma,
+                  sigmaY: _blurSigma,
+                ),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 9.0,
