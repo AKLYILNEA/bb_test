@@ -370,7 +370,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
             child: CustomScrollView(
               key: const PageStorageKey<String>('proxies_list'),
               controller: _scrollController,
-              cacheExtent: 500.0,
+              cacheExtent: 250.0,
               slivers: [
                 const SliverToBoxAdapter(child: SizedBox(height: 16)),
                 for (var i = 0; i < widget.groups.length; i++)
@@ -615,7 +615,6 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
   double _hidden;
   bool _clipContent;
   Color _surfaceColor;
-  SliverConstraints? _childConstraints;
 
   bool get clipContent => _clipContent;
 
@@ -659,10 +658,7 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
       geometry = SliverGeometry.zero;
       return;
     }
-    if (child.needsLayout || _childConstraints != constraints) {
-      child.layout(constraints, parentUsesSize: true);
-      _childConstraints = constraints;
-    }
+    child.layout(constraints, parentUsesSize: true);
     final childGeometry = child.geometry ?? SliverGeometry.zero;
     final factor = _factor;
     final maxPaintExtent = childGeometry.maxPaintExtent * factor;
