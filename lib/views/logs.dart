@@ -30,19 +30,7 @@ class _LogsViewState extends ConsumerState<LogsView>
     // empty state, so the page always opens unfiltered.
     ref.read(logsSearchProvider.notifier).state = '';
     ref.read(logsKeywordsProvider.notifier).state = [];
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!mounted) return;
-      await waitRouteSettled(context);
-      if (!mounted) return;
-      await _updateLogs();
-    });
-  }
-
-  Future<void> _updateLogs() async {
     clashCore.startLog();
-    final history = await clashCore.getLogs();
-    if (!mounted || history.isEmpty) return;
-    ref.read(logsProvider.notifier).setLogs(history);
   }
 
   @override

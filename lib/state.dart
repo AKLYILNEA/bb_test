@@ -189,6 +189,13 @@ class GlobalState {
     if (system.isAndroid) {
       _isAndroidTV = await app.isAndroidTV();
     }
+    if (!system.isDesktop && _isAndroidTV != true) {
+      // Touch-only highlight: list tiles read the highlight mode while they
+      // build, and a stale "traditional" read leaves a focus tint that looks
+      // like a second press after tapping.
+      FocusManager.instance.highlightStrategy =
+          FocusHighlightStrategy.alwaysTouch;
+    }
     config =
         await preferences.getConfig() ??
         Config(
