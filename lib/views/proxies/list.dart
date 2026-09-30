@@ -527,7 +527,7 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
         final veil = _controller.value;
         return _AnimatedExtentSliver(
           factor: factor,
-          clipContent: !widget.tail,
+          clipContent: animateSpace,
           veil: veil <= 0
               ? null
               : context.colorScheme.surface.withValues(alpha: veil),
