@@ -20,7 +20,6 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 /// 可见内容量由视口决定（任何组同屏都只有约 10~13 行），按"总节点数"拉长时长没有依据，
 /// 只会让大组显得慢；要调整手感只改这一个常量。
 const _listRevealDuration = Duration(milliseconds: 153);
-const _tailSlideDuration = Duration(milliseconds: 180);
 
 class ProxiesListView extends ConsumerWidget {
   const ProxiesListView({super.key});
@@ -387,11 +386,9 @@ class _GroupProxyListSliver extends StatefulWidget {
 }
 
 class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late final AnimationController _slideController;
   late final Animation<double> _reveal;
-  late final Animation<double> _slideReveal;
   late Widget _list;
 
   @override
@@ -401,22 +398,12 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       vsync: this,
       duration: _listRevealDuration,
     );
-    _slideController = AnimationController(
-      vsync: this,
-      duration: _tailSlideDuration,
-    );
     _reveal = CurvedAnimation(
       parent: _controller,
       curve: Curves.easeInOutCubic,
       reverseCurve: Curves.easeInOutCubic.flipped,
     );
-    _slideReveal = CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeInOutCubic,
-      reverseCurve: Curves.easeInOutCubic.flipped,
-    );
     _controller.addStatusListener(_handleStatus);
-    _slideController.addStatusListener(_handleSlideStatus);
     _syncList();
     if (widget.enterAnimated) {
       _controller.value = 1;
@@ -435,14 +422,10 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     if (widget.collapseRequested && !oldWidget.collapseRequested) {
       _controller.forward();
     } else if (!widget.collapseRequested && oldWidget.collapseRequested) {
-      if (_slideController.value > 0) {
-        _slideController.reverse();
-      }
       if (_controller.value > 0) {
         _controller.reverse();
       } else {
         _controller.stop();
-        _slideController.stop();
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
           widget.onEntered?.call();
@@ -475,27 +458,15 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
   void _handleStatus(AnimationStatus status) {
     if (!mounted) return;
     if (status == AnimationStatus.completed && widget.collapseRequested) {
-      if (widget.tail) {
-        _slideController.forward();
-      } else {
-        widget.onCollapsed?.call();
-      }
+      widget.onCollapsed?.call();
     } else if (status == AnimationStatus.dismissed && widget.enterAnimated) {
       widget.onEntered?.call();
-    }
-  }
-
-  void _handleSlideStatus(AnimationStatus status) {
-    if (!mounted) return;
-    if (status == AnimationStatus.completed && widget.collapseRequested) {
-      widget.onCollapsed?.call();
     }
   }
 
   @override
   void dispose() {
     _controller.dispose();
-    _slideController.dispose();
     super.dispose();
   }
 
@@ -557,22 +528,15 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: Listenable.merge([_controller, _slideController]),
+    return AnimatedBuilder(
+      animation: _controller,
       child: _list,
       builder: (context, list) {
-        final double factor;
-        final bool clipContent;
-        if (widget.tail) {
-          factor = 1.0 - _slideReveal.value;
-          clipContent = _slideController.value > 0;
-        } else {
-          factor = 1.0 - _reveal.value;
-          clipContent = true;
-        }
+        final factor = 1.0 - _reveal.value;
+        final clipContent = !widget.tail;
         final veil = _controller.value;
         return _AnimatedExtentSliver(
-          factor: factor,
+          factor: widget.tail && !widget.collapseRequested ? 1.0 : factor,
           clipContent: clipContent,
           veil: veil <= 0
               ? null
