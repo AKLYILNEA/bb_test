@@ -10,6 +10,10 @@ const _duration = Duration(milliseconds: 500);
 const double _dimAmount = 0.55;
 const double _fallbackCornerRadius = 28.0;
 
+/// Fraction of the exit after which the dimming is gone: leaving should clear
+/// the dim early instead of holding it until the very end.
+const double _dimExitFraction = 0.55;
+
 double _screenCornerRadius = 0;
 
 double get screenCornerRadius =>
@@ -103,24 +107,81 @@ Widget buildPageTransition<T>(
 
 /// Dims the page below while this route is moving. Driven by the route's own
 /// animation, so it never follows a proxy animation that swaps mid-flight.
-class _DimScrim extends StatelessWidget {
+///
+/// Entering follows the spring curve. Leaving does not run that curve backwards
+/// and does not switch to another curve either: the route's reverse is
+/// compressed to `duration × value`, so a transition interrupted right after it
+/// started would take the dim down with it in a few dozen milliseconds — and a
+/// curve switch on the flip frame drops it from the spring's value to nothing at
+/// all in that same frame, which is what flashed the page below back to full
+/// brightness. Instead the exit keeps the depth that is on screen right now (the
+/// first reverse frame is exactly the last enter frame) and fades from there on
+/// a clock of its own, gone after [_dimExitFraction] of it.
+class _DimScrim extends StatefulWidget {
   const _DimScrim({required this.animation});
 
   final Animation<double> animation;
 
+  @override
+  State<_DimScrim> createState() => _DimScrimState();
+}
+
+class _DimScrimState extends State<_DimScrim>
+    with SingleTickerProviderStateMixin {
   static const Curve _curve = PageTransitionCurve();
+
+  /// The exit clock: it runs the full `_duration`, so an interrupted enter
+  /// still gets a real fade instead of the few milliseconds its reverse takes.
+  late final AnimationController _exit;
+
+  @override
+  void initState() {
+    super.initState();
+    _exit = AnimationController(vsync: this, duration: _duration);
+    widget.animation.addStatusListener(_handleStatus);
+  }
+
+  @override
+  void didUpdateWidget(covariant _DimScrim oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.animation != widget.animation) {
+      oldWidget.animation.removeStatusListener(_handleStatus);
+      widget.animation.addStatusListener(_handleStatus);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.animation.removeStatusListener(_handleStatus);
+    _exit.dispose();
+    super.dispose();
+  }
+
+  void _handleStatus(AnimationStatus status) {
+    if (status == AnimationStatus.reverse) {
+      // Leaving: start the exit clock at zero, so the factor is exactly 1 on
+      // this frame and the dim keeps the depth it already has.
+      _exit.forward(from: 0);
+      return;
+    }
+    _exit.stop();
+    _exit.value = 0;
+  }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: animation,
+      animation: Listenable.merge([widget.animation, _exit]),
       builder: (context, _) {
+        final Animation<double> animation = widget.animation;
         if (!animation.isAnimating) return const SizedBox.shrink();
-        // Reverse fades out earlier, so the dim is gone by the time the previous
-        // page is fully back; forward keeps the spring curve.
-        final double progress = animation.status == AnimationStatus.reverse
-            ? Curves.easeInCubic.transform(animation.value)
-            : _curve.transform(animation.value);
+        double progress = _curve.transform(animation.value);
+        if (animation.status == AnimationStatus.reverse) {
+          progress *= 1 -
+              Curves.easeOutCubic.transform(
+                math.min(_exit.value / _dimExitFraction, 1),
+              );
+        }
         if (progress <= 0) return const SizedBox.shrink();
         return IgnorePointer(
           child: ColoredBox(
