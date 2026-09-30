@@ -20,60 +20,29 @@ class LogsView extends ConsumerStatefulWidget {
 class _LogsViewState extends ConsumerState<LogsView>
     with WidgetsBindingObserver {
   late final ScrollController _scrollController;
-  var _autoScrollToEnd = false;
 
   @override
   void initState() {
     super.initState();
-    _scrollController = ReverseScrollController();
+    _scrollController = ScrollController();
     WidgetsBinding.instance.addObserver(this);
-    _startLog();
-  }
-
-  // The in-memory list is dropped so the entry transition stays on the
-  // illustration; the core-side window is restored once the route has settled,
-  // which is also when live streaming starts (the core keeps recording while
-  // this page is closed, so nothing from the transition is lost).
-  void _startLog() {
-    ref.read(logsProvider.notifier).clearLogs();
+    // A filter left over from the last visit would hide rows and fake an
+    // empty state, so the page always opens unfiltered.
     ref.read(logsSearchProvider.notifier).state = '';
     ref.read(logsKeywordsProvider.notifier).state = [];
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       await waitRouteSettled(context);
       if (!mounted) return;
-      clashCore.startLog();
-      await _restoreLogs();
+      await _updateLogs();
     });
   }
 
-  Future<void> _restoreLogs() async {
+  Future<void> _updateLogs() async {
+    clashCore.startLog();
     final history = await clashCore.getLogs();
     if (!mounted || history.isEmpty) return;
-    final received = ref.read(logsProvider).list;
-    final receivedKeys = received
-        .map((item) => '${item.dateTime}\u0000${item.payload}')
-        .toSet();
-    ref.read(logsProvider.notifier).setLogs([
-      ...history.where(
-        (item) => !receivedKeys.contains('${item.dateTime}\u0000${item.payload}'),
-      ),
-      ...received,
-    ]);
-    _jumpToEnd();
-  }
-
-  // The entry snapshot must land on the tail (newest at the visual top).
-  void _jumpToEnd() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || !_scrollController.hasClients) return;
-      final positions = _scrollController.positions;
-      if (positions.isEmpty) return;
-      final position = positions.last;
-      if (position.pixels != position.maxScrollExtent) {
-        position.jumpTo(position.maxScrollExtent);
-      }
-    });
+    ref.read(logsProvider.notifier).setLogs(history);
   }
 
   @override
@@ -99,20 +68,6 @@ class _LogsViewState extends ConsumerState<LogsView>
 
   void _onKeywordsUpdate(List<String> keywords) {
     ref.read(logsKeywordsProvider.notifier).state = keywords;
-  }
-
-  void _toggleAutoScroll() {
-    setState(() {
-      _autoScrollToEnd = !_autoScrollToEnd;
-    });
-  }
-
-  void _cancelAutoScroll() {
-    if (_autoScrollToEnd) {
-      setState(() {
-        _autoScrollToEnd = false;
-      });
-    }
   }
 
   Future<void> _handleLogLevelSettings() async {
@@ -161,25 +116,12 @@ class _LogsViewState extends ConsumerState<LogsView>
   @override
   Widget build(BuildContext context) {
     final logs = ref.watch(filteredLogsProvider);
-    final hasLogs = logs.isNotEmpty;
     return CommonScaffold(
       actions: [
         IconButton(
           onPressed: _handleLogLevelSettings,
           icon: const Icon(FluentIcons.settings_24_regular),
           tooltip: appLocalizations.logLevel,
-        ),
-        IconButton(
-          style: _autoScrollToEnd
-              ? ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(
-                    context.colorScheme.secondaryContainer,
-                  ),
-                )
-              : null,
-          onPressed: _toggleAutoScroll,
-          tooltip: appLocalizations.autoScroll,
-          icon: const Icon(FluentIcons.swipe_up_24_regular),
         ),
         Tooltip(
           message: appLocalizations.export,
@@ -198,43 +140,30 @@ class _LogsViewState extends ConsumerState<LogsView>
       searchState: AppBarSearchState(onSearch: _onSearch),
       title: appLocalizations.logs,
       body: NullStatusSwitcher(
-        isEmpty: !hasLogs,
+        isEmpty: logs.isEmpty,
         nullStatus: NullStatus(
           label: appLocalizations.nullTip(appLocalizations.logs),
           illustration: NullStatusIllustration.logs,
         ),
-        child: ScrollToEndBox(
-          onCancelToEnd: _cancelAutoScroll,
+        child: CommonScrollBar(
           controller: _scrollController,
-          enable: _autoScrollToEnd,
-          reverse: true,
-          dataSource: logs,
-          child: CommonScrollBar(
+          child: ListView.builder(
+            physics: const NextClampingScrollPhysics(),
             controller: _scrollController,
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: ListView.builder(
-                physics: const NextClampingScrollPhysics(),
-                reverse: true,
-                shrinkWrap: logs.length < 20,
-                controller: _scrollController,
-                padding: const EdgeInsets.only(bottom: 16, top: 8),
-                itemBuilder: (context, index) {
-                  final log = logs[index];
-                  return LogItem(
-                    key: ValueKey(log.dateTime),
-                    index: index,
-                    count: logs.length,
-                    reversed: true,
-                    log: log,
-                    onClick: (value) {
-                      context.commonScaffoldState?.addKeyword(value);
-                    },
-                  );
+            padding: const EdgeInsets.only(bottom: 16, top: 8),
+            itemBuilder: (context, index) {
+              final log = logs[index];
+              return LogItem(
+                key: ValueKey(log.dateTime),
+                index: index,
+                count: logs.length,
+                log: log,
+                onClick: (value) {
+                  context.commonScaffoldState?.addKeyword(value);
                 },
-                itemCount: logs.length,
-              ),
-            ),
+              );
+            },
+            itemCount: logs.length,
           ),
         ),
       ),
