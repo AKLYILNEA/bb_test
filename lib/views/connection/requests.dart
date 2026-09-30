@@ -29,15 +29,32 @@ class _RequestsViewState extends ConsumerState<RequestsView>
     _startTrack();
   }
 
-  // Clean session per entry: the core keeps recording requests into a global
-  // ring buffer even while this page is closed, so dropping that tail plus the
-  // in-memory list and filters keeps the entry frame on the illustration.
+  // The in-memory list is dropped so the entry transition stays on the
+  // illustration; the core-side window is restored once the route has settled,
+  // which is also when live tracking starts (the core keeps recording while
+  // this page is closed, so nothing from the transition is lost).
   void _startTrack() {
     ref.read(requestsProvider.notifier).clearRequests();
     ref.read(requestsSearchProvider.notifier).state = '';
     ref.read(requestsKeywordsProvider.notifier).state = [];
-    clashCore.clearRequests();
-    clashCore.startTrackRequests();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      await waitRouteSettled(context);
+      if (!mounted) return;
+      clashCore.startTrackRequests();
+      await _restoreRequests();
+    });
+  }
+
+  Future<void> _restoreRequests() async {
+    final history = await clashCore.getRequests();
+    if (!mounted || history.isEmpty) return;
+    final received = ref.read(requestsProvider).list;
+    final receivedIds = received.map((item) => item.id).toSet();
+    ref.read(requestsProvider.notifier).setRequests([
+      ...history.where((item) => !receivedIds.contains(item.id)),
+      ...received,
+    ]);
   }
 
   @override

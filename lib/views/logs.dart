@@ -30,15 +30,36 @@ class _LogsViewState extends ConsumerState<LogsView>
     _startLog();
   }
 
-  // Clean session per entry: the core keeps recording logs into a global ring
-  // buffer even while this page is closed, so dropping that tail plus the
-  // in-memory list and filters keeps the entry frame on the illustration.
+  // The in-memory list is dropped so the entry transition stays on the
+  // illustration; the core-side window is restored once the route has settled,
+  // which is also when live streaming starts (the core keeps recording while
+  // this page is closed, so nothing from the transition is lost).
   void _startLog() {
     ref.read(logsProvider.notifier).clearLogs();
     ref.read(logsSearchProvider.notifier).state = '';
     ref.read(logsKeywordsProvider.notifier).state = [];
-    clashCore.clearLogs();
-    clashCore.startLog();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      await waitRouteSettled(context);
+      if (!mounted) return;
+      clashCore.startLog();
+      await _restoreLogs();
+    });
+  }
+
+  Future<void> _restoreLogs() async {
+    final history = await clashCore.getLogs();
+    if (!mounted || history.isEmpty) return;
+    final received = ref.read(logsProvider).list;
+    final receivedKeys = received
+        .map((item) => '${item.dateTime}\u0000${item.payload}')
+        .toSet();
+    ref.read(logsProvider.notifier).setLogs([
+      ...history.where(
+        (item) => !receivedKeys.contains('${item.dateTime}\u0000${item.payload}'),
+      ),
+      ...received,
+    ]);
   }
 
   @override
