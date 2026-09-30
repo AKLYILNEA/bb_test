@@ -55,6 +55,20 @@ class _RequestsViewState extends ConsumerState<RequestsView>
       ...history.where((item) => !receivedIds.contains(item.id)),
       ...received,
     ]);
+    _jumpToEnd();
+  }
+
+  // The entry snapshot must land on the tail (newest at the visual top).
+  void _jumpToEnd() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scrollController.hasClients) return;
+      final positions = _scrollController.positions;
+      if (positions.isEmpty) return;
+      final position = positions.last;
+      if (position.pixels != position.maxScrollExtent) {
+        position.jumpTo(position.maxScrollExtent);
+      }
+    });
   }
 
   @override
