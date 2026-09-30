@@ -248,7 +248,12 @@ class WindowHeaderContainer extends StatelessWidget {
                 Expanded(flex: 1, child: child!),
               ],
             ),
-            const WindowHeader(),
+            const Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: WindowHeader(),
+            ),
           ],
         );
       },
@@ -396,30 +401,35 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      child: Stack(
-        alignment: AlignmentDirectional.center,
-        children: [
-          Positioned(
-            child: GestureDetector(
-              onPanStart: (_) {
-                windowManager.startDragging();
-              },
-              onDoubleTap: () {
-                _updateMaximized();
-              },
-              child: Container(
-                color: context.colorScheme.secondary.opacity15,
-                alignment: Alignment.centerLeft,
-                height: kHeaderHeight,
+      shape: Border(
+        bottom: BorderSide(color: context.colorScheme.outlineVariant),
+      ),
+      child: SizedBox(
+        height: kHeaderHeight,
+        child: Stack(
+          alignment: AlignmentDirectional.center,
+          children: [
+            Positioned.fill(
+              child: GestureDetector(
+                onPanStart: (_) {
+                  windowManager.startDragging();
+                },
+                onDoubleTap: () {
+                  _updateMaximized();
+                },
+                child: Container(
+                  color: context.colorScheme.secondary.opacity15,
+                  alignment: Alignment.centerLeft,
+                ),
               ),
             ),
-          ),
-          if (system.isMacOS)
-            const Text(appName)
-          else ...[
-            Positioned(right: 0, child: _buildActions()),
+            if (system.isMacOS)
+              const Text(appName)
+            else ...[
+              Positioned(right: 0, child: _buildActions()),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

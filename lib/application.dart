@@ -236,8 +236,10 @@ class ApplicationState extends ConsumerState<Application>
                             enabled: enabled,
                             child: AppEnvManager(
                               child: _buildApp(
-                                AppSidebarContainer(
-                                  child: _buildPlatformApp(child!),
+                                _buildPlatformApp(
+                                  AppSidebarContainer(
+                                    child: child!,
+                                  ),
                                 ),
                               ),
                             ),
