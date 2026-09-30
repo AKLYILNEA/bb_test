@@ -20,6 +20,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 /// 可见内容量由视口决定（任何组同屏都只有约 10~13 行），按"总节点数"拉长时长没有依据，
 /// 只会让大组显得慢；要调整手感只改这一个常量。
 const _listRevealDuration = Duration(milliseconds: 153);
+const _tailSlideDuration = Duration(milliseconds: 180);
 
 class ProxiesListView extends ConsumerWidget {
   const ProxiesListView({super.key});
@@ -73,6 +74,21 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   double _containerHeight = 0;
   final Set<String> _enterGroups = <String>{};
   final Set<String> _collapsingGroups = <String>{};
+  late Set<String> _unfoldSet;
+
+  @override
+  void initState() {
+    super.initState();
+    _unfoldSet = Set<String>.from(widget.currentUnfoldSet);
+  }
+
+  @override
+  void didUpdateWidget(covariant _ProxyGroupsList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.currentUnfoldSet != widget.currentUnfoldSet) {
+      _unfoldSet = Set<String>.from(widget.currentUnfoldSet);
+    }
+  }
 
   @override
   void dispose() {
@@ -81,22 +97,19 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   }
 
   void _handleToggle(String groupName) {
-    final tempUnfoldSet = Set<String>.from(widget.currentUnfoldSet);
-    final isExpanding = !tempUnfoldSet.contains(groupName);
-    if (isExpanding) {
-      tempUnfoldSet.add(groupName);
-      _enterGroups.add(groupName);
-      if (_collapsingGroups.remove(groupName)) {
-        setState(() {});
-      }
-    } else {
-      tempUnfoldSet.remove(groupName);
-      _enterGroups.remove(groupName);
-      setState(() {
+    final isExpanding = !_unfoldSet.contains(groupName);
+    setState(() {
+      if (isExpanding) {
+        _unfoldSet.add(groupName);
+        _enterGroups.add(groupName);
+        _collapsingGroups.remove(groupName);
+      } else {
+        _unfoldSet.remove(groupName);
+        _enterGroups.remove(groupName);
         _collapsingGroups.add(groupName);
-      });
-    }
-    globalState.appController.updateCurrentUnfoldSet(tempUnfoldSet);
+      }
+    });
+    globalState.appController.updateCurrentUnfoldSet(Set<String>.from(_unfoldSet));
   }
 
   GroupOffsets _getGroupOffsets({
@@ -304,7 +317,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
         _groupOffsets = _getGroupOffsets(
           groups: widget.groups,
           columns: widget.columns,
-          currentUnfoldSet: widget.currentUnfoldSet,
+          currentUnfoldSet: _unfoldSet,
           cardType: widget.cardType,
         );
 
@@ -321,10 +334,10 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
                 _buildGroup(
                   context,
                   group: widget.groups[i],
-                  isExpand: widget.currentUnfoldSet.contains(
+                  isExpand: _unfoldSet.contains(
                     widget.groups[i].name,
                   ),
-                    enterAnimated: _enterGroups.contains(widget.groups[i].name),
+                  enterAnimated: _enterGroups.contains(widget.groups[i].name),
                     isLast: i == widget.groups.length - 1,
                     columns: widget.columns,
                     cardType: widget.cardType,
@@ -374,9 +387,11 @@ class _GroupProxyListSliver extends StatefulWidget {
 }
 
 class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _controller;
+  late final AnimationController _slideController;
   late final Animation<double> _reveal;
+  late final Animation<double> _slideReveal;
   late Widget _list;
 
   @override
@@ -386,12 +401,22 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       vsync: this,
       duration: _listRevealDuration,
     );
+    _slideController = AnimationController(
+      vsync: this,
+      duration: _tailSlideDuration,
+    );
     _reveal = CurvedAnimation(
       parent: _controller,
       curve: Curves.easeInOutCubic,
       reverseCurve: Curves.easeInOutCubic.flipped,
     );
+    _slideReveal = CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeInOutCubic,
+      reverseCurve: Curves.easeInOutCubic.flipped,
+    );
     _controller.addStatusListener(_handleStatus);
+    _slideController.addStatusListener(_handleSlideStatus);
     _syncList();
     if (widget.enterAnimated) {
       _controller.value = 1;
@@ -410,10 +435,14 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     if (widget.collapseRequested && !oldWidget.collapseRequested) {
       _controller.forward();
     } else if (!widget.collapseRequested && oldWidget.collapseRequested) {
+      if (_slideController.value > 0) {
+        _slideController.reverse();
+      }
       if (_controller.value > 0) {
         _controller.reverse();
       } else {
         _controller.stop();
+        _slideController.stop();
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
           widget.onEntered?.call();
@@ -446,15 +475,27 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
   void _handleStatus(AnimationStatus status) {
     if (!mounted) return;
     if (status == AnimationStatus.completed && widget.collapseRequested) {
-      widget.onCollapsed?.call();
+      if (widget.tail) {
+        _slideController.forward();
+      } else {
+        widget.onCollapsed?.call();
+      }
     } else if (status == AnimationStatus.dismissed && widget.enterAnimated) {
       widget.onEntered?.call();
+    }
+  }
+
+  void _handleSlideStatus(AnimationStatus status) {
+    if (!mounted) return;
+    if (status == AnimationStatus.completed && widget.collapseRequested) {
+      widget.onCollapsed?.call();
     }
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _slideController.dispose();
     super.dispose();
   }
 
@@ -516,16 +557,23 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
+    return ListenableBuilder(
+      listenable: Listenable.merge([_controller, _slideController]),
       child: _list,
       builder: (context, list) {
-        final animateSpace = !widget.tail;
-        final factor = animateSpace ? 1 - _reveal.value : 1.0;
+        final double factor;
+        final bool clipContent;
+        if (widget.tail) {
+          factor = 1.0 - _slideReveal.value;
+          clipContent = _slideController.value > 0;
+        } else {
+          factor = 1.0 - _reveal.value;
+          clipContent = true;
+        }
         final veil = _controller.value;
         return _AnimatedExtentSliver(
           factor: factor,
-          clipContent: animateSpace,
+          clipContent: clipContent,
           veil: veil <= 0
               ? null
               : context.colorScheme.surface.withValues(alpha: veil),
