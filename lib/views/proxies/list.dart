@@ -377,7 +377,6 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _reveal;
-  late final Animation<double> _rowFade;
   late Widget _list;
 
   @override
@@ -392,7 +391,6 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       curve: Curves.easeInOutCubic,
       reverseCurve: Curves.easeInOutCubic.flipped,
     );
-    _rowFade = Tween<double>(begin: 1.0, end: 0.0).animate(_controller);
     _controller.addStatusListener(_handleStatus);
     _syncList();
     if (widget.enterAnimated) {
@@ -504,11 +502,14 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       }
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-      child: SizedBox(
-        height: getItemHeight(widget.cardType),
-        child: Row(children: rowChildren),
+    // 单独一层：展开时后续各行是整体位移，有隔离层就只需合成层平移，不必重录重绘。
+    return RepaintBoundary(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+        child: SizedBox(
+          height: getItemHeight(widget.cardType),
+          child: Row(children: rowChildren),
+        ),
       ),
     );
   }
@@ -521,14 +522,16 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       builder: (context, list) {
         final animateSpace = !widget.tail || widget.collapseRequested;
         final factor = animateSpace ? 1 - _reveal.value : 1.0;
-        final extentSliver = _AnimatedExtentSliver(
+        // 展开淡入改用"同色底盖一层"（混色等价），不再用 SliverFadeTransition：
+        // 那个离屏层按展开面积每帧新建，手机上可达数 MB/帧。
+        final veil = _controller.value;
+        return _AnimatedExtentSliver(
           factor: factor,
           clipContent: !widget.tail,
+          veil: veil <= 0
+              ? null
+              : context.colorScheme.surface.withValues(alpha: veil),
           child: list!,
-        );
-        return SliverFadeTransition(
-          opacity: _rowFade,
-          sliver: extentSliver,
         );
       },
     );
@@ -538,16 +541,18 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
 class _AnimatedExtentSliver extends SingleChildRenderObjectWidget {
   final double factor;
   final bool clipContent;
+  final Color? veil;
 
   const _AnimatedExtentSliver({
     required super.child,
     required this.factor,
     required this.clipContent,
+    this.veil,
   });
 
   @override
   _RenderAnimatedExtentSliver createRenderObject(BuildContext context) {
-    return _RenderAnimatedExtentSliver(factor, clipContent);
+    return _RenderAnimatedExtentSliver(factor, clipContent, veil);
   }
 
   @override
@@ -557,23 +562,33 @@ class _AnimatedExtentSliver extends SingleChildRenderObjectWidget {
   ) {
     renderObject
       ..factor = factor
-      ..clipContent = clipContent;
+      ..clipContent = clipContent
+      ..veil = veil;
   }
 }
 
 class _RenderAnimatedExtentSliver extends RenderProxySliver {
-  _RenderAnimatedExtentSliver(this._factor, this._clipContent);
+  _RenderAnimatedExtentSliver(this._factor, this._clipContent, this._veil);
 
   static const _edgeGap = 8.0;
 
   double _factor;
   bool _clipContent;
+  Color? _veil;
 
   bool get clipContent => _clipContent;
 
   set clipContent(bool value) {
     if (_clipContent == value) return;
     _clipContent = value;
+    markNeedsPaint();
+  }
+
+  Color? get veil => _veil;
+
+  set veil(Color? value) {
+    if (_veil == value) return;
+    _veil = value;
     markNeedsPaint();
   }
 
@@ -634,6 +649,7 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
     if (!_clipContent || factor >= 1.0) {
       layer = null;
       super.paint(context, offset);
+      _paintVeil(context, offset);
       return;
     }
     final paintExtent = geometry?.paintExtent ?? 0.0;
@@ -651,9 +667,26 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
       needsCompositing,
       offset,
       Offset.zero & coreSize,
-      (context, offset) => super.paint(context, offset),
+      (context, offset) {
+        super.paint(context, offset);
+        _paintVeil(context, offset);
+      },
       oldLayer: layer as ClipRectLayer?,
     );
+  }
+
+  /// 用页面底色按当前透明度盖住整块揭示区域：行仍然是不透明绘制，
+  /// 混色结果与"整片透明度淡入"相同，但不需要离屏层。
+  void _paintVeil(PaintingContext context, Offset offset) {
+    final veil = _veil;
+    if (veil == null) return;
+    final paintExtent = geometry?.paintExtent ?? 0.0;
+    if (paintExtent <= 0) return;
+    final crossExtent = constraints.crossAxisExtent;
+    final size = constraints.axis == Axis.vertical
+        ? Size(crossExtent, paintExtent)
+        : Size(paintExtent, crossExtent);
+    context.canvas.drawRect(offset & size, Paint()..color = veil);
   }
 }
 
