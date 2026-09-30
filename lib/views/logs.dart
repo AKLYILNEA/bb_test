@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:bett_box/clash/clash.dart';
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
@@ -23,27 +21,24 @@ class _LogsViewState extends ConsumerState<LogsView>
     with WidgetsBindingObserver {
   late final ScrollController _scrollController;
   var _autoScrollToEnd = false;
-  var _settled = false;
-  var _loaded = false;
-  var _settleWatchStarted = false;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ReverseScrollController();
     WidgetsBinding.instance.addObserver(this);
-    ref.read(logsProvider.notifier).clearLogs();
-    _initLogs();
+    _startLog();
   }
 
-  void _initLogs() async {
+  // Clean session per entry: the core keeps recording logs into a global ring
+  // buffer even while this page is closed, so dropping that tail plus the
+  // in-memory list and filters keeps the entry frame on the illustration.
+  void _startLog() {
+    ref.read(logsProvider.notifier).clearLogs();
+    ref.read(logsSearchProvider.notifier).state = '';
+    ref.read(logsKeywordsProvider.notifier).state = [];
+    clashCore.clearLogs();
     clashCore.startLog();
-    final history = await clashCore.getLogs();
-    if (!mounted) return;
-    if (history.isNotEmpty) {
-      ref.read(logsProvider.notifier).setLogs(history);
-    }
-    setState(() => _loaded = true);
   }
 
   @override
@@ -51,21 +46,8 @@ class _LogsViewState extends ConsumerState<LogsView>
     if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
       clashCore.stopLog();
     } else if (state == AppLifecycleState.resumed) {
-      _initLogs();
+      clashCore.startLog();
     }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_settleWatchStarted) return;
-    _settleWatchStarted = true;
-    unawaited(
-      waitRouteSettled(context).then((_) {
-        if (!mounted) return;
-        setState(() => _settled = true);
-      }),
-    );
   }
 
   @override
@@ -180,45 +162,47 @@ class _LogsViewState extends ConsumerState<LogsView>
       onKeywordsUpdate: _onKeywordsUpdate,
       searchState: AppBarSearchState(onSearch: _onSearch),
       title: appLocalizations.logs,
-      body: !hasLogs
-          ? NullStatus(
-              label: appLocalizations.nullTip(appLocalizations.logs),
-              illustration: NullStatusIllustration.logs,
-            )
-          : ScrollToEndBox(
-              onCancelToEnd: _cancelAutoScroll,
-              controller: _scrollController,
-              enable: _autoScrollToEnd,
-              reverse: true,
-              dataSource: logs,
-              child: CommonScrollBar(
+      body: NullStatusSwitcher(
+        isEmpty: !hasLogs,
+        nullStatus: NullStatus(
+          label: appLocalizations.nullTip(appLocalizations.logs),
+          illustration: NullStatusIllustration.logs,
+        ),
+        child: ScrollToEndBox(
+          onCancelToEnd: _cancelAutoScroll,
+          controller: _scrollController,
+          enable: _autoScrollToEnd,
+          reverse: true,
+          dataSource: logs,
+          child: CommonScrollBar(
+            controller: _scrollController,
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: ListView.builder(
+                physics: const NextClampingScrollPhysics(),
+                reverse: true,
+                shrinkWrap: logs.length < 20,
                 controller: _scrollController,
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: ListView.builder(
-                    physics: const NextClampingScrollPhysics(),
-                    reverse: true,
-                    shrinkWrap: logs.length < 20,
-                    controller: _scrollController,
-                    padding: const EdgeInsets.only(bottom: 16, top: 8),
-                    itemBuilder: (context, index) {
-                      final log = logs[index];
-                      return LogItem(
-                        key: ValueKey(log.dateTime),
-                        index: index,
-                        count: logs.length,
-                        reversed: true,
-                        log: log,
-                        onClick: (value) {
-                          context.commonScaffoldState?.addKeyword(value);
-                        },
-                      );
+                padding: const EdgeInsets.only(bottom: 16, top: 8),
+                itemBuilder: (context, index) {
+                  final log = logs[index];
+                  return LogItem(
+                    key: ValueKey(log.dateTime),
+                    index: index,
+                    count: logs.length,
+                    reversed: true,
+                    log: log,
+                    onClick: (value) {
+                      context.commonScaffoldState?.addKeyword(value);
                     },
-                    itemCount: logs.length,
-                  ),
-                ),
+                  );
+                },
+                itemCount: logs.length,
               ),
             ),
+          ),
+        ),
+      ),
     );
   }
 }

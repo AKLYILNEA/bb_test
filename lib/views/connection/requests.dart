@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:bett_box/clash/clash.dart';
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/models/models.dart';
@@ -22,27 +20,24 @@ class _RequestsViewState extends ConsumerState<RequestsView>
     with WidgetsBindingObserver {
   late final ScrollController _scrollController;
   var _autoScrollToEnd = false;
-  var _settled = false;
-  var _loaded = false;
-  var _settleWatchStarted = false;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ReverseScrollController();
     WidgetsBinding.instance.addObserver(this);
-    ref.read(requestsProvider.notifier).clearRequests();
-    _initRequests();
+    _startTrack();
   }
 
-  void _initRequests() async {
+  // Clean session per entry: the core keeps recording requests into a global
+  // ring buffer even while this page is closed, so dropping that tail plus the
+  // in-memory list and filters keeps the entry frame on the illustration.
+  void _startTrack() {
+    ref.read(requestsProvider.notifier).clearRequests();
+    ref.read(requestsSearchProvider.notifier).state = '';
+    ref.read(requestsKeywordsProvider.notifier).state = [];
+    clashCore.clearRequests();
     clashCore.startTrackRequests();
-    final history = await clashCore.getRequests();
-    if (!mounted) return;
-    if (history.isNotEmpty) {
-      ref.read(requestsProvider.notifier).setRequests(history);
-    }
-    setState(() => _loaded = true);
   }
 
   @override
@@ -50,21 +45,8 @@ class _RequestsViewState extends ConsumerState<RequestsView>
     if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
       clashCore.stopTrackRequests();
     } else if (state == AppLifecycleState.resumed) {
-      _initRequests();
+      clashCore.startTrackRequests();
     }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_settleWatchStarted) return;
-    _settleWatchStarted = true;
-    unawaited(
-      waitRouteSettled(context).then((_) {
-        if (!mounted) return;
-        setState(() => _settled = true);
-      }),
-    );
   }
 
   @override
@@ -128,50 +110,52 @@ class _RequestsViewState extends ConsumerState<RequestsView>
       ],
       searchState: AppBarSearchState(onSearch: _onSearch),
       onKeywordsUpdate: _onKeywordsUpdate,
-      body: !hasRequests
-          ? NullStatus(
-              label: appLocalizations.nullTip(appLocalizations.requests),
-              illustration: NullStatusIllustration.requests,
-            )
-          : CommonScrollBar(
-              trackVisibility: false,
-              controller: _scrollController,
-              child: ScrollToEndBox(
-                controller: _scrollController,
-                dataSource: requests,
-                enable: _autoScrollToEnd,
+      body: NullStatusSwitcher(
+        isEmpty: !hasRequests,
+        nullStatus: NullStatus(
+          label: appLocalizations.nullTip(appLocalizations.requests),
+          illustration: NullStatusIllustration.requests,
+        ),
+        child: CommonScrollBar(
+          trackVisibility: false,
+          controller: _scrollController,
+          child: ScrollToEndBox(
+            controller: _scrollController,
+            dataSource: requests,
+            enable: _autoScrollToEnd,
+            reverse: true,
+            onCancelToEnd: _cancelAutoScroll,
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: ListView.builder(
                 reverse: true,
-                onCancelToEnd: _cancelAutoScroll,
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: ListView.builder(
-                    reverse: true,
-                    shrinkWrap: requests.length < 20,
-                    physics: const NextClampingScrollPhysics(),
-                    controller: _scrollController,
-                    padding: const EdgeInsets.only(bottom: 16, top: 8),
-                    itemBuilder: (context, index) {
-                      final trackerInfo = requests[index];
-                      return TrackerInfoItem(
-                        key: ValueKey(trackerInfo.id),
-                        index: index,
-                        count: requests.length,
-                        reversed: true,
-                        trackerInfo: trackerInfo,
-                        onClickKeyword: (value) {
-                          context.commonScaffoldState?.addKeyword(value);
-                        },
-                        detailTitle: appLocalizations.details,
-                      );
+                shrinkWrap: requests.length < 20,
+                physics: const NextClampingScrollPhysics(),
+                controller: _scrollController,
+                padding: const EdgeInsets.only(bottom: 16, top: 8),
+                itemBuilder: (context, index) {
+                  final trackerInfo = requests[index];
+                  return TrackerInfoItem(
+                    key: ValueKey(trackerInfo.id),
+                    index: index,
+                    count: requests.length,
+                    reversed: true,
+                    trackerInfo: trackerInfo,
+                    onClickKeyword: (value) {
+                      context.commonScaffoldState?.addKeyword(value);
                     },
-                    itemExtentBuilder: (index, _) {
-                      return TrackerInfoItem.height + 8;
-                    },
-                    itemCount: requests.length,
-                  ),
-                ),
+                    detailTitle: appLocalizations.details,
+                  );
+                },
+                itemExtentBuilder: (index, _) {
+                  return TrackerInfoItem.height + 8;
+                },
+                itemCount: requests.length,
               ),
             ),
+          ),
+        ),
+      ),
     );
   }
 }
