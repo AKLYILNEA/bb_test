@@ -520,10 +520,8 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       animation: _controller,
       child: _list,
       builder: (context, list) {
-        final animateSpace = !widget.tail || widget.collapseRequested;
+        final animateSpace = !widget.tail;
         final factor = animateSpace ? 1 - _reveal.value : 1.0;
-        // 展开淡入改用"同色底盖一层"（混色等价），不再用 SliverFadeTransition：
-        // 那个离屏层按展开面积每帧新建，手机上可达数 MB/帧。
         final veil = _controller.value;
         return _AnimatedExtentSliver(
           factor: factor,
@@ -680,12 +678,15 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
   void _paintVeil(PaintingContext context, Offset offset) {
     final veil = _veil;
     if (veil == null) return;
-    final paintExtent = geometry?.paintExtent ?? 0.0;
-    if (paintExtent <= 0) return;
+    final extent = max(
+      geometry?.paintExtent ?? 0.0,
+      child?.geometry?.paintExtent ?? 0.0,
+    );
+    if (extent <= 0) return;
     final crossExtent = constraints.crossAxisExtent;
     final size = constraints.axis == Axis.vertical
-        ? Size(crossExtent, paintExtent)
-        : Size(paintExtent, crossExtent);
+        ? Size(crossExtent, extent)
+        : Size(extent, crossExtent);
     context.canvas.drawRect(offset & size, Paint()..color = veil);
   }
 }
