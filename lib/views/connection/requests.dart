@@ -31,6 +31,7 @@ class _RequestsViewState extends ConsumerState<RequestsView>
     super.initState();
     _scrollController = ReverseScrollController();
     WidgetsBinding.instance.addObserver(this);
+    ref.read(requestsProvider.notifier).clearRequests();
     _initRequests();
   }
 
@@ -98,9 +99,7 @@ class _RequestsViewState extends ConsumerState<RequestsView>
 
   @override
   Widget build(BuildContext context) {
-    final requests = (_settled && _loaded)
-        ? ref.watch(filteredRequestsProvider)
-        : const <TrackerInfo>[];
+    final requests = ref.watch(filteredRequestsProvider);
     final hasRequests = requests.isNotEmpty;
 
     return CommonScaffold(

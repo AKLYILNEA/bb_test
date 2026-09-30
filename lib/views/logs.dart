@@ -32,6 +32,7 @@ class _LogsViewState extends ConsumerState<LogsView>
     super.initState();
     _scrollController = ReverseScrollController();
     WidgetsBinding.instance.addObserver(this);
+    ref.read(logsProvider.notifier).clearLogs();
     _initLogs();
   }
 
@@ -142,9 +143,7 @@ class _LogsViewState extends ConsumerState<LogsView>
 
   @override
   Widget build(BuildContext context) {
-    final logs = (_settled && _loaded)
-        ? ref.watch(filteredLogsProvider)
-        : const <Log>[];
+    final logs = ref.watch(filteredLogsProvider);
     final hasLogs = logs.isNotEmpty;
     return CommonScaffold(
       actions: [
