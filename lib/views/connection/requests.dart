@@ -23,6 +23,7 @@ class _RequestsViewState extends ConsumerState<RequestsView>
   late final ScrollController _scrollController;
   var _autoScrollToEnd = false;
   var _settled = false;
+  var _loaded = false;
   var _settleWatchStarted = false;
 
   @override
@@ -40,6 +41,7 @@ class _RequestsViewState extends ConsumerState<RequestsView>
     if (history.isNotEmpty) {
       ref.read(requestsProvider.notifier).setRequests(history);
     }
+    setState(() => _loaded = true);
   }
 
   @override
@@ -96,7 +98,7 @@ class _RequestsViewState extends ConsumerState<RequestsView>
 
   @override
   Widget build(BuildContext context) {
-    final requests = _settled
+    final requests = (_settled && _loaded)
         ? ref.watch(filteredRequestsProvider)
         : const <TrackerInfo>[];
     final hasRequests = requests.isNotEmpty;

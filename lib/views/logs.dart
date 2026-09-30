@@ -24,6 +24,7 @@ class _LogsViewState extends ConsumerState<LogsView>
   late final ScrollController _scrollController;
   var _autoScrollToEnd = false;
   var _settled = false;
+  var _loaded = false;
   var _settleWatchStarted = false;
 
   @override
@@ -41,6 +42,7 @@ class _LogsViewState extends ConsumerState<LogsView>
     if (history.isNotEmpty) {
       ref.read(logsProvider.notifier).setLogs(history);
     }
+    setState(() => _loaded = true);
   }
 
   @override
@@ -140,7 +142,9 @@ class _LogsViewState extends ConsumerState<LogsView>
 
   @override
   Widget build(BuildContext context) {
-    final logs = _settled ? ref.watch(filteredLogsProvider) : const <Log>[];
+    final logs = (_settled && _loaded)
+        ? ref.watch(filteredLogsProvider)
+        : const <Log>[];
     final hasLogs = logs.isNotEmpty;
     return CommonScaffold(
       actions: [
