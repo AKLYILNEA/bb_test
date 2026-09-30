@@ -931,9 +931,10 @@ class AppController {
         }
 
         if (hasChanged) {
-          _ref
-              .read(profilesProvider.notifier)
-              .setProfile(currentProfile.copyWith(selectedMap: selectedMap));
+          _ref.read(profilesProvider.notifier).updateProfile(
+                currentProfile.id,
+                (p) => p.copyWith(selectedMap: selectedMap),
+              );
         }
       }
 
@@ -1727,25 +1728,26 @@ class AppController {
   }
 
   void updateCurrentSelectedMap(String groupName, String proxyName) {
-    final currentProfile = _ref.read(currentProfileProvider);
-    if (currentProfile != null &&
-        currentProfile.selectedMap[groupName] != proxyName) {
-      final SelectedMap selectedMap = Map.from(currentProfile.selectedMap)
-        ..[groupName] = proxyName;
-      _ref
-          .read(profilesProvider.notifier)
-          .setProfile(currentProfile.copyWith(selectedMap: selectedMap));
-    }
+    final currentProfileId = _ref.read(currentProfileIdProvider);
+    if (currentProfileId == null) return;
+    _ref.read(profilesProvider.notifier).updateProfile(
+      currentProfileId,
+      (profile) {
+        if (profile.selectedMap[groupName] == proxyName) return profile;
+        final selectedMap = Map<String, String>.from(profile.selectedMap)
+          ..[groupName] = proxyName;
+        return profile.copyWith(selectedMap: selectedMap);
+      },
+    );
   }
 
   void updateCurrentUnfoldSet(Set<String> value) {
-    final currentProfile = _ref.read(currentProfileProvider);
-    if (currentProfile == null) {
-      return;
-    }
-    _ref
-        .read(profilesProvider.notifier)
-        .setProfile(currentProfile.copyWith(unfoldSet: value));
+    final currentProfileId = _ref.read(currentProfileIdProvider);
+    if (currentProfileId == null) return;
+    _ref.read(profilesProvider.notifier).updateProfile(
+      currentProfileId,
+      (profile) => profile.copyWith(unfoldSet: value),
+    );
   }
 
   void changeMode(Mode mode) {

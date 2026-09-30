@@ -27,6 +27,7 @@ class ProxiesListView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(proxiesListStateProvider);
+    final currentProfileId = ref.watch(currentProfileIdProvider);
 
     if (state.groups.isEmpty) {
       return NullStatus(
@@ -36,6 +37,7 @@ class ProxiesListView extends ConsumerWidget {
     }
 
     return _ProxyGroupsList(
+      key: ValueKey('proxy_groups_list_$currentProfileId'),
       groups: state.groups,
       columns: state.columns,
       cardType: state.proxyCardType,
@@ -55,6 +57,7 @@ class _ProxyGroupsList extends ConsumerStatefulWidget {
   final Set<String> currentUnfoldSet;
 
   const _ProxyGroupsList({
+    super.key,
     required this.groups,
     required this.columns,
     required this.cardType,
@@ -84,7 +87,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   @override
   void didUpdateWidget(covariant _ProxyGroupsList oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.currentUnfoldSet != widget.currentUnfoldSet) {
+    if (!stringSetEquality.equals(oldWidget.currentUnfoldSet, widget.currentUnfoldSet)) {
       _unfoldSet = Set<String>.from(widget.currentUnfoldSet);
     }
   }
