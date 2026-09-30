@@ -698,7 +698,8 @@ class AppController {
     return _coreLifecycleLock.synchronized(() async {
       final loading = _ref.read(loadingProvider.notifier);
       loading.value = true;
-      if (hardRestart) {
+      try {
+        if (hardRestart) {
         _ref.read(isRestartingCoreProvider.notifier).state = true;
         try {
           await _restartCore();
@@ -729,7 +730,9 @@ class AppController {
       _ref.read(requestsProvider.notifier).value = FixedList(maxLength);
       globalState.computeHeightMapCache = {};
       addCheckIpNumDebounce();
-      loading.value = false;
+      } finally {
+        loading.value = false;
+      }
     });
   }
 
