@@ -22,7 +22,6 @@ class LogsView extends ConsumerStatefulWidget {
 class _LogsViewState extends ConsumerState<LogsView>
     with WidgetsBindingObserver {
   late final ScrollController _scrollController;
-  late List<Log> _pending;
   var _autoScrollToEnd = false;
   var _settled = false;
   var _settleWatchStarted = false;
@@ -31,7 +30,6 @@ class _LogsViewState extends ConsumerState<LogsView>
   void initState() {
     super.initState();
     _scrollController = ReverseScrollController();
-    _pending = ref.read(filteredLogsProvider);
     WidgetsBinding.instance.addObserver(this);
     _initLogs();
   }
@@ -142,7 +140,7 @@ class _LogsViewState extends ConsumerState<LogsView>
 
   @override
   Widget build(BuildContext context) {
-    final logs = _settled ? ref.watch(filteredLogsProvider) : _pending;
+    final logs = _settled ? ref.watch(filteredLogsProvider) : const <Log>[];
     final hasLogs = logs.isNotEmpty;
     return CommonScaffold(
       actions: [

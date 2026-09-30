@@ -21,7 +21,6 @@ class RequestsView extends ConsumerStatefulWidget {
 class _RequestsViewState extends ConsumerState<RequestsView>
     with WidgetsBindingObserver {
   late final ScrollController _scrollController;
-  late List<TrackerInfo> _pending;
   var _autoScrollToEnd = false;
   var _settled = false;
   var _settleWatchStarted = false;
@@ -30,7 +29,6 @@ class _RequestsViewState extends ConsumerState<RequestsView>
   void initState() {
     super.initState();
     _scrollController = ReverseScrollController();
-    _pending = ref.read(filteredRequestsProvider);
     WidgetsBinding.instance.addObserver(this);
     _initRequests();
   }
@@ -100,7 +98,7 @@ class _RequestsViewState extends ConsumerState<RequestsView>
   Widget build(BuildContext context) {
     final requests = _settled
         ? ref.watch(filteredRequestsProvider)
-        : _pending;
+        : const <TrackerInfo>[];
     final hasRequests = requests.isNotEmpty;
 
     return CommonScaffold(
