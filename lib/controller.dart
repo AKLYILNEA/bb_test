@@ -696,6 +696,8 @@ class AppController {
 
   Future<void> handleChangeProfile({bool hardRestart = false}) {
     return _coreLifecycleLock.synchronized(() async {
+      final loading = _ref.read(loadingProvider.notifier);
+      loading.value = true;
       if (hardRestart) {
         _ref.read(isRestartingCoreProvider.notifier).state = true;
         try {
@@ -727,6 +729,7 @@ class AppController {
       _ref.read(requestsProvider.notifier).value = FixedList(maxLength);
       globalState.computeHeightMapCache = {};
       addCheckIpNumDebounce();
+      loading.value = false;
     });
   }
 
