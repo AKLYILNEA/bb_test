@@ -4,6 +4,7 @@ import 'package:bett_box/pages/pages.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -18,6 +19,43 @@ class MediaUnlock extends ConsumerStatefulWidget {
 }
 
 class _MediaUnlockState extends ConsumerState<MediaUnlock> {
+  MediaUnlockState? _lastState;
+  List<MediaPlatform>? _lastDisplayedPlatforms;
+  bool? _lastColorfulIcons;
+  Widget? _cachedCard;
+
+  bool _shouldRebuildCard({
+    required MediaUnlockState newState,
+    required List<MediaPlatform> displayedPlatforms,
+    required bool colorfulIcons,
+  }) {
+    if (_lastState == null ||
+        _cachedCard == null ||
+        _lastDisplayedPlatforms == null ||
+        _lastColorfulIcons == null) {
+      return true;
+    }
+    if (!listEquals(_lastDisplayedPlatforms, displayedPlatforms)) {
+      return true;
+    }
+    if (_lastColorfulIcons != colorfulIcons) {
+      return true;
+    }
+    if (_lastState!.isLoading != newState.isLoading) {
+      return true;
+    }
+    for (final p in displayedPlatforms) {
+      if (_lastState!.testingPlatforms.contains(p) !=
+          newState.testingPlatforms.contains(p)) {
+        return true;
+      }
+      if (_lastState!.results[p] != newState.results[p]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   String _getStatusText(MediaUnlockStatus status, [MediaPlatform? platform]) {
     switch (status) {
       case MediaUnlockStatus.unlocked:
@@ -194,9 +232,21 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
       child: ValueListenableBuilder<MediaUnlockState>(
         valueListenable: mediaUnlockState.state,
         builder: (context, state, _) {
+          final shouldRebuild = _shouldRebuildCard(
+            newState: state,
+            displayedPlatforms: displayedPlatforms,
+            colorfulIcons: colorfulIcons,
+          );
+          if (!shouldRebuild) {
+            return _cachedCard!;
+          }
+          _lastState = state;
+          _lastDisplayedPlatforms = displayedPlatforms;
+          _lastColorfulIcons = colorfulIcons;
+
           final isWidgetLoading =
               displayedPlatforms.any(state.testingPlatforms.contains);
-          return CommonCard(
+          final card = CommonCard(
             onPressed: () {
               showExtend(
                 context,
@@ -207,11 +257,8 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
               children: [
                 InfoHeader(
                   padding: baseInfoEdgeInsets.copyWith(bottom: 0),
-                  // 右侧刷新按钮不撑高表头：图标 / 标题 / 按钮同处一行标题高度
                   actionsHeight: globalState.measure.titleSmallHeight,
                   info: Info(
-                    // 卡片标题用短标题键（英文只写 Connectivity，去掉后面的 Test）；
-                    // 解锁页面标题仍用 mediaUnlock
                     label: appLocalizations.mediaUnlockShort,
                     iconData: FluentIcons.link_24_regular,
                   ),
@@ -228,12 +275,14 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
                                   force: true,
                                 ),
                         icon: isWidgetLoading
-                            ? SizedBox(
-                                width: 16.ap,
-                                height: 16.ap,
-                                child: SpinKitFadingCircle(
-                                  color: context.colorScheme.primary,
-                                  size: 16.ap,
+                            ? RepaintBoundary(
+                                child: SizedBox(
+                                  width: 16.ap,
+                                  height: 16.ap,
+                                  child: SpinKitFadingCircle(
+                                    color: context.colorScheme.primary,
+                                    size: 16.ap,
+                                  ),
                                 ),
                               )
                             : Icon(
@@ -278,6 +327,8 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
               ],
             ),
           );
+          _cachedCard = card;
+          return card;
         },
       ),
     );
