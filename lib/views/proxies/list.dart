@@ -525,6 +525,26 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
   late Widget _list;
   Timer? _settleTimer;
 
+  // 生命周期探针：定位"元素被锁死"（deactivate 之后既无 activate 也无 dispose/build）。
+  int _lifeBuilds = 0;
+  int _lifeUpdates = 0;
+
+  @override
+  void activate() {
+    super.activate();
+    commonPrint.log(
+      '[proxies] life activate "${widget.group.name}" builds=$_lifeBuilds',
+    );
+  }
+
+  @override
+  void deactivate() {
+    commonPrint.log(
+      '[proxies] life deactivate "${widget.group.name}" builds=$_lifeBuilds',
+    );
+    super.deactivate();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -555,6 +575,13 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
   @override
   void didUpdateWidget(covariant _GroupProxyListSliver oldWidget) {
     super.didUpdateWidget(oldWidget);
+    _lifeUpdates += 1;
+    commonPrint.log(
+      '[proxies] life update "${widget.group.name}" n=$_lifeUpdates '
+      'collapse=${oldWidget.collapseRequested}->${widget.collapseRequested} '
+      'enter=${oldWidget.enterAnimated}->${widget.enterAnimated} '
+      'value=${_controller.value.toStringAsFixed(2)} animating=${_controller.isAnimating}',
+    );
     if (widget.enterAnimated &&
         _controller.value == 1 &&
         !_controller.isAnimating) {
@@ -666,6 +693,9 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
 
   @override
   void dispose() {
+    commonPrint.log(
+      '[proxies] life dispose "${widget.group.name}" builds=$_lifeBuilds updates=$_lifeUpdates',
+    );
     _settleTimer?.cancel();
     proxiesRowsVisible.remove(widget.group.name);
     _controller.dispose();
@@ -727,6 +757,12 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
 
   @override
   Widget build(BuildContext context) {
+    _lifeBuilds += 1;
+    commonPrint.log(
+      '[proxies] life build "${widget.group.name}" n=$_lifeBuilds '
+      'collapse=${widget.collapseRequested} enter=${widget.enterAnimated} '
+      'value=${_controller.value.toStringAsFixed(2)}',
+    );
     // 可见性只由意图决定：动画没在跑却停在非终态（卡住 / 被吞掉）时就地吸附。
     final target = widget.collapseRequested ? 1.0 : 0.0;
     if (!_controller.isAnimating && _controller.value != target) {
