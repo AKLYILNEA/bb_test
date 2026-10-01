@@ -34,13 +34,6 @@ class DelayTestCoordinator extends ChangeNotifier {
 
 final delayTestCoordinator = DelayTestCoordinator();
 
-/// 列表重建信号：点击后整帧没有重建（元素卡死）时递增，用来换新整棵列表，
-/// 不必切页面就能恢复（见 list.dart 的 _handleToggle）。
-final proxiesListRebuildSignal = ValueNotifier<int>(0);
-
-/// 已挂载节点列表的可见性登记（诊断用，也是"展开是否真的渲染出来"的判据）。
-final Map<String, bool> proxiesRowsVisible = <String, bool>{};
-
 @immutable
 class DelayTestTarget {
   final String name;

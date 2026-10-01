@@ -26,35 +26,24 @@ class ProxiesListView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final hasGroups = ref.watch(
-      proxiesListStateProvider.select((state) => state.groups.isNotEmpty),
-    );
+    final state = ref.watch(proxiesListStateProvider);
     final currentProfileId = ref.watch(currentProfileIdProvider);
 
-    if (!hasGroups) {
+    if (state.groups.isEmpty) {
       return NullStatus(
         label: appLocalizations.nullTip(appLocalizations.proxies),
         illustration: NullStatusIllustration.proxies,
       );
     }
 
-    // generation 变化 = 换新整棵列表；builder 内重新 watch，重建取最新状态。
-    return ValueListenableBuilder<int>(
-      valueListenable: proxiesListRebuildSignal,
-      builder: (context, generation, _) => Consumer(
-        builder: (context, ref, _) {
-          final state = ref.watch(proxiesListStateProvider);
-          return _ProxyGroupsList(
-            key: ValueKey('proxy_groups_list_${currentProfileId}_$generation'),
-            groups: state.groups,
-            columns: state.columns,
-            cardType: state.proxyCardType,
-            sortType: state.proxiesSortType,
-            sortNum: state.sortNum,
-            currentUnfoldSet: state.currentUnfoldSet,
-          );
-        },
-      ),
+    return _ProxyGroupsList(
+      key: ValueKey('proxy_groups_list_$currentProfileId'),
+      groups: state.groups,
+      columns: state.columns,
+      cardType: state.proxyCardType,
+      sortType: state.proxiesSortType,
+      sortNum: state.sortNum,
+      currentUnfoldSet: state.currentUnfoldSet,
     );
   }
 }
@@ -81,6 +70,9 @@ class _ProxyGroupsList extends ConsumerStatefulWidget {
   ConsumerState<_ProxyGroupsList> createState() => _ProxyGroupsListState();
 }
 
+/// 当前挂在元素树里的节点列表（按组名）。用于判断"这次展开到底有没有渲染出来"。
+final Set<String> _mountedRows = <String>{};
+
 class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   final ScrollController _scrollController = ScrollController();
   GroupOffsets _groupOffsets = GroupOffsets.empty;
@@ -88,9 +80,6 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   final Set<String> _enterGroups = <String>{};
   final Set<String> _collapsingGroups = <String>{};
   int _toggleToken = 0;
-  int _buildStamp = 0;
-  bool _diagPending = false;
-  /// 列表内部子树代际：内部这一层卡住（新 sliver widget 到不了元素树）时 +1 换新。
   int _viewGeneration = 0;
   late Set<String> _unfoldSet;
 
@@ -128,111 +117,18 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
       }
     });
     final next = Set<String>.from(_unfoldSet);
-    final profileId = ref.read(currentProfileIdProvider);
     final token = ++_toggleToken;
-    final stamp = _buildStamp;
-    commonPrint.log(
-      '[proxies] toggle "$groupName" → ${isExpanding ? 'expand' : 'collapse'} local=${next.length}',
-    );
-    if (!isExpanding) {
-      _probeCollapseScroll(groupName);
-    }
     globalState.appController.updateCurrentUnfoldSet(next);
-    _diagPending = true;
-    // 帧后校验：① 这一帧到底有没有重建；② 这次展开到底有没有渲染出来；
-    // ③ provider 有没有拿到展开集。任一没成立都就地自愈，不必切页面。
+    if (!isExpanding) return;
+    // 展开后这一帧如果那一组的节点列表没进元素树（列表内层子树停止更新子级），
+    // 就把内层子树整体换新一次，效果等同用户切一次页面，不必手动切。
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (token != _toggleToken) return;
-      if (!mounted) {
-        // 点击所在的列表元素这一帧就被换掉了（配置切换等竞态）：从列表层兜底重建。
-        commonPrint.log(
-          '[proxies] postcheck "$groupName" dropped → re-inflate list',
-        );
-        proxiesListRebuildSignal.value += 1;
-        return;
-      }
-      final built = _buildStamp != stamp;
-      final rendered = proxiesRowsVisible[groupName] == true;
-      commonPrint.log(
-        '[proxies] postcheck "$groupName" built=$built rendered=$rendered '
-        'collapsing=${_collapsingGroups.contains(groupName)} '
-        'local=${_unfoldSet.contains(groupName)} '
-        'inGroups=${widget.groups.any((g) => g.name == groupName)}',
-      );
-      if (!built) {
-        commonPrint.log(
-          '[proxies] rebuild missed "$groupName" → re-inflate list',
-        );
-        proxiesListRebuildSignal.value += 1;
-      }
-      if (isExpanding && !rendered) {
-        // 展开点击之后节点列表没出现在元素树里（列表内层子树卡住）：换掉整棵内层子树。
-        commonPrint.log(
-          '[proxies] expand not rendered "$groupName" → re-inflate view',
-        );
-        setState(() {
-          _viewGeneration += 1;
-        });
-      }
-      if (profileId == null || profileId != ref.read(currentProfileIdProvider)) {
-        return;
-      }
-      final provider = ref.read(unfoldSetProvider);
-      if (stringSetEquality.equals(provider, next)) return;
-      commonPrint.log(
-        '[proxies] unfold write missed: local=${next.length} provider=${provider.length} → rewrite',
-      );
-      globalState.appController.updateCurrentUnfoldSet(next);
+      if (!mounted || token != _toggleToken) return;
+      if (_mountedRows.contains(groupName)) return;
+      setState(() {
+        _viewGeneration += 1;
+      });
     });
-  }
-
-  /// 收起期间的滚动采样：实测「收起时视口是否发生位置纠偏」以及纠偏量。
-  /// 纠偏发生在 layout 内，不会通知监听者，只能在逐帧的帧后回调里对比。
-  void _probeCollapseScroll(String groupName) {
-    if (!_scrollController.hasClients) return;
-    var pixels = _scrollController.position.pixels;
-    var maxExtent = _scrollController.position.maxScrollExtent;
-    var frames = 0;
-    var correctionFrames = 0;
-    var maxCorrection = 0.0;
-    var idleFrames = 0;
-    commonPrint.log(
-      '[proxies] collapse probe "$groupName" pixels=${pixels.toStringAsFixed(1)} max=${maxExtent.toStringAsFixed(1)}',
-    );
-    void sample(Duration _) {
-      if (!mounted || !_scrollController.hasClients) return;
-      final position = _scrollController.position;
-      final nextPixels = position.pixels;
-      final nextMax = position.maxScrollExtent;
-      final correction = (nextPixels - pixels).abs();
-      if (correction > 0.5) {
-        correctionFrames += 1;
-        idleFrames = 0;
-        if (correction > maxCorrection) {
-          maxCorrection = correction;
-        }
-        commonPrint.log(
-          '[proxies] collapse probe "$groupName" f=$frames Δpixels=${(nextPixels - pixels).toStringAsFixed(1)} '
-          'max=${nextMax.toStringAsFixed(1)} (max${maxExtent > nextMax ? '↓' : maxExtent < nextMax ? '↑' : '='}'
-          '${(maxExtent - nextMax).abs().toStringAsFixed(1)})',
-        );
-      } else {
-        idleFrames += 1;
-      }
-      pixels = nextPixels;
-      maxExtent = nextMax;
-      frames += 1;
-      if (frames >= 40 || idleFrames >= 3) {
-        commonPrint.log(
-          '[proxies] collapse probe "$groupName" done frames=$frames corrected=$correctionFrames '
-          'maxΔ=${maxCorrection.toStringAsFixed(1)} finalPixels=${pixels.toStringAsFixed(1)}',
-        );
-        return;
-      }
-      WidgetsBinding.instance.addPostFrameCallback(sample);
-    }
-
-    WidgetsBinding.instance.addPostFrameCallback(sample);
   }
 
   GroupOffsets _getGroupOffsets({
@@ -434,17 +330,9 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
 
   @override
   Widget build(BuildContext context) {
-    _buildStamp += 1;
-    if (_diagPending) {
-      _diagPending = false;
-      commonPrint.log(
-        '[proxies] build ran set=${_unfoldSet.length} groups=${widget.groups.length}',
-      );
-    }
     final isMobileView = ref.watch(isMobileViewProvider);
 
-    // 内层子树代际：列表内部这一层卡住（新 sliver widget 到不了元素树）时换新；
-    // 只换普通 Widget 的 key，不涉及 GlobalKey。
+    // 内层子树代际：列表内部这一层不再更新子级时整体换新（普通 Widget 换 key，不涉及 GlobalKey）。
     return LayoutBuilder(
       key: ValueKey('proxies_list_view#$_viewGeneration'),
       builder: (context, constraints) {
@@ -526,26 +414,6 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
   late Widget _list;
   Timer? _settleTimer;
 
-  // 生命周期探针：定位"元素被锁死"（deactivate 之后既无 activate 也无 dispose/build）。
-  int _lifeBuilds = 0;
-  int _lifeUpdates = 0;
-
-  @override
-  void activate() {
-    super.activate();
-    commonPrint.log(
-      '[proxies] life activate "${widget.group.name}" builds=$_lifeBuilds',
-    );
-  }
-
-  @override
-  void deactivate() {
-    commonPrint.log(
-      '[proxies] life deactivate "${widget.group.name}" builds=$_lifeBuilds',
-    );
-    super.deactivate();
-  }
-
   @override
   void initState() {
     super.initState();
@@ -560,10 +428,7 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     );
     _controller.addStatusListener(_handleStatus);
     _syncList();
-    commonPrint.log(
-      '[proxies] rows mount "${widget.group.name}" enter=${widget.enterAnimated} rows=${widget.rows.length} tail=${widget.tail}',
-    );
-    proxiesRowsVisible[widget.group.name] = _isRevealed;
+    _mountedRows.add(widget.group.name);
     if (widget.enterAnimated) {
       // 起跑值必须在没有状态回调的情况下设置：initState 期间回调里可能触发父级 setState
       _controller.removeStatusListener(_handleStatus);
@@ -576,13 +441,6 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
   @override
   void didUpdateWidget(covariant _GroupProxyListSliver oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _lifeUpdates += 1;
-    commonPrint.log(
-      '[proxies] life update "${widget.group.name}" n=$_lifeUpdates '
-      'collapse=${oldWidget.collapseRequested}->${widget.collapseRequested} '
-      'enter=${oldWidget.enterAnimated}->${widget.enterAnimated} '
-      'value=${_controller.value.toStringAsFixed(2)} animating=${_controller.isAnimating}',
-    );
     if (widget.enterAnimated &&
         _controller.value == 1 &&
         !_controller.isAnimating) {
@@ -618,9 +476,6 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     _settleTimer = null;
     final tickerEnabled = TickerMode.getNotifier(context).value;
     if (!tickerEnabled || _controller.value == target) {
-      commonPrint.log(
-        '[proxies] "${widget.group.name}" settle now (ticker=$tickerEnabled value=${_controller.value})',
-      );
       _snapTo(target);
       return;
     }
@@ -635,9 +490,6 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
         _settleTimer = null;
         if (!mounted) return;
         if (_controller.value == target) return;
-        commonPrint.log(
-          '[proxies] "${widget.group.name}" animation did not run → settle${target == 0.0 ? ' visible' : ' collapsed'}',
-        );
         _snapTo(target);
       },
     );
@@ -687,18 +539,10 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     }
   }
 
-  /// 展开意图生效、且动画没有"停在完全隐藏那一端不动"时，算这次展开真的渲染出来了。
-  bool get _isRevealed =>
-      !widget.collapseRequested &&
-      !(_controller.value == 1.0 && !_controller.isAnimating);
-
   @override
   void dispose() {
-    commonPrint.log(
-      '[proxies] life dispose "${widget.group.name}" builds=$_lifeBuilds updates=$_lifeUpdates',
-    );
     _settleTimer?.cancel();
-    proxiesRowsVisible.remove(widget.group.name);
+    _mountedRows.remove(widget.group.name);
     _controller.dispose();
     super.dispose();
   }
@@ -758,13 +602,7 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
 
   @override
   Widget build(BuildContext context) {
-    _lifeBuilds += 1;
-    commonPrint.log(
-      '[proxies] life build "${widget.group.name}" n=$_lifeBuilds '
-      'collapse=${widget.collapseRequested} enter=${widget.enterAnimated} '
-      'value=${_controller.value.toStringAsFixed(2)}',
-    );
-    // 可见性只由意图决定：动画没在跑却停在非终态（卡住 / 被吞掉）时就地吸附。
+    // 可见性只由意图决定：动画没在跑却停在非终态（被冻结 / 被吞掉）时就地吸附。
     final target = widget.collapseRequested ? 1.0 : 0.0;
     if (!_controller.isAnimating && _controller.value != target) {
       _snapTo(target);
@@ -773,7 +611,6 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       animation: _controller,
       child: _list,
       builder: (context, list) {
-        proxiesRowsVisible[widget.group.name] = _isRevealed;
         final factor = 1.0 - _reveal.value;
         final clipContent = !widget.tail;
         final veil = _controller.value;
