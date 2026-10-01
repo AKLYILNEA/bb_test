@@ -13,6 +13,19 @@ const _thumbRadius = 14.0;
 const _trackTone = 60.0;
 const _previewInset = 8.0;
 
+// The tone strip's hairline sits on a surface ring instead of on the darkest
+// cells, which would swallow an outlineVariant line in dark mode.
+const double _toneStripBorder = 1.0;
+
+// One dp tighter than the hairline, so the inner clip never reads as rounder
+// than the outer border.
+const double _toneStripInnerRadius = 16 - _toneStripBorder - 1;
+
+// Every panel in the palette shares one hairline: the same colour and width as
+// the role-preview card.
+BorderSide _panelBorderSide(ColorScheme colorScheme) =>
+    BorderSide(color: colorScheme.outlineVariant);
+
 class _SuperellipseClipper extends CustomClipper<Path> {
   final BorderRadius borderRadius;
 
@@ -224,11 +237,7 @@ class _PaletteState extends State<Palette> {
               Material(
                 shape: RoundedSuperellipseBorder(
                   borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(
-                    color: theme.colorScheme.outlineVariant.withValues(
-                      alpha: 0.6,
-                    ),
-                  ),
+                  side: _panelBorderSide(theme.colorScheme),
                 ),
                 color: theme.colorScheme.surfaceContainer,
                 clipBehavior: Clip.antiAlias,
@@ -465,21 +474,22 @@ class _ToneStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       height: 44,
-      foregroundDecoration: ShapeDecoration(
+      padding: const EdgeInsets.all(_toneStripBorder),
+      decoration: ShapeDecoration(
+        color: colorScheme.surfaceContainer,
         shape: RoundedSuperellipseBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(
-            color: Theme.of(
-              context,
-            ).colorScheme.outlineVariant.withValues(alpha: 0.6),
-          ),
+          side: _panelBorderSide(colorScheme),
         ),
       ),
       child: ClipPath(
         clipper: const _SuperellipseClipper(
-          borderRadius: BorderRadius.all(Radius.circular(16)),
+          borderRadius: BorderRadius.all(
+            Radius.circular(_toneStripInnerRadius),
+          ),
         ),
         child: Row(
           children: [
@@ -604,7 +614,7 @@ class _ColorSchemePreview extends StatelessWidget {
         color: colorScheme.surfaceContainer,
         shape: RoundedSuperellipseBorder(
           borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: colorScheme.outlineVariant),
+          side: _panelBorderSide(colorScheme),
         ),
       ),
       child: LayoutBuilder(

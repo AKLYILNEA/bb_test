@@ -175,10 +175,6 @@ class _PrimaryColorItem extends ConsumerStatefulWidget {
 class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
   int? _removablePrimaryColor;
 
-  int _calcColumns(double maxWidth) {
-    return max((maxWidth / 96).ceil(), 3);
-  }
-
   Future<void> _handleReset() async {
     final res = await globalState.showMessage(
       message: TextSpan(text: appLocalizations.resetTip),
@@ -311,7 +307,7 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
       },
       child: ItemCard(
         info: Info(label: appLocalizations.themeColor, iconData: FluentIcons.color_24_regular),
-        actions: genActions([
+        actions: [
           if (_removablePrimaryColor == null)
             FilledButton(
               style: FilledButton.styleFrom(
@@ -329,11 +325,7 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
                 foregroundColor: fabFgColor,
                 visualDensity: VisualDensity.compact,
               ),
-              onPressed: () {
-                setState(() {
-                  _removablePrimaryColor = null;
-                });
-              },
+              onPressed: _clearRemovable,
               child: Text(appLocalizations.cancel),
             ),
           if (_removablePrimaryColor == null && !isEquals)
@@ -344,102 +336,153 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
               onPressed: _handleReset,
               icon: Icon(FluentIcons.arrow_repeat_all_24_regular),
             ),
-        ], space: 8),
+        ].separated(const SizedBox(width: 8)).toList(),
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),
-          child: LayoutBuilder(
-            builder: (_, constraints) {
-              final columns = _calcColumns(constraints.maxWidth);
-              final itemWidth =
-                  (constraints.maxWidth - (columns - 1) * 16) / columns;
-              return Wrap(
-                spacing: 16,
-                runSpacing: 16,
-                children: [
-                  for (final color in primaryColors)
-                    Container(
-                      clipBehavior: Clip.none,
-                      width: itemWidth,
-                      height: itemWidth,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        clipBehavior: Clip.none,
-                        children: [
-                          EffectGestureDetector(
-                            onLongPress: () {
-                              setState(() {
-                                _removablePrimaryColor = color;
-                              });
-                            },
-                            child: ColorSchemeBox(
-                              isSelected: color == primaryColor,
-                              primaryColor: color != null ? Color(color) : null,
-                              onLongPress: () {
-                                setState(() {
-                                  _removablePrimaryColor = color;
-                                });
-                              },
-                              onPressed: () {
-                                setState(() {
-                                  _removablePrimaryColor = null;
-                                });
-                                ref
-                                    .read(themeSettingProvider.notifier)
-                                    .updateState(
-                                      (state) =>
-                                          state.copyWith(primaryColor: color),
-                                    );
-                              },
-                            ),
-                          ),
-                          if (_removablePrimaryColor != null &&
-                              _removablePrimaryColor == color)
-                            Container(
-                              color: Colors.white.opacity0,
-                              padding: EdgeInsets.all(8),
-                              child: IconButton.filledTonal(
-                                style: IconButton.styleFrom(
-                                  visualDensity: VisualDensity.compact,
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                  shape: const CircleBorder(),
-                                ),
-                                onPressed: _handleDel,
-                                padding: const EdgeInsets.all(12),
-                                iconSize: 30,
-                                icon: Icon(
-                                  color: context.colorScheme.primary,
-                                  FluentIcons.delete_24_regular,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  if (_removablePrimaryColor == null)
-                    Container(
-                      width: itemWidth,
-                      height: itemWidth,
-                      padding: const EdgeInsets.all(4),
-                      child: IconButton.filledTonal(
-                        style: IconButton.styleFrom(
-                          visualDensity: VisualDensity.compact,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          shape: const CircleBorder(),
-                        ),
-                        onPressed: _handleAdd,
-                        iconSize: 32,
-                        icon: Icon(
-                          color: context.colorScheme.primary,
-                          FluentIcons.add_24_regular,
-                        ),
-                      ),
-                    ),
-                ],
-              );
-            },
+          child: _PrimaryColorGrid(
+            colors: primaryColors,
+            selectedColor: primaryColor,
+            removableColor: _removablePrimaryColor,
+            onSelect: _handleSelectColor,
+            onRequestRemove: _markRemovable,
+            onDelete: _handleDel,
+            onAdd: _handleAdd,
           ),
         ),
       ),
+    );
+  }
+
+  void _clearRemovable() {
+    setState(() {
+      _removablePrimaryColor = null;
+    });
+  }
+
+  void _markRemovable(int? color) {
+    setState(() {
+      _removablePrimaryColor = color;
+    });
+  }
+
+  void _handleSelectColor(int? color) {
+    _clearRemovable();
+    ref
+        .read(themeSettingProvider.notifier)
+        .updateState((state) => state.copyWith(primaryColor: color));
+  }
+}
+
+// Column stride of the swatch grid: on a phone this lands on six per row, and
+// the tile size stays roughly constant as the width changes.
+const double _swatchStride = 58;
+
+class _PrimaryColorGrid extends StatelessWidget {
+  const _PrimaryColorGrid({
+    required this.colors,
+    required this.selectedColor,
+    required this.removableColor,
+    required this.onSelect,
+    required this.onRequestRemove,
+    required this.onDelete,
+    required this.onAdd,
+  });
+
+  final List<int?> colors;
+  final int? selectedColor;
+  final int? removableColor;
+  final void Function(int? color) onSelect;
+  final void Function(int? color) onRequestRemove;
+  final VoidCallback onDelete;
+  final VoidCallback onAdd;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (_, constraints) {
+        final columns = max((constraints.maxWidth / _swatchStride).ceil(), 3);
+        final itemWidth = (constraints.maxWidth - (columns - 1) * 16) / columns;
+        return Wrap(
+          spacing: 16,
+          runSpacing: 16,
+          children: [
+            for (final color in colors)
+              _PrimaryColorTile(
+                color: color,
+                size: itemWidth,
+                isSelected: color == selectedColor,
+                isRemovable: removableColor != null && removableColor == color,
+                onSelect: () => onSelect(color),
+                onRequestRemove: () => onRequestRemove(color),
+                onDelete: onDelete,
+              ),
+            if (removableColor == null)
+              SizedBox.square(
+                dimension: itemWidth,
+                child: IconButton.filledTonal(
+                  onPressed: onAdd,
+                  icon: const Icon(FluentIcons.add_24_regular),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _PrimaryColorTile extends StatelessWidget {
+  const _PrimaryColorTile({
+    required this.color,
+    required this.size,
+    required this.isSelected,
+    required this.isRemovable,
+    required this.onSelect,
+    required this.onRequestRemove,
+    required this.onDelete,
+  });
+
+  final int? color;
+  final double size;
+  final bool isSelected;
+  final bool isRemovable;
+  final VoidCallback onSelect;
+  final VoidCallback onRequestRemove;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.colorScheme;
+    return Stack(
+      children: [
+        EffectGestureDetector(
+          onLongPress: onRequestRemove,
+          child: ColorSchemeBox(
+            isSelected: isSelected,
+            primaryColor: color != null ? Color(color!) : null,
+            onPressed: onSelect,
+            size: size,
+          ),
+        ),
+        if (isRemovable)
+          Positioned.fill(
+            child: Material(
+              color: colorScheme.errorContainer.withValues(alpha: 0.9),
+              shape: const CircleBorder(),
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                customBorder: const CircleBorder(),
+                onTap: onDelete,
+                child: Center(
+                  child: Icon(
+                    FluentIcons.delete_24_regular,
+                    color: colorScheme.onErrorContainer,
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
