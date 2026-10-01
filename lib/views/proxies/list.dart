@@ -90,8 +90,8 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   int _toggleToken = 0;
   int _buildStamp = 0;
   bool _diagPending = false;
-  /// 每个组的节点列表代际：卡死（挂载了却渲染不出来）时 +1，换新元素重建。
-  final Map<String, int> _rowsGeneration = <String, int>{};
+  /// 列表内部子树代际：内部这一层卡住（新 sliver widget 到不了元素树）时 +1 换新。
+  int _viewGeneration = 0;
   late Set<String> _unfoldSet;
 
   @override
@@ -166,12 +166,12 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
         proxiesListRebuildSignal.value += 1;
       }
       if (isExpanding && !rendered) {
-        // 展开点击之后节点列表没渲染出来（元素卡死）：换掉这一个组的列表元素。
+        // 展开点击之后节点列表没出现在元素树里（列表内层子树卡住）：换掉整棵内层子树。
         commonPrint.log(
-          '[proxies] expand not rendered "$groupName" → re-inflate rows',
+          '[proxies] expand not rendered "$groupName" → re-inflate view',
         );
         setState(() {
-          _rowsGeneration[groupName] = (_rowsGeneration[groupName] ?? 0) + 1;
+          _viewGeneration += 1;
         });
       }
       if (profileId == null || profileId != ref.read(currentProfileIdProvider)) {
@@ -407,9 +407,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
         ),
         if (showList)
           _GroupProxyListSliver(
-            key: ValueKey(
-              'expanded_group_${group.name}#${_rowsGeneration[group.name] ?? 0}',
-            ),
+            key: ValueKey('expanded_group_${group.name}'),
             group: group,
             rows: rows,
             columns: columns,
@@ -445,7 +443,10 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     }
     final isMobileView = ref.watch(isMobileViewProvider);
 
+    // 内层子树代际：列表内部这一层卡住（新 sliver widget 到不了元素树）时换新；
+    // 只换普通 Widget 的 key，不涉及 GlobalKey。
     return LayoutBuilder(
+      key: ValueKey('proxies_list_view#$_viewGeneration'),
       builder: (context, constraints) {
         _containerHeight = max(constraints.maxHeight, 0);
         _groupOffsets = _getGroupOffsets(
