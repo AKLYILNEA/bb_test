@@ -623,6 +623,10 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
         return _AnimatedExtentSliver(
           factor: widget.tail && !widget.collapseRequested ? 1.0 : factor,
           clipContent: clipContent,
+          // 收起「非末尾」策略组时冻结滚动范围，见 _RenderAnimatedExtentSliver.performLayout。
+          // 只有这一种情况会走这条分支：展开时 collapseRequested == false，
+          // 几何与改动前**逐字节相同**；末尾组也与改动前相同。
+          freezeScrollExtent: widget.collapseRequested && !widget.tail,
           veil: veil <= 0
               ? null
               : context.colorScheme.surface.withValues(alpha: veil),
@@ -637,17 +641,24 @@ class _AnimatedExtentSliver extends SingleChildRenderObjectWidget {
   final double factor;
   final bool clipContent;
   final Color? veil;
+  final bool freezeScrollExtent;
 
   const _AnimatedExtentSliver({
     required super.child,
     required this.factor,
     required this.clipContent,
     this.veil,
+    this.freezeScrollExtent = false,
   });
 
   @override
   _RenderAnimatedExtentSliver createRenderObject(BuildContext context) {
-    return _RenderAnimatedExtentSliver(factor, clipContent, veil);
+    return _RenderAnimatedExtentSliver(
+      factor,
+      clipContent,
+      veil,
+      freezeScrollExtent,
+    );
   }
 
   @override
@@ -658,18 +669,34 @@ class _AnimatedExtentSliver extends SingleChildRenderObjectWidget {
     renderObject
       ..factor = factor
       ..clipContent = clipContent
-      ..veil = veil;
+      ..veil = veil
+      ..freezeScrollExtent = freezeScrollExtent;
   }
 }
 
 class _RenderAnimatedExtentSliver extends RenderProxySliver {
-  _RenderAnimatedExtentSliver(this._factor, this._clipContent, this._veil);
+  _RenderAnimatedExtentSliver(
+    this._factor,
+    this._clipContent,
+    this._veil,
+    this._freezeScrollExtent,
+  );
 
   static const _edgeGap = 8.0;
 
   double _factor;
   bool _clipContent;
   Color? _veil;
+  bool _freezeScrollExtent;
+
+  bool get freezeScrollExtent => _freezeScrollExtent;
+
+  /// 仅"收起非末尾策略组"期间为 true（见 performLayout 注释）。
+  set freezeScrollExtent(bool value) {
+    if (_freezeScrollExtent == value) return;
+    _freezeScrollExtent = value;
+    markNeedsLayout();
+  }
 
   bool get clipContent => _clipContent;
 
@@ -716,9 +743,19 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
     }
     final paintExtent = childGeometry.paintExtent * factor;
     final layoutExtent = childGeometry.layoutExtent * factor;
-    final scrollExtent = childGeometry.scrollExtent * factor;
-    final maxPaintExtent = childGeometry.maxPaintExtent * factor;
     final hitTestExtent = childGeometry.hitTestExtent * factor;
+    // 收起「非末尾」策略组时，滚动范围冻结（scrollExtent / maxPaintExtent 透传给子级），
+    // 视觉仍然只缩 layout / paint。原因：范围在动画期间一起塌陷时，它塌得比可见位移快
+    // （layoutExtent 只是"可见的那一段"，scrollExtent 是整组高度），已滚动的 pixels 很快
+    // 越过正在变小的 maxScrollExtent → Flutter 用弹簧把位置纠回去，与收起动画反向拉扯，
+    // 就是"收起上面一组、下面一组跳变"。范围改为随该 sliver 一起被移除（动画结束）时一次性变化。
+    // 展开方向与末尾组不进这条分支：几何与改动前逐字节相同。
+    final scrollExtent = _freezeScrollExtent
+        ? childGeometry.scrollExtent
+        : childGeometry.scrollExtent * factor;
+    final maxPaintExtent = _freezeScrollExtent
+        ? childGeometry.maxPaintExtent
+        : childGeometry.maxPaintExtent * factor;
     geometry = SliverGeometry(
       paintOrigin: childGeometry.paintOrigin,
       scrollExtent: scrollExtent,
