@@ -118,6 +118,9 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     commonPrint.log(
       '[proxies] toggle "$groupName" → ${isExpanding ? 'expand' : 'collapse'} local=${next.length}',
     );
+    if (!isExpanding) {
+      _probeCollapseScroll(groupName);
+    }
     globalState.appController.updateCurrentUnfoldSet(next);
     // 落库校验：写完之后如果 provider 没拿到这个值（写入被丢弃 / 被同一帧的旧快照覆盖），
     // 就在帧后按本地状态补写一次并留日志——"点了没反应" 若属状态丢失，这里能自愈也能被查到。
@@ -133,6 +136,55 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
       );
       globalState.appController.updateCurrentUnfoldSet(next);
     });
+  }
+
+  /// 收起期间的滚动采样：实测「收起时视口是否发生位置纠偏」以及纠偏量。
+  /// 纠偏发生在 layout 内，不会通知监听者，只能在逐帧的帧后回调里对比。
+  void _probeCollapseScroll(String groupName) {
+    if (!_scrollController.hasClients) return;
+    var pixels = _scrollController.position.pixels;
+    var maxExtent = _scrollController.position.maxScrollExtent;
+    var frames = 0;
+    var correctionFrames = 0;
+    var maxCorrection = 0.0;
+    var idleFrames = 0;
+    commonPrint.log(
+      '[proxies] collapse probe "$groupName" pixels=${pixels.toStringAsFixed(1)} max=${maxExtent.toStringAsFixed(1)}',
+    );
+    void sample(Duration _) {
+      if (!mounted || !_scrollController.hasClients) return;
+      final position = _scrollController.position;
+      final nextPixels = position.pixels;
+      final nextMax = position.maxScrollExtent;
+      final correction = (nextPixels - pixels).abs();
+      if (correction > 0.5) {
+        correctionFrames += 1;
+        idleFrames = 0;
+        if (correction > maxCorrection) {
+          maxCorrection = correction;
+        }
+        commonPrint.log(
+          '[proxies] collapse probe "$groupName" f=$frames Δpixels=${(nextPixels - pixels).toStringAsFixed(1)} '
+          'max=${nextMax.toStringAsFixed(1)} (max${maxExtent > nextMax ? '↓' : maxExtent < nextMax ? '↑' : '='}'
+          '${(maxExtent - nextMax).abs().toStringAsFixed(1)})',
+        );
+      } else {
+        idleFrames += 1;
+      }
+      pixels = nextPixels;
+      maxExtent = nextMax;
+      frames += 1;
+      if (frames >= 40 || idleFrames >= 3) {
+        commonPrint.log(
+          '[proxies] collapse probe "$groupName" done frames=$frames corrected=$correctionFrames '
+          'maxΔ=${maxCorrection.toStringAsFixed(1)} finalPixels=${pixels.toStringAsFixed(1)}',
+        );
+        return;
+      }
+      WidgetsBinding.instance.addPostFrameCallback(sample);
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback(sample);
   }
 
   GroupOffsets _getGroupOffsets({
@@ -267,10 +319,9 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     return true;
   }
 
-  /// 返回该策略组占用的 sliver 列表（组头 + 展开的节点列表）。
-  /// 不再用 `SliverMainAxisGroup` 包一层：上游列表模式是「一个扁平 sliver 序列」，
-  /// 少一层非上游的 RenderSliver 就少一处几何/命中测试的不确定因素。
-  List<Widget> _buildGroupSlivers(
+  /// 组头与节点列表合并为一个 `SliverMainAxisGroup`：
+  /// 组内两个 sliver 的 layoutOffset / paintOffset 由同一层统一计算与修正。
+  Widget _buildGroup(
     BuildContext context, {
     required Group group,
     required bool isExpand,
@@ -285,50 +336,52 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
         ? _rowsOf(group: group, columns: columns)
         : const <List<Proxy>>[];
 
-    return [
-      SliverToBoxAdapter(
-        child: Padding(
-          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-          child: SizedBox(
-            height: 64.0,
-            child: _GroupHeader(
-              key: ValueKey('header_${group.name}'),
-              group: group,
-              isExpand: isExpand,
-              enterAnimated: enterAnimated,
-              collapsing: isCollapsing,
-              onToggle: () => _handleToggle(group.name),
-              cardType: cardType,
-              columns: columns,
-              onScrollToSelected: () => _scrollToSelected(group.name),
+    return SliverMainAxisGroup(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+            child: SizedBox(
+              height: 64.0,
+              child: _GroupHeader(
+                key: ValueKey('header_${group.name}'),
+                group: group,
+                isExpand: isExpand,
+                enterAnimated: enterAnimated,
+                collapsing: isCollapsing,
+                onToggle: () => _handleToggle(group.name),
+                cardType: cardType,
+                columns: columns,
+                onScrollToSelected: () => _scrollToSelected(group.name),
+              ),
             ),
           ),
         ),
-      ),
-      if (showList)
-        _GroupProxyListSliver(
-          key: ValueKey('expanded_group_${group.name}'),
-          group: group,
-          rows: rows,
-          columns: columns,
-          cardType: cardType,
-          enterAnimated: enterAnimated,
-          tail: isLast,
-          collapseRequested: isCollapsing,
-          onCollapsed: () {
-            if (!mounted) return;
-            setState(() {
-              _collapsingGroups.remove(group.name);
-            });
-          },
-          onEntered: () {
-            if (!mounted) return;
-            setState(() {
-              _enterGroups.remove(group.name);
-            });
-          },
-        ),
-    ];
+        if (showList)
+          _GroupProxyListSliver(
+            key: ValueKey('expanded_group_${group.name}'),
+            group: group,
+            rows: rows,
+            columns: columns,
+            cardType: cardType,
+            enterAnimated: enterAnimated,
+            tail: isLast,
+            collapseRequested: isCollapsing,
+            onCollapsed: () {
+              if (!mounted) return;
+              setState(() {
+                _collapsingGroups.remove(group.name);
+              });
+            },
+            onEntered: () {
+              if (!mounted) return;
+              setState(() {
+                _enterGroups.remove(group.name);
+              });
+            },
+          ),
+      ],
+    );
   }
 
   @override
@@ -355,7 +408,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
             slivers: [
               const SliverToBoxAdapter(child: SizedBox(height: 16)),
               for (var i = 0; i < widget.groups.length; i++)
-                ..._buildGroupSlivers(
+                _buildGroup(
                   context,
                   group: widget.groups[i],
                   isExpand: _unfoldSet.contains(widget.groups[i].name),
@@ -599,14 +652,11 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       }
     }
 
-    // 单独一层：展开时后续各行是整体位移，有隔离层就只需合成层平移，不必重录重绘。
-    return RepaintBoundary(
-      child: Padding(
-        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-        child: SizedBox(
-          height: getItemHeight(widget.cardType),
-          child: Row(children: rowChildren),
-        ),
+    return Padding(
+      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+      child: SizedBox(
+        height: getItemHeight(widget.cardType),
+        child: Row(children: rowChildren),
       ),
     );
   }
