@@ -815,4 +815,16 @@
   "addressInfo": "Адресная информация",
   "traffic": "Трафик",
   "advancedInfo": "Дополнительно",
+  "intranetAndGateway": "LAN и шлюз",
+  "networkType": "Тип сети",
+  "defaultGateway": "Шлюз",
+  "lanSharing": "Общий доступ в LAN",
+  "sharedAddress": "Общий адрес",
+  "dnsResolution": "Разрешение DNS",
+  "systemDns": "DNS",
+  "enabled": "Включено",
+  "disabled": "Отключено",
+  "openRouterAdmin": "Открыть шлюз"
 }
+
+

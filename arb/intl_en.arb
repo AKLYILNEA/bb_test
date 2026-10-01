@@ -813,5 +813,17 @@
   "addressInfo": "Address",
   "traffic": "Traffic",
   "advancedInfo": "Advanced",
+  "intranetAndGateway": "LAN & Gateway",
+  "networkType": "Network Type",
+  "defaultGateway": "Gateway",
+  "lanSharing": "LAN Sharing",
+  "sharedAddress": "Shared Address",
+  "dnsResolution": "DNS Resolution",
+  "systemDns": "DNS",
+  "enabled": "Enabled",
+  "disabled": "Disabled",
+  "openRouterAdmin": "Open Gateway"
 }
+
+
 

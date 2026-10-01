@@ -813,5 +813,17 @@
   "addressInfo": "اطلاعات آدرس",
   "traffic": "ترافیک",
   "advancedInfo": "پیشرفته",
+  "intranetAndGateway": "شبکه محلی و گیت‌وی",
+  "networkType": "نوع شبکه",
+  "defaultGateway": "گیت‌وی",
+  "lanSharing": "اشتراک‌گذاری در شبکه محلی",
+  "sharedAddress": "آدرس اشتراکی",
+  "dnsResolution": "تفکیک DNS",
+  "systemDns": "DNS",
+  "enabled": "فعال",
+  "disabled": "غیرفعال",
+  "openRouterAdmin": "باز کردن گیت‌وی"
 }
+
+
 

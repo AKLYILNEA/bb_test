@@ -813,5 +813,17 @@
   "addressInfo": "地址",
   "traffic": "流量",
   "advancedInfo": "進階",
+  "intranetAndGateway": "內網與閘道",
+  "networkType": "網路類型",
+  "defaultGateway": "閘道",
+  "lanSharing": "區域網路共享",
+  "sharedAddress": "共享位址",
+  "dnsResolution": "DNS 解析",
+  "systemDns": "DNS",
+  "enabled": "已開啟",
+  "disabled": "已關閉",
+  "openRouterAdmin": "開啟後台閘道"
 }
+
+
 

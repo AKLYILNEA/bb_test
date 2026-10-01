@@ -813,5 +813,17 @@
   "addressInfo": "주소 정보",
   "traffic": "트래픽",
   "advancedInfo": "고급 정보",
+  "intranetAndGateway": "LAN 및 게이트웨이",
+  "networkType": "네트워크 유형",
+  "defaultGateway": "게이트웨이",
+  "lanSharing": "LAN 공유",
+  "sharedAddress": "공유 주소",
+  "dnsResolution": "DNS 확인",
+  "systemDns": "DNS",
+  "enabled": "사용 중",
+  "disabled": "사용 안 함",
+  "openRouterAdmin": "게이트웨이 열기"
 }
+
+
 

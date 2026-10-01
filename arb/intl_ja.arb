@@ -813,5 +813,17 @@
   "addressInfo": "アドレス情報",
   "traffic": "トラフィック",
   "advancedInfo": "詳細情報",
+  "intranetAndGateway": "LANとゲートウェイ",
+  "networkType": "ネットワークの種類",
+  "defaultGateway": "ゲートウェイ",
+  "lanSharing": "LAN共有",
+  "sharedAddress": "共有アドレス",
+  "dnsResolution": "DNS解決",
+  "systemDns": "DNS",
+  "enabled": "有効",
+  "disabled": "無効",
+  "openRouterAdmin": "ゲートウェイを開く"
 }
+
+
 
