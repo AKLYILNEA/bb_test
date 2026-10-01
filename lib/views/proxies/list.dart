@@ -76,6 +76,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   double _containerHeight = 0;
   final Set<String> _enterGroups = <String>{};
   final Set<String> _collapsingGroups = <String>{};
+  int _toggleToken = 0;
   late Set<String> _unfoldSet;
 
   @override
@@ -111,7 +112,27 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
         _collapsingGroups.add(groupName);
       }
     });
-    globalState.appController.updateCurrentUnfoldSet(Set<String>.from(_unfoldSet));
+    final next = Set<String>.from(_unfoldSet);
+    final profileId = ref.read(currentProfileIdProvider);
+    final token = ++_toggleToken;
+    commonPrint.log(
+      '[proxies] toggle "$groupName" → ${isExpanding ? 'expand' : 'collapse'} local=${next.length}',
+    );
+    globalState.appController.updateCurrentUnfoldSet(next);
+    // 落库校验：写完之后如果 provider 没拿到这个值（写入被丢弃 / 被同一帧的旧快照覆盖），
+    // 就在帧后按本地状态补写一次并留日志——"点了没反应" 若属状态丢失，这里能自愈也能被查到。
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || token != _toggleToken) return;
+      if (profileId == null || profileId != ref.read(currentProfileIdProvider)) {
+        return;
+      }
+      final provider = ref.read(unfoldSetProvider);
+      if (stringSetEquality.equals(provider, next)) return;
+      commonPrint.log(
+        '[proxies] unfold write missed: local=${next.length} provider=${provider.length} → rewrite',
+      );
+      globalState.appController.updateCurrentUnfoldSet(next);
+    });
   }
 
   GroupOffsets _getGroupOffsets({
@@ -246,7 +267,10 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     return true;
   }
 
-  Widget _buildGroup(
+  /// 返回该策略组占用的 sliver 列表（组头 + 展开的节点列表）。
+  /// 不再用 `SliverMainAxisGroup` 包一层：上游列表模式是「一个扁平 sliver 序列」，
+  /// 少一层非上游的 RenderSliver 就少一处几何/命中测试的不确定因素。
+  List<Widget> _buildGroupSlivers(
     BuildContext context, {
     required Group group,
     required bool isExpand,
@@ -261,52 +285,50 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
         ? _rowsOf(group: group, columns: columns)
         : const <List<Proxy>>[];
 
-    return SliverMainAxisGroup(
-      slivers: [
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-            child: SizedBox(
-              height: 64.0,
-              child: _GroupHeader(
-                key: ValueKey('header_${group.name}'),
-                group: group,
-                isExpand: isExpand,
-                enterAnimated: enterAnimated,
-                collapsing: isCollapsing,
-                onToggle: () => _handleToggle(group.name),
-                cardType: cardType,
-                columns: columns,
-                onScrollToSelected: () => _scrollToSelected(group.name),
-              ),
+    return [
+      SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+          child: SizedBox(
+            height: 64.0,
+            child: _GroupHeader(
+              key: ValueKey('header_${group.name}'),
+              group: group,
+              isExpand: isExpand,
+              enterAnimated: enterAnimated,
+              collapsing: isCollapsing,
+              onToggle: () => _handleToggle(group.name),
+              cardType: cardType,
+              columns: columns,
+              onScrollToSelected: () => _scrollToSelected(group.name),
             ),
           ),
         ),
-        if (showList)
-          _GroupProxyListSliver(
-            key: ValueKey('expanded_group_${group.name}'),
-            group: group,
-            rows: rows,
-            columns: columns,
-            cardType: cardType,
-            enterAnimated: enterAnimated,
-            tail: isLast,
-            collapseRequested: isCollapsing,
-            onCollapsed: () {
-              if (!mounted) return;
-              setState(() {
-                _collapsingGroups.remove(group.name);
-              });
-            },
-            onEntered: () {
-              if (!mounted) return;
-              setState(() {
-                _enterGroups.remove(group.name);
-              });
-            },
-          ),
-      ],
-    );
+      ),
+      if (showList)
+        _GroupProxyListSliver(
+          key: ValueKey('expanded_group_${group.name}'),
+          group: group,
+          rows: rows,
+          columns: columns,
+          cardType: cardType,
+          enterAnimated: enterAnimated,
+          tail: isLast,
+          collapseRequested: isCollapsing,
+          onCollapsed: () {
+            if (!mounted) return;
+            setState(() {
+              _collapsingGroups.remove(group.name);
+            });
+          },
+          onEntered: () {
+            if (!mounted) return;
+            setState(() {
+              _enterGroups.remove(group.name);
+            });
+          },
+        ),
+    ];
   }
 
   @override
@@ -333,27 +355,25 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
             slivers: [
               const SliverToBoxAdapter(child: SizedBox(height: 16)),
               for (var i = 0; i < widget.groups.length; i++)
-                _buildGroup(
+                ..._buildGroupSlivers(
                   context,
                   group: widget.groups[i],
-                  isExpand: _unfoldSet.contains(
-                    widget.groups[i].name,
-                  ),
+                  isExpand: _unfoldSet.contains(widget.groups[i].name),
                   enterAnimated: _enterGroups.contains(widget.groups[i].name),
-                    isLast: i == widget.groups.length - 1,
-                    columns: widget.columns,
-                    cardType: widget.cardType,
-                  ),
-                SliverToBoxAdapter(
-                  child: SizedBox(
-                    height: (globalState.isAndroidTV ? 48.0 : 16.0) +
-                        (isMobileView
-                            ? getFloatingBottomBarReserveHeight(context)
-                            : 0),
-                  ),
+                  isLast: i == widget.groups.length - 1,
+                  columns: widget.columns,
+                  cardType: widget.cardType,
                 ),
-              ],
-            ),
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: (globalState.isAndroidTV ? 48.0 : 16.0) +
+                      (isMobileView
+                          ? getFloatingBottomBarReserveHeight(context)
+                          : 0),
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
@@ -409,6 +429,9 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     );
     _controller.addStatusListener(_handleStatus);
     _syncList();
+    commonPrint.log(
+      '[proxies] rows mount "${widget.group.name}" enter=${widget.enterAnimated} rows=${widget.rows.length} tail=${widget.tail}',
+    );
     if (widget.enterAnimated) {
       // 起跑值必须在没有状态回调的情况下设置：initState 期间回调里可能触发父级 setState
       _controller.removeStatusListener(_handleStatus);
@@ -454,7 +477,11 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
   void _runTo(double target) {
     _settleTimer?.cancel();
     _settleTimer = null;
-    if (!TickerMode.getNotifier(context).value || _controller.value == target) {
+    final tickerEnabled = TickerMode.getNotifier(context).value;
+    if (!tickerEnabled || _controller.value == target) {
+      commonPrint.log(
+        '[proxies] "${widget.group.name}" settle now (ticker=$tickerEnabled value=${_controller.value})',
+      );
       _snapTo(target);
       return;
     }
@@ -464,11 +491,14 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       _controller.forward();
     }
     _settleTimer = Timer(
-      _listRevealDuration * 2 + const Duration(milliseconds: 100),
+      _listRevealDuration + const Duration(milliseconds: 60),
       () {
         _settleTimer = null;
         if (!mounted) return;
         if (_controller.value == target) return;
+        commonPrint.log(
+          '[proxies] "${widget.group.name}" animation did not run → settle${target == 0.0 ? ' visible' : ' collapsed'}',
+        );
         _snapTo(target);
       },
     );
