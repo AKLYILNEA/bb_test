@@ -495,18 +495,28 @@ class AppController {
   }
 
   Future<void> updateProfile(Profile profile, {bool validate = true}) async {
+    final notifier = _ref.read(profilesProvider.notifier);
     if (_updatingProfileIds.contains(profile.id)) {
-      _ref
-          .read(profilesProvider.notifier)
-          .setProfile(profile.copyWith(isUpdating: false));
+      notifier.updateProfile(
+        profile.id,
+        (p) => p.copyWith(isUpdating: false),
+      );
       return;
     }
     _updatingProfileIds.add(profile.id);
     try {
       final newProfile = await profile.update(validate: validate);
-      _ref
-          .read(profilesProvider.notifier)
-          .setProfile(newProfile.copyWith(isUpdating: false));
+      // 订阅更新期间用户可能改了展开集 / 选中节点 / 分组名，
+      // 只把「更新真正会变的字段」合并回去，绝不用旧快照整体覆盖。
+      notifier.updateProfile(
+        newProfile.id,
+        (current) => current.copyWith(
+          label: newProfile.label,
+          subscriptionInfo: newProfile.subscriptionInfo,
+          lastUpdateDate: newProfile.lastUpdateDate,
+          isUpdating: false,
+        ),
+      );
       if (profile.id == _ref.read(currentProfileIdProvider)) {
         applyProfileDebounce(silence: true);
       }
@@ -519,8 +529,23 @@ class AppController {
     _ref.read(profilesProvider.notifier).setProfile(profile);
   }
 
+  void setProfileUpdating(String profileId, bool isUpdating) {
+    _ref.read(profilesProvider.notifier).updateProfile(
+          profileId,
+          (p) => p.copyWith(isUpdating: isUpdating),
+        );
+  }
+
   void setProfileAndAutoApply(Profile profile) {
-    _ref.read(profilesProvider.notifier).setProfile(profile);
+    // selectedMap / unfoldSet / groupSwitches 是运行时状态，编辑页不带它们，保留现值。
+    _ref.read(profilesProvider.notifier).updateProfile(
+          profile.id,
+          (current) => profile.copyWith(
+            selectedMap: current.selectedMap,
+            unfoldSet: current.unfoldSet,
+            groupSwitches: current.groupSwitches,
+          ),
+        );
     if (profile.id == _ref.read(currentProfileIdProvider)) {
       applyProfileDebounce(silence: true);
     }
@@ -586,7 +611,10 @@ class AppController {
     if (profile == null || profile.currentGroupName == groupName) {
       return;
     }
-    setProfile(profile.copyWith(currentGroupName: groupName));
+    _ref.read(profilesProvider.notifier).updateProfile(
+          profile.id,
+          (p) => p.copyWith(currentGroupName: groupName),
+        );
   }
 
   Future<void> updateClashConfig() {

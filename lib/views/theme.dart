@@ -46,9 +46,15 @@ class ThemeView extends ConsumerWidget {
       themeSettingProvider.select((state) => state.useCustomFont),
     );
 
-    final toggleItems = [
+    // 深色/反色类开关合成一张卡（纯黑模式 + 托盘图标反转 + 图标取反）
+    final invertItems = [
+      if (brightness == Brightness.dark) _PrueBlackItem(),
       if (system.isAndroid) const _DarkIconItem(),
       if (system.isWindows) _TrayIconInvertItem(),
+    ];
+
+    // 排版与表情单独一张卡
+    final styleItems = [
       _TextScaleFactorItem(),
       const _CustomFontItem(),
       if (useCustomFont) const _SelectCustomFontItem(),
@@ -58,8 +64,8 @@ class ThemeView extends ConsumerWidget {
     final items = [
       _ThemeModeItem(),
       _PrimaryColorItem(),
-      if (brightness == Brightness.dark) _PrueBlackItem(),
-      if (toggleItems.isNotEmpty) ...generateSection(items: toggleItems),
+      if (invertItems.isNotEmpty) ...generateSection(items: invertItems),
+      if (styleItems.isNotEmpty) ...generateSection(items: styleItems),
     ];
     return generateListView(items);
   }
@@ -496,7 +502,7 @@ class _PrueBlackItem extends ConsumerWidget {
       themeSettingProvider.select((state) => state.pureBlack),
     );
     return ListItem.switchItem(
-      leading: const Icon(Icons.desktop_windows_outlined),
+      leading: const Icon(FluentIcons.weather_moon_24_regular),
       horizontalTitleGap: 12,
       title: Text(
         appLocalizations.pureBlackMode,

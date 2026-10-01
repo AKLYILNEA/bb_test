@@ -79,6 +79,7 @@ class GlobalState {
   bool _isExecutingTasks = false;
   bool _needsTaskRestart = false;
   Timer? _backgroundCleanupTimer;
+  int _lifecycleToken = 0;
   final Lock _scriptEvaluateLock = Lock();
   bool isInit = false;
 
@@ -281,9 +282,15 @@ class GlobalState {
   }
 
   Future<void> handleBackground() async {
+    // 窗口状态查询是异步的：查询期间若已经回到前台，这次后台处理必须作废，
+    // 否则会把 animationEnabled / backgroundMode 卡在「后台」，全应用动画全部冻结。
+    final token = ++_lifecycleToken;
     if (system.isDesktop) {
       final isMinimized = await window?.isMinimized ?? false;
       final isVisible = await window?.isVisible ?? true;
+      if (token != _lifecycleToken) {
+        return;
+      }
       if (!isMinimized && isVisible) {
         return;
       }
@@ -307,6 +314,7 @@ class GlobalState {
   }
 
   void handleForeground() {
+    _lifecycleToken++;
     if (system.isDesktop) {
       animationEnabled.value = true;
     }

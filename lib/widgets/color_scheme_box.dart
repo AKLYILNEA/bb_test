@@ -61,34 +61,13 @@ class ColorSchemeBox extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            child: ClipOval(
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Expanded(
-                                    child: ColoredBox(
-                                      color: colorScheme.primary,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        Expanded(
-                                          child: ColoredBox(
-                                            color: colorScheme.secondary,
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: ColoredBox(
-                                            color: colorScheme.tertiary,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
+                            child: SizedBox.expand(
+                              child: CustomPaint(
+                                painter: _ColorSchemeSwatchPainter(
+                                  primary: colorScheme.primary,
+                                  secondary: colorScheme.secondary,
+                                  tertiary: colorScheme.tertiary,
+                                ),
                               ),
                             ),
                           ),
@@ -130,6 +109,61 @@ class ColorSchemeBox extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// 三个色区一次成形：分开的色块各自抗锯齿，交界处会漏出底色
+/// （深色主题下就是 Windows 上那条黑细线），改成单层画布 + 1px 交叠。
+class _ColorSchemeSwatchPainter extends CustomPainter {
+  final Color primary;
+  final Color secondary;
+  final Color tertiary;
+
+  const _ColorSchemeSwatchPainter({
+    required this.primary,
+    required this.secondary,
+    required this.tertiary,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.isEmpty) return;
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.shortestSide / 2;
+    const overlap = 1.0;
+    final halfWidth = size.width / 2;
+    final halfHeight = size.height / 2;
+    final paint = Paint()..style = PaintingStyle.fill;
+
+    canvas.save();
+    canvas.clipPath(
+      Path()..addOval(Rect.fromCircle(center: center, radius: radius)),
+    );
+    canvas.drawRect(
+      Rect.fromLTRB(0, 0, halfWidth + overlap, size.height),
+      paint..color = primary,
+    );
+    canvas.drawRect(
+      Rect.fromLTRB(halfWidth - overlap, 0, size.width, halfHeight + overlap),
+      paint..color = secondary,
+    );
+    canvas.drawRect(
+      Rect.fromLTRB(
+        halfWidth - overlap,
+        halfHeight - overlap,
+        size.width,
+        size.height,
+      ),
+      paint..color = tertiary,
+    );
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _ColorSchemeSwatchPainter oldDelegate) {
+    return oldDelegate.primary != primary ||
+        oldDelegate.secondary != secondary ||
+        oldDelegate.tertiary != tertiary;
   }
 }
 

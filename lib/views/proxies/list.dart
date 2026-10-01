@@ -393,6 +393,7 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
   late final AnimationController _controller;
   late final Animation<double> _reveal;
   late Widget _list;
+  Timer? _settleTimer;
 
   @override
   void initState() {
@@ -409,8 +410,11 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     _controller.addStatusListener(_handleStatus);
     _syncList();
     if (widget.enterAnimated) {
+      // 起跑值必须在没有状态回调的情况下设置：initState 期间回调里可能触发父级 setState
+      _controller.removeStatusListener(_handleStatus);
       _controller.value = 1;
-      _controller.reverse();
+      _controller.addStatusListener(_handleStatus);
+      _runTo(0.0);
     }
   }
 
@@ -420,15 +424,14 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     if (widget.enterAnimated &&
         _controller.value == 1 &&
         !_controller.isAnimating) {
-      _controller.reverse();
+      _runTo(0.0);
     }
     if (widget.collapseRequested && !oldWidget.collapseRequested) {
-      _controller.forward();
+      _runTo(1.0);
     } else if (!widget.collapseRequested && oldWidget.collapseRequested) {
       if (_controller.value > 0) {
-        _controller.reverse();
+        _runTo(0.0);
       } else {
-        _controller.stop();
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
           widget.onEntered?.call();
@@ -442,6 +445,54 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
         widget.group.testUrl != oldWidget.group.testUrl) {
       _syncList();
     }
+  }
+
+  /// 动画只负责观感，**绝不能决定列表最终可见与否**。
+  /// TickerMode 被全局关掉（窗口最小化/隐藏、路由被压栈等）时 ticker 一帧都不会走，
+  /// controller 会永远停在起跑值（factor = 0 或遮罩 alpha = 1 → 节点全不可见，
+  /// 表现为"点了不展开"）。所以每段动画都挂一个不依赖 ticker 的兜底：到点还没落定就直接吸附到终态。
+  void _runTo(double target) {
+    _settleTimer?.cancel();
+    _settleTimer = null;
+    if (!TickerMode.getNotifier(context).value || _controller.value == target) {
+      _snapTo(target);
+      return;
+    }
+    if (target == 0.0) {
+      _controller.reverse();
+    } else {
+      _controller.forward();
+    }
+    _settleTimer = Timer(
+      _listRevealDuration * 2 + const Duration(milliseconds: 100),
+      () {
+        _settleTimer = null;
+        if (!mounted) return;
+        if (_controller.value == target) return;
+        _snapTo(target);
+      },
+    );
+  }
+
+  /// 直接把 controller 吸附到终态，状态回调推到帧后补发：
+  /// 兜底可能发生在 build 期间（initState / didUpdateWidget），而父级回调里是 setState。
+  void _snapTo(double target) {
+    _settleTimer?.cancel();
+    _settleTimer = null;
+    _controller.stop();
+    _controller.removeStatusListener(_handleStatus);
+    if (_controller.value != target) {
+      _controller.value = target;
+    }
+    _controller.addStatusListener(_handleStatus);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _handleStatus(
+        target == 0.0
+            ? AnimationStatus.dismissed
+            : AnimationStatus.completed,
+      );
+    });
   }
 
   bool _sameRows(List<List<Proxy>> a, List<List<Proxy>> b) {
@@ -469,6 +520,7 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
 
   @override
   void dispose() {
+    _settleTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }

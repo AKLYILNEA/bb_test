@@ -233,7 +233,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
     return CommonScaffold(
       resizeToAvoidBottomInset: false,
       title:
-          ref.watch(customDashboardTitleProvider) ?? '⚡️Bettbox',
+          ref.watch(customDashboardTitleProvider) ?? '⚡️ Bettbox',
       actions: _buildActions(),
       // 竖屏下启动按钮由全局常驻悬浮按钮承担（避免双按钮）；开启卡片开关后由卡片小部件承担；
       // 非移动视图（横屏 / 桌面 / TV）且未开启卡片开关时保持悬浮按钮
