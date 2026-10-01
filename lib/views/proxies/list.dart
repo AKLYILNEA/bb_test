@@ -89,6 +89,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   final Set<String> _collapsingGroups = <String>{};
   int _toggleToken = 0;
   int _buildStamp = 0;
+  bool _diagPending = false;
   late Set<String> _unfoldSet;
 
   @override
@@ -135,15 +136,39 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
       _probeCollapseScroll(groupName);
     }
     globalState.appController.updateCurrentUnfoldSet(next);
-    // 帧后校验两件事：① 这一帧到底有没有重建（元素卡死时 setState 会静默失效）；
-    // ② provider 有没有拿到展开集。任一没成立都就地自愈，不必切页面。
+    _diagPending = true;
+    // 帧后校验：① 这一帧到底有没有重建；② 这次展开到底有没有渲染出来；
+    // ③ provider 有没有拿到展开集。任一没成立都就地自愈，不必切页面。
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || token != _toggleToken) return;
-      if (_buildStamp == stamp) {
+      if (token != _toggleToken) return;
+      if (!mounted) {
+        // 点击所在的列表元素这一帧就被换掉了（配置切换等竞态）：直接升级为换新整页。
+        commonPrint.log(
+          '[proxies] postcheck "$groupName" dropped → rebuild page',
+        );
+        proxiesPageRebuildSignal.value += 1;
+        return;
+      }
+      final built = _buildStamp != stamp;
+      final rendered = proxiesRowsVisible[groupName] == true;
+      commonPrint.log(
+        '[proxies] postcheck "$groupName" built=$built rendered=$rendered '
+        'collapsing=${_collapsingGroups.contains(groupName)} '
+        'local=${_unfoldSet.contains(groupName)} '
+        'inGroups=${widget.groups.any((g) => g.name == groupName)}',
+      );
+      if (!built) {
         commonPrint.log(
           '[proxies] rebuild missed "$groupName" → re-inflate list',
         );
         proxiesListRebuildSignal.value += 1;
+      }
+      if (isExpanding && !rendered) {
+        // 展开点击之后一个可见的节点列表都没有：升级为换新整页（等同切一次页面）。
+        commonPrint.log(
+          '[proxies] expand not rendered "$groupName" → rebuild page',
+        );
+        proxiesPageRebuildSignal.value += 1;
       }
       if (profileId == null || profileId != ref.read(currentProfileIdProvider)) {
         return;
@@ -406,6 +431,12 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   @override
   Widget build(BuildContext context) {
     _buildStamp += 1;
+    if (_diagPending) {
+      _diagPending = false;
+      commonPrint.log(
+        '[proxies] build ran set=${_unfoldSet.length} groups=${widget.groups.length}',
+      );
+    }
     final isMobileView = ref.watch(isMobileViewProvider);
 
     return LayoutBuilder(
@@ -505,6 +536,7 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     commonPrint.log(
       '[proxies] rows mount "${widget.group.name}" enter=${widget.enterAnimated} rows=${widget.rows.length} tail=${widget.tail}',
     );
+    proxiesRowsVisible[widget.group.name] = _isRevealed;
     if (widget.enterAnimated) {
       // 起跑值必须在没有状态回调的情况下设置：initState 期间回调里可能触发父级 setState
       _controller.removeStatusListener(_handleStatus);
@@ -621,9 +653,15 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     }
   }
 
+  /// 展开意图生效、且动画没有"停在完全隐藏那一端不动"时，算这次展开真的渲染出来了。
+  bool get _isRevealed =>
+      !widget.collapseRequested &&
+      !(_controller.value == 1.0 && !_controller.isAnimating);
+
   @override
   void dispose() {
     _settleTimer?.cancel();
+    proxiesRowsVisible.remove(widget.group.name);
     _controller.dispose();
     super.dispose();
   }
@@ -692,6 +730,7 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       animation: _controller,
       child: _list,
       builder: (context, list) {
+        proxiesRowsVisible[widget.group.name] = _isRevealed;
         final factor = 1.0 - _reveal.value;
         final clipContent = !widget.tail;
         final veil = _controller.value;
