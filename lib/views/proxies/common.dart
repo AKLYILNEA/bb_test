@@ -38,10 +38,6 @@ final delayTestCoordinator = DelayTestCoordinator();
 /// 不必切页面就能恢复（见 list.dart 的 _handleToggle）。
 final proxiesListRebuildSignal = ValueNotifier<int>(0);
 
-/// 页面级兜底：列表侧确认"这次展开根本没渲染出来"时递增，
-/// 由页面容器换新整页（效果等同用户手动切一次页面）。
-final proxiesPageRebuildSignal = ValueNotifier<int>(0);
-
 /// 已挂载节点列表的可见性登记（诊断用，也是"展开是否真的渲染出来"的判据）。
 final Map<String, bool> proxiesRowsVisible = <String, bool>{};
 

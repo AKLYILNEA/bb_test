@@ -9,7 +9,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:bett_box/views/resident_fab.dart';
-import 'package:bett_box/views/proxies/common.dart';
 
 typedef OnSelected = void Function(int index);
 
@@ -447,22 +446,16 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
               : 0)
           : currentIndex;
 
-      // 列表侧判定"这次交互根本没渲染出来"时，这里换新整页兜底（等同用户切一次页面）。
-      return ValueListenableBuilder<int>(
-        valueListenable: proxiesPageRebuildSignal,
-        builder: (context, rebuild, _) => AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
-          switchInCurve: Curves.easeOutCubic,
-          switchOutCurve: Curves.easeInCubic,
-          transitionBuilder: (child, animation) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          child: KeyedSubtree(
-            key: ValueKey(
-              '${widget.navigationItems[targetIndex].label}#$rebuild',
-            ),
-            child: widget.pageBuilder(context, targetIndex),
-          ),
+      return AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        switchInCurve: Curves.easeOutCubic,
+        switchOutCurve: Curves.easeInCubic,
+        transitionBuilder: (child, animation) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        child: KeyedSubtree(
+          key: ValueKey(widget.navigationItems[targetIndex].label),
+          child: widget.pageBuilder(context, targetIndex),
         ),
       );
     }

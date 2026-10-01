@@ -90,6 +90,8 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   int _toggleToken = 0;
   int _buildStamp = 0;
   bool _diagPending = false;
+  /// 每个组的节点列表代际：卡死（挂载了却渲染不出来）时 +1，换新元素重建。
+  final Map<String, int> _rowsGeneration = <String, int>{};
   late Set<String> _unfoldSet;
 
   @override
@@ -142,11 +144,11 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (token != _toggleToken) return;
       if (!mounted) {
-        // 点击所在的列表元素这一帧就被换掉了（配置切换等竞态）：直接升级为换新整页。
+        // 点击所在的列表元素这一帧就被换掉了（配置切换等竞态）：从列表层兜底重建。
         commonPrint.log(
-          '[proxies] postcheck "$groupName" dropped → rebuild page',
+          '[proxies] postcheck "$groupName" dropped → re-inflate list',
         );
-        proxiesPageRebuildSignal.value += 1;
+        proxiesListRebuildSignal.value += 1;
         return;
       }
       final built = _buildStamp != stamp;
@@ -164,11 +166,13 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
         proxiesListRebuildSignal.value += 1;
       }
       if (isExpanding && !rendered) {
-        // 展开点击之后一个可见的节点列表都没有：升级为换新整页（等同切一次页面）。
+        // 展开点击之后节点列表没渲染出来（元素卡死）：换掉这一个组的列表元素。
         commonPrint.log(
-          '[proxies] expand not rendered "$groupName" → rebuild page',
+          '[proxies] expand not rendered "$groupName" → re-inflate rows',
         );
-        proxiesPageRebuildSignal.value += 1;
+        setState(() {
+          _rowsGeneration[groupName] = (_rowsGeneration[groupName] ?? 0) + 1;
+        });
       }
       if (profileId == null || profileId != ref.read(currentProfileIdProvider)) {
         return;
@@ -403,7 +407,9 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
         ),
         if (showList)
           _GroupProxyListSliver(
-            key: ValueKey('expanded_group_${group.name}'),
+            key: ValueKey(
+              'expanded_group_${group.name}#${_rowsGeneration[group.name] ?? 0}',
+            ),
             group: group,
             rows: rows,
             columns: columns,
