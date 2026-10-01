@@ -112,8 +112,6 @@ class ColorSchemeBox extends StatelessWidget {
   }
 }
 
-/// 三个色区一次成形：分开的色块各自抗锯齿，交界处会漏出底色
-/// （深色主题下就是 Windows 上那条黑细线），改成单层画布 + 1px 交叠。
 class _ColorSchemeSwatchPainter extends CustomPainter {
   final Color primary;
   final Color secondary;

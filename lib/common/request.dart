@@ -652,7 +652,6 @@ class Request {
     final isZh = Intl.getCurrentLocale().toLowerCase().startsWith('zh');
     final cacheKey = '${ip}_${isZh ? 'zh' : 'en'}';
 
-    // 0. 优先命中高频内存缓存（0 耗时）
     final memoryCached = _memoryIpCache[cacheKey];
     if (memoryCached != null) {
       return Result.success(memoryCached);

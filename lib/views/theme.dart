@@ -46,14 +46,12 @@ class ThemeView extends ConsumerWidget {
       themeSettingProvider.select((state) => state.useCustomFont),
     );
 
-    // 深色/反色类开关合成一张卡（纯黑模式 + 托盘图标反转 + 图标取反）
     final invertItems = [
       if (brightness == Brightness.dark) _PrueBlackItem(),
       if (system.isAndroid) const _DarkIconItem(),
       if (system.isWindows) _TrayIconInvertItem(),
     ];
 
-    // 排版与表情单独一张卡
     final styleItems = [
       _TextScaleFactorItem(),
       const _CustomFontItem(),
@@ -779,12 +777,6 @@ class _DarkIconItem extends ConsumerWidget {
           color: context.colorScheme.onSurfaceVariant,
         ),
       ),
-      subtitle: Text(
-        appLocalizations.darkIconDesc,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: context.colorScheme.onSurfaceVariant.withOpacity(0.7),
-        ),
-      ),
       delegate: SwitchDelegate(
         value: useDarkIcon,
         onChanged: (value) async {
@@ -813,12 +805,6 @@ class _TrayIconInvertItem extends ConsumerWidget {
         appLocalizations.trayIconInvert,
         style: Theme.of(context).textTheme.titleSmall?.copyWith(
           color: context.colorScheme.onSurfaceVariant,
-        ),
-      ),
-      subtitle: Text(
-        appLocalizations.trayIconInvertDesc,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: context.colorScheme.onSurfaceVariant.withOpacity(0.7),
         ),
       ),
       delegate: SwitchDelegate(

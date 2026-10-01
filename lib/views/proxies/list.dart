@@ -16,9 +16,6 @@ import 'card.dart';
 import 'common.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-/// 展开 / 收起时长：**固定值**，与节点数量无关。
-/// 可见内容量由视口决定（任何组同屏都只有约 10~13 行），按"总节点数"拉长时长没有依据，
-/// 只会让大组显得慢；要调整手感只改这一个常量。
 const _listRevealDuration = Duration(milliseconds: 153);
 
 class ProxiesListView extends ConsumerWidget {
@@ -70,7 +67,6 @@ class _ProxyGroupsList extends ConsumerStatefulWidget {
   ConsumerState<_ProxyGroupsList> createState() => _ProxyGroupsListState();
 }
 
-/// 当前挂在元素树里的节点列表（按组名）。用于判断"这次展开到底有没有渲染出来"。
 final Set<String> _mountedRows = <String>{};
 
 class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
@@ -120,8 +116,6 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     final token = ++_toggleToken;
     globalState.appController.updateCurrentUnfoldSet(next);
     if (!isExpanding) return;
-    // 展开后这一帧如果那一组的节点列表没进元素树（列表内层子树停止更新子级），
-    // 就把内层子树整体换新一次，效果等同用户切一次页面，不必手动切。
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || token != _toggleToken) return;
       if (_mountedRows.contains(groupName)) return;
@@ -263,8 +257,6 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     return true;
   }
 
-  /// 组头与节点列表合并为一个 `SliverMainAxisGroup`：
-  /// 组内两个 sliver 的 layoutOffset / paintOffset 由同一层统一计算与修正。
   Widget _buildGroup(
     BuildContext context, {
     required Group group,
@@ -332,7 +324,6 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   Widget build(BuildContext context) {
     final isMobileView = ref.watch(isMobileViewProvider);
 
-    // 内层子树代际：列表内部这一层不再更新子级时整体换新（普通 Widget 换 key，不涉及 GlobalKey）。
     return LayoutBuilder(
       key: ValueKey('proxies_list_view#$_viewGeneration'),
       builder: (context, constraints) {
@@ -430,7 +421,6 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     _syncList();
     _mountedRows.add(widget.group.name);
     if (widget.enterAnimated) {
-      // 起跑值必须在没有状态回调的情况下设置：initState 期间回调里可能触发父级 setState
       _controller.removeStatusListener(_handleStatus);
       _controller.value = 1;
       _controller.addStatusListener(_handleStatus);
@@ -467,10 +457,6 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     }
   }
 
-  /// 动画只负责观感，**绝不能决定列表最终可见与否**。
-  /// TickerMode 被全局关掉（窗口最小化/隐藏、路由被压栈等）时 ticker 一帧都不会走，
-  /// controller 会永远停在起跑值（factor = 0 或遮罩 alpha = 1 → 节点全不可见，
-  /// 表现为"点了不展开"）。所以每段动画都挂一个不依赖 ticker 的兜底：到点还没落定就直接吸附到终态。
   void _runTo(double target) {
     _settleTimer?.cancel();
     _settleTimer = null;
@@ -495,8 +481,6 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     );
   }
 
-  /// 直接把 controller 吸附到终态，状态回调推到帧后补发：
-  /// 兜底可能发生在 build 期间（initState / didUpdateWidget），而父级回调里是 setState。
   void _snapTo(double target) {
     _settleTimer?.cancel();
     _settleTimer = null;
@@ -602,7 +586,6 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
 
   @override
   Widget build(BuildContext context) {
-    // 可见性只由意图决定：动画没在跑却停在非终态（被冻结 / 被吞掉）时就地吸附。
     final target = widget.collapseRequested ? 1.0 : 0.0;
     if (!_controller.isAnimating && _controller.value != target) {
       _snapTo(target);
@@ -764,8 +747,6 @@ class _RenderAnimatedExtentSliver extends RenderProxySliver {
     );
   }
 
-  /// 用页面底色按当前透明度盖住整块揭示区域：行仍然是不透明绘制，
-  /// 混色结果与"整片透明度淡入"相同，但不需要离屏层。
   void _paintVeil(PaintingContext context, Offset offset) {
     final veil = _veil;
     if (veil == null) return;

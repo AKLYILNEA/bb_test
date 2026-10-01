@@ -46,7 +46,6 @@ class ShowBarScrollBehavior extends BaseScrollBehavior {
   }
 }
 
-/// 羽化 + 滚动条同层：羽化放在滚动条内侧，滑动指示条永远画在羽化之上（且羽化满宽）
 class FeatherBarScrollBehavior extends BaseScrollBehavior {
   const FeatherBarScrollBehavior();
 

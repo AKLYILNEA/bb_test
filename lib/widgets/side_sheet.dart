@@ -362,9 +362,6 @@ class ModalSideSheetRoute<T> extends PopupRoute<T> {
     if (_filter == null) {
       return barrier;
     }
-    // 模糊强度由动画驱动（sigma 0 → 目标值，观感等同淡入，省掉 FadeTransition 每帧的整屏 saveLayer）；
-    // 并且只模糊「面板还没盖住的那一条」：面板完全不透明，被盖住的区域不需要模糊，
-    // 于是模糊面积随面板推进不断缩小，展开全程的合成开销大幅下降。
     final anim = animation!;
     final panelWidth = constraints?.maxWidth ?? 360;
     return Stack(
@@ -418,7 +415,6 @@ class ModalSideSheetRoute<T> extends PopupRoute<T> {
   }
 }
 
-/// 抽屉/侧边弹层只保留最底层那一层背景模糊：下面已经有模糊路由（另一层弹层或弹窗）时不再叠加。
 ImageFilter? resolveSheetFilter(BuildContext context, ImageFilter? filter) {
   if (filter == null) return null;
   final route = ModalRoute.of(context);

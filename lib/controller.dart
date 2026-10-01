@@ -506,8 +506,6 @@ class AppController {
     _updatingProfileIds.add(profile.id);
     try {
       final newProfile = await profile.update(validate: validate);
-      // 订阅更新期间用户可能改了展开集 / 选中节点 / 分组名，
-      // 只把「更新真正会变的字段」合并回去，绝不用旧快照整体覆盖。
       notifier.updateProfile(
         newProfile.id,
         (current) => current.copyWith(
@@ -537,7 +535,6 @@ class AppController {
   }
 
   void setProfileAndAutoApply(Profile profile) {
-    // selectedMap / unfoldSet / groupSwitches 是运行时状态，编辑页不带它们，保留现值。
     _ref.read(profilesProvider.notifier).updateProfile(
           profile.id,
           (current) => profile.copyWith(
@@ -1004,8 +1001,6 @@ class AppController {
 
       _ref.read(groupsProvider.notifier).value = newGroups;
 
-      // 主动预取策略组图标：配置（YAML）中新增或更换图标后立即拉取，
-      // 不再依赖组件可见时才懒加载，也无需重启应用即可生效。
       unawaited(
         CommonTargetIcon.prefetchAll(newGroups.map((group) => group.icon)),
       );
@@ -1107,8 +1102,6 @@ class AppController {
         }
       }
       stopWakelockAutoRecovery();
-      // 完全退出应用：主动释放系统亮屏锁，恢复系统默认息屏策略
-      // （偏好本身保留，下次启动按偏好自动恢复）
       try {
         await WakelockPlus.disable();
       } catch (e) {
@@ -1359,8 +1352,6 @@ class AppController {
     }
 
     try {
-      // 按用户上次的偏好恢复亮屏锁（避免每次启动都要手动开启）。
-      // 完全退出应用时会主动释放系统亮屏锁，因此不会影响系统默认息屏策略。
       final wakelockEnabled = await preferences.getWakelockEnabled();
       _ref.read(wakelockStateProvider.notifier).state = wakelockEnabled;
       if (wakelockEnabled) {

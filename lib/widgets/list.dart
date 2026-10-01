@@ -270,8 +270,6 @@ class ListItem<T> extends StatelessWidget {
       key: key,
       dense: dense,
       enabled: enabled,
-      // 只在键盘 / 遥控器（traditional高亮模式）下给焦点底色：
-      // 触摸设备上点一下会同时获得焦点，而这个底色看起来就像"又按了一次"。
       focusColor:
           FocusManager.instance.highlightMode == FocusHighlightMode.traditional
           ? context.colorScheme.primary.withValues(alpha: 0.18)
@@ -821,4 +819,3 @@ Widget generateListView(List<Widget> items) {
     },
   );
 }
-

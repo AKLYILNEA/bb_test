@@ -44,15 +44,10 @@ class ClashCore {
       final geoFile = File(join(homePath, geoFileName));
       try {
         final data = await rootBundle.load('assets/data/$geoFileName');
-        // 必须按 offset/length 切片，不能直接 asUint8List()（那样可能写出超出该资源的字节）
         final bytes = data.buffer.asUint8List(
           data.offsetInBytes,
           data.lengthInBytes,
         );
-        // 文件缺失 / 被截断（比内置资源还小，含 0 字节）时必须补回来：
-        // 否则内核判定 geo 数据库不可用，会自己去 geox-url（GitHub）重新下载，
-        // 期间规则加载被阻塞 → 表现为「连不上，要等一阵子才好」。
-        // 反过来，家目录里更大的那份（内置资源之上另外下过的新版本）保持不动。
         if (await geoFile.exists() && await geoFile.length() >= bytes.length) {
           continue;
         }

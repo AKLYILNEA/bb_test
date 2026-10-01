@@ -68,7 +68,6 @@ class _CurrentProfileDialogState extends ConsumerState<CurrentProfileDialog> {
     }
   }
 
-  // 只有点确定才真正切换配置，滚轮/滚动只改选中项。
   void _handleConfirm() {
     final profileId = _selectedId;
     if (profileId != null && profileId != ref.read(currentProfileIdProvider)) {
@@ -209,7 +208,6 @@ class _CurrentProfileDialogState extends ConsumerState<CurrentProfileDialog> {
   }
 }
 
-// 与配置卡片同款三行：名字 + 到期/本地文件 · 进度条/无用量统计 · 用量 · 上次更新。
 class _ProfilePanel extends StatelessWidget {
   final Profile? profile;
 
@@ -249,7 +247,6 @@ class _ProfilePanel extends StatelessWidget {
     return SizedBox(height: 14, child: Center(child: child));
   }
 
-  // 第一行 = 配置卡片标题行（名字放大加粗 + · + 到期/本地文件），整行居中。
   Widget _titleRow(BuildContext context, String name, String subtitle) {
     final labelStyle = context.textTheme.labelMedium?.toLight;
     return SizedBox(

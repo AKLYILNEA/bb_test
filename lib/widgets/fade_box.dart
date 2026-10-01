@@ -6,7 +6,6 @@ class FadeBox extends StatelessWidget {
   final Widget child;
   final AlignmentGeometry? alignment;
   final StackFit fit;
-  // 先淡出旧内容再淡入新内容，避免两者同时可见（默认是交叉淡入淡出）。
   final bool sequential;
 
   const FadeBox({

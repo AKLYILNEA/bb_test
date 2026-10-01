@@ -201,9 +201,6 @@ extension ProfileExtension on Profile {
 
   Future<Profile> saveFile(Uint8List bytes, {bool validate = true}) async {
     String content = utf8.decode(bytes);
-    // 自动更新走 validate:false，此时若订阅服务器返回空内容 / 错误页，
-    // 旧代码会把整个 profile 文件覆盖成垃圾 —— 内核随即无法加载配置，
-    // 表现为「这个机场连不上，过一阵子（下次更新成功）才好」。这类内容一律拒绝写入。
     final trimmed = content.trimLeft();
     if (trimmed.isEmpty || trimmed.startsWith('<')) {
       throw 'Invalid profile content (${bytes.length} bytes)';
