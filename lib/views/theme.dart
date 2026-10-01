@@ -502,7 +502,7 @@ class _PrueBlackItem extends ConsumerWidget {
       themeSettingProvider.select((state) => state.pureBlack),
     );
     return ListItem.switchItem(
-      leading: const Icon(FluentIcons.weather_moon_24_regular),
+      leading: const Icon(Icons.desktop_windows_outlined),
       horizontalTitleGap: 12,
       title: Text(
         appLocalizations.pureBlackMode,
