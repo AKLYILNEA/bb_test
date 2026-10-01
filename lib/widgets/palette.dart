@@ -13,6 +13,23 @@ const _thumbRadius = 14.0;
 const _trackTone = 60.0;
 const _previewInset = 8.0;
 
+class _SuperellipseClipper extends CustomClipper<Path> {
+  final BorderRadius borderRadius;
+
+  const _SuperellipseClipper({required this.borderRadius});
+
+  @override
+  Path getClip(Size size) {
+    return RoundedSuperellipseBorder(
+      borderRadius: borderRadius,
+    ).getOuterPath(Offset.zero & size);
+  }
+
+  @override
+  bool shouldReclip(_SuperellipseClipper oldClipper) =>
+      borderRadius != oldClipper.borderRadius;
+}
+
 Color? parseColor(String input) {
   final cleanInput = input.trim().replaceAll(' ', '').toLowerCase();
 
@@ -204,61 +221,65 @@ class _PaletteState extends State<Palette> {
                 onToneSelected: _onToneSelected,
               ),
               const SizedBox(height: 14),
-              InkWell(
-                borderRadius: BorderRadius.circular(14),
-                onTap: () => _handleCustomInput(context),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainer,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: theme.colorScheme.outlineVariant.withValues(
-                        alpha: 0.6,
-                      ),
+              Material(
+                shape: RoundedSuperellipseBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(
+                    color: theme.colorScheme.outlineVariant.withValues(
+                      alpha: 0.6,
                     ),
                   ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 24,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          color: currentColor,
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.35),
-                            width: 1.5,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.16),
-                              blurRadius: 3,
-                              offset: const Offset(0, 1),
+                ),
+                color: theme.colorScheme.surfaceContainer,
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
+                  onTap: () => _handleCustomInput(context),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 24,
+                          height: 24,
+                          decoration: ShapeDecoration(
+                            color: currentColor,
+                            shape: RoundedSuperellipseBorder(
+                              borderRadius: BorderRadius.circular(6),
+                              side: BorderSide(
+                                color: Colors.white.withValues(alpha: 0.35),
+                                width: 1.5,
+                              ),
                             ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          currentColor.hex,
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontFamily: 'monospace',
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.8,
+                            shadows: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.16),
+                                blurRadius: 3,
+                                offset: const Offset(0, 1),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                      Icon(
-                        FluentIcons.edit_24_regular,
-                        size: 18,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ],
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            currentColor.hex,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontFamily: 'monospace',
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          FluentIcons.edit_24_regular,
+                          size: 18,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -369,17 +390,16 @@ class _GradientTrackShape extends SliderTrackShape {
       valueRect.right + _thumbRadius,
       valueRect.bottom,
     );
-    final rrect = RRect.fromRectAndRadius(
-      rect,
-      Radius.circular(rect.height / 2),
-    );
+    final path = RoundedSuperellipseBorder(
+      borderRadius: BorderRadius.circular(rect.height / 2),
+    ).getOuterPath(rect);
     final canvas = context.canvas;
-    canvas.drawRRect(
-      rrect,
+    canvas.drawPath(
+      path,
       Paint()..shader = LinearGradient(colors: colors).createShader(valueRect),
     );
-    canvas.drawRRect(
-      rrect,
+    canvas.drawPath(
+      path,
       Paint()
         ..color = outlineColor.withValues(alpha: 0.6)
         ..style = PaintingStyle.stroke
@@ -447,27 +467,33 @@ class _ToneStrip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 44,
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Theme.of(
-            context,
-          ).colorScheme.outlineVariant.withValues(alpha: 0.6),
+      foregroundDecoration: ShapeDecoration(
+        shape: RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: Theme.of(
+              context,
+            ).colorScheme.outlineVariant.withValues(alpha: 0.6),
+          ),
         ),
       ),
-      child: Row(
-        children: [
-          for (final tone in _tones)
-            Expanded(
-              child: _ToneCell(
-                tone: tone,
-                color: Color(Hct.from(hue, chroma, tone.toDouble()).toInt()),
-                isSelected: tone == selectedTone.round(),
-                onSelected: () => onToneSelected(tone.toDouble()),
+      child: ClipPath(
+        clipper: const _SuperellipseClipper(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+        ),
+        child: Row(
+          children: [
+            for (final tone in _tones)
+              Expanded(
+                child: _ToneCell(
+                  tone: tone,
+                  color: Color(Hct.from(hue, chroma, tone.toDouble()).toInt()),
+                  isSelected: tone == selectedTone.round(),
+                  onSelected: () => onToneSelected(tone.toDouble()),
+                ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -509,13 +535,15 @@ class _ToneCellState extends State<_ToneCell> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
                 child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: foregroundColor.withValues(
-                        alpha: widget.isSelected ? 0.9 : 0.5,
+                  decoration: ShapeDecoration(
+                    shape: RoundedSuperellipseBorder(
+                      borderRadius: BorderRadius.circular(1000),
+                      side: BorderSide(
+                        color: foregroundColor.withValues(
+                          alpha: widget.isSelected ? 0.9 : 0.5,
+                        ),
+                        width: 2,
                       ),
-                      width: 2,
                     ),
                   ),
                 ),
@@ -572,10 +600,12 @@ class _ColorSchemePreview extends StatelessWidget {
     ];
     return Container(
       padding: const EdgeInsets.all(_previewInset),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: colorScheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.outlineVariant),
+        shape: RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: colorScheme.outlineVariant),
+        ),
       ),
       child: LayoutBuilder(
         builder: (_, constraints) => Row(
@@ -584,8 +614,10 @@ class _ColorSchemePreview extends StatelessWidget {
               if (i > 0)
                 SizedBox(width: min(_previewInset, constraints.maxWidth / 8)),
               Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
+                child: ClipPath(
+                  clipper: const _SuperellipseClipper(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [

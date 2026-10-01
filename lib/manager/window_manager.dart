@@ -350,13 +350,17 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
             child: IgnorePointer(
               ignoring: !showButtons,
               child: IconTheme(
-                data: const IconThemeData(size: 15.6),
+                data: IconThemeData(
+                  size: 15.6,
+                  color: context.colorScheme.onSurface,
+                ),
                 child: Row(
                   children: [
                     ValueListenableBuilder(
                       valueListenable: isPinNotifier,
                       builder: (_, value, _) {
                         return IconButton(
+                          color: context.colorScheme.onSurface,
                           iconSize: 15.6,
                           onPressed: _updatePin,
                           icon: value
@@ -366,6 +370,7 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
                       },
                     ),
                     IconButton(
+                      color: context.colorScheme.onSurface,
                       iconSize: 15.6,
                       onPressed: () {
                         windowManager.minimize();
@@ -376,6 +381,7 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
                       valueListenable: isMaximizedNotifier,
                       builder: (_, value, _) {
                         return IconButton(
+                          color: context.colorScheme.onSurface,
                           iconSize: 15.6,
                           onPressed: () async {
                             _updateMaximized();
@@ -390,6 +396,7 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
                       },
                     ),
                     IconButton(
+                      color: context.colorScheme.onSurface,
                       iconSize: 15.6,
                       onPressed: () {
                         FocusManager.instance.primaryFocus?.unfocus();
