@@ -349,47 +349,57 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
             opacity: showButtons ? 1.0 : 0.0,
             child: IgnorePointer(
               ignoring: !showButtons,
-              child: Row(
-                children: [
-                  ValueListenableBuilder(
-                    valueListenable: isPinNotifier,
-                    builder: (_, value, _) {
-                      return IconButton(
-                        onPressed: _updatePin,
-                        icon: value
-                            ? const Icon(FluentIcons.pin_24_filled)
-                            : const Icon(FluentIcons.pin_24_regular),
-                      );
-                    },
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      windowManager.minimize();
-                    },
-                    icon: const Icon(FluentIcons.subtract_24_regular),
-                  ),
-                  ValueListenableBuilder(
-                    valueListenable: isMaximizedNotifier,
-                    builder: (_, value, _) {
-                      return IconButton(
-                        onPressed: () async {
-                          _updateMaximized();
-                        },
-                        icon: value
-                            ? const Icon(FluentIcons.square_multiple_24_regular, size: 20)
-                            : const Icon(FluentIcons.square_24_regular),
-                      );
-                    },
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      FocusManager.instance.primaryFocus?.unfocus();
-                      globalState.appController.unBackBlock();
-                      globalState.appController.handleBackOrExit();
-                    },
-                    icon: const Icon(FluentIcons.dismiss_24_regular),
-                  ),
-                ],
+              child: IconTheme(
+                data: const IconThemeData(size: 15.6),
+                child: Row(
+                  children: [
+                    ValueListenableBuilder(
+                      valueListenable: isPinNotifier,
+                      builder: (_, value, _) {
+                        return IconButton(
+                          iconSize: 15.6,
+                          onPressed: _updatePin,
+                          icon: value
+                              ? const Icon(FluentIcons.pin_24_filled)
+                              : const Icon(FluentIcons.pin_24_regular),
+                        );
+                      },
+                    ),
+                    IconButton(
+                      iconSize: 15.6,
+                      onPressed: () {
+                        windowManager.minimize();
+                      },
+                      icon: const Icon(FluentIcons.subtract_24_regular),
+                    ),
+                    ValueListenableBuilder(
+                      valueListenable: isMaximizedNotifier,
+                      builder: (_, value, _) {
+                        return IconButton(
+                          iconSize: 15.6,
+                          onPressed: () async {
+                            _updateMaximized();
+                          },
+                          icon: value
+                              ? const Icon(
+                                  FluentIcons.square_multiple_24_regular,
+                                  size: 13.0,
+                                )
+                              : const Icon(FluentIcons.square_24_regular),
+                        );
+                      },
+                    ),
+                    IconButton(
+                      iconSize: 15.6,
+                      onPressed: () {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        globalState.appController.unBackBlock();
+                        globalState.appController.handleBackOrExit();
+                      },
+                      icon: const Icon(FluentIcons.dismiss_24_regular),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
