@@ -26,24 +26,35 @@ class ProxiesListView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(proxiesListStateProvider);
+    final hasGroups = ref.watch(
+      proxiesListStateProvider.select((state) => state.groups.isNotEmpty),
+    );
     final currentProfileId = ref.watch(currentProfileIdProvider);
 
-    if (state.groups.isEmpty) {
+    if (!hasGroups) {
       return NullStatus(
         label: appLocalizations.nullTip(appLocalizations.proxies),
         illustration: NullStatusIllustration.proxies,
       );
     }
 
-    return _ProxyGroupsList(
-      key: ValueKey('proxy_groups_list_$currentProfileId'),
-      groups: state.groups,
-      columns: state.columns,
-      cardType: state.proxyCardType,
-      sortType: state.proxiesSortType,
-      sortNum: state.sortNum,
-      currentUnfoldSet: state.currentUnfoldSet,
+    // generation 变化 = 换新整棵列表；builder 内重新 watch，重建取最新状态。
+    return ValueListenableBuilder<int>(
+      valueListenable: proxiesListRebuildSignal,
+      builder: (context, generation, _) => Consumer(
+        builder: (context, ref, _) {
+          final state = ref.watch(proxiesListStateProvider);
+          return _ProxyGroupsList(
+            key: ValueKey('proxy_groups_list_${currentProfileId}_$generation'),
+            groups: state.groups,
+            columns: state.columns,
+            cardType: state.proxyCardType,
+            sortType: state.proxiesSortType,
+            sortNum: state.sortNum,
+            currentUnfoldSet: state.currentUnfoldSet,
+          );
+        },
+      ),
     );
   }
 }
@@ -77,6 +88,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   final Set<String> _enterGroups = <String>{};
   final Set<String> _collapsingGroups = <String>{};
   int _toggleToken = 0;
+  int _buildStamp = 0;
   late Set<String> _unfoldSet;
 
   @override
@@ -115,6 +127,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     final next = Set<String>.from(_unfoldSet);
     final profileId = ref.read(currentProfileIdProvider);
     final token = ++_toggleToken;
+    final stamp = _buildStamp;
     commonPrint.log(
       '[proxies] toggle "$groupName" → ${isExpanding ? 'expand' : 'collapse'} local=${next.length}',
     );
@@ -122,10 +135,16 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
       _probeCollapseScroll(groupName);
     }
     globalState.appController.updateCurrentUnfoldSet(next);
-    // 落库校验：写完之后如果 provider 没拿到这个值（写入被丢弃 / 被同一帧的旧快照覆盖），
-    // 就在帧后按本地状态补写一次并留日志——"点了没反应" 若属状态丢失，这里能自愈也能被查到。
+    // 帧后校验两件事：① 这一帧到底有没有重建（元素卡死时 setState 会静默失效）；
+    // ② provider 有没有拿到展开集。任一没成立都就地自愈，不必切页面。
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || token != _toggleToken) return;
+      if (_buildStamp == stamp) {
+        commonPrint.log(
+          '[proxies] rebuild missed "$groupName" → re-inflate list',
+        );
+        proxiesListRebuildSignal.value += 1;
+      }
       if (profileId == null || profileId != ref.read(currentProfileIdProvider)) {
         return;
       }
@@ -386,6 +405,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
 
   @override
   Widget build(BuildContext context) {
+    _buildStamp += 1;
     final isMobileView = ref.watch(isMobileViewProvider);
 
     return LayoutBuilder(
@@ -663,6 +683,11 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
 
   @override
   Widget build(BuildContext context) {
+    // 可见性只由意图决定：动画没在跑却停在非终态（卡住 / 被吞掉）时就地吸附。
+    final target = widget.collapseRequested ? 1.0 : 0.0;
+    if (!_controller.isAnimating && _controller.value != target) {
+      _snapTo(target);
+    }
     return AnimatedBuilder(
       animation: _controller,
       child: _list,
