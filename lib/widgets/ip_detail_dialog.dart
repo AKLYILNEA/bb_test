@@ -218,6 +218,8 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
             tooltip: appLocalizations.copy,
             onPressed: () => _copyIp(context),
           ),
+          if (system.isDesktop)
+            const SizedBox(width: 8),
           _buildIconButton(
             icon: FluentIcons.open_24_regular,
             tooltip: appLocalizations.viewDetailedIpData,
