@@ -44,7 +44,7 @@ class AboutView extends StatelessWidget {
             title: 'Github Releases',
             icon: FluentIcons.star_add_24_regular,
             onTap: () =>
-                globalState.openUrl('https://github.com/$repository'),
+                globalState.openUrl('https://github.com/$repository/releases'),
           ),
           right: _LinkGridTile(
             title: appLocalizations.checkUpdate,

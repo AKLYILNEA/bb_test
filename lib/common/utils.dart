@@ -806,25 +806,40 @@ class Utils {
   }
 
   int compareVersions(String version1, String version2) {
-    List<String> v1 = version1.split('+')[0].split('.');
-    List<String> v2 = version2.split('+')[0].split('.');
-    int major1 = int.parse(v1[0]);
-    int major2 = int.parse(v2[0]);
+    int parseSeg(String? seg) {
+      if (seg == null || seg.isEmpty) return 0;
+      final digits = seg.split(RegExp(r'[^\d]')).firstOrNull ?? '';
+      return int.tryParse(digits) ?? 0;
+    }
+
+    final v1 = version1.split('+')[0].split('.');
+    final v2 = version2.split('+')[0].split('.');
+    final major1 = parseSeg(v1.elementAtOrNull(0));
+    final major2 = parseSeg(v2.elementAtOrNull(0));
     if (major1 != major2) {
       return major1.compareTo(major2);
     }
-    int minor1 = v1.length > 1 ? int.parse(v1[1]) : 0;
-    int minor2 = v2.length > 1 ? int.parse(v2[1]) : 0;
+    final minor1 = parseSeg(v1.elementAtOrNull(1));
+    final minor2 = parseSeg(v2.elementAtOrNull(1));
     if (minor1 != minor2) {
       return minor1.compareTo(minor2);
     }
-    int patch1 = v1.length > 2 ? int.parse(v1[2]) : 0;
-    int patch2 = v2.length > 2 ? int.parse(v2[2]) : 0;
+    final patch1 = parseSeg(v1.elementAtOrNull(2));
+    final patch2 = parseSeg(v2.elementAtOrNull(2));
     if (patch1 != patch2) {
       return patch1.compareTo(patch2);
     }
-    int build1 = version1.contains('+') ? int.parse(version1.split('+')[1]) : 0;
-    int build2 = version2.contains('+') ? int.parse(version2.split('+')[1]) : 0;
+    final isPre1 = version1.contains('-') || version1.contains('pre');
+    final isPre2 = version2.contains('-') || version2.contains('pre');
+    if (isPre1 != isPre2) {
+      return isPre1 ? -1 : 1;
+    }
+    final build1 = version1.contains('+')
+        ? int.tryParse(version1.split('+')[1]) ?? 0
+        : 0;
+    final build2 = version2.contains('+')
+        ? int.tryParse(version2.split('+')[1]) ?? 0
+        : 0;
     return build1.compareTo(build2);
   }
 
