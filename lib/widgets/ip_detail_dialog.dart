@@ -135,6 +135,7 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
         ),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
             padding: const EdgeInsets.all(6),
@@ -161,24 +162,22 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
                       ),
                       const SizedBox(height: 1),
                       customValue ??
-                          SelectableText(
+                          Text(
                             value,
                             style: context.textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.bold,
                               fontVariations: const [FontVariation('wght', 700)],
                             ),
-                            maxLines: 1,
                           ),
                     ],
                   )
                 : (customValue ??
-                    SelectableText(
+                    Text(
                       value,
                       style: context.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         fontVariations: const [FontVariation('wght', 700)],
                       ),
-                      maxLines: 1,
                     )),
           ),
           if (action != null) ...[
@@ -358,13 +357,12 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
                   const SizedBox(width: 6),
                 ],
                 Flexible(
-                  child: SelectableText(
+                  child: Text(
                     countryText,
                     style: context.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       fontVariations: const [FontVariation('wght', 700)],
                     ),
-                    maxLines: 1,
                   ),
                 ),
               ],
