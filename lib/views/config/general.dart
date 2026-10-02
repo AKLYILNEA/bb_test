@@ -125,6 +125,7 @@ class _UaDialog extends StatelessWidget {
           Material(
             color: Colors.transparent,
             child: InkWell(
+              borderRadius: BorderRadius.circular(16),
               onTap: () {
                 Navigator.of(context, rootNavigator: true).pop(const _UaOption(_UaOptionType.default_));
               },
@@ -149,6 +150,7 @@ class _UaDialog extends StatelessWidget {
           Material(
             color: Colors.transparent,
             child: InkWell(
+              borderRadius: BorderRadius.circular(16),
               onTap: () {
                 Navigator.of(context, rootNavigator: true).pop(const _UaOption(_UaOptionType.custom));
               },
@@ -286,6 +288,7 @@ class _TestUrlDialog extends ConsumerWidget {
             return Material(
               color: Colors.transparent,
               child: InkWell(
+                borderRadius: BorderRadius.circular(16),
                 onTap: () async {
                   ref
                       .read(appSettingProvider.notifier)
@@ -332,6 +335,7 @@ class _TestUrlDialog extends ConsumerWidget {
           Material(
             color: Colors.transparent,
             child: InkWell(
+              borderRadius: BorderRadius.circular(16),
               onTap: () async {
                 final notifier = ref.read(appSettingProvider.notifier);
                 final overrideTestUrl = ref.read(overrideTestUrlProvider);

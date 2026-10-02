@@ -302,6 +302,11 @@ class ApplicationState extends ConsumerState<Application>
                     borderRadius: BorderRadius.circular(35),
                   ),
                 ),
+                listTileTheme: const ListTileThemeData(
+                  shape: RoundedSuperellipseBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                  ),
+                ),
                 bottomSheetTheme: const BottomSheetThemeData(
                   shape: RoundedSuperellipseBorder(
                     borderRadius: BorderRadius.vertical(
@@ -425,6 +430,11 @@ class ApplicationState extends ConsumerState<Application>
                 dialogTheme: DialogThemeData(
                   shape: RoundedSuperellipseBorder(
                     borderRadius: BorderRadius.circular(35),
+                  ),
+                ),
+                listTileTheme: const ListTileThemeData(
+                  shape: RoundedSuperellipseBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
                   ),
                 ),
                 bottomSheetTheme: const BottomSheetThemeData(

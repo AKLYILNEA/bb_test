@@ -31,10 +31,14 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
     globalState.showCommonDialog<IpClickBehavior>(
       child: CommonDialog(
         title: appLocalizations.ipClickBehavior,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              shape: RoundedSuperellipseBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               leading: Icon(FluentIcons.arrow_sync_24_regular),
               title: Text(appLocalizations.manualRefreshIp),
               onTap: () {
@@ -44,6 +48,9 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
             ),
             if (isZh)
               ListTile(
+                shape: RoundedSuperellipseBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 leading: Icon(FluentIcons.cd_16_regular),
                 title: Text(appLocalizations.switchToDomesticIp),
                 onTap: () {
@@ -52,6 +59,9 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
                 },
               ),
             ListTile(
+              shape: RoundedSuperellipseBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               leading: Icon(FluentIcons.shield_24_regular),
               title: Text(appLocalizations.ipPrivacyProtection),
               onTap: () {

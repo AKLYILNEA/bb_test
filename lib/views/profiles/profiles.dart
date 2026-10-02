@@ -525,6 +525,9 @@ class ProfileItem extends StatelessWidget {
           children: [
             for (final item in items)
               ListTile(
+                shape: RoundedSuperellipseBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 leading: item.icon != null ? Icon(item.icon) : null,
                 title: Text(item.label),
                 onTap: () {

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/providers/config.dart';
@@ -7,6 +9,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
+import 'package:material_color_utilities/blend/blend.dart';
+import 'package:material_color_utilities/hct/hct.dart';
+import 'package:material_color_utilities/palettes/tonal_palette.dart';
+
+const _maxTonalChroma = 36.0;
+const _selectDuration = Duration(milliseconds: 320);
+const _selectCurve = Curves.easeInOutCubic;
 
 class OutboundMode extends StatelessWidget {
   const OutboundMode({super.key});
@@ -14,86 +23,255 @@ class OutboundMode extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final height = getWidgetHeight(2);
+    const pillInset = 8.0;
     return SizedBox(
       height: height,
       child: Consumer(
-          builder: (_, ref, _) {
-            final mode = ref.watch(
-              patchClashConfigProvider.select((state) => state.mode),
-            );
-            return CommonCard(
+        builder: (_, ref, _) {
+          final mode = ref.watch(
+            patchClashConfigProvider.select((state) => state.mode),
+          );
+          return Theme(
+            data: Theme.of(context).copyWith(
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              hoverColor: Colors.transparent,
+            ),
+            child: CommonCard(
+              padding: EdgeInsets.zero,
               info: Info(
                 label: appLocalizations.outboundMode,
                 iconData: FluentIcons.arrow_split_24_regular,
               ),
               child: Padding(
-                padding: const EdgeInsets.only(top: 12, bottom: 16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                child: _ModeRows(
+                  mode: mode,
+                  pillInset: pillInset,
+                  onSelect: (item) {
+                    globalState.appController.changeMode(item);
+                  },
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _ModeRows extends StatelessWidget {
+  const _ModeRows({
+    required this.mode,
+    required this.pillInset,
+    required this.onSelect,
+  });
+
+  final Mode mode;
+  final double pillInset;
+  final void Function(Mode mode) onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (_, constraints) {
+        final count = Mode.values.length;
+        const spacing = 4.0;
+        final rowHeight = max(
+          (constraints.maxHeight - spacing * (count - 1)) / count,
+          0.0,
+        );
+        const shape = RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.all(Radius.circular(13)),
+        );
+        final colors = [
+          for (final item in Mode.values) _ModeColors.of(context, item),
+        ];
+        return TweenAnimationBuilder<double>(
+          tween: Tween(end: Mode.values.indexOf(mode).toDouble()),
+          duration: _selectDuration,
+          curve: _selectCurve,
+          builder: (context, position, _) {
+            final from = position.floor().clamp(0, count - 1);
+            final to = position.ceil().clamp(0, count - 1);
+            final highlight = _ModeColors.lerp(
+              colors[from],
+              colors[to],
+              position - from,
+            );
+            return Stack(
+              children: [
+                Positioned(
+                  key: const ValueKey('outbound-mode-highlight'),
+                  left: pillInset,
+                  right: pillInset,
+                  top: position * (rowHeight + spacing),
+                  height: rowHeight,
+                  child: DecoratedBox(
+                    decoration: ShapeDecoration(
+                      color: highlight.container,
+                      shape: shape,
+                    ),
+                  ),
+                ),
+                for (final (index, item) in Mode.values.indexed)
+                  Positioned(
+                    left: pillInset,
+                    right: pillInset,
+                    top: index * (rowHeight + spacing),
+                    height: rowHeight,
+                    child: _ModeRow(
+                      title: Intl.message(item.name),
+                      icon: _getModeIcon(item),
+                      selected: item == mode,
+                      foreground: Color.lerp(
+                        context.colorScheme.onSurfaceVariant,
+                        colors[index].onContainer,
+                        (1 - (index - position).abs()).clamp(0.0, 1.0),
+                      )!,
+                      shape: shape,
+                      onTap: () {
+                        onSelect(item);
+                      },
+                    ),
+                  ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+IconData _getModeIcon(Mode mode) {
+  return switch (mode) {
+    Mode.rule => FluentIcons.task_list_square_rtl_24_regular,
+    Mode.global => IconsExt.cowork,
+    Mode.direct => FluentIcons.cd_16_regular,
+  };
+}
+
+class _ModeColors {
+  const _ModeColors(this.container, this.onContainer);
+
+  factory _ModeColors.of(BuildContext context, Mode mode) {
+    final colorScheme = context.colorScheme;
+    final primary = colorScheme.primary.toARGB32();
+    return switch (mode) {
+      Mode.rule => _ModeColors(
+        colorScheme.secondaryContainer,
+        colorScheme.onSecondaryContainer,
+      ),
+      Mode.global => _ModeColors.tonal(
+        Color(Blend.harmonize(Colors.orange.toARGB32(), primary)),
+        colorScheme,
+      ),
+      Mode.direct => _ModeColors.tonal(
+        Color(Blend.harmonize(Colors.green.toARGB32(), primary)),
+        colorScheme,
+      ),
+    };
+  }
+
+  /// Material 3 container tones, with chroma capped to match the scheme's own.
+  factory _ModeColors.tonal(Color seed, ColorScheme colorScheme) {
+    final hct = Hct.fromInt(seed.toARGB32());
+    final palette = TonalPalette.of(hct.hue, min(hct.chroma, _maxTonalChroma));
+    final dark = colorScheme.brightness == Brightness.dark;
+    return _ModeColors(
+      Color(palette.get(dark ? 30 : 90)),
+      Color(palette.get(dark ? 90 : 10)),
+    );
+  }
+
+  factory _ModeColors.lerp(_ModeColors a, _ModeColors b, double t) {
+    return _ModeColors(
+      Color.lerp(a.container, b.container, t)!,
+      Color.lerp(a.onContainer, b.onContainer, t)!,
+    );
+  }
+
+  final Color container;
+  final Color onContainer;
+}
+
+class _ModeRow extends StatelessWidget {
+  const _ModeRow({
+    required this.title,
+    required this.icon,
+    required this.selected,
+    required this.foreground,
+    required this.shape,
+    required this.onTap,
+  });
+
+  final String title;
+  final IconData icon;
+  final bool selected;
+  final Color foreground;
+  final ShapeBorder shape;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      selected: selected,
+      inMutuallyExclusiveGroup: true,
+      child: Focus(
+        child: Builder(
+          builder: (context) {
+            final isFocused = Focus.of(context).hasFocus;
+            return InkWell(
+              customBorder: shape,
+              onTap: onTap,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(13),
+                  color: isFocused && globalState.isAndroidTV
+                      ? context.colorScheme.primary.withValues(alpha: 0.15)
+                      : Colors.transparent,
+                  border: isFocused && globalState.isAndroidTV
+                      ? Border.all(
+                          color: context.colorScheme.primary,
+                          width: 2,
+                        )
+                      : null,
+                ),
+                padding: const EdgeInsets.only(left: 8, right: 8),
+                child: Row(
                   children: [
-                    for (final item in Mode.values)
-                      Flexible(
-                        fit: FlexFit.tight,
-                        child: Material(
-                          color: Colors.transparent,
-                          child: Focus(
-                            child: Builder(
-                              builder: (context) {
-                                final isFocused = Focus.of(context).hasFocus;
-                                return InkWell(
-                                  borderRadius: BorderRadius.circular(10),
-                                  onTap: () {
-                                    globalState.appController.changeMode(item);
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: isFocused && globalState.isAndroidTV
-                                          ? context.colorScheme.primary
-                                              .withValues(alpha: 0.15)
-                                          : Colors.transparent,
-                                      border: isFocused && globalState.isAndroidTV
-                                          ? Border.all(
-                                              color: context.colorScheme.primary,
-                                              width: 2,
-                                            )
-                                          : null,
-                                    ),
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 16.ap,
-                                      vertical: 8.ap,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        OptionRadioIcon(
-                                          selected: item == mode,
-                                        ),
-                                        SizedBox(width: 12.ap),
-                                        Expanded(
-                                          child: Text(
-                                            Intl.message(item.name),
-                                            style: Theme.of(
-                                              context,
-                                            ).textTheme.bodyMedium?.toSoftBold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
+                    SizedBox(
+                      width: 24,
+                      child: Center(
+                        child: Icon(
+                          icon,
+                          size: 20,
+                          color: foreground,
                         ),
                       ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: foreground,
+                              fontWeight:
+                                  selected ? FontWeight.w600 : FontWeight.normal,
+                            ),
+                      ),
+                    ),
                   ],
                 ),
               ),
             );
           },
         ),
+      ),
     );
   }
 }
