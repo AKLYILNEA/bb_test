@@ -344,8 +344,12 @@ class _IntranetIpInfoDialogState extends ConsumerState<_IntranetIpInfoDialog> {
   }) {
     return IconButton(
       visualDensity: VisualDensity.compact,
-      padding: EdgeInsets.zero,
-      constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+      style: IconButton.styleFrom(
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        padding: EdgeInsets.zero,
+        minimumSize: const Size(28, 28),
+        fixedSize: const Size(28, 28),
+      ),
       icon: Icon(icon, size: 15, color: context.colorScheme.onSurfaceVariant),
       tooltip: tooltip,
       onPressed: onPressed,
