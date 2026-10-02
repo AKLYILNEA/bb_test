@@ -92,9 +92,14 @@ class _ModeRows extends StatelessWidget {
           0.0,
         );
         final contentInset = inset - pillInset;
-        const shape = RoundedSuperellipseBorder(
-          borderRadius: BorderRadius.all(Radius.circular(13)),
+        final innerRadius = max(
+          min(20.0 - pillInset, rowHeight / 3),
+          0.0,
         );
+        final shape = RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.all(Radius.circular(innerRadius)),
+        );
+        final glyphWidth = IconTheme.of(context).size ?? 20.0;
         final colors = [
           for (final item in Mode.values) _ModeColors.of(context, item),
         ];
@@ -141,6 +146,7 @@ class _ModeRows extends StatelessWidget {
                         (1 - (index - position).abs()).clamp(0.0, 1.0),
                       )!,
                       contentInset: contentInset,
+                      glyphWidth: glyphWidth,
                       shape: shape,
                       onTap: () {
                         onSelect(item);
@@ -215,6 +221,7 @@ class _ModeRow extends StatelessWidget {
     required this.selected,
     required this.foreground,
     required this.contentInset,
+    required this.glyphWidth,
     required this.shape,
     required this.onTap,
   });
@@ -224,6 +231,7 @@ class _ModeRow extends StatelessWidget {
   final bool selected;
   final Color foreground;
   final double contentInset;
+  final double glyphWidth;
   final ShapeBorder shape;
   final VoidCallback onTap;
 
@@ -250,7 +258,7 @@ class _ModeRow extends StatelessWidget {
                 child: Row(
                   children: [
                     SizedBox(
-                      width: 24,
+                      width: glyphWidth,
                       child: Center(
                         child: Icon(
                           icon,
