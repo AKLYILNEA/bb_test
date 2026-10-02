@@ -80,19 +80,12 @@ class CommonDialog extends ConsumerWidget {
             maxWidth: 300,
           ),
           width: size.width - 40,
-          child: ListTileTheme(
-            data: ListTileTheme.of(context).copyWith(
-              shape: RoundedSuperellipseBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-            child: !overrideScroll
-                ? SingleChildScrollView(
-                    clipBehavior: Clip.hardEdge,
-                    child: child,
-                  )
-                : (child ?? const SizedBox.shrink()),
-          ),
+          child: !overrideScroll
+              ? SingleChildScrollView(
+                  clipBehavior: Clip.hardEdge,
+                  child: child,
+                )
+              : child,
         ),
       ),
     );

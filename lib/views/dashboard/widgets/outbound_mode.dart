@@ -14,6 +14,11 @@ import 'package:material_color_utilities/hct/hct.dart';
 import 'package:material_color_utilities/palettes/tonal_palette.dart';
 
 const _maxTonalChroma = 36.0;
+const _rowGap = 8.0;
+const _rowSpacing = 4.0;
+const _pillInset = 8.0;
+const _rowGlyphSize = 18.0;
+const _headerGlyphGap = 8.0;
 const _selectDuration = Duration(milliseconds: 320);
 const _selectCurve = Curves.easeInOutCubic;
 
@@ -23,7 +28,8 @@ class OutboundMode extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final height = getWidgetHeight(2);
-    const pillInset = 8.0;
+    final inset = baseInfoEdgeInsets.left;
+    final pillInset = min(_pillInset.ap, inset);
     return SizedBox(
       height: height,
       child: Consumer(
@@ -44,9 +50,10 @@ class OutboundMode extends StatelessWidget {
                 iconData: FluentIcons.arrow_split_24_regular,
               ),
               child: Padding(
-                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                padding: EdgeInsets.only(top: _rowGap.ap, bottom: pillInset),
                 child: _ModeRows(
                   mode: mode,
+                  inset: inset,
                   pillInset: pillInset,
                   onSelect: (item) {
                     globalState.appController.changeMode(item);
@@ -64,11 +71,13 @@ class OutboundMode extends StatelessWidget {
 class _ModeRows extends StatelessWidget {
   const _ModeRows({
     required this.mode,
+    required this.inset,
     required this.pillInset,
     required this.onSelect,
   });
 
   final Mode mode;
+  final double inset;
   final double pillInset;
   final void Function(Mode mode) onSelect;
 
@@ -77,11 +86,12 @@ class _ModeRows extends StatelessWidget {
     return LayoutBuilder(
       builder: (_, constraints) {
         final count = Mode.values.length;
-        const spacing = 4.0;
+        final spacing = _rowSpacing.ap;
         final rowHeight = max(
           (constraints.maxHeight - spacing * (count - 1)) / count,
           0.0,
         );
+        final contentInset = inset - pillInset;
         const shape = RoundedSuperellipseBorder(
           borderRadius: BorderRadius.all(Radius.circular(13)),
         );
@@ -130,6 +140,7 @@ class _ModeRows extends StatelessWidget {
                         colors[index].onContainer,
                         (1 - (index - position).abs()).clamp(0.0, 1.0),
                       )!,
+                      contentInset: contentInset,
                       shape: shape,
                       onTap: () {
                         onSelect(item);
@@ -203,6 +214,7 @@ class _ModeRow extends StatelessWidget {
     required this.icon,
     required this.selected,
     required this.foreground,
+    required this.contentInset,
     required this.shape,
     required this.onTap,
   });
@@ -211,6 +223,7 @@ class _ModeRow extends StatelessWidget {
   final IconData icon;
   final bool selected;
   final Color foreground;
+  final double contentInset;
   final ShapeBorder shape;
   final VoidCallback onTap;
 
@@ -227,19 +240,13 @@ class _ModeRow extends StatelessWidget {
               customBorder: shape,
               onTap: onTap,
               child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(13),
-                  color: isFocused && globalState.isAndroidTV
-                      ? context.colorScheme.primary.withValues(alpha: 0.15)
-                      : Colors.transparent,
-                  border: isFocused && globalState.isAndroidTV
-                      ? Border.all(
-                          color: context.colorScheme.primary,
-                          width: 2,
-                        )
-                      : null,
-                ),
-                padding: const EdgeInsets.only(left: 8, right: 8),
+                decoration: isFocused && globalState.isAndroidTV
+                    ? ShapeDecoration(
+                        color: context.colorScheme.primary.withValues(alpha: 0.15),
+                        shape: shape,
+                      )
+                    : null,
+                padding: EdgeInsets.symmetric(horizontal: contentInset),
                 child: Row(
                   children: [
                     SizedBox(
@@ -247,12 +254,12 @@ class _ModeRow extends StatelessWidget {
                       child: Center(
                         child: Icon(
                           icon,
-                          size: 20,
+                          size: _rowGlyphSize,
                           color: foreground,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: _headerGlyphGap),
                     Expanded(
                       child: Text(
                         title,
@@ -260,8 +267,6 @@ class _ModeRow extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: foreground,
-                              fontWeight:
-                                  selected ? FontWeight.w600 : FontWeight.normal,
                             ),
                       ),
                     ),

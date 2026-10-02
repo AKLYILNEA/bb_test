@@ -42,7 +42,9 @@ class OptionsDialog<T> extends StatelessWidget {
             Material(
               color: Colors.transparent,
               child: InkWell(
-                borderRadius: BorderRadius.circular(16),
+                customBorder: const RoundedSuperellipseBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                ),
                 onTap: () {
                   Navigator.of(context).pop(option);
                 },
