@@ -703,7 +703,7 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
   Widget build(BuildContext context) {
     const menuStyle = MenuStyle(
       shape: WidgetStatePropertyAll<OutlinedBorder>(
-        RoundedSuperellipseBorder(
+        SuperellipseBorder(
           borderRadius: BorderRadius.all(Radius.circular(20)),
         ),
       ),

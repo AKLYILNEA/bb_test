@@ -248,7 +248,7 @@ class AdaptiveSheetScaffold extends StatelessWidget {
         ? Material(
             color: backgroundColor,
             clipBehavior: Clip.antiAlias,
-            shape: const RoundedSuperellipseBorder(
+            shape: const SuperellipseBorder(
               borderRadius: BorderRadius.vertical(
                 top: Radius.circular(35.0),
               ),

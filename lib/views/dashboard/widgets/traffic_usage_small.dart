@@ -43,7 +43,7 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              shape: RoundedSuperellipseBorder(
+              shape: SuperellipseBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
               leading: const Icon(FluentIcons.arrow_circle_up_24_regular),
@@ -55,7 +55,7 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
               },
             ),
             ListTile(
-              shape: RoundedSuperellipseBorder(
+              shape: SuperellipseBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
               leading: const Icon(FluentIcons.arrow_circle_down_24_regular),

@@ -383,7 +383,7 @@ class _ContributorDialog extends StatelessWidget {
               ),
               decoration: ShapeDecoration(
                 color: fabBgColor,
-                shape: RoundedSuperellipseBorder(
+                shape: SuperellipseBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 shadows: [

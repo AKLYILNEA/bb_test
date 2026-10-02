@@ -236,7 +236,7 @@ class CommonCard extends StatelessWidget {
       style: ButtonStyle(
         padding: const WidgetStatePropertyAll(EdgeInsets.zero),
         shape: WidgetStatePropertyAll(
-          RoundedSuperellipseBorder(
+          SuperellipseBorder(
             borderRadius: BorderRadius.circular(actualRadius),
           ),
         ),

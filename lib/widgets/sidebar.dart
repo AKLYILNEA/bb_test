@@ -22,7 +22,7 @@ const _indicatorHeight = 16.0;
 const _expandDuration = Duration(milliseconds: 250);
 const _indicatorDuration = Duration(milliseconds: 320);
 
-final _itemShape = const RoundedSuperellipseBorder(
+final _itemShape = const SuperellipseBorder(
   borderRadius: BorderRadius.all(Radius.circular(10)),
 );
 

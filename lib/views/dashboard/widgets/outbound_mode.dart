@@ -96,7 +96,7 @@ class _ModeRows extends StatelessWidget {
           min(20.0 - pillInset, rowHeight / 3),
           0.0,
         );
-        final shape = RoundedSuperellipseBorder(
+        final shape = SuperellipseBorder(
           borderRadius: BorderRadius.all(Radius.circular(innerRadius)),
         );
         final glyphWidth = IconTheme.of(context).size ?? 20.0;

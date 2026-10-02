@@ -36,7 +36,7 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              shape: RoundedSuperellipseBorder(
+              shape: SuperellipseBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
               leading: Icon(FluentIcons.arrow_sync_24_regular),
@@ -48,7 +48,7 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
             ),
             if (isZh)
               ListTile(
-                shape: RoundedSuperellipseBorder(
+                shape: SuperellipseBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
                 leading: Icon(FluentIcons.cd_16_regular),
@@ -59,7 +59,7 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
                 },
               ),
             ListTile(
-              shape: RoundedSuperellipseBorder(
+              shape: SuperellipseBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
               leading: Icon(FluentIcons.shield_24_regular),

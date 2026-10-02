@@ -274,7 +274,7 @@ class ListItem<T> extends StatelessWidget {
           FocusManager.instance.highlightMode == FocusHighlightMode.traditional
           ? context.colorScheme.primary.withValues(alpha: 0.18)
           : Colors.transparent,
-      shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(16)),
+      shape: SuperellipseBorder(borderRadius: BorderRadius.circular(16)),
       titleTextStyle: titleTextStyle,
       subtitleTextStyle: subtitleTextStyle,
       leading: leading ?? this.leading,
@@ -643,7 +643,7 @@ class ContinuousListItem extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         decoration: ShapeDecoration(
           color: context.colorScheme.surfaceContainer,
-          shape: RoundedSuperellipseBorder(
+          shape: SuperellipseBorder(
             borderRadius: BorderRadius.circular(radius),
           ),
         ),
@@ -665,7 +665,7 @@ class ContinuousListItem extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: ShapeDecoration(
         color: context.colorScheme.surfaceContainer,
-        shape: RoundedSuperellipseBorder(
+        shape: SuperellipseBorder(
           borderRadius: BorderRadius.vertical(
             top: isFirst ? Radius.circular(radius) : Radius.zero,
             bottom: isLast ? Radius.circular(radius) : Radius.zero,

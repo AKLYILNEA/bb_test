@@ -625,7 +625,7 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         decoration: ShapeDecoration(
           color: colorScheme.surfaceContainerHighest.withAlpha(220),
-          shape: RoundedSuperellipseBorder(
+          shape: SuperellipseBorder(
             borderRadius: BorderRadius.circular(12),
             side: BorderSide(
               color: colorScheme.outlineVariant.withAlpha(120),
@@ -671,7 +671,7 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: ShapeDecoration(
               color: colorScheme.surfaceContainerHigh,
-              shape: RoundedSuperellipseBorder(
+              shape: SuperellipseBorder(
                 borderRadius: BorderRadius.circular(8),
                 side: BorderSide(
                   color: colorScheme.outlineVariant.withAlpha(80),
@@ -950,7 +950,7 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
         color: isSelected
             ? colorScheme.primaryContainer
             : colorScheme.surfaceContainerHigh,
-        shape: RoundedSuperellipseBorder(
+        shape: SuperellipseBorder(
           borderRadius: BorderRadius.circular(6),
           side: BorderSide(
             color: isSelected
@@ -960,7 +960,7 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       child: InkWell(
-        customBorder: RoundedSuperellipseBorder(
+        customBorder: SuperellipseBorder(
           borderRadius: BorderRadius.circular(6),
         ),
         onTap: onPressed,
@@ -990,7 +990,7 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
       tooltip: tooltip,
       style: ButtonStyle(
         shape: WidgetStatePropertyAll(
-          RoundedSuperellipseBorder(
+          SuperellipseBorder(
             borderRadius: BorderRadius.circular(6),
           ),
         ),

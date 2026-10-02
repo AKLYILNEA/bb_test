@@ -76,7 +76,7 @@ double getFloatingBottomBarFABReserveHeight(BuildContext context) {
 Decoration getCommonFabDecoration(BuildContext context) {
   final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
   return ShapeDecoration(
-    shape: RoundedSuperellipseBorder(
+    shape: SuperellipseBorder(
       borderRadius: BorderRadius.circular(20),
     ),
     shadows: [

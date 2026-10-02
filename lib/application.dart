@@ -286,7 +286,7 @@ class ApplicationState extends ConsumerState<Application>
                       const Icon(FluentIcons.dismiss_24_regular),
                 ),
                 floatingActionButtonTheme: FloatingActionButtonThemeData(
-                  shape: RoundedSuperellipseBorder(
+                  shape: SuperellipseBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
                   elevation: 3,
@@ -298,17 +298,17 @@ class ApplicationState extends ConsumerState<Application>
                   ),
                 ),
                 dialogTheme: DialogThemeData(
-                  shape: RoundedSuperellipseBorder(
+                  shape: SuperellipseBorder(
                     borderRadius: BorderRadius.circular(35),
                   ),
                 ),
                 listTileTheme: const ListTileThemeData(
-                  shape: RoundedSuperellipseBorder(
+                  shape: SuperellipseBorder(
                     borderRadius: BorderRadius.all(Radius.circular(16)),
                   ),
                 ),
                 bottomSheetTheme: const BottomSheetThemeData(
-                  shape: RoundedSuperellipseBorder(
+                  shape: SuperellipseBorder(
                     borderRadius: BorderRadius.vertical(
                       top: Radius.circular(35),
                     ),
@@ -316,14 +316,14 @@ class ApplicationState extends ConsumerState<Application>
                   clipBehavior: Clip.antiAlias,
                 ),
                 popupMenuTheme: const PopupMenuThemeData(
-                  shape: RoundedSuperellipseBorder(
+                  shape: SuperellipseBorder(
                     borderRadius: BorderRadius.all(Radius.circular(20)),
                   ),
                 ),
                 dropdownMenuTheme: const DropdownMenuThemeData(
                   menuStyle: MenuStyle(
                     shape: WidgetStatePropertyAll<OutlinedBorder>(
-                      RoundedSuperellipseBorder(
+                      SuperellipseBorder(
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                       ),
                     ),
@@ -332,7 +332,7 @@ class ApplicationState extends ConsumerState<Application>
                 menuTheme: const MenuThemeData(
                   style: MenuStyle(
                     shape: WidgetStatePropertyAll<OutlinedBorder>(
-                      RoundedSuperellipseBorder(
+                      SuperellipseBorder(
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                       ),
                     ),
@@ -371,7 +371,7 @@ class ApplicationState extends ConsumerState<Application>
                   ),
                 ),
                 chipTheme: ChipThemeData(
-                  shape: const RoundedSuperellipseBorder(
+                  shape: const SuperellipseBorder(
                     borderRadius: BorderRadius.all(Radius.circular(16)),
                   ),
                   side: BorderSide(
@@ -416,7 +416,7 @@ class ApplicationState extends ConsumerState<Application>
                       const Icon(FluentIcons.dismiss_24_regular),
                 ),
                 floatingActionButtonTheme: FloatingActionButtonThemeData(
-                  shape: RoundedSuperellipseBorder(
+                  shape: SuperellipseBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
                   elevation: 3,
@@ -428,17 +428,17 @@ class ApplicationState extends ConsumerState<Application>
                   ),
                 ),
                 dialogTheme: DialogThemeData(
-                  shape: RoundedSuperellipseBorder(
+                  shape: SuperellipseBorder(
                     borderRadius: BorderRadius.circular(35),
                   ),
                 ),
                 listTileTheme: const ListTileThemeData(
-                  shape: RoundedSuperellipseBorder(
+                  shape: SuperellipseBorder(
                     borderRadius: BorderRadius.all(Radius.circular(16)),
                   ),
                 ),
                 bottomSheetTheme: const BottomSheetThemeData(
-                  shape: RoundedSuperellipseBorder(
+                  shape: SuperellipseBorder(
                     borderRadius: BorderRadius.vertical(
                       top: Radius.circular(35),
                     ),
@@ -446,14 +446,14 @@ class ApplicationState extends ConsumerState<Application>
                   clipBehavior: Clip.antiAlias,
                 ),
                 popupMenuTheme: const PopupMenuThemeData(
-                  shape: RoundedSuperellipseBorder(
+                  shape: SuperellipseBorder(
                     borderRadius: BorderRadius.all(Radius.circular(20)),
                   ),
                 ),
                 dropdownMenuTheme: const DropdownMenuThemeData(
                   menuStyle: MenuStyle(
                     shape: WidgetStatePropertyAll<OutlinedBorder>(
-                      RoundedSuperellipseBorder(
+                      SuperellipseBorder(
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                       ),
                     ),
@@ -462,7 +462,7 @@ class ApplicationState extends ConsumerState<Application>
                 menuTheme: const MenuThemeData(
                   style: MenuStyle(
                     shape: WidgetStatePropertyAll<OutlinedBorder>(
-                      RoundedSuperellipseBorder(
+                      SuperellipseBorder(
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                       ),
                     ),
@@ -509,7 +509,7 @@ class ApplicationState extends ConsumerState<Application>
                   ),
                 ),
                 chipTheme: ChipThemeData(
-                  shape: const RoundedSuperellipseBorder(
+                  shape: const SuperellipseBorder(
                     borderRadius: BorderRadius.all(Radius.circular(16)),
                   ),
                   side: BorderSide(

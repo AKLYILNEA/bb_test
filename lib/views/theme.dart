@@ -690,7 +690,7 @@ class _EmojiStyleDialog extends StatelessWidget {
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    customBorder: const RoundedSuperellipseBorder(
+                    customBorder: const SuperellipseBorder(
                       borderRadius: BorderRadius.all(Radius.circular(16)),
                     ),
                     onTap: () async {

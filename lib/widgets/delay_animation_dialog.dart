@@ -270,7 +270,7 @@ class _DelayAnimationPickerDialogState
             decoration: ShapeDecoration(
               color: context.colorScheme.surfaceContainerHighest
                   .withValues(alpha: 0.45),
-              shape: RoundedSuperellipseBorder(
+              shape: SuperellipseBorder(
                 borderRadius: BorderRadius.circular(20),
                 side: BorderSide(
                   color:
@@ -329,7 +329,7 @@ class _DelayAnimationPickerDialogState
                         decoration: ShapeDecoration(
                           color: context.colorScheme.primary
                               .withValues(alpha: 0.08),
-                          shape: RoundedSuperellipseBorder(
+                          shape: SuperellipseBorder(
                             borderRadius: BorderRadius.circular(10),
                             side: BorderSide(
                               color: context.colorScheme.primary

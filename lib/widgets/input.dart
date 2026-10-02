@@ -42,7 +42,7 @@ class OptionsDialog<T> extends StatelessWidget {
             Material(
               color: Colors.transparent,
               child: InkWell(
-                customBorder: const RoundedSuperellipseBorder(
+                customBorder: const SuperellipseBorder(
                   borderRadius: BorderRadius.all(Radius.circular(16)),
                 ),
                 onTap: () {
@@ -722,7 +722,7 @@ class SuperellipseInputBorder extends OutlineInputBorder {
 
   @override
   Path getInnerPath(Rect rect, {TextDirection? textDirection}) {
-    return RoundedSuperellipseBorder(
+    return SuperellipseBorder(
       borderRadius: borderRadius,
       side: borderSide,
     ).getInnerPath(rect, textDirection: textDirection);
@@ -730,7 +730,7 @@ class SuperellipseInputBorder extends OutlineInputBorder {
 
   @override
   Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
-    return RoundedSuperellipseBorder(
+    return SuperellipseBorder(
       borderRadius: borderRadius,
       side: borderSide,
     ).getOuterPath(rect, textDirection: textDirection);
@@ -754,7 +754,7 @@ class SuperellipseInputBorder extends OutlineInputBorder {
       ..strokeWidth = borderSide.width
       ..style = PaintingStyle.stroke;
 
-    final border = RoundedSuperellipseBorder(
+    final border = SuperellipseBorder(
       borderRadius: borderRadius,
       side: borderSide,
     );

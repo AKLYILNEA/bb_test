@@ -397,7 +397,7 @@ class TrackerInfoDetailView extends ConsumerWidget {
       IpCategory.lan => FluentIcons.arrow_shuffle_24_regular,
       IpCategory.public => FluentIcons.search_24_regular,
     };
-    final pillShape = RoundedSuperellipseBorder(
+    final pillShape = SuperellipseBorder(
       borderRadius: BorderRadius.circular(8),
     );
 

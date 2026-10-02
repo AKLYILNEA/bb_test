@@ -59,7 +59,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
           itemBuilder: (context, index) {
             final cat = categories[index];
             final isSelected = _selectedCategory == cat;
-            final shape = RoundedSuperellipseBorder(
+            final shape = SuperellipseBorder(
               borderRadius: BorderRadius.circular(12),
             );
             return Material(
@@ -299,7 +299,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                                       (ref.read(appSettingProvider).mediaUnlockMoreStreamingPlatforms ||
                                           !moreStreamingPlatforms.contains(p))))
                                 ListTile(
-                                  shape: RoundedSuperellipseBorder(
+                                  shape: SuperellipseBorder(
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                   dense: true,
@@ -465,7 +465,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: ShapeDecoration(
         color: context.colorScheme.surfaceContainerLow,
-        shape: RoundedSuperellipseBorder(
+        shape: SuperellipseBorder(
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(
             color: context.colorScheme.outlineVariant.withValues(alpha: 0.3),
@@ -582,7 +582,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: ShapeDecoration(
           color: context.colorScheme.surfaceContainerLow,
-          shape: RoundedSuperellipseBorder(
+          shape: SuperellipseBorder(
             borderRadius: BorderRadius.circular(16),
           ),
         ),
@@ -644,7 +644,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                           ),
                           decoration: ShapeDecoration(
                             color: context.colorScheme.surfaceContainerHighest,
-                            shape: RoundedSuperellipseBorder(
+                            shape: SuperellipseBorder(
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -665,7 +665,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                           ),
                           decoration: ShapeDecoration(
                             color: Colors.orange.withValues(alpha: 0.15),
-                            shape: RoundedSuperellipseBorder(
+                            shape: SuperellipseBorder(
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -706,7 +706,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
             clipBehavior: Clip.antiAlias,
             decoration: ShapeDecoration(
               color: color.withValues(alpha: 0.12),
-              shape: RoundedSuperellipseBorder(
+              shape: SuperellipseBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
