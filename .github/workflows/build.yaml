@@ -20,7 +20,7 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     permissions:
-      contents: read
+      contents: write
       actions: write
     strategy:
       fail-fast: false
@@ -417,6 +417,7 @@ jobs:
 
       - name: Upload Artifacts (macOS & Android)
         if: matrix.platform != 'linux' && matrix.platform != 'windows'
+        continue-on-error: true
         uses: actions/upload-artifact@v7
         with:
           name: Bettbox-${{ matrix.platform }}-${{ matrix.arch }}${{ matrix.compatible == true && '-compatible' || '' }}
@@ -427,6 +428,7 @@ jobs:
 
       - name: Upload Windows Installer Artifact
         if: matrix.platform == 'windows'
+        continue-on-error: true
         uses: actions/upload-artifact@v7
         with:
           name: Bettbox-${{ matrix.platform }}-${{ matrix.arch }}${{ matrix.compatible == true && '-compatible' || '' }}-installer
@@ -437,6 +439,7 @@ jobs:
 
       - name: Upload Windows Portable Artifact
         if: matrix.platform == 'windows' && matrix.compatible == true && matrix.arch == 'amd64'
+        continue-on-error: true
         uses: actions/upload-artifact@v7
         with:
           name: Bettbox-${{ matrix.platform }}-${{ matrix.arch }}${{ matrix.compatible == true && '-compatible' || '' }}-portable
@@ -447,6 +450,7 @@ jobs:
 
       - name: Upload DEB Artifact
         if: matrix.platform == 'linux'
+        continue-on-error: true
         uses: actions/upload-artifact@v7
         with:
           name: Bettbox-${{ matrix.platform }}-${{ matrix.arch }}${{ matrix.compatible == true && '-compatible' || '' }}-deb
@@ -457,6 +461,7 @@ jobs:
 
       - name: Upload AppImage Artifact
         if: matrix.platform == 'linux' && matrix.arch == 'amd64'
+        continue-on-error: true
         uses: actions/upload-artifact@v7
         with:
           name: Bettbox-${{ matrix.platform }}-${{ matrix.arch }}${{ matrix.compatible == true && '-compatible' || '' }}-AppImage
@@ -467,6 +472,7 @@ jobs:
 
       - name: Upload RPM Artifact
         if: matrix.platform == 'linux' && matrix.arch == 'amd64'
+        continue-on-error: true
         uses: actions/upload-artifact@v7
         with:
           name: Bettbox-${{ matrix.platform }}-${{ matrix.arch }}${{ matrix.compatible == true && '-compatible' || '' }}-rpm
@@ -475,7 +481,16 @@ jobs:
           overwrite: true
           retention-days: 3
 
+      - name: Release to GitHub (Direct Upload)
+        if: env.SHOULD_RELEASE == 'true'
+        uses: softprops/action-gh-release@v3.0.0
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: ./dist/*
+          prerelease: ${{ env.IS_PRERELEASE == 'true' }}
+
   upload:
+    if: false
     permissions: write-all
     needs: [ build ]
     runs-on: ubuntu-latest
