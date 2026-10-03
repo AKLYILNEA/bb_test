@@ -1,8 +1,6 @@
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
-import 'package:bett_box/models/common.dart';
-import 'package:bett_box/models/config.dart';
-import 'package:bett_box/models/widget.dart';
+import 'package:bett_box/models/models.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/views/proxies/list.dart';

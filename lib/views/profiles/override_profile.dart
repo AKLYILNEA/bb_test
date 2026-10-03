@@ -133,8 +133,11 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
                 SliverToBoxAdapter(
                   child: Consumer(
                     builder: (_, ref, child) {
-                      final profile =
-                          ref.watch(getProfileProvider(widget.profileId));
+                      final profile = ref.watch(
+                        profilesProvider.select(
+                          (state) => state.getProfile(widget.profileId),
+                        ),
+                      );
                       final scriptProps = ref.watch(scriptStateProvider);
                       final effectiveScript =
                           profile?.getEffectiveScript(scriptProps);
@@ -341,7 +344,9 @@ class ProfileScriptCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final profile = ref.watch(getProfileProvider(profileId));
+    final profile = ref.watch(
+      profilesProvider.select((state) => state.getProfile(profileId)),
+    );
     if (profile == null) return const SizedBox();
 
     final scriptProps = ref.watch(scriptStateProvider);
