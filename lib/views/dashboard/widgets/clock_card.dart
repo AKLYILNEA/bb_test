@@ -203,18 +203,24 @@ class ClockCard extends ConsumerWidget {
         onPressed: () => _showClockDialog(context, ref, data),
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final innerHeight = max(0.0, constraints.maxHeight - 26);
-            final imageSize =
-                min(innerHeight, max(0.0, (constraints.maxWidth - 28) * 0.44));
+            final innerHeight =
+                max(0.0, constraints.maxHeight - baseInfoEdgeInsets.vertical);
+            final innerAvailableWidth = max(
+              0.0,
+              constraints.maxWidth - baseInfoEdgeInsets.horizontal - 14.ap,
+            );
+            final idealImageWidth = innerHeight * (4 / 3);
+            final maxImageWidth = innerAvailableWidth * 0.60;
+            final imageWidth = min(idealImageWidth, maxImageWidth);
 
             return Padding(
-              padding: const EdgeInsets.all(13),
+              padding: baseInfoEdgeInsets,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Expanded(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         ValueListenableBuilder<int>(
                           valueListenable: dashboardRefreshManager.tick1s,
@@ -230,19 +236,16 @@ class ClockCard extends ConsumerWidget {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Icon(
-                                  FluentIcons.clock_20_filled,
-                                  size: 22,
+                                  FluentIcons.clock_24_filled,
+                                  size: 20,
                                   color: colorScheme.primary,
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
                                   timeText,
-                                  style: TextStyle(
+                                  style: context.textTheme.titleSmall?.copyWith(
                                     fontFamily: customFont,
-                                    fontSize: 26,
-                                    fontWeight: FontWeight.w700,
-                                    height: 1.1,
-                                    letterSpacing: 0.5,
+                                    fontWeight: FontWeight.w600,
                                     color: colorScheme.onSurface,
                                     fontFeatures: const [
                                       FontFeature.tabularFigures(),
@@ -253,61 +256,78 @@ class ClockCard extends ConsumerWidget {
                             );
                           },
                         ),
-                        const Spacer(),
-                        EmojiText(
-                          displayText,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontFamily: customFont,
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w500,
-                            height: 1.4,
-                            color: colorScheme.onSurface,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: EmojiText(
-                            authorText,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontFamily: customFont,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                              color: colorScheme.onSurfaceVariant,
+                        Expanded(
+                          child: Center(
+                            child: EmojiText(
+                              displayText,
+                              textAlign: TextAlign.center,
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontFamily: customFont,
+                                fontSize: 16.5,
+                                fontWeight: FontWeight.w600,
+                                height: 1.35,
+                                color: colorScheme.onSurface,
+                              ),
                             ),
                           ),
                         ),
+                        if (authorText.isNotEmpty)
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 4),
+                              child: EmojiText(
+                                authorText,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontFamily: customFont,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),
                   const SizedBox(width: 14),
-                  SizedBox.square(
-                    dimension: imageSize,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: colorScheme.outlineVariant.withValues(
-                            alpha: isDark ? 0.35 : 0.45,
+                  SizedBox(
+                    width: imageWidth,
+                    height: innerHeight,
+                    child: DecoratedBox(
+                      position: DecorationPosition.foreground,
+                      decoration: ShapeDecoration(
+                        shape: SuperellipseBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          side: BorderSide(
+                            color: colorScheme.outlineVariant.withValues(
+                              alpha: isDark ? 0.35 : 0.45,
+                            ),
+                            width: 1,
                           ),
-                          width: 1,
                         ),
                       ),
-                      clipBehavior: Clip.antiAlias,
-                      child: hasCustomImage
-                          ? Image.file(
-                              File(data.imagePath!),
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: double.infinity,
-                              errorBuilder: (_, _, _) =>
-                                  _buildDefaultBackground(isDark),
-                            )
-                          : _buildDefaultBackground(isDark),
+                      child: ClipPath(
+                        clipper: ShapeBorderClipper(
+                          shape: SuperellipseBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        child: hasCustomImage
+                            ? Image.file(
+                                File(data.imagePath!),
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: double.infinity,
+                                errorBuilder: (_, _, _) =>
+                                    _buildDefaultBackground(isDark),
+                              )
+                            : _buildDefaultBackground(isDark),
+                      ),
                     ),
                   ),
                 ],
@@ -503,23 +523,35 @@ class _ClockDialogState extends State<_ClockDialog> {
               ),
               child: Row(
                 children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: colorScheme.outlineVariant.withValues(alpha: 0.3),
-                        width: 1,
+                  SizedBox(
+                    width: 52,
+                    height: 39,
+                    child: DecoratedBox(
+                      position: DecorationPosition.foreground,
+                      decoration: ShapeDecoration(
+                        shape: SuperellipseBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: BorderSide(
+                            color: colorScheme.outlineVariant
+                                .withValues(alpha: 0.3),
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: ClipPath(
+                        clipper: ShapeBorderClipper(
+                          shape: SuperellipseBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: hasImage
+                            ? Image.file(
+                                File(_selectedImagePath!),
+                                fit: BoxFit.cover,
+                              )
+                            : _buildDefaultBackground(isDark),
                       ),
                     ),
-                    clipBehavior: Clip.antiAlias,
-                    child: hasImage
-                        ? Image.file(
-                            File(_selectedImagePath!),
-                            fit: BoxFit.cover,
-                          )
-                        : _buildDefaultBackground(isDark),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
