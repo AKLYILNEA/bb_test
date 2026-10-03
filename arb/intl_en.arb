@@ -832,7 +832,15 @@
   "customCardTextHint": "Please enter custom text",
   "changeImage": "Change Image",
   "restoreDefaultImage": "Restore Default Image",
-  "clockWidgetDefaultText": "Tap to edit text, long press to change image"
+  "clockWidgetDefaultText": "Tap to edit text, long press to change image",
+  "clock": "Clock",
+  "clockCardAuthor": "Author",
+  "clockCardAuthorHint": "Enter author name",
+  "clockCardImage": "Card Image",
+  "clockCardDefaultText": "Life is bright and lovely",
+  "clockCardDefaultAuthor": "Wang Zengqi",
+  "customImageSelected": "Custom image set",
+  "defaultImage": "Default background"
 }
 
 

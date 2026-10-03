@@ -1570,5 +1570,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "clockWidgetDefaultText": MessageLookupByLibrary.simpleMessage(
       "برای ویرایش متن ضربه بزنید، برای تغییر تصویر نگه دارید",
     ),
+    "clock": MessageLookupByLibrary.simpleMessage("ساعت"),
+    "clockCardAuthor": MessageLookupByLibrary.simpleMessage("نویسنده"),
+    "clockCardAuthorHint": MessageLookupByLibrary.simpleMessage(
+      "نام نویسنده را وارد کنید",
+    ),
+    "clockCardImage": MessageLookupByLibrary.simpleMessage("تصویر کارت"),
+    "clockCardDefaultText": MessageLookupByLibrary.simpleMessage("زندگی زیباست"),
+    "clockCardDefaultAuthor": MessageLookupByLibrary.simpleMessage("وانگ زنگ‌چی"),
+    "customImageSelected": MessageLookupByLibrary.simpleMessage("تصویر سفارشی تنظیم شد"),
+    "defaultImage": MessageLookupByLibrary.simpleMessage("پس‌زمینه پیش‌فرض"),
   };
 }

@@ -6798,6 +6798,86 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Clock`
+  String get clock {
+    return Intl.message(
+      'Clock',
+      name: 'clock',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Author`
+  String get clockCardAuthor {
+    return Intl.message(
+      'Author',
+      name: 'clockCardAuthor',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter author name`
+  String get clockCardAuthorHint {
+    return Intl.message(
+      'Enter author name',
+      name: 'clockCardAuthorHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Card Image`
+  String get clockCardImage {
+    return Intl.message(
+      'Card Image',
+      name: 'clockCardImage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Life is bright and lovely`
+  String get clockCardDefaultText {
+    return Intl.message(
+      'Life is bright and lovely',
+      name: 'clockCardDefaultText',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Wang Zengqi`
+  String get clockCardDefaultAuthor {
+    return Intl.message(
+      'Wang Zengqi',
+      name: 'clockCardDefaultAuthor',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Custom image set`
+  String get customImageSelected {
+    return Intl.message(
+      'Custom image set',
+      name: 'customImageSelected',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Default background`
+  String get defaultImage {
+    return Intl.message(
+      'Default background',
+      name: 'defaultImage',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

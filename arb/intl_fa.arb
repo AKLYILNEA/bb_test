@@ -832,7 +832,15 @@
   "customCardTextHint": "لطفاً متن سفارشی را وارد کنید",
   "changeImage": "تغییر تصویر",
   "restoreDefaultImage": "بازیابی تصویر پیش‌فرض",
-  "clockWidgetDefaultText": "برای ویرایش متن ضربه بزنید، برای تغییر تصویر نگه دارید"
+  "clockWidgetDefaultText": "برای ویرایش متن ضربه بزنید، برای تغییر تصویر نگه دارید",
+  "clock": "ساعت",
+  "clockCardAuthor": "نویسنده",
+  "clockCardAuthorHint": "نام نویسنده را وارد کنید",
+  "clockCardImage": "تصویر کارت",
+  "clockCardDefaultText": "زندگی زیباست",
+  "clockCardDefaultAuthor": "وانگ زنگ‌چی",
+  "customImageSelected": "تصویر سفارشی تنظیم شد",
+  "defaultImage": "پس‌زمینه پیش‌فرض"
 }
 
 

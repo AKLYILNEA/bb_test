@@ -832,7 +832,15 @@
   "customCardTextHint": "请输入自定义文案",
   "changeImage": "更换图片",
   "restoreDefaultImage": "恢复默认图片",
-  "clockWidgetDefaultText": "点击自定义文案，长按更换图片"
+  "clockWidgetDefaultText": "点击自定义文案，长按更换图片",
+  "clock": "时钟",
+  "clockCardAuthor": "文案作者",
+  "clockCardAuthorHint": "请输入作者",
+  "clockCardImage": "卡片图片",
+  "clockCardDefaultText": "生活明朗，万物可爱",
+  "clockCardDefaultAuthor": "汪曾祺",
+  "customImageSelected": "已设置自定义图片",
+  "defaultImage": "默认背景"
 }
 
 

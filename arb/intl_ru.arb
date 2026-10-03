@@ -834,7 +834,15 @@
   "customCardTextHint": "Введите текст",
   "changeImage": "Сменить изображение",
   "restoreDefaultImage": "Восстановить по умолчанию",
-  "clockWidgetDefaultText": "Нажмите для текста, удерживайте для фото"
+  "clockWidgetDefaultText": "Нажмите для текста, удерживайте для фото",
+  "clock": "Часы",
+  "clockCardAuthor": "Автор",
+  "clockCardAuthorHint": "Введите имя автора",
+  "clockCardImage": "Изображение карточки",
+  "clockCardDefaultText": "Жизнь прекрасна и удивительна",
+  "clockCardDefaultAuthor": "Ван Цзэнци",
+  "customImageSelected": "Пользовательское изображение",
+  "defaultImage": "Фон по умолчанию"
 }
 
 

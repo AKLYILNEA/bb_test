@@ -1532,5 +1532,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "clockWidgetDefaultText": MessageLookupByLibrary.simpleMessage(
       "Tap to edit text, long press to change image",
     ),
+    "clock": MessageLookupByLibrary.simpleMessage("Clock"),
+    "clockCardAuthor": MessageLookupByLibrary.simpleMessage("Author"),
+    "clockCardAuthorHint": MessageLookupByLibrary.simpleMessage(
+      "Enter author name",
+    ),
+    "clockCardImage": MessageLookupByLibrary.simpleMessage("Card Image"),
+    "clockCardDefaultText": MessageLookupByLibrary.simpleMessage(
+      "Life is bright and lovely",
+    ),
+    "clockCardDefaultAuthor": MessageLookupByLibrary.simpleMessage("Wang Zengqi"),
+    "customImageSelected": MessageLookupByLibrary.simpleMessage("Custom image set"),
+    "defaultImage": MessageLookupByLibrary.simpleMessage("Default background"),
   };
 }

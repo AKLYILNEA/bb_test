@@ -1613,5 +1613,21 @@ class MessageLookup extends MessageLookupByLibrary {
     "clockWidgetDefaultText": MessageLookupByLibrary.simpleMessage(
       "Нажмите для текста, удерживайте для фото",
     ),
+    "clock": MessageLookupByLibrary.simpleMessage("Часы"),
+    "clockCardAuthor": MessageLookupByLibrary.simpleMessage("Автор"),
+    "clockCardAuthorHint": MessageLookupByLibrary.simpleMessage(
+      "Введите имя автора",
+    ),
+    "clockCardImage": MessageLookupByLibrary.simpleMessage(
+      "Изображение карточки",
+    ),
+    "clockCardDefaultText": MessageLookupByLibrary.simpleMessage(
+      "Жизнь прекрасна и удивительна",
+    ),
+    "clockCardDefaultAuthor": MessageLookupByLibrary.simpleMessage("Ван Цзэнци"),
+    "customImageSelected": MessageLookupByLibrary.simpleMessage(
+      "Пользовательское изображение",
+    ),
+    "defaultImage": MessageLookupByLibrary.simpleMessage("Фон по умолчанию"),
   };
 }

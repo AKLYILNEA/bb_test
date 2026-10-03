@@ -1241,5 +1241,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "changeImage": MessageLookupByLibrary.simpleMessage("画像を変更"),
     "restoreDefaultImage": MessageLookupByLibrary.simpleMessage("デフォルトに戻す"),
     "clockWidgetDefaultText": MessageLookupByLibrary.simpleMessage("タップして編集、長押しで画像変更"),
+    "clock": MessageLookupByLibrary.simpleMessage("時計"),
+    "clockCardAuthor": MessageLookupByLibrary.simpleMessage("作者"),
+    "clockCardAuthorHint": MessageLookupByLibrary.simpleMessage("作者を入力"),
+    "clockCardImage": MessageLookupByLibrary.simpleMessage("カード画像"),
+    "clockCardDefaultText": MessageLookupByLibrary.simpleMessage("明日は明日の風が吹く"),
+    "clockCardDefaultAuthor": MessageLookupByLibrary.simpleMessage("汪曾祺"),
+    "customImageSelected": MessageLookupByLibrary.simpleMessage("カスタム画像設定済み"),
+    "defaultImage": MessageLookupByLibrary.simpleMessage("デフォルト背景"),
   };
 }

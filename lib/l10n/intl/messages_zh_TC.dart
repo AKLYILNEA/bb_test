@@ -1123,5 +1123,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "changeImage": MessageLookupByLibrary.simpleMessage("更換圖片"),
     "restoreDefaultImage": MessageLookupByLibrary.simpleMessage("恢復預設圖片"),
     "clockWidgetDefaultText": MessageLookupByLibrary.simpleMessage("點擊自訂文案，長按更換圖片"),
+    "clock": MessageLookupByLibrary.simpleMessage("時鐘"),
+    "clockCardAuthor": MessageLookupByLibrary.simpleMessage("文案作者"),
+    "clockCardAuthorHint": MessageLookupByLibrary.simpleMessage("請輸入作者"),
+    "clockCardImage": MessageLookupByLibrary.simpleMessage("卡片圖片"),
+    "clockCardDefaultText": MessageLookupByLibrary.simpleMessage("生活明朗，萬物可愛"),
+    "clockCardDefaultAuthor": MessageLookupByLibrary.simpleMessage("汪曾祺"),
+    "customImageSelected": MessageLookupByLibrary.simpleMessage("已設定自訂圖片"),
+    "defaultImage": MessageLookupByLibrary.simpleMessage("預設背景"),
   };
 }

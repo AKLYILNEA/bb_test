@@ -74,7 +74,8 @@ List<DashboardWidget> dashboardWidgetsSafeFromJson(
 ) {
   try {
     return dashboardWidgets
-            ?.map((e) => $enumDecode(_$DashboardWidgetEnumMap, e))
+            ?.map((e) => $enumDecodeNullable(_$DashboardWidgetEnumMap, e))
+            .whereType<DashboardWidget>()
             .toList() ??
         (system.isAndroid
             ? defaultAndroidDashboardWidgets
@@ -91,7 +92,8 @@ List<DashboardWidget> mobileDashboardWidgetsSafeFromJson(
 ) {
   try {
     return dashboardWidgets
-            ?.map((e) => $enumDecode(_$DashboardWidgetEnumMap, e))
+            ?.map((e) => $enumDecodeNullable(_$DashboardWidgetEnumMap, e))
+            .whereType<DashboardWidget>()
             .toList() ??
         defaultAndroidDashboardWidgets;
   } catch (_) {
@@ -104,7 +106,8 @@ List<DashboardWidget> desktopDashboardWidgetsSafeFromJson(
 ) {
   try {
     return dashboardWidgets
-            ?.map((e) => $enumDecode(_$DashboardWidgetEnumMap, e))
+            ?.map((e) => $enumDecodeNullable(_$DashboardWidgetEnumMap, e))
+            .whereType<DashboardWidget>()
             .toList() ??
         defaultDashboardWidgets;
   } catch (_) {
