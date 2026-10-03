@@ -825,7 +825,14 @@
   "systemDns": "DNS",
   "enabled": "Enabled",
   "disabled": "Disabled",
-  "openRouterAdmin": "Open Gateway"
+  "openRouterAdmin": "Open Gateway",
+  "clockMedium": "Clock (Medium)",
+  "clockLarge": "Clock (Large)",
+  "customCardText": "Custom Text",
+  "customCardTextHint": "Please enter custom text",
+  "changeImage": "Change Image",
+  "restoreDefaultImage": "Restore Default Image",
+  "clockWidgetDefaultText": "Tap to edit text, long press to change image"
 }
 
 

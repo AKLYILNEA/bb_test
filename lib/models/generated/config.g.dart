@@ -141,6 +141,8 @@ const _$DashboardWidgetEnumMap = {
   DashboardWidget.mediaUnlock: 'mediaUnlock',
   DashboardWidget.mediaUnlockSmall: 'mediaUnlockSmall',
   DashboardWidget.currentProfile: 'currentProfile',
+  DashboardWidget.clockMedium: 'clockMedium',
+  DashboardWidget.clockLarge: 'clockLarge',
   DashboardWidget.startButton: 'startButton',
 };
 

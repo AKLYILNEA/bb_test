@@ -355,6 +355,8 @@ enum DashboardWidget {
   mediaUnlock(GridItem(crossAxisCellCount: 8, child: MediaUnlock())),
   mediaUnlockSmall(GridItem(crossAxisCellCount: 4, child: MediaUnlockSmall())),
   currentProfile(GridItem(crossAxisCellCount: 4, child: CurrentProfile())),
+  clockMedium(GridItem(crossAxisCellCount: 4, child: ClockCardMedium())),
+  clockLarge(GridItem(crossAxisCellCount: 8, child: ClockCardLarge())),
   startButton(
     GridItem(crossAxisCellCount: 4, isDeletable: false, child: StartButton()),
   );

@@ -1519,5 +1519,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
       "No available LAN detected, please check Wi-Fi",
     ),
+    "clockMedium": MessageLookupByLibrary.simpleMessage("Clock (Medium)"),
+    "clockLarge": MessageLookupByLibrary.simpleMessage("Clock (Large)"),
+    "customCardText": MessageLookupByLibrary.simpleMessage("Custom Text"),
+    "customCardTextHint": MessageLookupByLibrary.simpleMessage(
+      "Please enter custom text",
+    ),
+    "changeImage": MessageLookupByLibrary.simpleMessage("Change Image"),
+    "restoreDefaultImage": MessageLookupByLibrary.simpleMessage(
+      "Restore Default Image",
+    ),
+    "clockWidgetDefaultText": MessageLookupByLibrary.simpleMessage(
+      "Tap to edit text, long press to change image",
+    ),
   };
 }

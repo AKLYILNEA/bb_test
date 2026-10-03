@@ -1098,5 +1098,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
       "未检测到可用的局域网，请检查 Wi-Fi",
     ),
+    "clockMedium": MessageLookupByLibrary.simpleMessage("时钟中卡"),
+    "clockLarge": MessageLookupByLibrary.simpleMessage("时钟大卡"),
+    "customCardText": MessageLookupByLibrary.simpleMessage("自定义文案"),
+    "customCardTextHint": MessageLookupByLibrary.simpleMessage("请输入自定义文案"),
+    "changeImage": MessageLookupByLibrary.simpleMessage("更换图片"),
+    "restoreDefaultImage": MessageLookupByLibrary.simpleMessage("恢复默认图片"),
+    "clockWidgetDefaultText": MessageLookupByLibrary.simpleMessage("点击自定义文案，长按更换图片"),
   };
 }

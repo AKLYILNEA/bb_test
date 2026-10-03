@@ -825,7 +825,14 @@
   "systemDns": "DNS",
   "enabled": "有効",
   "disabled": "無効",
-  "openRouterAdmin": "ゲートウェイを開く"
+  "openRouterAdmin": "ゲートウェイを開く",
+  "clockMedium": "時計カード (中)",
+  "clockLarge": "時計カード (大)",
+  "customCardText": "カスタムテキスト",
+  "customCardTextHint": "カスタムテキストを入力してください",
+  "changeImage": "画像を変更",
+  "restoreDefaultImage": "デフォルトに戻す",
+  "clockWidgetDefaultText": "タップして編集、長押しで画像変更"
 }
 
 

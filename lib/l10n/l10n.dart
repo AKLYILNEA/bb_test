@@ -6728,6 +6728,76 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Clock (Medium)`
+  String get clockMedium {
+    return Intl.message(
+      'Clock (Medium)',
+      name: 'clockMedium',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Clock (Large)`
+  String get clockLarge {
+    return Intl.message(
+      'Clock (Large)',
+      name: 'clockLarge',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Custom Text`
+  String get customCardText {
+    return Intl.message(
+      'Custom Text',
+      name: 'customCardText',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter custom text`
+  String get customCardTextHint {
+    return Intl.message(
+      'Please enter custom text',
+      name: 'customCardTextHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Change Image`
+  String get changeImage {
+    return Intl.message(
+      'Change Image',
+      name: 'changeImage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Restore Default Image`
+  String get restoreDefaultImage {
+    return Intl.message(
+      'Restore Default Image',
+      name: 'restoreDefaultImage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap to edit text, long press to change image`
+  String get clockWidgetDefaultText {
+    return Intl.message(
+      'Tap to edit text, long press to change image',
+      name: 'clockWidgetDefaultText',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

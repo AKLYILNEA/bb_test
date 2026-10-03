@@ -825,7 +825,14 @@
   "systemDns": "DNS",
   "enabled": "已開啟",
   "disabled": "已關閉",
-  "openRouterAdmin": "開啟後台閘道"
+  "openRouterAdmin": "開啟後台閘道",
+  "clockMedium": "時鐘中卡",
+  "clockLarge": "時鐘大卡",
+  "customCardText": "自訂文案",
+  "customCardTextHint": "請輸入自訂文案",
+  "changeImage": "更換圖片",
+  "restoreDefaultImage": "恢復預設圖片",
+  "clockWidgetDefaultText": "點擊自訂文案，長按更換圖片"
 }
 
 

@@ -825,7 +825,14 @@
   "systemDns": "DNS",
   "enabled": "فعال",
   "disabled": "غیرفعال",
-  "openRouterAdmin": "باز کردن گیت‌وی"
+  "openRouterAdmin": "باز کردن گیت‌وی",
+  "clockMedium": "کارت ساعت (متوسط)",
+  "clockLarge": "کارت ساعت (بزرگ)",
+  "customCardText": "متن سفارشی",
+  "customCardTextHint": "لطفاً متن سفارشی را وارد کنید",
+  "changeImage": "تغییر تصویر",
+  "restoreDefaultImage": "بازیابی تصویر پیش‌فرض",
+  "clockWidgetDefaultText": "برای ویرایش متن ضربه بزنید، برای تغییر تصویر نگه دارید"
 }
 
 

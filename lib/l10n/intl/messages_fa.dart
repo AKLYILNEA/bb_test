@@ -1557,5 +1557,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
       "شبکه محلی در دسترس یافت نشد، لطفاً Wi-Fi را بررسی کنید",
     ),
+    "clockMedium": MessageLookupByLibrary.simpleMessage("کارت ساعت (متوسط)"),
+    "clockLarge": MessageLookupByLibrary.simpleMessage("کارت ساعت (بزرگ)"),
+    "customCardText": MessageLookupByLibrary.simpleMessage("متن سفارشی"),
+    "customCardTextHint": MessageLookupByLibrary.simpleMessage(
+      "لطفاً متن سفارشی را وارد کنید",
+    ),
+    "changeImage": MessageLookupByLibrary.simpleMessage("تغییر تصویر"),
+    "restoreDefaultImage": MessageLookupByLibrary.simpleMessage(
+      "بازیابی تصویر پیش‌فرض",
+    ),
+    "clockWidgetDefaultText": MessageLookupByLibrary.simpleMessage(
+      "برای ویرایش متن ضربه بزنید، برای تغییر تصویر نگه دارید",
+    ),
   };
 }

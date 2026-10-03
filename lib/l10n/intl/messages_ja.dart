@@ -1234,5 +1234,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
       "利用可能なLANが見つかりません。Wi-Fiを確認してください",
     ),
+    "clockMedium": MessageLookupByLibrary.simpleMessage("時計カード (中)"),
+    "clockLarge": MessageLookupByLibrary.simpleMessage("時計カード (大)"),
+    "customCardText": MessageLookupByLibrary.simpleMessage("カスタムテキスト"),
+    "customCardTextHint": MessageLookupByLibrary.simpleMessage("カスタムテキストを入力してください"),
+    "changeImage": MessageLookupByLibrary.simpleMessage("画像を変更"),
+    "restoreDefaultImage": MessageLookupByLibrary.simpleMessage("デフォルトに戻す"),
+    "clockWidgetDefaultText": MessageLookupByLibrary.simpleMessage("タップして編集、長押しで画像変更"),
   };
 }

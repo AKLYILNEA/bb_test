@@ -1240,5 +1240,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
       "사용 가능한 LAN을 찾을 수 없습니다. Wi-Fi를 확인하세요",
     ),
+    "clockMedium": MessageLookupByLibrary.simpleMessage("시계 카드 (중)"),
+    "clockLarge": MessageLookupByLibrary.simpleMessage("시계 카드 (대)"),
+    "customCardText": MessageLookupByLibrary.simpleMessage("사용자 지정 문구"),
+    "customCardTextHint": MessageLookupByLibrary.simpleMessage("문구를 입력하세요"),
+    "changeImage": MessageLookupByLibrary.simpleMessage("이미지 변경"),
+    "restoreDefaultImage": MessageLookupByLibrary.simpleMessage("기본 이미지로 복원"),
+    "clockWidgetDefaultText": MessageLookupByLibrary.simpleMessage(
+      "탭하여 문구 편집, 길게 눌러 이미지 변경",
+    ),
   };
 }

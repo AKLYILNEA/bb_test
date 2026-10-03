@@ -827,7 +827,14 @@
   "systemDns": "DNS",
   "enabled": "Включено",
   "disabled": "Отключено",
-  "openRouterAdmin": "Открыть шлюз"
+  "openRouterAdmin": "Открыть шлюз",
+  "clockMedium": "Часы (Средняя)",
+  "clockLarge": "Часы (Большая)",
+  "customCardText": "Пользовательский текст",
+  "customCardTextHint": "Введите текст",
+  "changeImage": "Сменить изображение",
+  "restoreDefaultImage": "Восстановить по умолчанию",
+  "clockWidgetDefaultText": "Нажмите для текста, удерживайте для фото"
 }
 
 

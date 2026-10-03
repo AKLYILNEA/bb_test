@@ -1600,5 +1600,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
       "Доступная локальная сеть не найдена, проверьте Wi-Fi",
     ),
+    "clockMedium": MessageLookupByLibrary.simpleMessage("Часы (Средняя)"),
+    "clockLarge": MessageLookupByLibrary.simpleMessage("Часы (Большая)"),
+    "customCardText": MessageLookupByLibrary.simpleMessage(
+      "Пользовательский текст",
+    ),
+    "customCardTextHint": MessageLookupByLibrary.simpleMessage("Введите текст"),
+    "changeImage": MessageLookupByLibrary.simpleMessage("Сменить изображение"),
+    "restoreDefaultImage": MessageLookupByLibrary.simpleMessage(
+      "Восстановить по умолчанию",
+    ),
+    "clockWidgetDefaultText": MessageLookupByLibrary.simpleMessage(
+      "Нажмите для текста, удерживайте для фото",
+    ),
   };
 }

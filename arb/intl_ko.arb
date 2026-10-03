@@ -825,7 +825,14 @@
   "systemDns": "DNS",
   "enabled": "사용 중",
   "disabled": "사용 안 함",
-  "openRouterAdmin": "게이트웨이 열기"
+  "openRouterAdmin": "게이트웨이 열기",
+  "clockMedium": "시계 카드 (중)",
+  "clockLarge": "시계 카드 (대)",
+  "customCardText": "사용자 지정 문구",
+  "customCardTextHint": "문구를 입력하세요",
+  "changeImage": "이미지 변경",
+  "restoreDefaultImage": "기본 이미지로 복원",
+  "clockWidgetDefaultText": "탭하여 문구 편집, 길게 눌러 이미지 변경"
 }
 
 
