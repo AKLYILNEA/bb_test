@@ -1382,6 +1382,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "useGlobalScriptOverride": MessageLookupByLibrary.simpleMessage(
       "استفاده از اسکریپت اورراید سراسری",
     ),
+    "profileScriptSettings": MessageLookupByLibrary.simpleMessage(
+      "تنظیمات اسکریپت نمایه",
+    ),
+    "assignToProfiles": MessageLookupByLibrary.simpleMessage(
+      "اختصاص به نمایه‌ها",
+    ),
+    "followGlobal": MessageLookupByLibrary.simpleMessage(
+      "پیروی از پیش‌فرض سراسری",
+    ),
+    "noScriptAssigned": MessageLookupByLibrary.simpleMessage(
+      "عدم استفاده از اسکریپت",
+    ),
     "useHosts": MessageLookupByLibrary.simpleMessage("استفاده از Hosts"),
     "useSystemHosts": MessageLookupByLibrary.simpleMessage(
       "استفاده از Hosts سیستم",

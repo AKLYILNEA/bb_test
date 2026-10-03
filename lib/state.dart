@@ -1085,9 +1085,9 @@ class GlobalState {
       rawConfig.remove('rule');
     }
 
-    final scriptActive =
-        config.scriptProps.currentScript != null &&
-        targetProfile.useScriptOverride;
+    final effectiveScript =
+        targetProfile.getEffectiveScript(config.scriptProps);
+    final scriptActive = effectiveScript != null;
 
     final overrideData = targetProfile.overrideData;
     if (overrideData.enable && !scriptActive) {
@@ -1195,10 +1195,11 @@ class GlobalState {
     Profile? profile,
   }) async {
     return _scriptEvaluateLock.synchronized(() async {
-      final currentScript = globalState.config.scriptProps.currentScript;
+      final targetProfile = profile ?? globalState.config.currentProfile;
+      final currentScript = targetProfile != null
+          ? targetProfile.getEffectiveScript(globalState.config.scriptProps)
+          : globalState.config.scriptProps.currentScript;
       if (currentScript == null) return config;
-
-      if (profile != null && !profile.useScriptOverride) return config;
 
       config['proxy-providers'] ??= <String, dynamic>{};
 

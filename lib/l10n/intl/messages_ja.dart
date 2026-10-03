@@ -1083,6 +1083,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "useGlobalScriptOverride": MessageLookupByLibrary.simpleMessage(
       "グローバルスクリプトオーバーライドを使用",
     ),
+    "profileScriptSettings": MessageLookupByLibrary.simpleMessage("プロファイルスクリプト設定"),
+    "assignToProfiles": MessageLookupByLibrary.simpleMessage("プロファイルに割り当て"),
+    "followGlobal": MessageLookupByLibrary.simpleMessage("全体デフォルトに従う"),
+    "noScriptAssigned": MessageLookupByLibrary.simpleMessage("スクリプトを使用しない"),
     "useHosts": MessageLookupByLibrary.simpleMessage("Hostsを使用"),
     "useSystemHosts": MessageLookupByLibrary.simpleMessage("システムHostsを使用"),
     "userAuth": MessageLookupByLibrary.simpleMessage("ユーザー認証"),

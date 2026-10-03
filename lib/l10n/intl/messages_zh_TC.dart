@@ -983,6 +983,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "useGlobalScriptOverride": MessageLookupByLibrary.simpleMessage(
       "使用全域指令碼覆寫",
     ),
+    "profileScriptSettings": MessageLookupByLibrary.simpleMessage("設定腳本設定"),
+    "assignToProfiles": MessageLookupByLibrary.simpleMessage("分配至設定"),
+    "followGlobal": MessageLookupByLibrary.simpleMessage("跟隨全域預設"),
+    "noScriptAssigned": MessageLookupByLibrary.simpleMessage("不使用腳本"),
     "useHosts": MessageLookupByLibrary.simpleMessage("使用 Hosts"),
     "useSystemHosts": MessageLookupByLibrary.simpleMessage("使用系統 Hosts"),
     "userAuth": MessageLookupByLibrary.simpleMessage("用戶驗證"),

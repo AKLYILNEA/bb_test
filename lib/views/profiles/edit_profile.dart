@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' show FontVariation;
 
 import 'package:bett_box/clash/clash.dart';
@@ -13,6 +14,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class EditProfileView extends StatefulWidget {
   final Profile profile;
@@ -35,6 +37,8 @@ class EditProfileViewState extends State<EditProfileView> {
   late TextEditingController urlController;
   late TextEditingController autoUpdateDurationController;
   late bool autoUpdate;
+  late bool useScriptOverride;
+  late String? scriptId;
   late TextEditingController ageSecretKeyController;
   FocusNode? urlFocusNode;
   bool _obscureAgeSecretKey = true;
@@ -51,6 +55,8 @@ class EditProfileViewState extends State<EditProfileView> {
     labelController = EmojiTextEditingController(text: widget.profile.label);
     urlController = TextEditingController(text: widget.profile.url);
     autoUpdate = widget.isNew ? false : widget.profile.autoUpdate;
+    useScriptOverride = widget.profile.useScriptOverride;
+    scriptId = widget.profile.scriptId;
     autoUpdateDurationController = TextEditingController(
       text: widget.profile.autoUpdateDuration.inMinutes.toString(),
     );
@@ -94,6 +100,8 @@ class EditProfileViewState extends State<EditProfileView> {
           ? null
           : ageSecretKeyController.text.trim(),
       autoUpdate: autoUpdate,
+      useScriptOverride: useScriptOverride,
+      scriptId: scriptId,
       autoUpdateDuration: Duration(
         minutes: int.parse(autoUpdateDurationController.text),
       ),
@@ -393,6 +401,77 @@ class EditProfileViewState extends State<EditProfileView> {
             ),
           ),
       ],
+      Consumer(
+        builder: (_, ref, _) {
+          final scriptProps = ref.watch(scriptStateProvider);
+          final scripts = scriptProps.scripts;
+          final globalScript = scriptProps.currentScript;
+
+          String scriptDesc;
+          if (!useScriptOverride) {
+            scriptDesc = appLocalizations.disabled;
+          } else if (scriptId == null) {
+            final globalName =
+                globalScript?.label ?? appLocalizations.none;
+            scriptDesc = '${appLocalizations.followGlobal} ($globalName)';
+          } else {
+            final target =
+                scripts.where((s) => s.id == scriptId).firstOrNull;
+            scriptDesc = target?.label ?? appLocalizations.none;
+          }
+
+          return ListItem(
+            title: Text(appLocalizations.script),
+            subtitle: Text(
+              scriptDesc,
+              style: context.textTheme.labelMedium?.toLight,
+            ),
+            trailing: const Icon(FluentIcons.chevron_right_24_regular),
+            onTap: () async {
+              final currentSelected = !useScriptOverride
+                  ? '__disabled__'
+                  : (scriptId ?? '__follow_global__');
+              final options = [
+                '__follow_global__',
+                ...scripts.map((s) => s.id),
+                '__disabled__',
+              ];
+              final selected = await globalState.showCommonDialog<String>(
+                child: OptionsDialog<String>(
+                  title: appLocalizations.script,
+                  options: options,
+                  value: currentSelected,
+                  textBuilder: (val) {
+                    if (val == '__disabled__') {
+                      return appLocalizations.noScriptAssigned;
+                    }
+                    if (val == '__follow_global__') {
+                      final defName =
+                          globalScript?.label ?? appLocalizations.none;
+                      return '${appLocalizations.followGlobal} ($defName)';
+                    }
+                    final match =
+                        scripts.where((s) => s.id == val).firstOrNull;
+                    return match?.label ?? val;
+                  },
+                ),
+              );
+              if (selected == null) return;
+              setState(() {
+                if (selected == '__disabled__') {
+                  useScriptOverride = false;
+                } else if (selected == '__follow_global__') {
+                  useScriptOverride = true;
+                  scriptId = null;
+                } else {
+                  useScriptOverride = true;
+                  scriptId = selected;
+                }
+              });
+            },
+          );
+        },
+      ),
       if (!widget.isNew)
         ValueListenableBuilder<FileInfo?>(
           valueListenable: fileInfoNotifier,

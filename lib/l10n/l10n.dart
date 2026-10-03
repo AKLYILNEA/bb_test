@@ -5531,6 +5531,46 @@ class AppLocalizations {
     );
   }
 
+  /// `Profile Script Settings`
+  String get profileScriptSettings {
+    return Intl.message(
+      'Profile Script Settings',
+      name: 'profileScriptSettings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Assign to Profiles`
+  String get assignToProfiles {
+    return Intl.message(
+      'Assign to Profiles',
+      name: 'assignToProfiles',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Follow Global Default`
+  String get followGlobal {
+    return Intl.message(
+      'Follow Global Default',
+      name: 'followGlobal',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Do not use script`
+  String get noScriptAssigned {
+    return Intl.message(
+      'Do not use script',
+      name: 'noScriptAssigned',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Failed to import profile. Please check your network status or try resetting the subscription link ( HTTP error code: {statusCode} )`
   String profileImportFailed(Object statusCode) {
     return Intl.message(

@@ -1407,6 +1407,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "useGlobalScriptOverride": MessageLookupByLibrary.simpleMessage(
       "Глобальное переопределение",
     ),
+    "profileScriptSettings": MessageLookupByLibrary.simpleMessage(
+      "Настройки скриптов профиля",
+    ),
+    "assignToProfiles": MessageLookupByLibrary.simpleMessage(
+      "Назначить профилям",
+    ),
+    "followGlobal": MessageLookupByLibrary.simpleMessage(
+      "По умолчанию",
+    ),
+    "noScriptAssigned": MessageLookupByLibrary.simpleMessage(
+      "Не использовать скрипт",
+    ),
     "useHosts": MessageLookupByLibrary.simpleMessage("Использовать hosts"),
     "useSystemHosts": MessageLookupByLibrary.simpleMessage(
       "Использовать системные hosts",

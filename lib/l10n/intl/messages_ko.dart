@@ -1089,6 +1089,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "useGlobalScriptOverride": MessageLookupByLibrary.simpleMessage(
       "글로벌 스크립트 오버라이드 사용",
     ),
+    "profileScriptSettings": MessageLookupByLibrary.simpleMessage("프로필 스크립트 설정"),
+    "assignToProfiles": MessageLookupByLibrary.simpleMessage("프로필에 할당"),
+    "followGlobal": MessageLookupByLibrary.simpleMessage("글로벌 기본값 따르기"),
+    "noScriptAssigned": MessageLookupByLibrary.simpleMessage("스크립트 사용 안 함"),
     "useHosts": MessageLookupByLibrary.simpleMessage("Hosts 사용"),
     "useSystemHosts": MessageLookupByLibrary.simpleMessage("시스템 Hosts 사용"),
     "userAuth": MessageLookupByLibrary.simpleMessage("사용자 인증"),

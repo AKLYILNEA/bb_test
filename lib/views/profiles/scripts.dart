@@ -147,7 +147,7 @@ class ScriptsView extends ConsumerStatefulWidget {
 }
 
 class _ScriptsViewState extends ConsumerState<ScriptsView> {
-  Future<void> _handleDelScript(String label) async {
+  Future<void> _handleDelScript(Script script) async {
     final res = await globalState.showMessage(
       message: TextSpan(
         text: appLocalizations.deleteTip(appLocalizations.script),
@@ -156,7 +156,72 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
     if (res != true) {
       return;
     }
-    ref.read(scriptStateProvider.notifier).del(label);
+    ref.read(scriptStateProvider.notifier).del(script.label);
+    final profiles = ref.read(profilesProvider);
+    final currentProfileId = ref.read(currentProfileIdProvider);
+    bool shouldReapply = false;
+    for (final p in profiles) {
+      if (p.scriptId == script.id) {
+        ref.read(profilesProvider.notifier).updateProfile(
+          p.id,
+          (item) => item.copyWith(scriptId: null),
+        );
+        if (p.id == currentProfileId) {
+          shouldReapply = true;
+        }
+      }
+    }
+    if (shouldReapply) {
+      await globalState.appController.applyProfile(silence: true);
+    }
+  }
+
+  Future<void> _handleAssignToProfiles(Script script) async {
+    final profiles = ref.read(profilesProvider);
+    if (profiles.isEmpty) {
+      globalState.showNotifier(appLocalizations.nullProfileDesc);
+      return;
+    }
+    final selectedProfileIds = profiles
+        .where((p) => p.useScriptOverride && p.scriptId == script.id)
+        .map((p) => p.id)
+        .toSet();
+
+    final result = await globalState.showCommonDialog<Set<String>>(
+      child: _AssignScriptDialog(
+        script: script,
+        profiles: profiles,
+        initialSelected: selectedProfileIds,
+      ),
+    );
+
+    if (result == null) return;
+
+    final currentProfileId = ref.read(currentProfileIdProvider);
+    bool shouldReapply = false;
+
+    for (final profile in profiles) {
+      final willUse = result.contains(profile.id);
+      final currentlyUses = profile.scriptId == script.id;
+
+      if (willUse && (!profile.useScriptOverride || profile.scriptId != script.id)) {
+        ref.read(profilesProvider.notifier).updateProfile(
+          profile.id,
+          (p) => p.copyWith(useScriptOverride: true, scriptId: script.id),
+        );
+        if (profile.id == currentProfileId) shouldReapply = true;
+      } else if (!willUse && currentlyUses) {
+        ref.read(profilesProvider.notifier).updateProfile(
+          profile.id,
+          (p) => p.copyWith(scriptId: null),
+        );
+        if (profile.id == currentProfileId) shouldReapply = true;
+      }
+    }
+
+    if (shouldReapply) {
+      await globalState.appController.applyProfile(silence: true);
+    }
   }
 
   Future<void> _handleSyncScript(String id) async {
@@ -227,6 +292,22 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
             itemBuilder: (_, index) {
               final script = scripts[index];
               final isSelected = script.id == currentId;
+              final profiles = ref.watch(profilesProvider);
+              final assignedProfiles = profiles
+                  .where((p) => p.useScriptOverride && p.scriptId == script.id)
+                  .toList();
+
+              String? subtitleText;
+              if (assignedProfiles.isNotEmpty) {
+                final names =
+                    assignedProfiles.map((p) => p.label ?? p.id).join(', ');
+                subtitleText = isSelected
+                    ? '${appLocalizations.defaultText} · $names'
+                    : names;
+              } else if (isSelected) {
+                subtitleText = appLocalizations.defaultText;
+              }
+
               return Container(
                 padding: kTabLabelPadding,
                 margin: EdgeInsets.symmetric(vertical: 6),
@@ -236,6 +317,14 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
                   child: ListItem(
                     padding: const EdgeInsets.only(left: 12, right: 12),
                     title: EmojiText(script.label),
+                    subtitle: subtitleText != null
+                        ? Text(
+                            subtitleText,
+                            style: context.textTheme.labelMedium?.toLight,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )
+                        : null,
                     leading: Switch(
                       value: isSelected,
                       onChanged: (value) {
@@ -265,6 +354,13 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
                               _handleToEditor(script: script);
                             },
                           ),
+                          PopupMenuItemData(
+                            icon: FluentIcons.apps_add_in_24_regular,
+                            label: appLocalizations.assignToProfiles,
+                            onPressed: () {
+                              _handleAssignToProfiles(script);
+                            },
+                          ),
                           if (script.isCompatibleWithBettbox)
                             PopupMenuItemData(
                               icon: FluentIcons.options_24_regular,
@@ -292,7 +388,7 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
                             icon: FluentIcons.delete_24_regular,
                             label: appLocalizations.delete,
                             onPressed: () {
-                              _handleDelScript(script.label);
+                              _handleDelScript(script);
                             },
                           ),
                         ],
@@ -510,8 +606,13 @@ class _ScriptSettingsSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final profiles = ref.watch(profilesProvider);
     final currentProfileId = ref.watch(currentProfileIdProvider);
+    final scriptProps = ref.watch(scriptStateProvider);
+    final scripts = scriptProps.scripts;
+    final globalScript = scriptProps.currentScript;
+
     return AdaptiveSheetScaffold(
       type: type,
+      title: appLocalizations.profileScriptSettings,
       body: profiles.isEmpty
           ? NullStatus(
               label: appLocalizations.nullProfileDesc,
@@ -520,16 +621,98 @@ class _ScriptSettingsSheet extends ConsumerWidget {
           : ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               itemCount: profiles.length,
-              itemBuilder: (_, index) {
+              itemBuilder: (context, index) {
                 final profile = profiles[index];
                 final isCurrentProfile = profile.id == currentProfileId;
+
+                String scriptDesc;
+                if (!profile.useScriptOverride) {
+                  scriptDesc = appLocalizations.disabled;
+                } else if (profile.scriptId == null) {
+                  final globalName =
+                      globalScript?.label ?? appLocalizations.none;
+                  scriptDesc = '${appLocalizations.followGlobal} ($globalName)';
+                } else {
+                  final target =
+                      scripts.where((s) => s.id == profile.scriptId).firstOrNull;
+                  scriptDesc = target?.label ?? appLocalizations.none;
+                }
+
                 return Container(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: CommonCard(
                     type: CommonCardType.filled,
+                    radius: 20,
                     child: ListTile(
-                      contentPadding: const EdgeInsets.only(left: 16, right: 16),
+                      contentPadding:
+                          const EdgeInsets.only(left: 16, right: 16),
                       title: EmojiText(profile.label ?? profile.id),
+                      subtitle: Text(
+                        scriptDesc,
+                        style: context.textTheme.labelMedium?.toLight,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      onTap: () async {
+                        final currentSelected = !profile.useScriptOverride
+                            ? '__disabled__'
+                            : (profile.scriptId ?? '__follow_global__');
+                        final options = [
+                          '__follow_global__',
+                          ...scripts.map((s) => s.id),
+                          '__disabled__',
+                        ];
+                        final selected =
+                            await globalState.showCommonDialog<String>(
+                          child: OptionsDialog<String>(
+                            title:
+                                '${profile.label ?? profile.id} - ${appLocalizations.script}',
+                            options: options,
+                            value: currentSelected,
+                            textBuilder: (val) {
+                              if (val == '__disabled__') {
+                                return appLocalizations.noScriptAssigned;
+                              }
+                              if (val == '__follow_global__') {
+                                final defName = globalScript?.label ??
+                                    appLocalizations.none;
+                                return '${appLocalizations.followGlobal} ($defName)';
+                              }
+                              final match = scripts
+                                  .where((s) => s.id == val)
+                                  .firstOrNull;
+                              return match?.label ?? val;
+                            },
+                          ),
+                        );
+                        if (selected == null) return;
+                        if (selected == '__disabled__') {
+                          ref.read(profilesProvider.notifier).updateProfile(
+                            profile.id,
+                            (p) => p.copyWith(useScriptOverride: false),
+                          );
+                        } else if (selected == '__follow_global__') {
+                          ref.read(profilesProvider.notifier).updateProfile(
+                            profile.id,
+                            (p) => p.copyWith(
+                              useScriptOverride: true,
+                              scriptId: null,
+                            ),
+                          );
+                        } else {
+                          ref.read(profilesProvider.notifier).updateProfile(
+                            profile.id,
+                            (p) => p.copyWith(
+                              useScriptOverride: true,
+                              scriptId: selected,
+                            ),
+                          );
+                        }
+                        if (isCurrentProfile) {
+                          await globalState.appController
+                              .applyProfile(silence: true);
+                        }
+                      },
                       trailing: Switch(
                         value: profile.useScriptOverride,
                         onChanged: (value) async {
@@ -538,7 +721,8 @@ class _ScriptSettingsSheet extends ConsumerWidget {
                             (p) => p.copyWith(useScriptOverride: value),
                           );
                           if (isCurrentProfile) {
-                            await globalState.appController.applyProfile(silence: true);
+                            await globalState.appController
+                                .applyProfile(silence: true);
                           }
                         },
                       ),
@@ -547,7 +731,74 @@ class _ScriptSettingsSheet extends ConsumerWidget {
                 );
               },
             ),
-      title: appLocalizations.useGlobalScriptOverride,
+    );
+  }
+}
+
+class _AssignScriptDialog extends StatefulWidget {
+  final Script script;
+  final List<Profile> profiles;
+  final Set<String> initialSelected;
+
+  const _AssignScriptDialog({
+    required this.script,
+    required this.profiles,
+    required this.initialSelected,
+  });
+
+  @override
+  State<_AssignScriptDialog> createState() => _AssignScriptDialogState();
+}
+
+class _AssignScriptDialogState extends State<_AssignScriptDialog> {
+  late Set<String> _selected;
+
+  @override
+  void initState() {
+    super.initState();
+    _selected = Set.from(widget.initialSelected);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CommonDialog(
+      title: '${appLocalizations.assignToProfiles} - ${widget.script.label}',
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(appLocalizations.cancel),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(_selected),
+          child: Text(appLocalizations.confirm),
+        ),
+      ],
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * 0.45,
+        ),
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: widget.profiles.length,
+          itemBuilder: (_, index) {
+            final profile = widget.profiles[index];
+            final isChecked = _selected.contains(profile.id);
+            return ListItem(
+              onTap: () {
+                setState(() {
+                  if (isChecked) {
+                    _selected.remove(profile.id);
+                  } else {
+                    _selected.add(profile.id);
+                  }
+                });
+              },
+              title: EmojiText(profile.label ?? profile.id),
+              trailing: OptionCheckIcon(selected: isChecked),
+            );
+          },
+        ),
+      ),
     );
   }
 }
