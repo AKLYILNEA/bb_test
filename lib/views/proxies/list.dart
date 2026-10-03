@@ -804,6 +804,7 @@ class _GroupHeader extends ConsumerWidget {
   static const _expandButtonWidth = 32.0;
   static const _actionsGap = 6.0;
   static const _actionsRightOffset = _expandButtonWidth + _actionsGap;
+  static const _actionsWidth = _expandButtonWidth * 2 + 2;
 
   static const _actionsDuration = Duration(milliseconds: 160);
 
@@ -819,15 +820,19 @@ class _GroupHeader extends ConsumerWidget {
   }
 
   Widget _wrapAction({required Widget child, required String key}) {
-    final double end = collapsing ? 0.0 : 1.0;
-    final double begin = collapsing || !enterAnimated ? 1.0 : 0.0;
+    final bool visible = isExpand && !collapsing;
+    final double end = visible ? 1.0 : 0.0;
+    final double begin = visible && enterAnimated ? 0.0 : end;
     return TweenAnimationBuilder<double>(
       key: ValueKey(key),
       tween: Tween<double>(begin: begin, end: end),
       duration: _actionsDuration,
       curve: Curves.fastOutSlowIn,
       child: child,
-      builder: (_, value, c) => _buildActionTransition(value, c),
+      builder: (_, value, c) => IgnorePointer(
+        ignoring: value < 1.0,
+        child: _buildActionTransition(value, c),
+      ),
     );
   }
 
@@ -850,10 +855,9 @@ class _GroupHeader extends ConsumerWidget {
       proxyIconProvider(selectedProxyName),
     );
 
-    // The key keeps the action subtree (and the running delay spinner) alive
-    // when it moves into the collapse overlay.
+    // Lives in the stack overlay instead of this row so the buttons (and the
+    // running delay spinner) keep their state while collapsing.
     final actions = Row(
-      key: GlobalObjectKey('proxy_group_actions_${group.name}'),
       mainAxisSize: MainAxisSize.min,
       children: [
         _wrapAction(
@@ -949,10 +953,8 @@ class _GroupHeader extends ConsumerWidget {
             ],
           ),
         ),
-        if (isExpand && !collapsing) ...[
-          actions,
-          const SizedBox(width: _actionsGap),
-        ],
+        if (isExpand && !collapsing)
+          const SizedBox(width: _actionsWidth + _actionsGap),
         IconButton.filledTonal(
           key: ValueKey('expand_${group.name}'),
           style: _circleFilledTonalStyle,
@@ -972,13 +974,12 @@ class _GroupHeader extends ConsumerWidget {
         child: Stack(
           children: [
             headerRow,
-            if (collapsing)
-              Positioned(
-                top: 0,
-                bottom: 0,
-                right: _actionsRightOffset,
-                child: Center(child: actions),
-              ),
+            Positioned(
+              top: 0,
+              bottom: 0,
+              right: _actionsRightOffset,
+              child: Center(child: actions),
+            ),
           ],
         ),
       ),
