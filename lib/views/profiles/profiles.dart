@@ -8,7 +8,6 @@ import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/views/profiles/edit_profile.dart';
 import 'package:bett_box/views/profiles/override_profile.dart';
-import 'package:bett_box/views/profiles/scripts.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -62,28 +61,6 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
         },
         icon: const Icon(FluentIcons.arrow_sync_24_regular),
         tooltip: appLocalizations.syncAll,
-      ),
-      IconButton(
-        onPressed: () {
-          showExtend(
-            context,
-            builder: (_, type) {
-              return const ScriptsView();
-            },
-          );
-        },
-        tooltip: appLocalizations.script,
-        icon: Consumer(
-          builder: (_, ref, _) {
-            final isScriptMode = ref.watch(
-              scriptStateProvider.select((state) => state.realId != null),
-            );
-            return Icon(
-              FluentIcons.javascript_24_regular,
-              color: isScriptMode ? context.colorScheme.primary : null,
-            );
-          },
-        ),
       ),
       IconButton(
         onPressed: () {

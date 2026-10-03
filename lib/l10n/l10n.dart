@@ -160,11 +160,31 @@ class AppLocalizations {
     );
   }
 
-  /// `Global override script config`
+  /// `Modify profile override scripts`
   String get scriptDesc {
     return Intl.message(
-      'Global override script config',
+      'Modify profile override scripts',
       name: 'scriptDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `My Scripts`
+  String get myScripts {
+    return Intl.message(
+      'My Scripts',
+      name: 'myScripts',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `My Profiles`
+  String get myProfiles {
+    return Intl.message(
+      'My Profiles',
+      name: 'myProfiles',
       desc: '',
       args: [],
     );

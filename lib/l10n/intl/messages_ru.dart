@@ -1166,8 +1166,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "saveTip": MessageLookupByLibrary.simpleMessage("Сохранить изменения?"),
     "script": MessageLookupByLibrary.simpleMessage("Скрипт"),
     "scriptDesc": MessageLookupByLibrary.simpleMessage(
-      "Настройка глобального скрипта переопределения",
+      "Изменить скрипты переопределения профиля",
     ),
+    "myScripts": MessageLookupByLibrary.simpleMessage("Мои скрипты"),
+    "myProfiles": MessageLookupByLibrary.simpleMessage("Мои профили"),
     "scriptOtherOptions": MessageLookupByLibrary.simpleMessage(
       "Другие настройки",
     ),

@@ -62,7 +62,12 @@ class OptionsDialog<T> extends StatelessWidget {
                       Expanded(
                         child: EmojiText(
                           textBuilder(option),
-                          style: context.textTheme.bodyMedium,
+                          style: value == option
+                              ? context.textTheme.bodyMedium?.copyWith(
+                                  color: context.colorScheme.primary,
+                                  fontWeight: FontWeight.w600,
+                                )
+                              : context.textTheme.bodyMedium,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                         ),

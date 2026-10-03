@@ -1155,8 +1155,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "script": MessageLookupByLibrary.simpleMessage("اسکریپت"),
     "scriptDesc": MessageLookupByLibrary.simpleMessage(
-      "تنظیمات اسکریپت اورراید سراسری",
+      "ویرایش اسکریپت‌های بازنویسی پروفایل",
     ),
+    "myScripts": MessageLookupByLibrary.simpleMessage("اسکریپت‌های من"),
+    "myProfiles": MessageLookupByLibrary.simpleMessage("پروفایل‌های من"),
     "scriptOtherOptions": MessageLookupByLibrary.simpleMessage("تنظیمات دیگر"),
     "search": MessageLookupByLibrary.simpleMessage("جستجو"),
     "seconds": MessageLookupByLibrary.simpleMessage("ثانیه"),

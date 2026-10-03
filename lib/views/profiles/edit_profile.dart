@@ -401,60 +401,6 @@ class EditProfileViewState extends State<EditProfileView> {
             ),
           ),
       ],
-      Consumer(
-        builder: (_, ref, _) {
-          final scriptProps = ref.watch(scriptStateProvider);
-          final scripts = scriptProps.scripts;
-          final currentScript = (useScriptOverride && scriptId != null)
-              ? scripts.where((s) => s.id == scriptId).firstOrNull
-              : null;
-
-          final scriptDesc = currentScript != null
-              ? currentScript.label
-              : appLocalizations.none;
-
-          return ListItem(
-            title: Text(appLocalizations.script),
-            subtitle: Text(
-              scriptDesc,
-              style: (useScriptOverride && currentScript != null)
-                  ? TextStyle(
-                      color: context.colorScheme.primary,
-                      fontWeight: FontWeight.w500,
-                    )
-                  : context.textTheme.labelMedium?.toLight,
-            ),
-            trailing: const Icon(FluentIcons.chevron_right_24_regular),
-            onTap: () async {
-              final selected = await globalState.showCommonDialog<String?>(
-                child: OptionsDialog<String?>(
-                  title: appLocalizations.script,
-                  options: [null, ...scripts.map((s) => s.id)],
-                  value: currentScript?.id,
-                  textBuilder: (val) {
-                    if (val == null) {
-                      return appLocalizations.none;
-                    }
-                    final match =
-                        scripts.where((s) => s.id == val).firstOrNull;
-                    return match?.label ?? val;
-                  },
-                ),
-              );
-              if (selected == currentScript?.id) return;
-              setState(() {
-                if (selected == null) {
-                  useScriptOverride = false;
-                  scriptId = null;
-                } else {
-                  useScriptOverride = true;
-                  scriptId = selected;
-                }
-              });
-            },
-          );
-        },
-      ),
       if (!widget.isNew)
         ValueListenableBuilder<FileInfo?>(
           valueListenable: fileInfoNotifier,
