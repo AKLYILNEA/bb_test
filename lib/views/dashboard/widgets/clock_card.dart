@@ -257,10 +257,10 @@ class ClockCard extends ConsumerWidget {
                           },
                         ),
                         Expanded(
-                          child: Center(
+                          child: Align(
+                            alignment: Alignment.centerLeft,
                             child: EmojiText(
                               displayText,
-                              textAlign: TextAlign.center,
                               maxLines: 3,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -277,7 +277,7 @@ class ClockCard extends ConsumerWidget {
                           Align(
                             alignment: Alignment.centerRight,
                             child: Padding(
-                              padding: const EdgeInsets.only(right: 4),
+                              padding: EdgeInsets.only(right: 16.ap),
                               child: EmojiText(
                                 authorText,
                                 maxLines: 1,
@@ -553,18 +553,7 @@ class _ClockDialogState extends State<_ClockDialog> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      hasImage
-                          ? appLocalizations.customImageSelected
-                          : appLocalizations.defaultImage,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                  ),
+                  const Spacer(),
                   if (hasImage) ...[
                     IconButton.filledTonal(
                       iconSize: 20,
