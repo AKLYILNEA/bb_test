@@ -18,6 +18,8 @@ enum ClockCardType {
   String get textPrefKey => 'clock_card_${name}_text';
 }
 
+enum _ImageAction { change, restore }
+
 class ClockCardData {
   final String? imagePath;
   final String? customText;
@@ -133,8 +135,6 @@ class ClockCard extends ConsumerWidget {
       await notifier.updateText(newText);
     }
   }
-
-enum _ImageAction { change, restore }
 
   Future<void> _showImageActionMenu(
     BuildContext context,

@@ -23,6 +23,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 bool _isExtractingCustomOptions = false;
 const Duration _kMinLoadingDuration = Duration(seconds: 1);
@@ -147,6 +148,8 @@ class ScriptsView extends ConsumerStatefulWidget {
 }
 
 class _ScriptsViewState extends ConsumerState<ScriptsView> {
+  final Set<String> _updatingScriptIds = {};
+
   Future<void> _handleDelScript(Script script) async {
     final res = await globalState.showMessage(
       message: TextSpan(
@@ -225,13 +228,66 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
   }
 
   Future<void> _handleSyncScript(String id) async {
-    await globalState.appController.safeRun(
-      silence: false,
-      () async {
-        await ref.read(scriptStateProvider.notifier).syncScript(id);
-        globalState.showNotifier(appLocalizations.success);
-      },
-    );
+    if (_updatingScriptIds.contains(id)) return;
+    setState(() {
+      _updatingScriptIds.add(id);
+    });
+    try {
+      await globalState.appController.safeRun(
+        silence: false,
+        () async {
+          await ref.read(scriptStateProvider.notifier).syncScript(id);
+          globalState.showNotifier(appLocalizations.success);
+        },
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _updatingScriptIds.remove(id);
+        });
+      }
+    }
+  }
+
+  Future<void> _handleSyncAllScripts() async {
+    final scripts = ref.read(scriptStateProvider).scripts;
+    final urlScripts =
+        scripts.where((s) => s.url != null && s.url!.isNotEmpty).toList();
+    if (urlScripts.isEmpty) {
+      return;
+    }
+    setState(() {
+      for (final s in urlScripts) {
+        _updatingScriptIds.add(s.id);
+      }
+    });
+    final messages = <String>[];
+    final updateScripts = urlScripts.map<Future>((script) async {
+      try {
+        await ref.read(scriptStateProvider.notifier).syncScript(script.id);
+      } on Object catch (e) {
+        messages.add('${script.label}: ${e.formatError}\n');
+      } finally {
+        if (mounted) {
+          setState(() {
+            _updatingScriptIds.remove(script.id);
+          });
+        }
+      }
+    });
+    await Future.wait(updateScripts);
+    if (!mounted) return;
+    if (messages.isNotEmpty) {
+      globalState.showMessage(
+        title: appLocalizations.tip,
+        message: TextSpan(
+          children: [for (final message in messages) TextSpan(text: message)],
+        ),
+        cancelable: false,
+      );
+    } else {
+      globalState.showNotifier(appLocalizations.success);
+    }
   }
 
   Future<void> _handleCustomOptions(Script script) async {
@@ -276,67 +332,87 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
                   ),
                 ),
               ]
-            : scripts.map((script) {
-                return ListItem(
-                  padding: const EdgeInsets.only(left: 16, right: 4),
-                  onTap: () {
-                    _handleToEditor(script: script);
-                  },
-                  title: EmojiText(script.label),
-                  trailing: CommonPopupBox(
-                    targetBuilder: (open) {
-                      return IconButton(
-                        onPressed: open,
-                        tooltip: appLocalizations.more,
-                        icon: const Icon(
-                          FluentIcons.more_vertical_24_regular,
-                        ),
-                      );
-                    },
-                    popup: CommonPopupMenu(
-                      items: [
-                        PopupMenuItemData(
-                          icon: FluentIcons.edit_24_regular,
-                          label: appLocalizations.edit,
-                          onPressed: () {
+              : scripts.map((script) {
+                  final isUpdating = _updatingScriptIds.contains(script.id);
+                  return ListItem(
+                    padding: const EdgeInsets.only(left: 16, right: 4),
+                    onTap: isUpdating
+                        ? null
+                        : () {
                             _handleToEditor(script: script);
                           },
-                        ),
-                        if (script.isCompatibleWithBettbox)
-                          PopupMenuItemData(
-                            icon: FluentIcons.options_24_regular,
-                            label: appLocalizations.custom,
-                            onPressed: () {
-                              _handleCustomOptions(script);
-                            },
-                          ),
-                        if (script.url != null && script.url!.isNotEmpty)
-                          PopupMenuItemData(
-                            icon: FluentIcons.arrow_sync_24_regular,
-                            label: appLocalizations.sync,
-                            onPressed: () {
-                              _handleSyncScript(script.id);
-                            },
-                          ),
-                        PopupMenuItemData(
-                          icon: FluentIcons.document_copy_24_regular,
-                          label: appLocalizations.exportFile,
-                          onPressed: () {
-                            _handleExportFile(script);
-                          },
-                        ),
-                        PopupMenuItemData(
-                          icon: FluentIcons.delete_24_regular,
-                          label: appLocalizations.delete,
-                          onPressed: () {
-                            _handleDelScript(script);
-                          },
-                        ),
-                      ],
+                    title: EmojiText(script.label),
+                    trailing: SizedBox(
+                      height: 36,
+                      width: 36,
+                      child: FadeThroughBox(
+                        child: isUpdating
+                            ? Padding(
+                                padding: const EdgeInsets.all(6),
+                                child: SpinKitFadingCircle(
+                                  color: context.colorScheme.primary,
+                                  size: 24,
+                                ),
+                              )
+                            : CommonPopupBox(
+                                targetBuilder: (open) {
+                                  return IconButton(
+                                    onPressed: open,
+                                    tooltip: appLocalizations.more,
+                                    icon: const Icon(
+                                      FluentIcons.more_vertical_24_regular,
+                                      size: 20,
+                                    ),
+                                  );
+                                },
+                                popup: CommonPopupMenu(
+                                  items: [
+                                    PopupMenuItemData(
+                                      icon: FluentIcons.edit_24_regular,
+                                      label: appLocalizations.edit,
+                                      onPressed: () {
+                                        _handleToEditor(script: script);
+                                      },
+                                    ),
+                                    if (script.isCompatibleWithBettbox)
+                                      PopupMenuItemData(
+                                        icon: FluentIcons.options_24_regular,
+                                        label: appLocalizations.custom,
+                                        onPressed: () {
+                                          _handleCustomOptions(script);
+                                        },
+                                      ),
+                                    if (script.url != null &&
+                                        script.url!.isNotEmpty)
+                                      PopupMenuItemData(
+                                        icon: FluentIcons.arrow_sync_24_regular,
+                                        label: appLocalizations.sync,
+                                        onPressed: () {
+                                          _handleSyncScript(script.id);
+                                        },
+                                      ),
+                                    PopupMenuItemData(
+                                      icon:
+                                          FluentIcons.document_copy_24_regular,
+                                      label: appLocalizations.exportFile,
+                                      onPressed: () {
+                                        _handleExportFile(script);
+                                      },
+                                    ),
+                                    PopupMenuItemData(
+                                      icon: FluentIcons.delete_24_regular,
+                                      label: appLocalizations.delete,
+                                      onPressed: () {
+                                        _handleDelScript(script);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                      ),
                     ),
-                  ),
-                );
-              }).toList();
+                  );
+                }).toList();
 
         final profileItems = profiles.isEmpty
             ? [
@@ -587,6 +663,13 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
       floatingActionButton: _buildFAB(),
       body: _buildContent(),
       title: appLocalizations.script,
+      actions: [
+        IconButton(
+          onPressed: _handleSyncAllScripts,
+          icon: const Icon(FluentIcons.arrow_sync_24_regular),
+          tooltip: appLocalizations.syncAll,
+        ),
+      ],
     );
   }
 }
