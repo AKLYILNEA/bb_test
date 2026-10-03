@@ -515,7 +515,7 @@ class _ClockDialogState extends State<_ClockDialog> {
                 color:
                     colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
                 shape: SuperellipseBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(18),
                   side: BorderSide(
                     color: colorScheme.outlineVariant.withValues(alpha: 0.3),
                     width: 1,
