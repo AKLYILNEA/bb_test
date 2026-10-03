@@ -213,7 +213,7 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
       } else if (!willUse && currentlyUses) {
         ref.read(profilesProvider.notifier).updateProfile(
           profile.id,
-          (p) => p.copyWith(scriptId: null),
+          (p) => p.copyWith(useScriptOverride: false, scriptId: null),
         );
         if (profile.id == currentProfileId) shouldReapply = true;
       }
@@ -259,31 +259,19 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
     }
   }
 
-  void _handleShowScriptSettings() {
-    showSheet(
-      context: context,
-      builder: (_, type) {
-        return _ScriptSettingsSheet(type: type);
-      },
-    );
-  }
-
   Widget _buildContent() {
     return Consumer(
       builder: (_, ref, _) {
-        final vm2 = ref.watch(
-          scriptStateProvider.select(
-            (state) => VM2(a: state.currentId, b: state.scripts),
-          ),
+        final scripts = ref.watch(
+          scriptStateProvider.select((state) => state.scripts),
         );
-        final currentId = vm2.a;
-        final scripts = vm2.b;
         if (scripts.isEmpty) {
           return NullStatus(
             label: appLocalizations.nullTip(appLocalizations.script),
             illustration: NullStatusIllustration.scripts,
           );
         }
+        final profiles = ref.watch(profilesProvider);
         return CommonScrollBar(
           controller: null,
           child: ListView.builder(
@@ -291,31 +279,31 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
             itemCount: scripts.length,
             itemBuilder: (_, index) {
               final script = scripts[index];
-              final isSelected = script.id == currentId;
-              final profiles = ref.watch(profilesProvider);
               final assignedProfiles = profiles
                   .where((p) => p.useScriptOverride && p.scriptId == script.id)
                   .toList();
 
-              String? subtitleText;
-              if (assignedProfiles.isNotEmpty) {
-                final names =
-                    assignedProfiles.map((p) => p.label ?? p.id).join(', ');
-                subtitleText = isSelected
-                    ? '${appLocalizations.defaultText} · $names'
-                    : names;
-              } else if (isSelected) {
-                subtitleText = appLocalizations.defaultText;
-              }
+              final String? subtitleText = assignedProfiles.isNotEmpty
+                  ? assignedProfiles.map((p) => p.label ?? p.id).join(', ')
+                  : null;
 
               return Container(
                 padding: kTabLabelPadding,
-                margin: EdgeInsets.symmetric(vertical: 6),
+                margin: const EdgeInsets.symmetric(vertical: 6),
                 child: CommonCard(
                   type: CommonCardType.filled,
                   radius: 20,
+                  onPressed: () {
+                    _handleAssignToProfiles(script);
+                  },
                   child: ListItem(
-                    padding: const EdgeInsets.only(left: 12, right: 12),
+                    padding: const EdgeInsets.only(left: 16, right: 12),
+                    leading: Icon(
+                      FluentIcons.javascript_24_regular,
+                      color: assignedProfiles.isNotEmpty
+                          ? context.colorScheme.primary
+                          : null,
+                    ),
                     title: EmojiText(script.label),
                     subtitle: subtitleText != null
                         ? Text(
@@ -325,40 +313,30 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
                             overflow: TextOverflow.ellipsis,
                           )
                         : null,
-                    leading: Switch(
-                      value: isSelected,
-                      onChanged: (value) {
-                        if (value) {
-                          ref.read(scriptStateProvider.notifier).setId(script.id);
-                        } else if (isSelected) {
-                          ref.read(scriptStateProvider.notifier).setId(script.id);
-                        }
-                      },
-                    ),
                     trailing: CommonPopupBox(
                       targetBuilder: (open) {
                         return IconButton(
-                          onPressed: () {
-                            open();
-                          },
+                          onPressed: open,
                           tooltip: appLocalizations.more,
-                          icon: Icon(FluentIcons.more_vertical_24_regular),
+                          icon: const Icon(
+                            FluentIcons.more_vertical_24_regular,
+                          ),
                         );
                       },
                       popup: CommonPopupMenu(
                         items: [
                           PopupMenuItemData(
-                            icon: FluentIcons.edit_24_regular,
-                            label: appLocalizations.edit,
-                            onPressed: () {
-                              _handleToEditor(script: script);
-                            },
-                          ),
-                          PopupMenuItemData(
                             icon: FluentIcons.apps_add_in_24_regular,
                             label: appLocalizations.assignToProfiles,
                             onPressed: () {
                               _handleAssignToProfiles(script);
+                            },
+                          ),
+                          PopupMenuItemData(
+                            icon: FluentIcons.edit_24_regular,
+                            label: appLocalizations.edit,
+                            onPressed: () {
+                              _handleToEditor(script: script);
                             },
                           ),
                           if (script.isCompatibleWithBettbox)
@@ -582,158 +560,12 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
     return CommonScaffold(
       resizeToAvoidBottomInset: false,
       floatingActionButton: _buildFAB(),
-      actions: [
-        IconButton(
-          onPressed: _handleShowScriptSettings,
-          tooltip: appLocalizations.settings,
-          icon: const Icon(FluentIcons.settings_24_regular),
-        ),
-      ],
       body: _buildContent(),
       title: appLocalizations.script,
     );
   }
 }
 
-class _ScriptSettingsSheet extends ConsumerWidget {
-  final SheetType type;
-
-  const _ScriptSettingsSheet({
-    required this.type,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final profiles = ref.watch(profilesProvider);
-    final currentProfileId = ref.watch(currentProfileIdProvider);
-    final scriptProps = ref.watch(scriptStateProvider);
-    final scripts = scriptProps.scripts;
-    final globalScript = scriptProps.currentScript;
-
-    return AdaptiveSheetScaffold(
-      type: type,
-      title: appLocalizations.profileScriptSettings,
-      body: profiles.isEmpty
-          ? NullStatus(
-              label: appLocalizations.nullProfileDesc,
-              illustration: NullStatusIllustration.profile,
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-              itemCount: profiles.length,
-              itemBuilder: (context, index) {
-                final profile = profiles[index];
-                final isCurrentProfile = profile.id == currentProfileId;
-
-                String scriptDesc;
-                if (!profile.useScriptOverride) {
-                  scriptDesc = appLocalizations.disabled;
-                } else if (profile.scriptId == null) {
-                  final globalName =
-                      globalScript?.label ?? appLocalizations.none;
-                  scriptDesc = '${appLocalizations.followGlobal} ($globalName)';
-                } else {
-                  final target =
-                      scripts.where((s) => s.id == profile.scriptId).firstOrNull;
-                  scriptDesc = target?.label ?? appLocalizations.none;
-                }
-
-                return Container(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: CommonCard(
-                    type: CommonCardType.filled,
-                    radius: 20,
-                    child: ListTile(
-                      contentPadding:
-                          const EdgeInsets.only(left: 16, right: 16),
-                      title: EmojiText(profile.label ?? profile.id),
-                      subtitle: Text(
-                        scriptDesc,
-                        style: context.textTheme.labelMedium?.toLight,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      onTap: () async {
-                        final currentSelected = !profile.useScriptOverride
-                            ? '__disabled__'
-                            : (profile.scriptId ?? '__follow_global__');
-                        final options = [
-                          '__follow_global__',
-                          ...scripts.map((s) => s.id),
-                          '__disabled__',
-                        ];
-                        final selected =
-                            await globalState.showCommonDialog<String>(
-                          child: OptionsDialog<String>(
-                            title:
-                                '${profile.label ?? profile.id} - ${appLocalizations.script}',
-                            options: options,
-                            value: currentSelected,
-                            textBuilder: (val) {
-                              if (val == '__disabled__') {
-                                return appLocalizations.noScriptAssigned;
-                              }
-                              if (val == '__follow_global__') {
-                                final defName = globalScript?.label ??
-                                    appLocalizations.none;
-                                return '${appLocalizations.followGlobal} ($defName)';
-                              }
-                              final match = scripts
-                                  .where((s) => s.id == val)
-                                  .firstOrNull;
-                              return match?.label ?? val;
-                            },
-                          ),
-                        );
-                        if (selected == null) return;
-                        if (selected == '__disabled__') {
-                          ref.read(profilesProvider.notifier).updateProfile(
-                            profile.id,
-                            (p) => p.copyWith(useScriptOverride: false),
-                          );
-                        } else if (selected == '__follow_global__') {
-                          ref.read(profilesProvider.notifier).updateProfile(
-                            profile.id,
-                            (p) => p.copyWith(
-                              useScriptOverride: true,
-                              scriptId: null,
-                            ),
-                          );
-                        } else {
-                          ref.read(profilesProvider.notifier).updateProfile(
-                            profile.id,
-                            (p) => p.copyWith(
-                              useScriptOverride: true,
-                              scriptId: selected,
-                            ),
-                          );
-                        }
-                        if (isCurrentProfile) {
-                          await globalState.appController
-                              .applyProfile(silence: true);
-                        }
-                      },
-                      trailing: Switch(
-                        value: profile.useScriptOverride,
-                        onChanged: (value) async {
-                          ref.read(profilesProvider.notifier).updateProfile(
-                            profile.id,
-                            (p) => p.copyWith(useScriptOverride: value),
-                          );
-                          if (isCurrentProfile) {
-                            await globalState.appController
-                                .applyProfile(silence: true);
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-    );
-  }
-}
 
 class _AssignScriptDialog extends StatefulWidget {
   final Script script;

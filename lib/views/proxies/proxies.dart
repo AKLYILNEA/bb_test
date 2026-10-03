@@ -34,15 +34,11 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
     final showHiddenItems = ref.watch(
       proxiesStyleSettingProvider.select((state) => state.showHiddenItems),
     );
-    final (scriptOn, compatible) = ref.watch(
-      scriptStateProvider.select(
-        (s) => (s.currentId != null, s.currentScript?.isCompatibleWithBettbox ?? false),
-      ),
-    );
-    final profileOverride = ref.watch(
-      currentProfileProvider.select((p) => p?.useScriptOverride ?? false),
-    );
-    final hasScriptCustom = scriptOn && compatible && profileOverride;
+    final currentProfile = ref.watch(currentProfileProvider);
+    final scriptProps = ref.watch(scriptStateProvider);
+    final effectiveScript = currentProfile?.getEffectiveScript(scriptProps);
+    final hasScriptCustom =
+        effectiveScript != null && effectiveScript.isCompatibleWithBettbox;
     final hasGroupCustom =
         !hasScriptCustom && ref.read(currentProfileIdProvider) != null;
     final hasCustom = hasScriptCustom || hasGroupCustom;
@@ -190,11 +186,11 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
   }
 
   Future<void> _handleCustomOptions() async {
-    final profileOverride =
-        ref.read(currentProfileProvider)?.useScriptOverride ?? false;
-    final script = ref.read(scriptStateProvider).currentScript;
-    if (script != null && script.isCompatibleWithBettbox && profileOverride) {
-      await showScriptCustomOptions(context, ref, script: script);
+    final currentProfile = ref.read(currentProfileProvider);
+    final scriptProps = ref.read(scriptStateProvider);
+    final effectiveScript = currentProfile?.getEffectiveScript(scriptProps);
+    if (effectiveScript != null && effectiveScript.isCompatibleWithBettbox) {
+      await showScriptCustomOptions(context, ref, script: effectiveScript);
       return;
     }
     final profileId = ref.read(currentProfileIdProvider);

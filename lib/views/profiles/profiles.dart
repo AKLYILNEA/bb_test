@@ -466,59 +466,6 @@ class ProfileItem extends StatelessWidget {
     BaseNavigator.push(context, overrideProfileView);
   }
 
-  Future<void> _handleSelectScript(BuildContext context) async {
-    final scriptProps = globalState.config.scriptProps;
-    final scripts = scriptProps.scripts;
-    final currentSelected = !profile.useScriptOverride
-        ? '__disabled__'
-        : (profile.scriptId ?? '__follow_global__');
-    final options = [
-      '__follow_global__',
-      ...scripts.map((s) => s.id),
-      '__disabled__',
-    ];
-    final selected = await globalState.showCommonDialog<String>(
-      child: OptionsDialog<String>(
-        title: '${profile.label ?? profile.id} - ${appLocalizations.script}',
-        options: options,
-        value: currentSelected,
-        textBuilder: (val) {
-          if (val == '__disabled__') {
-            return appLocalizations.noScriptAssigned;
-          }
-          if (val == '__follow_global__') {
-            final defName =
-                scriptProps.currentScript?.label ?? appLocalizations.none;
-            return '${appLocalizations.followGlobal} ($defName)';
-          }
-          final match = scripts.where((s) => s.id == val).firstOrNull;
-          return match?.label ?? val;
-        },
-      ),
-    );
-    if (selected == null) return;
-    final appController = globalState.appController;
-    if (selected == '__disabled__') {
-      appController.ref.read(profilesProvider.notifier).updateProfile(
-        profile.id,
-        (p) => p.copyWith(useScriptOverride: false),
-      );
-    } else if (selected == '__follow_global__') {
-      appController.ref.read(profilesProvider.notifier).updateProfile(
-        profile.id,
-        (p) => p.copyWith(useScriptOverride: true, scriptId: null),
-      );
-    } else {
-      appController.ref.read(profilesProvider.notifier).updateProfile(
-        profile.id,
-        (p) => p.copyWith(useScriptOverride: true, scriptId: selected),
-      );
-    }
-    if (profile.id == globalState.config.currentProfileId) {
-      await appController.applyProfile(silence: true);
-    }
-  }
-
   List<PopupMenuItemData> _buildMenuItems(BuildContext context) {
     return [
       PopupMenuItemData(
@@ -544,13 +491,6 @@ class ProfileItem extends StatelessWidget {
           },
         ),
       ],
-      PopupMenuItemData(
-        icon: FluentIcons.javascript_24_regular,
-        label: appLocalizations.script,
-        onPressed: () {
-          _handleSelectScript(context);
-        },
-      ),
       PopupMenuItemData(
         icon: FluentIcons.puzzle_piece_24_regular,
         label: appLocalizations.override,

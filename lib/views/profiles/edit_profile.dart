@@ -405,50 +405,35 @@ class EditProfileViewState extends State<EditProfileView> {
         builder: (_, ref, _) {
           final scriptProps = ref.watch(scriptStateProvider);
           final scripts = scriptProps.scripts;
-          final globalScript = scriptProps.currentScript;
+          final currentScript = (useScriptOverride && scriptId != null)
+              ? scripts.where((s) => s.id == scriptId).firstOrNull
+              : null;
 
-          String scriptDesc;
-          if (!useScriptOverride) {
-            scriptDesc = appLocalizations.disabled;
-          } else if (scriptId == null) {
-            final globalName =
-                globalScript?.label ?? appLocalizations.none;
-            scriptDesc = '${appLocalizations.followGlobal} ($globalName)';
-          } else {
-            final target =
-                scripts.where((s) => s.id == scriptId).firstOrNull;
-            scriptDesc = target?.label ?? appLocalizations.none;
-          }
+          final scriptDesc = currentScript != null
+              ? currentScript.label
+              : appLocalizations.none;
 
           return ListItem(
             title: Text(appLocalizations.script),
             subtitle: Text(
               scriptDesc,
-              style: context.textTheme.labelMedium?.toLight,
+              style: (useScriptOverride && currentScript != null)
+                  ? TextStyle(
+                      color: context.colorScheme.primary,
+                      fontWeight: FontWeight.w500,
+                    )
+                  : context.textTheme.labelMedium?.toLight,
             ),
             trailing: const Icon(FluentIcons.chevron_right_24_regular),
             onTap: () async {
-              final currentSelected = !useScriptOverride
-                  ? '__disabled__'
-                  : (scriptId ?? '__follow_global__');
-              final options = [
-                '__follow_global__',
-                ...scripts.map((s) => s.id),
-                '__disabled__',
-              ];
-              final selected = await globalState.showCommonDialog<String>(
-                child: OptionsDialog<String>(
+              final selected = await globalState.showCommonDialog<String?>(
+                child: OptionsDialog<String?>(
                   title: appLocalizations.script,
-                  options: options,
-                  value: currentSelected,
+                  options: [null, ...scripts.map((s) => s.id)],
+                  value: currentScript?.id,
                   textBuilder: (val) {
-                    if (val == '__disabled__') {
-                      return appLocalizations.noScriptAssigned;
-                    }
-                    if (val == '__follow_global__') {
-                      final defName =
-                          globalScript?.label ?? appLocalizations.none;
-                      return '${appLocalizations.followGlobal} ($defName)';
+                    if (val == null) {
+                      return appLocalizations.none;
                     }
                     final match =
                         scripts.where((s) => s.id == val).firstOrNull;
@@ -456,12 +441,10 @@ class EditProfileViewState extends State<EditProfileView> {
                   },
                 ),
               );
-              if (selected == null) return;
+              if (selected == currentScript?.id) return;
               setState(() {
-                if (selected == '__disabled__') {
+                if (selected == null) {
                   useScriptOverride = false;
-                } else if (selected == '__follow_global__') {
-                  useScriptOverride = true;
                   scriptId = null;
                 } else {
                   useScriptOverride = true;

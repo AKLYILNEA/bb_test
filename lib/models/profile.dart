@@ -113,7 +113,7 @@ extension ProfileScriptExt on Profile {
         if (script.id == scriptId) return script;
       }
     }
-    return scriptProps.currentScript;
+    return null;
   }
 }
 

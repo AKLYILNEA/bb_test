@@ -124,15 +124,24 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
               cacheExtent: 500,
               slivers: [
                 SliverToBoxAdapter(child: SizedBox(height: 8)),
+                SliverPadding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  sliver: SliverToBoxAdapter(
+                    child: ProfileScriptCard(profileId: widget.profileId),
+                  ),
+                ),
                 SliverToBoxAdapter(
                   child: Consumer(
                     builder: (_, ref, child) {
-                      final scriptMode = ref.watch(
-                        scriptStateProvider.select(
-                          (state) => state.realId != null,
-                        ),
-                      );
-                      if (!scriptMode) {
+                      final profile =
+                          ref.watch(getProfileProvider(widget.profileId));
+                      final scriptProps = ref.watch(scriptStateProvider);
+                      final effectiveScript =
+                          profile?.getEffectiveScript(scriptProps);
+                      final isScriptActive =
+                          profile?.useScriptOverride == true &&
+                              effectiveScript != null;
+                      if (!isScriptActive) {
                         return SizedBox();
                       }
                       return child!;
@@ -140,7 +149,7 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
                     child: ListItem(
                       padding: EdgeInsets.symmetric(
                         horizontal: 20,
-                        vertical: 0,
+                        vertical: 4,
                       ),
                       title: Row(
                         spacing: 8,
@@ -152,7 +161,7 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
                     ),
                   ),
                 ),
-                SliverToBoxAdapter(child: SizedBox(height: 8)),
+                SliverToBoxAdapter(child: SizedBox(height: 4)),
                 SliverPadding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   sliver: SliverToBoxAdapter(child: OverrideSwitch()),
@@ -276,6 +285,95 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+class ProfileScriptCard extends ConsumerWidget {
+  final String profileId;
+
+  const ProfileScriptCard({super.key, required this.profileId});
+
+  Future<void> _handleSelectScript(
+    BuildContext context,
+    WidgetRef ref,
+    Profile profile,
+    ScriptProps scriptProps,
+  ) async {
+    final scripts = scriptProps.scripts;
+    final currentScriptId =
+        profile.useScriptOverride ? profile.scriptId : null;
+
+    final selected = await globalState.showCommonDialog<String?>(
+      child: OptionsDialog<String?>(
+        title: '${profile.label ?? profile.id} - ${appLocalizations.script}',
+        options: [null, ...scripts.map((s) => s.id)],
+        value: currentScriptId,
+        textBuilder: (val) {
+          if (val == null) {
+            return appLocalizations.none;
+          }
+          final match = scripts.where((s) => s.id == val).firstOrNull;
+          return match?.label ?? val;
+        },
+      ),
+    );
+
+    if (selected == currentScriptId) return;
+
+    if (selected == null) {
+      ref.read(profilesProvider.notifier).updateProfile(
+        profile.id,
+        (p) => p.copyWith(useScriptOverride: false, scriptId: null),
+      );
+    } else {
+      ref.read(profilesProvider.notifier).updateProfile(
+        profile.id,
+        (p) => p.copyWith(useScriptOverride: true, scriptId: selected),
+      );
+    }
+
+    if (profile.id == ref.read(currentProfileIdProvider)) {
+      await globalState.appController.applyProfile(silence: true);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profile = ref.watch(getProfileProvider(profileId));
+    if (profile == null) return const SizedBox();
+
+    final scriptProps = ref.watch(scriptStateProvider);
+    final effectiveScript = profile.getEffectiveScript(scriptProps);
+    final isScriptActive =
+        profile.useScriptOverride && effectiveScript != null;
+
+    final subtitleText =
+        isScriptActive ? effectiveScript.label : appLocalizations.none;
+
+    return CommonCard(
+      type: CommonCardType.filled,
+      radius: 20,
+      onPressed: () =>
+          _handleSelectScript(context, ref, profile, scriptProps),
+      child: ListItem(
+        padding: const EdgeInsets.only(left: 16, right: 16),
+        leading: Icon(
+          FluentIcons.javascript_24_regular,
+          color: isScriptActive ? context.colorScheme.primary : null,
+        ),
+        title: Text(appLocalizations.script),
+        subtitle: Text(
+          subtitleText,
+          style: isScriptActive
+              ? TextStyle(
+                  color: context.colorScheme.primary,
+                  fontWeight: FontWeight.w500,
+                )
+              : context.textTheme.labelMedium?.toLight,
+        ),
+        trailing: const Icon(FluentIcons.chevron_right_24_regular),
       ),
     );
   }

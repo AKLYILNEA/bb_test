@@ -785,15 +785,15 @@ ColorScheme genColorScheme(
 
 @riverpod
 VM3<String?, String?, Dns?> needSetup(Ref ref) {
-  final profileId = ref.watch(currentProfileIdProvider);
-  final content = ref.watch(
-    scriptStateProvider.select((state) => state.currentScript?.content),
-  );
+  final currentProfile = ref.watch(currentProfileProvider);
+  final scriptProps = ref.watch(scriptStateProvider);
+  final effectiveScript = currentProfile?.getEffectiveScript(scriptProps);
+  final content = effectiveScript?.content;
   final overrideDns = ref.watch(overrideDnsProvider);
   final dns = overrideDns == true
       ? ref.watch(patchClashConfigProvider.select((state) => state.dns))
       : null;
-  return VM3(a: profileId, b: content, c: dns);
+  return VM3(a: currentProfile?.id, b: content, c: dns);
 }
 
 @riverpod

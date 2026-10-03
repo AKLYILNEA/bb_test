@@ -1196,9 +1196,8 @@ class GlobalState {
   }) async {
     return _scriptEvaluateLock.synchronized(() async {
       final targetProfile = profile ?? globalState.config.currentProfile;
-      final currentScript = targetProfile != null
-          ? targetProfile.getEffectiveScript(globalState.config.scriptProps)
-          : globalState.config.scriptProps.currentScript;
+      final currentScript =
+          targetProfile?.getEffectiveScript(globalState.config.scriptProps);
       if (currentScript == null) return config;
 
       config['proxy-providers'] ??= <String, dynamic>{};
