@@ -475,7 +475,7 @@ class _ClockDialogState extends State<_ClockDialog> {
         ),
       ],
       child: Padding(
-        padding: const EdgeInsets.only(top: 8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
