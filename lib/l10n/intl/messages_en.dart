@@ -1127,8 +1127,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "scriptDesc": MessageLookupByLibrary.simpleMessage(
       "Modify profile override scripts",
     ),
-    "myScripts": MessageLookupByLibrary.simpleMessage("My Scripts"),
-    "myProfiles": MessageLookupByLibrary.simpleMessage("My Profiles"),
+    "myScripts": MessageLookupByLibrary.simpleMessage("Manage"),
+    "myProfiles": MessageLookupByLibrary.simpleMessage("Binding"),
     "scriptOtherOptions": MessageLookupByLibrary.simpleMessage(
       "Other Settings",
     ),

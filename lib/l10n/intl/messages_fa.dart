@@ -1157,8 +1157,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "scriptDesc": MessageLookupByLibrary.simpleMessage(
       "ویرایش اسکریپت‌های بازنویسی پروفایل",
     ),
-    "myScripts": MessageLookupByLibrary.simpleMessage("اسکریپت‌های من"),
-    "myProfiles": MessageLookupByLibrary.simpleMessage("پروفایل‌های من"),
+    "myScripts": MessageLookupByLibrary.simpleMessage("مدیریت"),
+    "myProfiles": MessageLookupByLibrary.simpleMessage("پیوند"),
     "scriptOtherOptions": MessageLookupByLibrary.simpleMessage("تنظیمات دیگر"),
     "search": MessageLookupByLibrary.simpleMessage("جستجو"),
     "seconds": MessageLookupByLibrary.simpleMessage("ثانیه"),

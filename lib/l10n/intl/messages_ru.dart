@@ -1168,8 +1168,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "scriptDesc": MessageLookupByLibrary.simpleMessage(
       "Изменить скрипты переопределения профиля",
     ),
-    "myScripts": MessageLookupByLibrary.simpleMessage("Мои скрипты"),
-    "myProfiles": MessageLookupByLibrary.simpleMessage("Мои профили"),
+    "myScripts": MessageLookupByLibrary.simpleMessage("Управление"),
+    "myProfiles": MessageLookupByLibrary.simpleMessage("Привязка"),
     "scriptOtherOptions": MessageLookupByLibrary.simpleMessage(
       "Другие настройки",
     ),

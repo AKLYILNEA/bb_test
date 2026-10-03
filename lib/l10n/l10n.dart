@@ -170,20 +170,20 @@ class AppLocalizations {
     );
   }
 
-  /// `My Scripts`
+  /// `Manage`
   String get myScripts {
     return Intl.message(
-      'My Scripts',
+      'Manage',
       name: 'myScripts',
       desc: '',
       args: [],
     );
   }
 
-  /// `My Profiles`
+  /// `Binding`
   String get myProfiles {
     return Intl.message(
-      'My Profiles',
+      'Binding',
       name: 'myProfiles',
       desc: '',
       args: [],

@@ -278,6 +278,7 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
               ]
             : scripts.map((script) {
                 return ListItem(
+                  padding: const EdgeInsets.only(left: 16, right: 4),
                   onTap: () {
                     _handleToEditor(script: script);
                   },
