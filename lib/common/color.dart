@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 
 extension ColorExtension on Color {
@@ -119,4 +120,6 @@ extension ColorSchemeExtension on ColorScheme {
           surfaceContainer: surfaceContainer.darken(5),
         )
       : this;
+
+  Color get success => Colors.green.harmonizeWith(primary);
 }

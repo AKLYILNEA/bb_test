@@ -1254,7 +1254,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "clockCardAuthorHint": MessageLookupByLibrary.simpleMessage("작성자 입력"),
     "clockCardImage": MessageLookupByLibrary.simpleMessage("카드 이미지"),
     "clockCardDefaultText": MessageLookupByLibrary.simpleMessage("오늘도 좋은 하루"),
-    "clockCardDefaultAuthor": MessageLookupByLibrary.simpleMessage("왕쩡치"),
+    "clockCardDefaultAuthor": MessageLookupByLibrary.simpleMessage("지셴린"),
     "customImageSelected": MessageLookupByLibrary.simpleMessage("사용자 지정 이미지 설정됨"),
     "defaultImage": MessageLookupByLibrary.simpleMessage("기본 배경"),
   };

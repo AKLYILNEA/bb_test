@@ -1320,7 +1320,7 @@ class DetectionState {
 
   IpInfo? _maskIpInfo(IpInfo? ipInfo) {
     if (ipInfo == null) return null;
-    return _isIpMasked ? ipInfo.copyWith(ip: '*** *** *** ***') : ipInfo;
+    return _isIpMasked ? ipInfo.copyWith(ip: '*****') : ipInfo;
   }
 
   void toggleIpPrivacy() {

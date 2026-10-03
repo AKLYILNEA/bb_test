@@ -6849,10 +6849,10 @@ class AppLocalizations {
     );
   }
 
-  /// `Wang Zengqi`
+  /// `Ji Xianlin`
   String get clockCardDefaultAuthor {
     return Intl.message(
-      'Wang Zengqi',
+      'Ji Xianlin',
       name: 'clockCardDefaultAuthor',
       desc: '',
       args: [],

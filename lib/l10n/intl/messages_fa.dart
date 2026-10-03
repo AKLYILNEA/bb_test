@@ -1577,7 +1577,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "clockCardImage": MessageLookupByLibrary.simpleMessage("تصویر کارت"),
     "clockCardDefaultText": MessageLookupByLibrary.simpleMessage("زندگی زیباست"),
-    "clockCardDefaultAuthor": MessageLookupByLibrary.simpleMessage("وانگ زنگ‌چی"),
+    "clockCardDefaultAuthor": MessageLookupByLibrary.simpleMessage("جی شیان‌لین"),
     "customImageSelected": MessageLookupByLibrary.simpleMessage("تصویر سفارشی تنظیم شد"),
     "defaultImage": MessageLookupByLibrary.simpleMessage("پس‌زمینه پیش‌فرض"),
   };

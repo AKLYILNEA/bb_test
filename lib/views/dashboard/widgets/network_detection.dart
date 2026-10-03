@@ -139,8 +139,17 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
                           ? TooltipText(
                               text: Text(
                                 ipInfo.ip,
-                                style: context.textTheme.bodyMedium?.toLight
-                                    .adjustSize(1),
+                                style: (detectionState.isIpMasked ||
+                                        ipInfo.ip == '*****')
+                                    ? context.textTheme.bodyMedium
+                                        ?.copyWith(
+                                          color: context.colorScheme.success
+                                              .opacity80,
+                                        )
+                                        .toJetBrainsMono
+                                        .adjustSize(1)
+                                    : context.textTheme.bodyMedium?.toLight
+                                        .adjustSize(1),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),

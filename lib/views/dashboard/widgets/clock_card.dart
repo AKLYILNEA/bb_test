@@ -510,74 +510,79 @@ class _ClockDialogState extends State<_ClockDialog> {
               ),
             ),
             const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
+            DecoratedBox(
+              decoration: ShapeDecoration(
                 color:
                     colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-                border: Border.all(
-                  color: colorScheme.outlineVariant.withValues(alpha: 0.3),
-                  width: 1,
+                shape: SuperellipseBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: BorderSide(
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
                 ),
               ),
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 52,
-                    height: 39,
-                    child: DecoratedBox(
-                      position: DecorationPosition.foreground,
-                      decoration: ShapeDecoration(
-                        shape: SuperellipseBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          side: BorderSide(
-                            color: colorScheme.outlineVariant
-                                .withValues(alpha: 0.3),
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: ClipPath(
-                        clipper: ShapeBorderClipper(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 52,
+                      height: 39,
+                      child: DecoratedBox(
+                        position: DecorationPosition.foreground,
+                        decoration: ShapeDecoration(
                           shape: SuperellipseBorder(
                             borderRadius: BorderRadius.circular(10),
+                            side: BorderSide(
+                              color: colorScheme.outlineVariant
+                                  .withValues(alpha: 0.3),
+                              width: 1,
+                            ),
                           ),
                         ),
-                        child: hasImage
-                            ? Image.file(
-                                File(_selectedImagePath!),
-                                fit: BoxFit.cover,
-                              )
-                            : _buildDefaultBackground(isDark),
+                        child: ClipPath(
+                          clipper: ShapeBorderClipper(
+                            shape: SuperellipseBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: hasImage
+                              ? Image.file(
+                                  File(_selectedImagePath!),
+                                  fit: BoxFit.cover,
+                                )
+                              : _buildDefaultBackground(isDark),
+                        ),
                       ),
                     ),
-                  ),
-                  const Spacer(),
-                  if (hasImage) ...[
-                    IconButton.filledTonal(
-                      iconSize: 20,
-                      padding: const EdgeInsets.all(6),
-                      visualDensity: VisualDensity.compact,
-                      tooltip: appLocalizations.restoreDefaultImage,
-                      onPressed: _resetImage,
-                      icon: const Icon(FluentIcons.arrow_repeat_all_24_regular),
+                    const Spacer(),
+                    if (hasImage) ...[
+                      IconButton.filledTonal(
+                        iconSize: 20,
+                        padding: const EdgeInsets.all(6),
+                        visualDensity: VisualDensity.compact,
+                        tooltip: appLocalizations.restoreDefaultImage,
+                        onPressed: _resetImage,
+                        icon: const Icon(FluentIcons.arrow_repeat_all_24_regular),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                    FilledButton.tonalIcon(
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      onPressed: _pickImage,
+                      icon: const Icon(FluentIcons.image_24_regular, size: 18),
+                      label: Text(appLocalizations.changeImage),
                     ),
-                    const SizedBox(width: 8),
                   ],
-                  FilledButton.tonalIcon(
-                    style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      visualDensity: VisualDensity.compact,
-                    ),
-                    onPressed: _pickImage,
-                    icon: const Icon(FluentIcons.image_24_regular, size: 18),
-                    label: Text(appLocalizations.changeImage),
-                  ),
-                ],
+                ),
               ),
             ),
           ],
