@@ -9,11 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:material_color_utilities/blend/blend.dart';
-import 'package:material_color_utilities/hct/hct.dart';
-import 'package:material_color_utilities/palettes/tonal_palette.dart';
 
-const _maxTonalChroma = 36.0;
 const _rowGap = 8.0;
 const _rowSpacing = 4.0;
 const _pillInset = 8.0;
@@ -139,6 +135,7 @@ class _ModeRows extends StatelessWidget {
                     child: _ModeRow(
                       title: Intl.message(item.name),
                       icon: _getModeIcon(item),
+                      glyphTurns: _getModeGlyphTurns(item),
                       selected: item == mode,
                       foreground: Color.lerp(
                         context.colorScheme.onSurfaceVariant,
@@ -165,8 +162,15 @@ class _ModeRows extends StatelessWidget {
 IconData _getModeIcon(Mode mode) {
   return switch (mode) {
     Mode.rule => FluentIcons.task_list_square_rtl_24_regular,
-    Mode.global => IconsExt.cowork,
+    Mode.global => FluentIcons.hexagon_three_24_regular,
     Mode.direct => FluentIcons.cd_16_regular,
+  };
+}
+
+int _getModeGlyphTurns(Mode mode) {
+  return switch (mode) {
+    Mode.global => 3,
+    _ => 0,
   };
 }
 
@@ -175,32 +179,20 @@ class _ModeColors {
 
   factory _ModeColors.of(BuildContext context, Mode mode) {
     final colorScheme = context.colorScheme;
-    final primary = colorScheme.primary.toARGB32();
     return switch (mode) {
       Mode.rule => _ModeColors(
         colorScheme.secondaryContainer,
         colorScheme.onSecondaryContainer,
       ),
-      Mode.global => _ModeColors.tonal(
-        Color(Blend.harmonize(Colors.orange.toARGB32(), primary)),
-        colorScheme,
+      Mode.global => _ModeColors(
+        globalState.theme.darken3PrimaryContainer,
+        colorScheme.onPrimaryContainer,
       ),
-      Mode.direct => _ModeColors.tonal(
-        Color(Blend.harmonize(Colors.green.toARGB32(), primary)),
-        colorScheme,
+      Mode.direct => _ModeColors(
+        colorScheme.tertiaryContainer,
+        colorScheme.onTertiaryContainer,
       ),
     };
-  }
-
-  /// Material 3 container tones, with chroma capped to match the scheme's own.
-  factory _ModeColors.tonal(Color seed, ColorScheme colorScheme) {
-    final hct = Hct.fromInt(seed.toARGB32());
-    final palette = TonalPalette.of(hct.hue, min(hct.chroma, _maxTonalChroma));
-    final dark = colorScheme.brightness == Brightness.dark;
-    return _ModeColors(
-      Color(palette.get(dark ? 30 : 90)),
-      Color(palette.get(dark ? 90 : 10)),
-    );
   }
 
   factory _ModeColors.lerp(_ModeColors a, _ModeColors b, double t) {
@@ -218,6 +210,7 @@ class _ModeRow extends StatelessWidget {
   const _ModeRow({
     required this.title,
     required this.icon,
+    required this.glyphTurns,
     required this.selected,
     required this.foreground,
     required this.contentInset,
@@ -228,6 +221,7 @@ class _ModeRow extends StatelessWidget {
 
   final String title;
   final IconData icon;
+  final int glyphTurns;
   final bool selected;
   final Color foreground;
   final double contentInset;
@@ -260,10 +254,13 @@ class _ModeRow extends StatelessWidget {
                     SizedBox(
                       width: glyphWidth,
                       child: Center(
-                        child: Icon(
-                          icon,
-                          size: _rowGlyphSize,
-                          color: foreground,
+                        child: RotatedBox(
+                          quarterTurns: glyphTurns,
+                          child: Icon(
+                            icon,
+                            size: _rowGlyphSize,
+                            color: foreground,
+                          ),
                         ),
                       ),
                     ),

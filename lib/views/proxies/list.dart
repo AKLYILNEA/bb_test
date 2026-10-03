@@ -819,23 +819,15 @@ class _GroupHeader extends ConsumerWidget {
   }
 
   Widget _wrapAction({required Widget child, required String key}) {
-    if (collapsing) {
-      return TweenAnimationBuilder<double>(
-        tween: Tween<double>(begin: 1.0, end: 0.0),
-        duration: _actionsDuration,
-        curve: Curves.fastOutSlowIn,
-        child: child,
-        builder: (_, value, c) => _buildActionTransition(value, c),
-      );
-    }
-    if (!enterAnimated) return child;
+    final double end = collapsing ? 0.0 : 1.0;
+    final double begin = collapsing || !enterAnimated ? 1.0 : 0.0;
     return TweenAnimationBuilder<double>(
       key: ValueKey(key),
-      tween: Tween<double>(begin: 0.0, end: 1.0),
+      tween: Tween<double>(begin: begin, end: end),
       duration: _actionsDuration,
       curve: Curves.fastOutSlowIn,
-      builder: (_, value, c) => _buildActionTransition(value, c),
       child: child,
+      builder: (_, value, c) => _buildActionTransition(value, c),
     );
   }
 
@@ -858,7 +850,10 @@ class _GroupHeader extends ConsumerWidget {
       proxyIconProvider(selectedProxyName),
     );
 
+    // The key keeps the action subtree (and the running delay spinner) alive
+    // when it moves into the collapse overlay.
     final actions = Row(
+      key: GlobalObjectKey('proxy_group_actions_${group.name}'),
       mainAxisSize: MainAxisSize.min,
       children: [
         _wrapAction(

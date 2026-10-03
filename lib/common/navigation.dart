@@ -40,7 +40,10 @@ class Navigation {
             ProfilesView(key: const GlobalObjectKey(PageLabel.profiles)),
       ),
       NavigationItem(
-        icon: const Icon(FluentIcons.document_one_page_24_regular),
+        icon: const RotatedBox(
+          quarterTurns: 2,
+          child: Icon(FluentIcons.timeline_24_regular),
+        ),
         label: PageLabel.requests,
         builder: (_) =>
             RequestsView(key: const GlobalObjectKey(PageLabel.requests)),

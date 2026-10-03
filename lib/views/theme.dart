@@ -543,7 +543,7 @@ class _CustomFontItem extends ConsumerWidget {
         }
 
         return ListItem.switchItem(
-          leading: const Icon(FluentIcons.text_font_24_regular),
+          leading: const Icon(FluentIcons.text_effects_24_regular),
           horizontalTitleGap: 12,
           title: Text(
             appLocalizations.customFont,
