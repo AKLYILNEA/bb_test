@@ -39,6 +39,15 @@ class NetworkSpeedSmall extends ConsumerWidget {
     return traffics.last;
   }
 
+  static String _formatTrafficValue(TrafficValue tv) {
+    final show = tv.trafficValueShow;
+    if (show.value == 0) return '0B';
+    final numStr = show.value >= 100
+        ? show.value.fixed(decimals: 1)
+        : show.value.fixed(decimals: 2);
+    return '$numStr${show.unit.name}';
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final primaryColor = Theme.of(context).colorScheme.primary;
@@ -61,29 +70,39 @@ class NetworkSpeedSmall extends ConsumerWidget {
                 showSpeedTestConfirm(context);
               },
               info: Info(
-                labelWidget: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        FluentIcons.arrow_up_24_filled,
-                        size: 14,
-                        color: titleColor,
+                labelWidget: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      FluentIcons.arrow_up_24_filled,
+                      size: 14,
+                      color: titleColor,
+                    ),
+                    const SizedBox(width: 2),
+                    Flexible(
+                      child: Text(
+                        _formatTrafficValue(traffic.up),
+                        style: titleStyle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(width: 3),
-                      Text('${traffic.up}/s', style: titleStyle),
-                      const SizedBox(width: 6),
-                      Icon(
-                        FluentIcons.arrow_down_24_filled,
-                        size: 14,
-                        color: titleColor,
+                    ),
+                    const SizedBox(width: 6),
+                    Icon(
+                      FluentIcons.arrow_down_24_filled,
+                      size: 14,
+                      color: titleColor,
+                    ),
+                    const SizedBox(width: 2),
+                    Flexible(
+                      child: Text(
+                        _formatTrafficValue(traffic.down),
+                        style: titleStyle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(width: 3),
-                      Text('${traffic.down}/s', style: titleStyle),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
                 iconData: FluentIcons.gauge_24_regular,
               ),

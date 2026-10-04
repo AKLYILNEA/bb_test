@@ -410,6 +410,7 @@ class _DashboardTitleDialogState extends State<_DashboardTitleDialog> {
   void initState() {
     super.initState();
     _controller = EmojiTextEditingController(text: widget.initialValue);
+    _validate(widget.initialValue);
   }
 
   @override
@@ -419,12 +420,8 @@ class _DashboardTitleDialogState extends State<_DashboardTitleDialog> {
   }
 
   void _validate(String value) {
-    int len = 0;
-    for (int i = 0; i < value.length; i++) {
-      len += value.codeUnitAt(i) > 127 ? 2 : 1;
-    }
     setState(() {
-      if (len > 20) {
+      if (value.characters.length > 80) {
         _errorText = appLocalizations.titleTooLong;
       } else {
         _errorText = null;

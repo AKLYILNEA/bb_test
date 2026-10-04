@@ -337,6 +337,8 @@ class CommonScaffoldState extends State<CommonScaffold> {
                 : appLocalizations.selectedCountTitle(
                     '${_appBarState.value.editState?.editCount ?? 0}',
                   ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           );
   }
 
