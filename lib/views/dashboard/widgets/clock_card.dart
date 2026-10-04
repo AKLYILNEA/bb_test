@@ -298,36 +298,19 @@ class ClockCard extends ConsumerWidget {
                   SizedBox(
                     width: imageWidth,
                     height: innerHeight,
-                    child: DecoratedBox(
-                      position: DecorationPosition.foreground,
-                      decoration: ShapeDecoration(
-                        shape: SuperellipseBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          side: BorderSide(
-                            color: colorScheme.outlineVariant.withValues(
-                              alpha: isDark ? 0.35 : 0.45,
-                            ),
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: ClipPath(
-                        clipper: ShapeBorderClipper(
-                          shape: SuperellipseBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        child: hasCustomImage
-                            ? Image.file(
-                                File(data.imagePath!),
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: double.infinity,
-                                errorBuilder: (_, _, _) =>
-                                    _buildDefaultBackground(isDark),
-                              )
-                            : _buildDefaultBackground(isDark),
-                      ),
+                    child: _BlurredSuperellipseFrame(
+                      borderRadius: BorderRadius.circular(16),
+                      borderWidth: 3,
+                      child: hasCustomImage
+                          ? Image.file(
+                              File(data.imagePath!),
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                              errorBuilder: (_, _, _) =>
+                                  _buildDefaultBackground(isDark),
+                            )
+                          : _buildDefaultBackground(isDark),
                     ),
                   ),
                 ],
@@ -530,31 +513,15 @@ class _ClockDialogState extends State<_ClockDialog> {
                     SizedBox(
                       width: 52,
                       height: 39,
-                      child: DecoratedBox(
-                        position: DecorationPosition.foreground,
-                        decoration: ShapeDecoration(
-                          shape: SuperellipseBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            side: BorderSide(
-                              color: colorScheme.outlineVariant
-                                  .withValues(alpha: 0.3),
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: ClipPath(
-                          clipper: ShapeBorderClipper(
-                            shape: SuperellipseBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: hasImage
-                              ? Image.file(
-                                  File(_selectedImagePath!),
-                                  fit: BoxFit.cover,
-                                )
-                              : _buildDefaultBackground(isDark),
-                        ),
+                      child: _BlurredSuperellipseFrame(
+                        borderRadius: BorderRadius.circular(10),
+                        borderWidth: 2,
+                        child: hasImage
+                            ? Image.file(
+                                File(_selectedImagePath!),
+                                fit: BoxFit.cover,
+                              )
+                            : _buildDefaultBackground(isDark),
                       ),
                     ),
                     const Spacer(),
@@ -591,3 +558,94 @@ class _ClockDialogState extends State<_ClockDialog> {
     );
   }
 }
+
+class _BlurredSuperellipseFrame extends StatelessWidget {
+  final Widget child;
+  final BorderRadius borderRadius;
+  final double borderWidth;
+
+  const _BlurredSuperellipseFrame({
+    required this.child,
+    required this.borderRadius,
+    this.borderWidth = 3.0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    final strokeColor = isDark
+        ? Colors.white.withValues(alpha: 0.35)
+        : colorScheme.outlineVariant.withValues(alpha: 0.6);
+    final glowColor = isDark
+        ? Colors.white.withValues(alpha: 0.25)
+        : colorScheme.outline.withValues(alpha: 0.2);
+    final blurSigma = isDark ? 2.5 : 1.8;
+
+    return CustomPaint(
+      foregroundPainter: _BlurredSuperellipseBorderPainter(
+        strokeColor: strokeColor,
+        glowColor: glowColor,
+        borderWidth: borderWidth,
+        blurSigma: blurSigma,
+        borderRadius: borderRadius,
+      ),
+      child: ClipPath(
+        clipper: ShapeBorderClipper(
+          shape: SuperellipseBorder(
+            borderRadius: borderRadius,
+          ),
+        ),
+        child: child,
+      ),
+    );
+  }
+}
+
+class _BlurredSuperellipseBorderPainter extends CustomPainter {
+  final Color strokeColor;
+  final Color glowColor;
+  final double borderWidth;
+  final double blurSigma;
+  final BorderRadius borderRadius;
+
+  const _BlurredSuperellipseBorderPainter({
+    required this.strokeColor,
+    required this.glowColor,
+    required this.borderWidth,
+    required this.blurSigma,
+    required this.borderRadius,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    final shape = SuperellipseBorder(borderRadius: borderRadius);
+    final path = shape.getOuterPath(rect);
+
+    final glowPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth
+      ..color = glowColor
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, blurSigma);
+    canvas.drawPath(path, glowPaint);
+
+    final corePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth
+      ..color = strokeColor;
+    canvas.drawPath(path, corePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _BlurredSuperellipseBorderPainter oldDelegate) {
+    return oldDelegate.strokeColor != strokeColor ||
+        oldDelegate.glowColor != glowColor ||
+        oldDelegate.borderWidth != borderWidth ||
+        oldDelegate.blurSigma != blurSigma ||
+        oldDelegate.borderRadius != borderRadius;
+  }
+}
+
