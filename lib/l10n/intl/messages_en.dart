@@ -1544,5 +1544,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "clockCardDefaultAuthor": MessageLookupByLibrary.simpleMessage("Ji Xianlin"),
     "customImageSelected": MessageLookupByLibrary.simpleMessage("Custom image set"),
     "defaultImage": MessageLookupByLibrary.simpleMessage("Default background"),
+    "overridden": MessageLookupByLibrary.simpleMessage("Overridden"),
+    "notOverridden": MessageLookupByLibrary.simpleMessage("Not Overridden"),
   };
 }

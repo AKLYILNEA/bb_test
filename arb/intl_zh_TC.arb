@@ -840,7 +840,9 @@
   "clockCardDefaultText": "生活明朗，萬物可愛",
   "clockCardDefaultAuthor": "季羨林",
   "customImageSelected": "已設定自訂圖片",
-  "defaultImage": "預設背景"
+  "defaultImage": "預設背景",
+  "overridden": "已覆寫",
+  "notOverridden": "未覆寫"
 }
 
 

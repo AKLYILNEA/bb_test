@@ -840,7 +840,9 @@
   "clockCardDefaultText": "明日は明日の風が吹く",
   "clockCardDefaultAuthor": "季羨林",
   "customImageSelected": "カスタム画像設定済み",
-  "defaultImage": "デフォルト背景"
+  "defaultImage": "デフォルト背景",
+  "overridden": "オーバーライド済み",
+  "notOverridden": "未オーバーライド"
 }
 
 

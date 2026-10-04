@@ -840,7 +840,9 @@
   "clockCardDefaultText": "زندگی زیباست",
   "clockCardDefaultAuthor": "جی شیان‌لین",
   "customImageSelected": "تصویر سفارشی تنظیم شد",
-  "defaultImage": "پس‌زمینه پیش‌فرض"
+  "defaultImage": "پس‌زمینه پیش‌فرض",
+  "overridden": "بازنویسی شده",
+  "notOverridden": "بازنویسی نشده"
 }
 
 

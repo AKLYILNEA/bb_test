@@ -122,4 +122,13 @@ extension ColorSchemeExtension on ColorScheme {
       : this;
 
   Color get success => Colors.green.harmonizeWith(primary);
+
+  Color get warning => Colors.orange.harmonizeWith(primary);
+
+  Color? delayColor(int? delay) {
+    if (delay == null) return null;
+    if (delay < 0) return error;
+    if (delay < 600) return success;
+    return warning;
+  }
 }

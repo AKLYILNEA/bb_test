@@ -1257,5 +1257,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "clockCardDefaultAuthor": MessageLookupByLibrary.simpleMessage("지셴린"),
     "customImageSelected": MessageLookupByLibrary.simpleMessage("사용자 지정 이미지 설정됨"),
     "defaultImage": MessageLookupByLibrary.simpleMessage("기본 배경"),
+    "overridden": MessageLookupByLibrary.simpleMessage("재정의됨"),
+    "notOverridden": MessageLookupByLibrary.simpleMessage("재정의 안 됨"),
   };
 }

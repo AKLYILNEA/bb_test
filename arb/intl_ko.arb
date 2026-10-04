@@ -840,7 +840,9 @@
   "clockCardDefaultText": "오늘도 좋은 하루",
   "clockCardDefaultAuthor": "지셴린",
   "customImageSelected": "사용자 지정 이미지 설정됨",
-  "defaultImage": "기본 배경"
+  "defaultImage": "기본 배경",
+  "overridden": "재정의됨",
+  "notOverridden": "재정의 안 됨"
 }
 
 

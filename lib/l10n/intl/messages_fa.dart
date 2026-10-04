@@ -1580,5 +1580,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "clockCardDefaultAuthor": MessageLookupByLibrary.simpleMessage("جی شیان‌لین"),
     "customImageSelected": MessageLookupByLibrary.simpleMessage("تصویر سفارشی تنظیم شد"),
     "defaultImage": MessageLookupByLibrary.simpleMessage("پس‌زمینه پیش‌فرض"),
+    "overridden": MessageLookupByLibrary.simpleMessage("بازنویسی شده"),
+    "notOverridden": MessageLookupByLibrary.simpleMessage("بازنویسی نشده"),
   };
 }

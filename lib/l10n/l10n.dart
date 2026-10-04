@@ -6878,6 +6878,26 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Overridden`
+  String get overridden {
+    return Intl.message(
+      'Overridden',
+      name: 'overridden',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Not Overridden`
+  String get notOverridden {
+    return Intl.message(
+      'Not Overridden',
+      name: 'notOverridden',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -842,7 +842,9 @@
   "clockCardDefaultText": "Жизнь прекрасна и удивительна",
   "clockCardDefaultAuthor": "Цзи Сяньлинь",
   "customImageSelected": "Пользовательское изображение",
-  "defaultImage": "Фон по умолчанию"
+  "defaultImage": "Фон по умолчанию",
+  "overridden": "Переопределено",
+  "notOverridden": "Не переопределено"
 }
 
 

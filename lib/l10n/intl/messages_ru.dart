@@ -1629,5 +1629,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Пользовательское изображение",
     ),
     "defaultImage": MessageLookupByLibrary.simpleMessage("Фон по умолчанию"),
+    "overridden": MessageLookupByLibrary.simpleMessage("Переопределено"),
+    "notOverridden": MessageLookupByLibrary.simpleMessage("Не переопределено"),
   };
 }

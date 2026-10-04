@@ -840,7 +840,9 @@
   "clockCardDefaultText": "生活明朗，万物可爱",
   "clockCardDefaultAuthor": "季羡林",
   "customImageSelected": "已设置自定义图片",
-  "defaultImage": "默认背景"
+  "defaultImage": "默认背景",
+  "overridden": "已覆写",
+  "notOverridden": "未覆写"
 }
 
 

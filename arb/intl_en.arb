@@ -840,7 +840,9 @@
   "clockCardDefaultText": "Life is bright and lovely",
   "clockCardDefaultAuthor": "Ji Xianlin",
   "customImageSelected": "Custom image set",
-  "defaultImage": "Default background"
+  "defaultImage": "Default background",
+  "overridden": "Overridden",
+  "notOverridden": "Not Overridden"
 }
 
 

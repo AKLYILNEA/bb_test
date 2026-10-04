@@ -1131,5 +1131,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "clockCardDefaultAuthor": MessageLookupByLibrary.simpleMessage("季羨林"),
     "customImageSelected": MessageLookupByLibrary.simpleMessage("已設定自訂圖片"),
     "defaultImage": MessageLookupByLibrary.simpleMessage("預設背景"),
+    "overridden": MessageLookupByLibrary.simpleMessage("已覆寫"),
+    "notOverridden": MessageLookupByLibrary.simpleMessage("未覆寫"),
   };
 }
