@@ -87,12 +87,12 @@ class NetworkSpeedSmall extends ConsumerWidget {
                     ),
                     const SizedBox(width: 4),
                     Icon(
-                      FluentIcons.arrow_down_24_filled,
+                      FluentIcons.arrow_up_24_filled,
                       size: 13,
                       color: titleColor,
                     ),
                     Icon(
-                      FluentIcons.arrow_up_24_filled,
+                      FluentIcons.arrow_down_24_filled,
                       size: 13,
                       color: titleColor,
                     ),
