@@ -246,7 +246,7 @@ class ClockCard extends ConsumerWidget {
                                   style: context.textTheme.titleSmall?.copyWith(
                                     fontFamily: customFont,
                                     fontWeight: FontWeight.w600,
-                                    color: colorScheme.onSurface,
+                                    color: colorScheme.onSurfaceVariant,
                                     fontFeatures: const [
                                       FontFeature.tabularFigures(),
                                     ],

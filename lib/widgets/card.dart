@@ -8,12 +8,14 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class Info {
   final String label;
+  final Widget? labelWidget;
   final IconData? iconData;
   final Widget? icon;
   final TextStyle? style;
 
   const Info({
-    required this.label,
+    this.label = '',
+    this.labelWidget,
     this.iconData,
     this.icon,
     this.style,
@@ -60,20 +62,21 @@ class InfoHeader extends StatelessWidget {
                 ],
                 Flexible(
                   flex: 1,
-                  child: TooltipText(
-                    text: EmojiText(
-                      info.label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style:
-                          (info.style ?? Theme.of(context).textTheme.titleSmall)
-                              ?.copyWith(
-                                color:
-                                    info.style?.color ??
-                                    context.colorScheme.onSurfaceVariant,
-                              ),
-                    ),
-                  ),
+                  child: info.labelWidget ??
+                      TooltipText(
+                        text: EmojiText(
+                          info.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                              (info.style ?? Theme.of(context).textTheme.titleSmall)
+                                  ?.copyWith(
+                                    color:
+                                        info.style?.color ??
+                                        context.colorScheme.onSurfaceVariant,
+                                  ),
+                        ),
+                      ),
                 ),
               ],
             ),

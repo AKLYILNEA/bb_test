@@ -34,18 +34,19 @@ class NetworkSpeedSmall extends ConsumerWidget {
     return result;
   }
 
+  static Traffic _getLastTraffic(List<Traffic> traffics) {
+    if (traffics.isEmpty) return Traffic();
+    return traffics.last;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isMobile = ref.watch(isMobileViewProvider);
     final primaryColor = Theme.of(context).colorScheme.primary;
-    final speedStyle = isMobile
-        ? context.textTheme.titleSmall?.copyWith(
-            fontSize: 14,
-            fontFeatures: const [FontFeature.tabularFigures()],
-          )
-        : context.textTheme.titleSmall
-            ?.adjustSize(-2)
-            .copyWith(fontFeatures: const [FontFeature.tabularFigures()]);
+    final titleColor = context.colorScheme.onSurfaceVariant;
+    final titleStyle = context.textTheme.titleSmall?.copyWith(
+      color: titleColor,
+      fontFeatures: const [FontFeature.tabularFigures()],
+    );
     return RepaintBoundary(
       child: SizedBox(
         height: getWidgetHeight(1),
@@ -54,14 +55,37 @@ class NetworkSpeedSmall extends ConsumerWidget {
           builder: (_, _, _) {
             final traffics = ref.read(trafficsProvider).list;
             final points = _getPoints(traffics);
+            final traffic = _getLastTraffic(traffics);
             return CommonCard(
               onPressed: () {
                 showSpeedTestConfirm(context);
               },
               info: Info(
-                label: appLocalizations.networkSpeed,
+                labelWidget: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        FluentIcons.arrow_up_24_filled,
+                        size: 14,
+                        color: titleColor,
+                      ),
+                      const SizedBox(width: 3),
+                      Text('${traffic.up}/s', style: titleStyle),
+                      const SizedBox(width: 6),
+                      Icon(
+                        FluentIcons.arrow_down_24_filled,
+                        size: 14,
+                        color: titleColor,
+                      ),
+                      const SizedBox(width: 3),
+                      Text('${traffic.down}/s', style: titleStyle),
+                    ],
+                  ),
+                ),
                 iconData: FluentIcons.gauge_24_regular,
-                style: speedStyle,
               ),
               child: Padding(
                 padding: const EdgeInsets.only(
