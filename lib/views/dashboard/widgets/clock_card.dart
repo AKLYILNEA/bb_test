@@ -301,7 +301,8 @@ class ClockCard extends ConsumerWidget {
                     height: innerHeight,
                     child: _BlurredSuperellipseFrame(
                       borderRadius: BorderRadius.circular(16),
-                      borderWidth: 3.5,
+                      borderWidth: 4.0,
+                      outerOutset: 1.5,
                       child: hasCustomImage
                           ? Image.file(
                               File(data.imagePath!),
@@ -516,7 +517,8 @@ class _ClockDialogState extends State<_ClockDialog> {
                       height: 39,
                       child: _BlurredSuperellipseFrame(
                         borderRadius: BorderRadius.circular(10),
-                        borderWidth: 2,
+                        borderWidth: 2.5,
+                        outerOutset: 1.0,
                         child: hasImage
                             ? Image.file(
                                 File(_selectedImagePath!),
@@ -564,11 +566,13 @@ class _BlurredSuperellipseFrame extends StatelessWidget {
   final Widget child;
   final BorderRadius borderRadius;
   final double borderWidth;
+  final double outerOutset;
 
   const _BlurredSuperellipseFrame({
     required this.child,
     required this.borderRadius,
-    this.borderWidth = 3.5,
+    this.borderWidth = 4.0,
+    this.outerOutset = 1.5,
   });
 
   @override
@@ -585,7 +589,13 @@ class _BlurredSuperellipseFrame extends StatelessWidget {
         ? Colors.white.withValues(alpha: 0.35)
         : colorScheme.outlineVariant.withValues(alpha: 0.5);
 
+    final glowColor = isDark
+        ? Colors.white.withValues(alpha: 0.28)
+        : colorScheme.outline.withValues(alpha: 0.22);
+    final glowBlurSigma = isDark ? 3.0 : 2.0;
+
     return Stack(
+      clipBehavior: Clip.none,
       fit: StackFit.expand,
       children: [
         ClipPath(
@@ -602,6 +612,7 @@ class _BlurredSuperellipseFrame extends StatelessWidget {
             clipper: _SuperellipseRingClipper(
               borderRadius: borderRadius,
               borderWidth: borderWidth,
+              outerOutset: outerOutset,
             ),
             child: BackdropFilter(
               filter: ImageFilter.blur(
@@ -611,6 +622,16 @@ class _BlurredSuperellipseFrame extends StatelessWidget {
               child: Container(
                 color: tintColor,
               ),
+            ),
+          ),
+        ),
+        IgnorePointer(
+          child: CustomPaint(
+            painter: _SuperellipseGlowPainter(
+              borderRadius: borderRadius,
+              glowColor: glowColor,
+              borderWidth: borderWidth,
+              glowBlurSigma: glowBlurSigma,
             ),
           ),
         ),
@@ -632,38 +653,97 @@ class _BlurredSuperellipseFrame extends StatelessWidget {
   }
 }
 
+class _SuperellipseGlowPainter extends CustomPainter {
+  final BorderRadius borderRadius;
+  final Color glowColor;
+  final double borderWidth;
+  final double glowBlurSigma;
+
+  const _SuperellipseGlowPainter({
+    required this.borderRadius,
+    required this.glowColor,
+    required this.borderWidth,
+    required this.glowBlurSigma,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    final shape = SuperellipseBorder(borderRadius: borderRadius);
+    final path = shape.getOuterPath(rect);
+
+    final glowPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth
+      ..color = glowColor
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, glowBlurSigma);
+    canvas.drawPath(path, glowPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _SuperellipseGlowPainter oldDelegate) {
+    return oldDelegate.borderRadius != borderRadius ||
+        oldDelegate.glowColor != glowColor ||
+        oldDelegate.borderWidth != borderWidth ||
+        oldDelegate.glowBlurSigma != glowBlurSigma;
+  }
+}
+
 class _SuperellipseRingClipper extends CustomClipper<Path> {
   final BorderRadius borderRadius;
   final double borderWidth;
+  final double outerOutset;
 
   const _SuperellipseRingClipper({
     required this.borderRadius,
     required this.borderWidth,
+    this.outerOutset = 1.5,
   });
 
   @override
   Path getClip(Size size) {
     final rect = Offset.zero & size;
-    final outerShape = SuperellipseBorder(borderRadius: borderRadius);
-    final outerPath = outerShape.getOuterPath(rect);
 
-    final innerRect = rect.deflate(borderWidth);
-    final innerRadius = BorderRadius.only(
+    final outerRect = rect.inflate(outerOutset);
+    final outerRadius = BorderRadius.only(
       topLeft: Radius.elliptical(
-        max(0.0, borderRadius.topLeft.x - borderWidth),
-        max(0.0, borderRadius.topLeft.y - borderWidth),
+        borderRadius.topLeft.x + outerOutset,
+        borderRadius.topLeft.y + outerOutset,
       ),
       topRight: Radius.elliptical(
-        max(0.0, borderRadius.topRight.x - borderWidth),
-        max(0.0, borderRadius.topRight.y - borderWidth),
+        borderRadius.topRight.x + outerOutset,
+        borderRadius.topRight.y + outerOutset,
       ),
       bottomLeft: Radius.elliptical(
-        max(0.0, borderRadius.bottomLeft.x - borderWidth),
-        max(0.0, borderRadius.bottomLeft.y - borderWidth),
+        borderRadius.bottomLeft.x + outerOutset,
+        borderRadius.bottomLeft.y + outerOutset,
       ),
       bottomRight: Radius.elliptical(
-        max(0.0, borderRadius.bottomRight.x - borderWidth),
-        max(0.0, borderRadius.bottomRight.y - borderWidth),
+        borderRadius.bottomRight.x + outerOutset,
+        borderRadius.bottomRight.y + outerOutset,
+      ),
+    );
+    final outerShape = SuperellipseBorder(borderRadius: outerRadius);
+    final outerPath = outerShape.getOuterPath(outerRect);
+
+    final innerInset = max(0.0, borderWidth - outerOutset);
+    final innerRect = rect.deflate(innerInset);
+    final innerRadius = BorderRadius.only(
+      topLeft: Radius.elliptical(
+        max(0.0, borderRadius.topLeft.x - innerInset),
+        max(0.0, borderRadius.topLeft.y - innerInset),
+      ),
+      topRight: Radius.elliptical(
+        max(0.0, borderRadius.topRight.x - innerInset),
+        max(0.0, borderRadius.topRight.y - innerInset),
+      ),
+      bottomLeft: Radius.elliptical(
+        max(0.0, borderRadius.bottomLeft.x - innerInset),
+        max(0.0, borderRadius.bottomLeft.y - innerInset),
+      ),
+      bottomRight: Radius.elliptical(
+        max(0.0, borderRadius.bottomRight.x - innerInset),
+        max(0.0, borderRadius.bottomRight.y - innerInset),
       ),
     );
     final innerShape = SuperellipseBorder(borderRadius: innerRadius);
@@ -675,8 +755,10 @@ class _SuperellipseRingClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(covariant _SuperellipseRingClipper oldClipper) {
     return oldClipper.borderRadius != borderRadius ||
-        oldClipper.borderWidth != borderWidth;
+        oldClipper.borderWidth != borderWidth ||
+        oldClipper.outerOutset != outerOutset;
   }
 }
+
 
 
