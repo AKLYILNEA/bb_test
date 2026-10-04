@@ -50,7 +50,6 @@ class NetworkSpeedSmall extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isMobile = ref.watch(isMobileViewProvider);
     final primaryColor = Theme.of(context).colorScheme.primary;
     final titleColor = context.colorScheme.onSurfaceVariant;
     final titleStyle = context.textTheme.titleSmall?.copyWith(
@@ -66,79 +65,39 @@ class NetworkSpeedSmall extends ConsumerWidget {
             final traffics = ref.read(trafficsProvider).list;
             final points = _getPoints(traffics);
             final traffic = _getLastTraffic(traffics);
-
-            final Widget labelWidget;
-            if (isMobile) {
-              final total = TrafficValue(
-                value: traffic.up.value + traffic.down.value,
-              );
-              labelWidget = Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Flexible(
-                    child: Text(
-                      '$total',
-                      style: titleStyle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Icon(
-                    FluentIcons.arrow_down_24_filled,
-                    size: 13,
-                    color: titleColor,
-                  ),
-                  Icon(
-                    FluentIcons.arrow_up_24_filled,
-                    size: 13,
-                    color: titleColor,
-                  ),
-                ],
-              );
-            } else {
-              labelWidget = Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Flexible(
-                    child: Text(
-                      _formatTrafficValue(traffic.up),
-                      style: titleStyle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const SizedBox(width: 2),
-                  Icon(
-                    FluentIcons.arrow_up_24_filled,
-                    size: 13,
-                    color: titleColor,
-                  ),
-                  const SizedBox(width: 6),
-                  Flexible(
-                    child: Text(
-                      _formatTrafficValue(traffic.down),
-                      style: titleStyle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const SizedBox(width: 2),
-                  Icon(
-                    FluentIcons.arrow_down_24_filled,
-                    size: 13,
-                    color: titleColor,
-                  ),
-                ],
-              );
-            }
+            final total = TrafficValue(
+              value: traffic.up.value + traffic.down.value,
+            );
 
             return CommonCard(
               onPressed: () {
                 showSpeedTestConfirm(context);
               },
               info: Info(
-                labelWidget: labelWidget,
+                labelWidget: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        _formatTrafficValue(total),
+                        style: titleStyle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      FluentIcons.arrow_down_24_filled,
+                      size: 13,
+                      color: titleColor,
+                    ),
+                    Icon(
+                      FluentIcons.arrow_up_24_filled,
+                      size: 13,
+                      color: titleColor,
+                    ),
+                  ],
+                ),
                 iconData: FluentIcons.gauge_24_regular,
               ),
               child: Padding(
