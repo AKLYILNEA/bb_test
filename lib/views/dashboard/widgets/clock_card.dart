@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -300,7 +301,7 @@ class ClockCard extends ConsumerWidget {
                     height: innerHeight,
                     child: _BlurredSuperellipseFrame(
                       borderRadius: BorderRadius.circular(16),
-                      borderWidth: 3,
+                      borderWidth: 3.5,
                       child: hasCustomImage
                           ? Image.file(
                               File(data.imagePath!),
@@ -567,7 +568,7 @@ class _BlurredSuperellipseFrame extends StatelessWidget {
   const _BlurredSuperellipseFrame({
     required this.child,
     required this.borderRadius,
-    this.borderWidth = 3.0,
+    this.borderWidth = 3.5,
   });
 
   @override
@@ -576,76 +577,106 @@ class _BlurredSuperellipseFrame extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
-    final strokeColor = isDark
+    final blurSigma = isDark ? 10.0 : 8.0;
+    final tintColor = isDark
+        ? Colors.white.withValues(alpha: 0.18)
+        : Colors.white.withValues(alpha: 0.35);
+    final borderColor = isDark
         ? Colors.white.withValues(alpha: 0.35)
-        : colorScheme.outlineVariant.withValues(alpha: 0.6);
-    final glowColor = isDark
-        ? Colors.white.withValues(alpha: 0.25)
-        : colorScheme.outline.withValues(alpha: 0.2);
-    final blurSigma = isDark ? 2.5 : 1.8;
+        : colorScheme.outlineVariant.withValues(alpha: 0.5);
 
-    return CustomPaint(
-      foregroundPainter: _BlurredSuperellipseBorderPainter(
-        strokeColor: strokeColor,
-        glowColor: glowColor,
-        borderWidth: borderWidth,
-        blurSigma: blurSigma,
-        borderRadius: borderRadius,
-      ),
-      child: ClipPath(
-        clipper: ShapeBorderClipper(
-          shape: SuperellipseBorder(
-            borderRadius: borderRadius,
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        ClipPath(
+          clipper: ShapeBorderClipper(
+            shape: SuperellipseBorder(
+              borderRadius: borderRadius,
+            ),
+          ),
+          child: child,
+        ),
+        IgnorePointer(
+          child: ClipPath(
+            clipBehavior: Clip.antiAlias,
+            clipper: _SuperellipseRingClipper(
+              borderRadius: borderRadius,
+              borderWidth: borderWidth,
+            ),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(
+                sigmaX: blurSigma,
+                sigmaY: blurSigma,
+              ),
+              child: Container(
+                color: tintColor,
+              ),
+            ),
           ),
         ),
-        child: child,
-      ),
+        IgnorePointer(
+          child: DecoratedBox(
+            decoration: ShapeDecoration(
+              shape: SuperellipseBorder(
+                borderRadius: borderRadius,
+                side: BorderSide(
+                  color: borderColor,
+                  width: 1,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
 
-class _BlurredSuperellipseBorderPainter extends CustomPainter {
-  final Color strokeColor;
-  final Color glowColor;
-  final double borderWidth;
-  final double blurSigma;
+class _SuperellipseRingClipper extends CustomClipper<Path> {
   final BorderRadius borderRadius;
+  final double borderWidth;
 
-  const _BlurredSuperellipseBorderPainter({
-    required this.strokeColor,
-    required this.glowColor,
-    required this.borderWidth,
-    required this.blurSigma,
+  const _SuperellipseRingClipper({
     required this.borderRadius,
+    required this.borderWidth,
   });
 
   @override
-  void paint(Canvas canvas, Size size) {
+  Path getClip(Size size) {
     final rect = Offset.zero & size;
-    final shape = SuperellipseBorder(borderRadius: borderRadius);
-    final path = shape.getOuterPath(rect);
+    final outerShape = SuperellipseBorder(borderRadius: borderRadius);
+    final outerPath = outerShape.getOuterPath(rect);
 
-    final glowPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = borderWidth
-      ..color = glowColor
-      ..maskFilter = MaskFilter.blur(BlurStyle.normal, blurSigma);
-    canvas.drawPath(path, glowPaint);
+    final innerRect = rect.deflate(borderWidth);
+    final innerRadius = BorderRadius.only(
+      topLeft: Radius.elliptical(
+        max(0.0, borderRadius.topLeft.x - borderWidth),
+        max(0.0, borderRadius.topLeft.y - borderWidth),
+      ),
+      topRight: Radius.elliptical(
+        max(0.0, borderRadius.topRight.x - borderWidth),
+        max(0.0, borderRadius.topRight.y - borderWidth),
+      ),
+      bottomLeft: Radius.elliptical(
+        max(0.0, borderRadius.bottomLeft.x - borderWidth),
+        max(0.0, borderRadius.bottomLeft.y - borderWidth),
+      ),
+      bottomRight: Radius.elliptical(
+        max(0.0, borderRadius.bottomRight.x - borderWidth),
+        max(0.0, borderRadius.bottomRight.y - borderWidth),
+      ),
+    );
+    final innerShape = SuperellipseBorder(borderRadius: innerRadius);
+    final innerPath = innerShape.getOuterPath(innerRect);
 
-    final corePaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = borderWidth
-      ..color = strokeColor;
-    canvas.drawPath(path, corePaint);
+    return Path.combine(PathOperation.difference, outerPath, innerPath);
   }
 
   @override
-  bool shouldRepaint(covariant _BlurredSuperellipseBorderPainter oldDelegate) {
-    return oldDelegate.strokeColor != strokeColor ||
-        oldDelegate.glowColor != glowColor ||
-        oldDelegate.borderWidth != borderWidth ||
-        oldDelegate.blurSigma != blurSigma ||
-        oldDelegate.borderRadius != borderRadius;
+  bool shouldReclip(covariant _SuperellipseRingClipper oldClipper) {
+    return oldClipper.borderRadius != borderRadius ||
+        oldClipper.borderWidth != borderWidth;
   }
 }
+
 
