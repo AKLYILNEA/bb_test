@@ -233,7 +233,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
     return CommonScaffold(
       resizeToAvoidBottomInset: false,
       title:
-          ref.watch(customDashboardTitleProvider) ?? '⚡️ Bettbox',
+          ref.watch(customDashboardTitleProvider) ?? '⚡️ 𝐁𝐞𝐭𝐭𝐛𝐨𝐱',
       actions: _buildActions(),
       floatingActionButton:
           (isMobileView || showCardStartButton) ? null : const StartFab(),
