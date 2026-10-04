@@ -275,20 +275,22 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     return SliverMainAxisGroup(
       slivers: [
         SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-            child: SizedBox(
-              height: 64.0,
-              child: _GroupHeader(
-                key: ValueKey('header_${group.name}'),
-                group: group,
-                isExpand: isExpand,
-                enterAnimated: enterAnimated,
-                collapsing: isCollapsing,
-                onToggle: () => _handleToggle(group.name),
-                cardType: cardType,
-                columns: columns,
-                onScrollToSelected: () => _scrollToSelected(group.name),
+          child: RepaintBoundary(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+              child: SizedBox(
+                height: 64.0,
+                child: _GroupHeader(
+                  key: ValueKey('header_${group.name}'),
+                  group: group,
+                  isExpand: isExpand,
+                  enterAnimated: enterAnimated,
+                  collapsing: isCollapsing,
+                  onToggle: () => _handleToggle(group.name),
+                  cardType: cardType,
+                  columns: columns,
+                  onScrollToSelected: () => _scrollToSelected(group.name),
+                ),
               ),
             ),
           ),
@@ -414,8 +416,8 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     );
     _reveal = CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeInOutCubic,
-      reverseCurve: Curves.easeInOutCubic.flipped,
+      curve: Curves.fastOutSlowIn,
+      reverseCurve: Curves.fastOutSlowIn.flipped,
     );
     _controller.addStatusListener(_handleStatus);
     _syncList();
@@ -575,11 +577,13 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       }
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-      child: SizedBox(
-        height: getItemHeight(widget.cardType),
-        child: Row(children: rowChildren),
+    return RepaintBoundary(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+        child: SizedBox(
+          height: getItemHeight(widget.cardType),
+          child: Row(children: rowChildren),
+        ),
       ),
     );
   }
