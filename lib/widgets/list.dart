@@ -621,11 +621,17 @@ class SectionContainer extends StatelessWidget {
 /// Outline of one row inside a continuous card pack.
 ///
 /// Every row owns its own rounded box, so a plain outline would draw a line
-/// between rows as well. Each row therefore only paints the edges that belong
-/// to the pack outline: the vertical ones (running the full row height so
-/// neighbouring rows join seamlessly, but stopping at the corner radius when
-/// the row owns a rounded end) plus the top / bottom edge when the row is the
-/// first or the last of the pack.
+/// between rows as well. Each row therefore clips the outline of its own box to
+/// the edges that belong to the pack: both vertical edges at full height (so
+/// neighbouring rows join without a seam) plus the top / bottom edge with its
+/// whole corner region when the row is the first or the last of the pack.
+///
+/// The corner is deliberately taken from the shape itself instead of being
+/// rebuilt from the radius: a rounded superellipse is a superellipse whose
+/// corners are replaced by circular arcs, so its straight edge ends well before
+/// the radius (about 0.86–0.96 × radius depending on the radius / side ratio).
+/// Drawing a straight line down to `radius` from the corner therefore leaves a
+/// small stub sticking out of the curve.
 class ContinuousCardBorder extends SuperellipseBorder {
   final bool topEdge;
   final bool bottomEdge;
@@ -658,47 +664,53 @@ class ContinuousCardBorder extends SuperellipseBorder {
       canvas.drawPath(path, paint);
       return;
     }
-    // The rounded end curves inward, so the straight edge starts where the
-    // corner arc meets it instead of running through the corner.
-    final top = rect.top + (topEdge ? cornerRadius : 0);
-    final bottom = rect.bottom - (bottomEdge ? cornerRadius : 0);
-    canvas.drawLine(
-      Offset(rect.left + half, top),
-      Offset(rect.left + half, bottom),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(rect.right - half, top),
-      Offset(rect.right - half, bottom),
-      paint,
-    );
-    final inset = cornerRadius + half + 1;
-    if (topEdge) {
-      canvas.save();
-      canvas.clipRect(
+    // Rects added to one path merge into a single clip region.
+    final edge = side.width + 0.5;
+    final band = (cornerRadius * 2 > rect.height
+            ? rect.height / 2
+            : cornerRadius) +
+        1;
+    final clip = Path()
+      ..addRect(
         Rect.fromLTRB(
           rect.left - 1,
           rect.top - 1,
-          rect.right + 1,
-          rect.top + inset,
+          rect.left + edge,
+          rect.bottom + 1,
         ),
-      );
-      canvas.drawPath(path, paint);
-      canvas.restore();
-    }
-    if (bottomEdge) {
-      canvas.save();
-      canvas.clipRect(
+      )
+      ..addRect(
         Rect.fromLTRB(
-          rect.left - 1,
-          rect.bottom - inset,
+          rect.right - edge,
+          rect.top - 1,
           rect.right + 1,
           rect.bottom + 1,
         ),
       );
-      canvas.drawPath(path, paint);
-      canvas.restore();
+    if (topEdge) {
+      clip.addRect(
+        Rect.fromLTRB(
+          rect.left - 1,
+          rect.top - 1,
+          rect.right + 1,
+          rect.top + band,
+        ),
+      );
     }
+    if (bottomEdge) {
+      clip.addRect(
+        Rect.fromLTRB(
+          rect.left - 1,
+          rect.bottom - band,
+          rect.right + 1,
+          rect.bottom + 1,
+        ),
+      );
+    }
+    canvas.save();
+    canvas.clipPath(clip);
+    canvas.drawPath(path, paint);
+    canvas.restore();
   }
 
   @override
