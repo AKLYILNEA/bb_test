@@ -464,12 +464,10 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: ShapeDecoration(
-        color: context.colorScheme.surfaceContainerLow,
+        color: commonCardColor(context),
         shape: SuperellipseBorder(
           borderRadius: BorderRadius.circular(20),
-          side: BorderSide(
-            color: context.colorScheme.outlineVariant.withValues(alpha: 0.3),
-          ),
+          side: commonCardBorderSide(context),
         ),
       ),
       child: Row(
@@ -581,9 +579,10 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: ShapeDecoration(
-          color: context.colorScheme.surfaceContainerLow,
+          color: commonCardColor(context),
           shape: SuperellipseBorder(
             borderRadius: BorderRadius.circular(16),
+            side: commonCardBorderSide(context),
           ),
         ),
       child: Row(

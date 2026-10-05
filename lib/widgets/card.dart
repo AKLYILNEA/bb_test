@@ -98,6 +98,35 @@ class InfoHeader extends StatelessWidget {
   }
 }
 
+/// Background of every card surface ([CommonCard] and hand built cards).
+Color commonCardColor(BuildContext context) {
+  final colorScheme = context.colorScheme;
+  if (colorScheme.brightness == Brightness.light) {
+    return Color.lerp(
+          colorScheme.surface,
+          colorScheme.surfaceContainerLowest,
+          0.5,
+        ) ??
+        colorScheme.surface;
+  }
+  return colorScheme.surfaceContainerHigh;
+}
+
+/// Outline of every card surface ([CommonCard] and hand built cards).
+BorderSide commonCardBorderSide(
+  BuildContext context, {
+  bool isSelected = false,
+}) {
+  final colorScheme = context.colorScheme;
+  final isLight = colorScheme.brightness == Brightness.light;
+  return BorderSide(
+    color: isSelected
+        ? colorScheme.primary
+        : colorScheme.outlineVariant.withValues(alpha: isLight ? 0.45 : 0.25),
+    strokeAlign: BorderSide.strokeAlignInside,
+  );
+}
+
 class CommonCard extends StatelessWidget {
   const CommonCard({
     super.key,
@@ -144,32 +173,16 @@ class CommonCard extends StatelessWidget {
         strokeAlign: BorderSide.strokeAlignInside,
       );
     }
-    final isLight = colorScheme.brightness == Brightness.light;
-    return BorderSide(
-      color: isSelected
-          ? colorScheme.primary
-          : colorScheme.outlineVariant.withValues(
-              alpha: isLight ? 0.45 : 0.25,
-            ),
-      strokeAlign: BorderSide.strokeAlignInside,
-    );
+    return commonCardBorderSide(context, isSelected: isSelected);
   }
 
   Color? getBackgroundColor(BuildContext context, Set<WidgetState> states) {
-    final colorScheme = context.colorScheme;
     if (isSelected) {
       return type == CommonCardType.filled
-          ? colorScheme.secondaryContainer.opacity80
-          : colorScheme.secondaryContainer;
+          ? context.colorScheme.secondaryContainer.opacity80
+          : context.colorScheme.secondaryContainer;
     }
-    final isLight = colorScheme.brightness == Brightness.light;
-    return isLight
-        ? Color.lerp(
-            colorScheme.surface,
-            colorScheme.surfaceContainerLowest,
-            0.5,
-          )
-        : colorScheme.surfaceContainerHigh;
+    return commonCardColor(context);
   }
 
   @override

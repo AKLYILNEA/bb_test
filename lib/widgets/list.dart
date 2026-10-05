@@ -618,6 +618,99 @@ class SectionContainer extends StatelessWidget {
   }
 }
 
+/// Outline of one row inside a continuous card pack.
+///
+/// Every row owns its own rounded box, so a plain outline would draw a line
+/// between rows as well. Each row therefore only paints the edges that belong
+/// to the pack outline: the vertical ones (kept full height so neighbouring
+/// rows join seamlessly) plus the top / bottom edge when the row is the first
+/// or the last of the pack.
+class ContinuousCardBorder extends SuperellipseBorder {
+  final bool topEdge;
+  final bool bottomEdge;
+  final double cornerRadius;
+
+  const ContinuousCardBorder({
+    super.side,
+    super.borderRadius,
+    this.topEdge = true,
+    this.bottomEdge = true,
+    this.cornerRadius = 0,
+  });
+
+  @override
+  void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {
+    if (rect.isEmpty || side.style != BorderStyle.solid) {
+      return;
+    }
+    final half = side.width / 2;
+    final paint = Paint()
+      ..color = side.color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = side.width
+      ..isAntiAlias = true;
+    final path = getOuterPath(
+      rect.deflate(half),
+      textDirection: textDirection,
+    );
+    if (topEdge && bottomEdge) {
+      canvas.drawPath(path, paint);
+      return;
+    }
+    canvas.drawLine(
+      Offset(rect.left + half, rect.top),
+      Offset(rect.left + half, rect.bottom),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(rect.right - half, rect.top),
+      Offset(rect.right - half, rect.bottom),
+      paint,
+    );
+    final inset = cornerRadius + half + 1;
+    if (topEdge) {
+      canvas.save();
+      canvas.clipRect(
+        Rect.fromLTRB(
+          rect.left - 1,
+          rect.top - 1,
+          rect.right + 1,
+          rect.top + inset,
+        ),
+      );
+      canvas.drawPath(path, paint);
+      canvas.restore();
+    }
+    if (bottomEdge) {
+      canvas.save();
+      canvas.clipRect(
+        Rect.fromLTRB(
+          rect.left - 1,
+          rect.bottom - inset,
+          rect.right + 1,
+          rect.bottom + 1,
+        ),
+      );
+      canvas.drawPath(path, paint);
+      canvas.restore();
+    }
+  }
+
+  @override
+  ContinuousCardBorder copyWith({
+    BorderSide? side,
+    BorderRadiusGeometry? borderRadius,
+  }) {
+    return ContinuousCardBorder(
+      side: side ?? this.side,
+      borderRadius: borderRadius ?? this.borderRadius,
+      topEdge: topEdge,
+      bottomEdge: bottomEdge,
+      cornerRadius: cornerRadius,
+    );
+  }
+}
+
 class ContinuousListItem extends StatelessWidget {
   final Widget child;
   final int index;
@@ -640,16 +733,8 @@ class ContinuousListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
     final isLight = colorScheme.brightness == Brightness.light;
-    final cardColor = isLight
-        ? Color.lerp(
-            colorScheme.surface,
-            colorScheme.surfaceContainerLowest,
-            0.5,
-          )!
-        : colorScheme.surfaceContainer;
-    final borderColor = colorScheme.outlineVariant.withValues(
-      alpha: isLight ? 0.45 : 0.25,
-    );
+    final cardColor = commonCardColor(context);
+    final borderSide = commonCardBorderSide(context);
 
     if (standalone) {
       return Container(
@@ -658,10 +743,7 @@ class ContinuousListItem extends StatelessWidget {
           color: cardColor,
           shape: SuperellipseBorder(
             borderRadius: BorderRadius.circular(radius),
-            side: BorderSide(
-              color: borderColor,
-              strokeAlign: BorderSide.strokeAlignInside,
-            ),
+            side: borderSide,
           ),
         ),
         clipBehavior: Clip.antiAlias,
@@ -682,11 +764,15 @@ class ContinuousListItem extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: ShapeDecoration(
         color: cardColor,
-        shape: SuperellipseBorder(
+        shape: ContinuousCardBorder(
           borderRadius: BorderRadius.vertical(
             top: isFirst ? Radius.circular(radius) : Radius.zero,
             bottom: isLast ? Radius.circular(radius) : Radius.zero,
           ),
+          topEdge: isFirst,
+          bottomEdge: isLast,
+          cornerRadius: radius,
+          side: borderSide,
         ),
       ),
       clipBehavior: Clip.antiAlias,
