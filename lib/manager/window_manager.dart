@@ -419,6 +419,9 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
   Widget build(BuildContext context) {
     return Material(
       color: context.colorScheme.surfaceContainer,
+      shape: Border(
+        bottom: BorderSide(color: panelDividerColor(context)),
+      ),
       child: SizedBox(
         height: kHeaderHeight,
         child: Stack(

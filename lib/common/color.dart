@@ -133,3 +133,13 @@ extension ColorSchemeExtension on ColorScheme {
     return warning;
   }
 }
+
+/// Hairline used for structural separations (window header, side bar) and for
+/// the dividers inside cards, so every line in the app shares one token that
+/// follows the theme's neutral variant and the current brightness.
+Color panelDividerColor(BuildContext context) {
+  final colorScheme = Theme.of(context).colorScheme;
+  return colorScheme.outlineVariant.withValues(
+    alpha: colorScheme.brightness == Brightness.light ? 0.6 : 0.45,
+  );
+}
