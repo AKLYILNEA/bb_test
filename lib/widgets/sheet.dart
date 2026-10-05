@@ -211,9 +211,11 @@ class AdaptiveSheetScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor = context.colorScheme.surface;
     final bottomSheet = type == SheetType.bottomSheet;
     final sideSheet = type == SheetType.sideSheet;
+    final backgroundColor = bottomSheet
+        ? context.colorScheme.surfaceContainerHigh
+        : context.colorScheme.surfaceContainer;
     final canPop = ModalRoute.of(context)?.canPop ?? false;
     final implyLeading = !bottomSheet && (!(actions.isEmpty && sideSheet));
     final hasLeading = leading != null || (implyLeading && canPop);
@@ -229,11 +231,12 @@ class AdaptiveSheetScaffold extends StatelessWidget {
             )
           : null,
       leadingWidth: hasLeading ? 58.0 : null,
-      forceMaterialTransparency: bottomSheet ? true : false,
+      forceMaterialTransparency: bottomSheet,
       automaticallyImplyLeading: false,
       titleSpacing: hasLeading ? 0.0 : (bottomSheet ? null : 18.0),
       centerTitle: bottomSheet,
-      backgroundColor: backgroundColor,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
       surfaceTintColor: Colors.transparent,
       scrolledUnderElevation: 0.0,
       title: EmojiText(

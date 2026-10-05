@@ -606,7 +606,7 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
           clipContent: clipContent,
           veil: veil <= 0
               ? null
-              : context.colorScheme.surface.withValues(alpha: veil),
+              : context.colorScheme.surfaceContainer.withValues(alpha: veil),
           child: list!,
         );
       },

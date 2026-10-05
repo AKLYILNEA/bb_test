@@ -251,18 +251,8 @@ class AppSidebarContainer extends ConsumerWidget {
     );
   }
 
-  Widget _buildBackground({
-    required BuildContext context,
-    required Widget child,
-  }) {
-    final colorScheme = context.colorScheme;
-    return Material(
-      color: colorScheme.surfaceContainer,
-      shape: BorderDirectional(
-        end: BorderSide(color: colorScheme.outlineVariant),
-      ),
-      child: child,
-    );
+  Widget _buildBackground({required Widget child}) {
+    return Material(color: Colors.transparent, child: child);
   }
 
   void _handleToPage(
@@ -299,7 +289,6 @@ class AppSidebarContainer extends ConsumerWidget {
             alignment: Alignment.topRight,
             children: [
               _buildBackground(
-                context: context,
                 child: CallbackShortcuts(
                   bindings: <ShortcutActivator, VoidCallback>{
                     const SingleActivator(LogicalKeyboardKey.arrowUp): () {

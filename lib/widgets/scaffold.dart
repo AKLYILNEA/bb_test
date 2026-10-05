@@ -67,7 +67,7 @@ class _ScrollFeatherGradientOverlayState
   @override
   Widget build(BuildContext context) {
     final surface =
-        widget.surfaceColor ?? Theme.of(context).colorScheme.surface;
+        widget.surfaceColor ?? Theme.of(context).colorScheme.surfaceContainer;
     return NotificationListener<Notification>(
       onNotification: (notification) {
         if (notification is ScrollNotification) {
@@ -210,7 +210,8 @@ class CommonScaffoldState extends State<CommonScaffold> {
     return Theme(
       data: theme.copyWith(
         appBarTheme: theme.appBarTheme.copyWith(
-          backgroundColor: widget.backgroundColor ?? colorScheme.surface,
+          backgroundColor:
+              widget.backgroundColor ?? colorScheme.surfaceContainer,
           surfaceTintColor: Colors.transparent,
           scrolledUnderElevation: 0,
           iconTheme: theme.primaryIconTheme.copyWith(color: Colors.grey),
@@ -420,7 +421,8 @@ class CommonScaffoldState extends State<CommonScaffold> {
                   return _buildAppBarWrap(
                     AppBar(
                       backgroundColor:
-                          widget.backgroundColor ?? context.colorScheme.surface,
+                          widget.backgroundColor ?? Colors.transparent,
+                      elevation: 0,
                       surfaceTintColor: Colors.transparent,
                       scrolledUnderElevation: 0,
                       centerTitle: widget.centerTitle ?? false,

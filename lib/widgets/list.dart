@@ -638,13 +638,30 @@ class ContinuousListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = context.colorScheme;
+    final isLight = colorScheme.brightness == Brightness.light;
+    final cardColor = isLight
+        ? Color.lerp(
+            colorScheme.surface,
+            colorScheme.surfaceContainerLowest,
+            0.5,
+          )!
+        : colorScheme.surfaceContainer;
+    final borderColor = colorScheme.outlineVariant.withValues(
+      alpha: isLight ? 0.45 : 0.25,
+    );
+
     if (standalone) {
       return Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         decoration: ShapeDecoration(
-          color: context.colorScheme.surfaceContainer,
+          color: cardColor,
           shape: SuperellipseBorder(
             borderRadius: BorderRadius.circular(radius),
+            side: BorderSide(
+              color: borderColor,
+              strokeAlign: BorderSide.strokeAlignInside,
+            ),
           ),
         ),
         clipBehavior: Clip.antiAlias,
@@ -657,14 +674,14 @@ class ContinuousListItem extends StatelessWidget {
 
     final isFirst = reversed ? index == count - 1 : index == 0;
     final isLast = reversed ? index == 0 : index == count - 1;
-    final dividerColor = context.colorScheme.outlineVariant.withValues(
-      alpha: context.colorScheme.brightness == Brightness.light ? 0.6 : 0.45,
+    final dividerColor = colorScheme.outlineVariant.withValues(
+      alpha: isLight ? 0.6 : 0.45,
     );
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: ShapeDecoration(
-        color: context.colorScheme.surfaceContainer,
+        color: cardColor,
         shape: SuperellipseBorder(
           borderRadius: BorderRadius.vertical(
             top: isFirst ? Radius.circular(radius) : Radius.zero,

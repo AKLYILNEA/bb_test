@@ -78,7 +78,7 @@ class _HomePageState extends State<HomePage> {
         return true;
       },
       child: Material(
-        color: context.colorScheme.surface,
+        color: context.colorScheme.surfaceContainer,
         child: Consumer(
           builder: (context, ref, child) {
             final state = ref.watch(navigationStateProvider);

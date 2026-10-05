@@ -418,9 +418,7 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      shape: Border(
-        bottom: BorderSide(color: context.colorScheme.outlineVariant),
-      ),
+      color: context.colorScheme.surfaceContainer,
       child: SizedBox(
         height: kHeaderHeight,
         child: Stack(
@@ -428,16 +426,13 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
           children: [
             Positioned.fill(
               child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
                 onPanStart: (_) {
                   windowManager.startDragging();
                 },
                 onDoubleTap: () {
                   _updateMaximized();
                 },
-                child: Container(
-                  color: context.colorScheme.secondary.opacity15,
-                  alignment: Alignment.centerLeft,
-                ),
               ),
             ),
             if (system.isMacOS)

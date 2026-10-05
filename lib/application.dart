@@ -266,17 +266,19 @@ class ApplicationState extends ConsumerState<Application>
               theme: ThemeData(
                 useMaterial3: true,
                 pageTransitionsTheme: _pageTransitionsTheme,
+                scaffoldBackgroundColor: _getAppColorScheme(
+                  brightness: Brightness.light,
+                  primaryColor: themeProps.primaryColor,
+                ).surfaceContainer,
                 colorScheme: _getAppColorScheme(
                   brightness: Brightness.light,
                   primaryColor: themeProps.primaryColor,
                 ),
-                appBarTheme: AppBarTheme(
-                  backgroundColor: _getAppColorScheme(
-                    brightness: Brightness.light,
-                    primaryColor: themeProps.primaryColor,
-                  ).surface,
-                  surfaceTintColor: Colors.transparent,
+                appBarTheme: const AppBarTheme(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
                   scrolledUnderElevation: 0,
+                  surfaceTintColor: Colors.transparent,
                 ),
                 fontFamily: fontFamily,
                 actionIconTheme: ActionIconThemeData(
@@ -396,17 +398,19 @@ class ApplicationState extends ConsumerState<Application>
               darkTheme: ThemeData(
                 useMaterial3: true,
                 pageTransitionsTheme: _pageTransitionsTheme,
+                scaffoldBackgroundColor: _getAppColorScheme(
+                  brightness: Brightness.dark,
+                  primaryColor: themeProps.primaryColor,
+                ).toPureBlack(themeProps.pureBlack).surfaceContainer,
                 colorScheme: _getAppColorScheme(
                   brightness: Brightness.dark,
                   primaryColor: themeProps.primaryColor,
                 ).toPureBlack(themeProps.pureBlack),
-                appBarTheme: AppBarTheme(
-                  backgroundColor: _getAppColorScheme(
-                    brightness: Brightness.dark,
-                    primaryColor: themeProps.primaryColor,
-                  ).toPureBlack(themeProps.pureBlack).surface,
-                  surfaceTintColor: Colors.transparent,
+                appBarTheme: const AppBarTheme(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
                   scrolledUnderElevation: 0,
+                  surfaceTintColor: Colors.transparent,
                 ),
                 fontFamily: fontFamily,
                 actionIconTheme: ActionIconThemeData(
