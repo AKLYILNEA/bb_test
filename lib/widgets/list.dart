@@ -622,9 +622,10 @@ class SectionContainer extends StatelessWidget {
 ///
 /// Every row owns its own rounded box, so a plain outline would draw a line
 /// between rows as well. Each row therefore only paints the edges that belong
-/// to the pack outline: the vertical ones (kept full height so neighbouring
-/// rows join seamlessly) plus the top / bottom edge when the row is the first
-/// or the last of the pack.
+/// to the pack outline: the vertical ones (running the full row height so
+/// neighbouring rows join seamlessly, but stopping at the corner radius when
+/// the row owns a rounded end) plus the top / bottom edge when the row is the
+/// first or the last of the pack.
 class ContinuousCardBorder extends SuperellipseBorder {
   final bool topEdge;
   final bool bottomEdge;
@@ -657,14 +658,18 @@ class ContinuousCardBorder extends SuperellipseBorder {
       canvas.drawPath(path, paint);
       return;
     }
+    // The rounded end curves inward, so the straight edge starts where the
+    // corner arc meets it instead of running through the corner.
+    final top = rect.top + (topEdge ? cornerRadius : 0);
+    final bottom = rect.bottom - (bottomEdge ? cornerRadius : 0);
     canvas.drawLine(
-      Offset(rect.left + half, rect.top),
-      Offset(rect.left + half, rect.bottom),
+      Offset(rect.left + half, top),
+      Offset(rect.left + half, bottom),
       paint,
     );
     canvas.drawLine(
-      Offset(rect.right - half, rect.top),
-      Offset(rect.right - half, rect.bottom),
+      Offset(rect.right - half, top),
+      Offset(rect.right - half, bottom),
       paint,
     );
     final inset = cornerRadius + half + 1;
