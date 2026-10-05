@@ -6839,10 +6839,10 @@ class AppLocalizations {
     );
   }
 
-  /// `辛くても頑張りたい、強くなりたい`
+  /// `一緒に頑張ろう`
   String get clockCardDefaultText {
     return Intl.message(
-      '辛くても頑張りたい、強くなりたい',
+      '一緒に頑張ろう',
       name: 'clockCardDefaultText',
       desc: '',
       args: [],

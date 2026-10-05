@@ -1576,7 +1576,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "نام نویسنده را وارد کنید",
     ),
     "clockCardImage": MessageLookupByLibrary.simpleMessage("تصویر کارت"),
-    "clockCardDefaultText": MessageLookupByLibrary.simpleMessage("辛くても頑張りたい、強くなりたい"),
+    "clockCardDefaultText": MessageLookupByLibrary.simpleMessage("一緒に頑張ろう"),
     "clockCardDefaultAuthor": MessageLookupByLibrary.simpleMessage("古河渚"),
     "customImageSelected": MessageLookupByLibrary.simpleMessage("تصویر سفارشی تنظیم شد"),
     "defaultImage": MessageLookupByLibrary.simpleMessage("پس‌زمینه پیش‌فرض"),

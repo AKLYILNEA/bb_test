@@ -1245,7 +1245,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "clockCardAuthor": MessageLookupByLibrary.simpleMessage("作者"),
     "clockCardAuthorHint": MessageLookupByLibrary.simpleMessage("作者を入力"),
     "clockCardImage": MessageLookupByLibrary.simpleMessage("カード画像"),
-    "clockCardDefaultText": MessageLookupByLibrary.simpleMessage("辛くても頑張りたい、強くなりたい"),
+    "clockCardDefaultText": MessageLookupByLibrary.simpleMessage("一緒に頑張ろう"),
     "clockCardDefaultAuthor": MessageLookupByLibrary.simpleMessage("古河渚"),
     "customImageSelected": MessageLookupByLibrary.simpleMessage("カスタム画像設定済み"),
     "defaultImage": MessageLookupByLibrary.simpleMessage("デフォルト背景"),
