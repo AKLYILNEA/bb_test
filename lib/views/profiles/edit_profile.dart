@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -92,7 +93,7 @@ class EditProfileViewState extends State<EditProfileView> {
     if (!_formKey.currentState!.validate()) return;
     final appController = globalState.appController;
     Profile profile = this.profile.copyWith(
-      url: urlController.text,
+      url: urlController.text.trim(),
       label: labelController.text.trim().isEmpty
           ? null
           : labelController.text.trim(),
@@ -149,19 +150,26 @@ class EditProfileViewState extends State<EditProfileView> {
           }
           return;
         }
-      } else if (!hasUpdate) {
-        appController.setProfileAndAutoApply(profile);
       } else {
-        try {
-          await Future.delayed(commonDuration);
-          await appController.updateProfile(profile);
-        } on Object catch (e) {
-          await globalState.showMessage(
-            title: appLocalizations.tip,
-            message: TextSpan(
-              text: '${profile.label ?? profile.id}: ${e.formatError}',
-            ),
-            cancelable: false,
+        appController.setProfileAndAutoApply(profile);
+        if (hasUpdate && profile.type == ProfileType.url) {
+          appController.setProfileUpdating(profile.id, true);
+          unawaited(
+            () async {
+              try {
+                await Future.delayed(commonDuration);
+                await appController.updateProfile(profile);
+              } on Object catch (e) {
+                appController.setProfileUpdating(profile.id, false);
+                await globalState.showMessage(
+                  title: appLocalizations.tip,
+                  message: TextSpan(
+                    text: '${profile.label ?? profile.id}: ${e.formatError}',
+                  ),
+                  cancelable: false,
+                );
+              }
+            }(),
           );
         }
       }
