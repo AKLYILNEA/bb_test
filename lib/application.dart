@@ -14,6 +14,7 @@ import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,6 +22,26 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'controller.dart';
 import 'pages/pages.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
+
+/// Status / navigation bar style for the given theme [brightness].
+///
+/// Transparent app bars are estimated as dark by [AppBar], which would force
+/// white status bar icons on light themes.
+SystemUiOverlayStyle _systemUiOverlayStyle(Brightness brightness) {
+  final iconBrightness = brightness == Brightness.light
+      ? Brightness.dark
+      : Brightness.light;
+  return SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: iconBrightness,
+    statusBarBrightness: brightness,
+    systemStatusBarContrastEnforced: false,
+    systemNavigationBarColor: Colors.transparent,
+    systemNavigationBarIconBrightness: iconBrightness,
+    systemNavigationBarDividerColor: Colors.transparent,
+    systemNavigationBarContrastEnforced: false,
+  );
+}
 
 class Application extends ConsumerStatefulWidget {
   const Application({super.key});
@@ -274,11 +295,12 @@ class ApplicationState extends ConsumerState<Application>
                   brightness: Brightness.light,
                   primaryColor: themeProps.primaryColor,
                 ),
-                appBarTheme: const AppBarTheme(
+                appBarTheme: AppBarTheme(
                   backgroundColor: Colors.transparent,
                   elevation: 0,
                   scrolledUnderElevation: 0,
                   surfaceTintColor: Colors.transparent,
+                  systemOverlayStyle: _systemUiOverlayStyle(Brightness.light),
                 ),
                 fontFamily: fontFamily,
                 actionIconTheme: ActionIconThemeData(
@@ -406,11 +428,12 @@ class ApplicationState extends ConsumerState<Application>
                   brightness: Brightness.dark,
                   primaryColor: themeProps.primaryColor,
                 ).toPureBlack(themeProps.pureBlack),
-                appBarTheme: const AppBarTheme(
+                appBarTheme: AppBarTheme(
                   backgroundColor: Colors.transparent,
                   elevation: 0,
                   scrolledUnderElevation: 0,
                   surfaceTintColor: Colors.transparent,
+                  systemOverlayStyle: _systemUiOverlayStyle(Brightness.dark),
                 ),
                 fontFamily: fontFamily,
                 actionIconTheme: ActionIconThemeData(
