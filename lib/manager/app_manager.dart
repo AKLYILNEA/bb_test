@@ -256,7 +256,7 @@ class AppSidebarContainer extends ConsumerWidget {
     required Widget child,
   }) {
     return Material(
-      color: context.colorScheme.surfaceContainer,
+      color: panelSurfaceColor(context),
       shape: BorderDirectional(
         end: BorderSide(color: panelDividerColor(context)),
       ),

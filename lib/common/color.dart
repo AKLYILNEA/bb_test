@@ -143,3 +143,12 @@ Color panelDividerColor(BuildContext context) {
     alpha: colorScheme.brightness == Brightness.light ? 0.6 : 0.45,
   );
 }
+
+/// Background of the desktop chrome (window header, side bar).
+///
+/// The page sits on `surfaceContainer`, so the chrome takes the next container
+/// step (darker in light, lighter in dark) to stay one level away from the page
+/// without leaving the theme derived palette.
+Color panelSurfaceColor(BuildContext context) {
+  return Theme.of(context).colorScheme.surfaceContainerHigh;
+}
