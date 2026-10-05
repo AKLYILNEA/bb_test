@@ -418,7 +418,7 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: panelSurfaceColor(context),
+      color: headerSurfaceColor(context),
       shape: Border(
         bottom: BorderSide(color: panelDividerColor(context)),
       ),
