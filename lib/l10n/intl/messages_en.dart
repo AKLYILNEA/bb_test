@@ -1539,9 +1539,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "clockCardImage": MessageLookupByLibrary.simpleMessage("Card Image"),
     "clockCardDefaultText": MessageLookupByLibrary.simpleMessage(
-      "Life is bright and lovely",
+      "辛くても頑張りたい、強くなりたい",
     ),
-    "clockCardDefaultAuthor": MessageLookupByLibrary.simpleMessage("Ji Xianlin"),
+    "clockCardDefaultAuthor": MessageLookupByLibrary.simpleMessage("古河渚"),
     "customImageSelected": MessageLookupByLibrary.simpleMessage("Custom image set"),
     "defaultImage": MessageLookupByLibrary.simpleMessage("Default background"),
     "overridden": MessageLookupByLibrary.simpleMessage("Overridden"),

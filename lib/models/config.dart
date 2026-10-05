@@ -48,6 +48,7 @@ const defaultAccessControl = AccessControl();
 final defaultThemeProps = ThemeProps(primaryColor: defaultPrimaryColor);
 
 const List<DashboardWidget> defaultDashboardWidgets = [
+  DashboardWidget.clockLarge,
   DashboardWidget.mediaUnlock,
   DashboardWidget.networkSpeedSmall,
   DashboardWidget.trafficUsageSmall,
@@ -59,6 +60,7 @@ const List<DashboardWidget> defaultDashboardWidgets = [
 ];
 
 const List<DashboardWidget> defaultAndroidDashboardWidgets = [
+  DashboardWidget.clockLarge,
   DashboardWidget.mediaUnlock,
   DashboardWidget.networkSpeedSmall,
   DashboardWidget.trafficUsageSmall,

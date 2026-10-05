@@ -1622,9 +1622,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Изображение карточки",
     ),
     "clockCardDefaultText": MessageLookupByLibrary.simpleMessage(
-      "Жизнь прекрасна и удивительна",
+      "辛くても頑張りたい、強くなりたい",
     ),
-    "clockCardDefaultAuthor": MessageLookupByLibrary.simpleMessage("Цзи Сяньлинь"),
+    "clockCardDefaultAuthor": MessageLookupByLibrary.simpleMessage("古河渚"),
     "customImageSelected": MessageLookupByLibrary.simpleMessage(
       "Пользовательское изображение",
     ),

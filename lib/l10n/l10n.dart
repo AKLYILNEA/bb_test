@@ -6839,20 +6839,20 @@ class AppLocalizations {
     );
   }
 
-  /// `Life is bright and lovely`
+  /// `辛くても頑張りたい、強くなりたい`
   String get clockCardDefaultText {
     return Intl.message(
-      'Life is bright and lovely',
+      '辛くても頑張りたい、強くなりたい',
       name: 'clockCardDefaultText',
       desc: '',
       args: [],
     );
   }
 
-  /// `Ji Xianlin`
+  /// `古河渚`
   String get clockCardDefaultAuthor {
     return Intl.message(
-      'Ji Xianlin',
+      '古河渚',
       name: 'clockCardDefaultAuthor',
       desc: '',
       args: [],

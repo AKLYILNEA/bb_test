@@ -153,21 +153,27 @@ class ClockCard extends ConsumerWidget {
   }
 
   Widget _buildDefaultBackground(bool isDark) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: isDark
-              ? const [Color(0xFF1E1B4B), Color(0xFF0F172A), Color(0xFF1E293B)]
-              : const [Color(0xFFE0E7FF), Color(0xFFF1F5F9), Color(0xFFE2E8F0)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+    return Image.asset(
+      'assets/images/xiaozhu.png',
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+      errorBuilder: (_, _, _) => DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isDark
+                ? const [Color(0xFF1E1B4B), Color(0xFF0F172A), Color(0xFF1E293B)]
+                : const [Color(0xFFE0E7FF), Color(0xFFF1F5F9), Color(0xFFE2E8F0)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
         ),
-      ),
-      child: Center(
-        child: Icon(
-          FluentIcons.image_24_regular,
-          size: 28,
-          color: isDark ? Colors.white38 : Colors.black26,
+        child: Center(
+          child: Icon(
+            FluentIcons.image_24_regular,
+            size: 28,
+            color: isDark ? Colors.white38 : Colors.black26,
+          ),
         ),
       ),
     );
@@ -409,21 +415,27 @@ class _ClockDialogState extends State<_ClockDialog> {
   }
 
   Widget _buildDefaultBackground(bool isDark) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: isDark
-              ? const [Color(0xFF1E1B4B), Color(0xFF0F172A), Color(0xFF1E293B)]
-              : const [Color(0xFFE0E7FF), Color(0xFFF1F5F9), Color(0xFFE2E8F0)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+    return Image.asset(
+      'assets/images/xiaozhu.png',
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+      errorBuilder: (_, _, _) => DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isDark
+                ? const [Color(0xFF1E1B4B), Color(0xFF0F172A), Color(0xFF1E293B)]
+                : const [Color(0xFFE0E7FF), Color(0xFFF1F5F9), Color(0xFFE2E8F0)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
         ),
-      ),
-      child: Center(
-        child: Icon(
-          FluentIcons.image_24_regular,
-          size: 20,
-          color: isDark ? Colors.white38 : Colors.black26,
+        child: Center(
+          child: Icon(
+            FluentIcons.image_24_regular,
+            size: 20,
+            color: isDark ? Colors.white38 : Colors.black26,
+          ),
         ),
       ),
     );
