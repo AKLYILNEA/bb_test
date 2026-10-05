@@ -9,7 +9,7 @@ import 'package:bett_box/widgets/sidebar_toggle_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-const _compactWidth = 48.0;
+const _compactWidth = 56.0;
 const _itemSize = 40.0;
 const _itemGap = 4.0;
 const _toggleGap = 8.0;
@@ -73,7 +73,7 @@ class NavigationSidebar extends StatelessWidget {
     final iconInset = (compactWidth - sideInset * 2 - _iconSize) / 2;
     final total =
         sideInset * 2 + iconInset + _iconSize + _labelGap * 2 + maxTextWidth;
-    final clamped = math.max(123.0, math.min(240.0, total));
+    final clamped = math.max(131.0, math.min(240.0, total));
     return (clamped * dpr).ceil() / dpr;
   }
 
