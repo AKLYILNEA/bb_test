@@ -78,6 +78,7 @@ class _ScrollFeatherGradientOverlayState
         return false;
       },
       child: Stack(
+        clipBehavior: Clip.none,
         children: [
           widget.child,
           ValueListenableBuilder<double>(
@@ -85,10 +86,10 @@ class _ScrollFeatherGradientOverlayState
             builder: (context, progress, _) {
               if (progress <= 0) return const SizedBox.shrink();
               return Positioned(
-                top: 0,
+                top: -3.0,
                 left: 0,
                 right: 0,
-                height: widget.height,
+                height: widget.height + 3.0,
                 child: IgnorePointer(
                   child: Opacity(
                     opacity: progress,
@@ -99,12 +100,12 @@ class _ScrollFeatherGradientOverlayState
                           end: Alignment.bottomCenter,
                           colors: [
                             surface,
-                            surface.withValues(alpha: 0.85),
-                            surface.withValues(alpha: 0.50),
-                            surface.withValues(alpha: 0.18),
+                            surface,
+                            surface.withValues(alpha: 0.70),
+                            surface.withValues(alpha: 0.25),
                             surface.withValues(alpha: 0.0),
                           ],
-                          stops: const [0.0, 0.25, 0.55, 0.80, 1.0],
+                          stops: const [0.0, 0.15, 0.45, 0.75, 1.0],
                         ),
                       ),
                     ),
