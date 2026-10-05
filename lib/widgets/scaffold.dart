@@ -66,8 +66,9 @@ class _ScrollFeatherGradientOverlayState
 
   @override
   Widget build(BuildContext context) {
-    final surface =
-        widget.surfaceColor ?? Theme.of(context).colorScheme.surfaceContainer;
+    final surface = widget.surfaceColor ??
+        ScrollFeatherTheme.maybeOf(context) ??
+        Theme.of(context).colorScheme.surfaceContainer;
     return NotificationListener<Notification>(
       onNotification: (notification) {
         if (notification is ScrollNotification) {
@@ -128,6 +129,23 @@ class FeatherScope extends InheritedWidget {
 
   @override
   bool updateShouldNotify(FeatherScope oldWidget) => false;
+}
+
+class ScrollFeatherTheme extends InheritedWidget {
+  final Color surfaceColor;
+
+  const ScrollFeatherTheme({
+    super.key,
+    required this.surfaceColor,
+    required super.child,
+  });
+
+  static Color? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<ScrollFeatherTheme>()?.surfaceColor;
+
+  @override
+  bool updateShouldNotify(ScrollFeatherTheme oldWidget) =>
+      surfaceColor != oldWidget.surfaceColor;
 }
 
 class CommonScaffold extends StatefulWidget {
@@ -497,12 +515,16 @@ class CommonScaffoldState extends State<CommonScaffold> {
             },
           ),
           Expanded(
-            child: (widget.showScrollGradient ?? true)
-                ? ScrollConfiguration(
-                    behavior: const FeatherBarScrollBehavior(),
-                    child: widget.body,
-                  )
-                : widget.body,
+            child: ScrollFeatherTheme(
+              surfaceColor: widget.backgroundColor ??
+                  Theme.of(context).colorScheme.surfaceContainer,
+              child: (widget.showScrollGradient ?? true)
+                  ? ScrollConfiguration(
+                      behavior: const FeatherBarScrollBehavior(),
+                      child: widget.body,
+                    )
+                  : widget.body,
+            ),
           ),
         ],
       ),

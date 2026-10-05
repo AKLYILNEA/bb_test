@@ -267,8 +267,10 @@ class AdaptiveSheetScaffold extends StatelessWidget {
                       alignment: Alignment.center,
                       height: 4,
                       width: 32,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(2),
+                      decoration: ShapeDecoration(
+                        shape: const SuperellipseBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(2)),
+                        ),
                         color: context.colorScheme.onSurfaceVariant,
                       ),
                     ),
@@ -276,12 +278,15 @@ class AdaptiveSheetScaffold extends StatelessWidget {
                   appBar,
                   Flexible(
                     flex: 1,
-                    child: (showScrollGradient ?? true)
-                        ? ScrollConfiguration(
-                            behavior: const FeatherBarScrollBehavior(),
-                            child: body,
-                          )
-                        : body,
+                    child: ScrollFeatherTheme(
+                      surfaceColor: backgroundColor,
+                      child: (showScrollGradient ?? true)
+                          ? ScrollConfiguration(
+                              behavior: const FeatherBarScrollBehavior(),
+                              child: body,
+                            )
+                          : body,
+                    ),
                   ),
                 ],
               ),
