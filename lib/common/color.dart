@@ -173,21 +173,30 @@ Color commonCardColor(BuildContext context) {
   return colorScheme.surfaceContainerHigh;
 }
 
+// The side bar and the window header stay on the plain 60% blend on purpose:
+// only the cards (and the widgets built from them) carry the extra lift.
 Color sidebarSurfaceColor(BuildContext context) {
-  return commonCardColor(context);
+  final colorScheme = Theme.of(context).colorScheme;
+  if (colorScheme.brightness == Brightness.light) {
+    return Color.lerp(
+          colorScheme.surfaceContainerLow,
+          colorScheme.surfaceContainerLowest,
+          0.60,
+        ) ??
+        colorScheme.surfaceContainerLow;
+  }
+  return colorScheme.surfaceContainerHigh;
 }
 
 Color headerSurfaceColor(BuildContext context) {
   final colorScheme = Theme.of(context).colorScheme;
   if (colorScheme.brightness == Brightness.light) {
-    return _liftColor(
-      Color.lerp(
-            colorScheme.surface,
-            colorScheme.surfaceContainerLowest,
-            0.72,
-          ) ??
+    return Color.lerp(
           colorScheme.surface,
-    );
+          colorScheme.surfaceContainerLowest,
+          0.60,
+        ) ??
+        colorScheme.surface;
   }
   return colorScheme.surfaceContainerHighest;
 }
