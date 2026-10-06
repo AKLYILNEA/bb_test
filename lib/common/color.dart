@@ -147,7 +147,7 @@ Color panelDividerColor(BuildContext context) {
 Color commonCardColor(BuildContext context) {
   final colorScheme = Theme.of(context).colorScheme;
   if (colorScheme.brightness == Brightness.light) {
-    return colorScheme.surface;
+    return colorScheme.surfaceContainerLow;
   }
   return colorScheme.surfaceContainerHigh;
 }
@@ -159,10 +159,11 @@ Color sidebarSurfaceColor(BuildContext context) {
 Color headerSurfaceColor(BuildContext context) {
   final colorScheme = Theme.of(context).colorScheme;
   if (colorScheme.brightness == Brightness.light) {
-    return colorScheme.surfaceContainerLow;
+    return colorScheme.surface;
   }
   return colorScheme.surfaceContainerHighest;
 }
+
 
 
 
