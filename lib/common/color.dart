@@ -144,17 +144,19 @@ Color panelDividerColor(BuildContext context) {
   );
 }
 
-/// Background of the desktop side bar.
-///
-/// The page sits on `surfaceContainer`, the side bar takes the next container
-/// step (darker in light, lighter in dark) and the window header one more, so
-/// page / side bar / header keep the same three step ladder the app had before
-/// the palette moved down a step, without leaving the theme derived palette.
 Color sidebarSurfaceColor(BuildContext context) {
-  return Theme.of(context).colorScheme.surfaceContainerHigh;
+  final colorScheme = Theme.of(context).colorScheme;
+  if (colorScheme.brightness == Brightness.light) {
+    return colorScheme.surfaceContainerLowest;
+  }
+  return colorScheme.surfaceContainerHigh;
 }
 
-/// Background of the window header, one container step above the side bar.
 Color headerSurfaceColor(BuildContext context) {
-  return Theme.of(context).colorScheme.surfaceContainerHighest;
+  final colorScheme = Theme.of(context).colorScheme;
+  if (colorScheme.brightness == Brightness.light) {
+    return colorScheme.surfaceContainerLow;
+  }
+  return colorScheme.surfaceContainerHighest;
 }
+
