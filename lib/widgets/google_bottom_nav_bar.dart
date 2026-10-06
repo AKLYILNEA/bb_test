@@ -72,9 +72,11 @@ class GoogleBottomNavBar extends ConsumerWidget {
           color: Colors.transparent,
           padding: const EdgeInsets.only(left: 16, right: 16, top: 8),
           child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(36),
-              boxShadow: [
+            decoration: ShapeDecoration(
+              shape: SuperellipseBorder(
+                borderRadius: BorderRadius.circular(36),
+              ),
+              shadows: [
                 BoxShadow(
                   blurRadius: 28,
                   offset: const Offset(0, 8),
@@ -91,8 +93,12 @@ class GoogleBottomNavBar extends ConsumerWidget {
                 ),
               ],
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(36),
+            child: ClipPath(
+              clipper: ShapeBorderClipper(
+                shape: SuperellipseBorder(
+                  borderRadius: BorderRadius.circular(36),
+                ),
+              ),
               child: BackdropFilter(
                 filter: ImageFilter.blur(
                   sigmaX: _blurSigma,
@@ -103,19 +109,21 @@ class GoogleBottomNavBar extends ConsumerWidget {
                     horizontal: 9.0,
                     vertical: 8,
                   ),
-                  decoration: BoxDecoration(
+                  decoration: ShapeDecoration(
                     color: (isLight
                             ? context.colorScheme.surface
                             : context.colorScheme.surfaceContainer)
                         .withValues(alpha: isLight ? 0.80 : 0.72),
-                    borderRadius: BorderRadius.circular(36),
-                    border: Border.all(
-                      color: isLight
-                          ? context.colorScheme.outlineVariant.withValues(
-                              alpha: 0.45,
-                            )
-                          : Colors.white.withValues(alpha: 0.14),
-                      width: 1,
+                    shape: SuperellipseBorder(
+                      borderRadius: BorderRadius.circular(36),
+                      side: BorderSide(
+                        color: isLight
+                            ? context.colorScheme.outlineVariant.withValues(
+                                alpha: 0.45,
+                              )
+                            : Colors.white.withValues(alpha: 0.14),
+                        width: 1,
+                      ),
                     ),
                   ),
                   child: GNav(
