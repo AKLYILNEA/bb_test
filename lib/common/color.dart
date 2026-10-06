@@ -144,10 +144,28 @@ Color panelDividerColor(BuildContext context) {
   );
 }
 
+Color commonCardColor(BuildContext context) {
+  final colorScheme = Theme.of(context).colorScheme;
+  if (colorScheme.brightness == Brightness.light) {
+    return Color.lerp(
+          colorScheme.surface,
+          colorScheme.surfaceContainerLowest,
+          0.5,
+        ) ??
+        colorScheme.surface;
+  }
+  return colorScheme.surfaceContainerHigh;
+}
+
 Color sidebarSurfaceColor(BuildContext context) {
   final colorScheme = Theme.of(context).colorScheme;
   if (colorScheme.brightness == Brightness.light) {
-    return colorScheme.surfaceContainerLowest;
+    return Color.lerp(
+          commonCardColor(context),
+          colorScheme.surfaceContainerLowest,
+          0.35,
+        ) ??
+        commonCardColor(context);
   }
   return colorScheme.surfaceContainerHigh;
 }
@@ -155,8 +173,14 @@ Color sidebarSurfaceColor(BuildContext context) {
 Color headerSurfaceColor(BuildContext context) {
   final colorScheme = Theme.of(context).colorScheme;
   if (colorScheme.brightness == Brightness.light) {
-    return colorScheme.surfaceContainerLow;
+    return Color.lerp(
+          commonCardColor(context),
+          colorScheme.surfaceContainerLowest,
+          0.70,
+        ) ??
+        colorScheme.surfaceContainerLowest;
   }
   return colorScheme.surfaceContainerHighest;
 }
+
 

@@ -98,20 +98,6 @@ class InfoHeader extends StatelessWidget {
   }
 }
 
-/// Background of every card surface ([CommonCard] and hand built cards).
-Color commonCardColor(BuildContext context) {
-  final colorScheme = context.colorScheme;
-  if (colorScheme.brightness == Brightness.light) {
-    return Color.lerp(
-          colorScheme.surface,
-          colorScheme.surfaceContainerLowest,
-          0.5,
-        ) ??
-        colorScheme.surface;
-  }
-  return colorScheme.surfaceContainerHigh;
-}
-
 /// Outline of every card surface ([CommonCard] and hand built cards).
 BorderSide commonCardBorderSide(
   BuildContext context, {
