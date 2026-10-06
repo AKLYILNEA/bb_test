@@ -115,57 +115,33 @@ class _ProvidersViewState extends ConsumerState<ProvidersView> {
         body: Builder(
           builder: (context) {
             final bottomPadding = MediaQuery.of(context).padding.bottom;
-            final itemCount = sections.fold<int>(
-              0,
-              (sum, section) => sum + 1 + section.providers.length,
-            );
-            return ListView.builder(
+            return ListView(
               padding: EdgeInsets.only(bottom: 24 + bottomPadding, top: 12),
-              itemCount: itemCount,
-              itemBuilder: (context, index) {
-                var current = 0;
-                for (final section in sections) {
-                  if (index == current) {
-                    return ListHeader(
-                      title: section.title,
-                      padding: current == 0
-                          ? const EdgeInsets.only(
-                              left: 36,
-                              right: 8,
-                              top: 8,
-                              bottom: 8,
-                            )
-                          : null,
-                      actions: [
-                        IconButton(
-                          onPressed: section.onSync,
-                          tooltip: appLocalizations.update,
-                          icon: const Icon(FluentIcons.arrow_sync_24_regular),
-                          iconSize: 20,
-                          splashRadius: 20,
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
+              children: [
+                for (final (index, section) in sections.indexed)
+                  SectionContainer(
+                    title: section.title,
+                    isFirst: index == 0,
+                    items: [
+                      for (final provider in section.providers)
+                        ProviderItem(
+                          key: ValueKey(provider.name),
+                          provider: provider,
                         ),
-                      ],
-                    );
-                  }
-                  current++;
-                  if (index < current + section.providers.length) {
-                    final providerIndex = index - current;
-                    final provider = section.providers[providerIndex];
-                    return ContinuousListItem(
-                      index: providerIndex,
-                      count: section.providers.length,
-                      child: ProviderItem(
-                        key: ValueKey(provider.name),
-                        provider: provider,
+                    ],
+                    actions: [
+                      IconButton(
+                        onPressed: section.onSync,
+                        tooltip: appLocalizations.update,
+                        icon: const Icon(FluentIcons.arrow_sync_24_regular),
+                        iconSize: 20,
+                        splashRadius: 20,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
                       ),
-                    );
-                  }
-                  current += section.providers.length;
-                }
-                return const SizedBox.shrink();
-              },
+                    ],
+                  ),
+              ],
             );
           },
         ),
