@@ -531,9 +531,7 @@ class ListHeader extends StatelessWidget {
               style: ButtonStyle(
                 minimumSize: const WidgetStatePropertyAll(Size.zero),
                 padding: const WidgetStatePropertyAll(EdgeInsets.zero),
-                tapTargetSize: const WidgetStatePropertyAll(
-                  MaterialTapTargetSize.shrinkWrap,
-                ),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
             ),
             child: Row(
