@@ -150,7 +150,7 @@ Color commonCardColor(BuildContext context) {
     return Color.lerp(
           colorScheme.surfaceContainerLow,
           colorScheme.surfaceContainerLowest,
-          0.60,
+          0.72,
         ) ??
         colorScheme.surfaceContainerLow;
   }
@@ -167,7 +167,7 @@ Color headerSurfaceColor(BuildContext context) {
     return Color.lerp(
           colorScheme.surface,
           colorScheme.surfaceContainerLowest,
-          0.60,
+          0.72,
         ) ??
         colorScheme.surface;
   }
