@@ -8,6 +8,7 @@ import 'package:bett_box/views/proxies/providers.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../profiles/scripts.dart'
     show showGroupSwitchOptions, showScriptCustomOptions;
@@ -112,6 +113,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
                         type: type,
                         body: const _IconConfigView(),
                         title: appLocalizations.iconConfiguration,
+                        actions: const [_IconRefreshAction()],
                       );
                     },
                   );
@@ -289,6 +291,48 @@ class _IconConfigView extends ConsumerWidget {
             .read(proxiesStyleSettingProvider.notifier)
             .updateState((state) => state.copyWith(iconMap: value));
       },
+    );
+  }
+}
+
+class _IconRefreshAction extends ConsumerStatefulWidget {
+  const _IconRefreshAction();
+
+  @override
+  ConsumerState<_IconRefreshAction> createState() => _IconRefreshActionState();
+}
+
+class _IconRefreshActionState extends ConsumerState<_IconRefreshAction> {
+  bool _isRefreshing = false;
+
+  Future<void> _handleRefresh() async {
+    if (_isRefreshing) return;
+    setState(() => _isRefreshing = true);
+    try {
+      await CommonTargetIcon.refreshAll(
+        ref.read(proxiesStyleSettingProvider).iconMap.values,
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isRefreshing = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: _isRefreshing ? null : _handleRefresh,
+      tooltip: appLocalizations.update,
+      icon: _isRefreshing
+          ? SizedBox.square(
+              dimension: 18,
+              child: SpinKitFadingCircle(
+                color: context.colorScheme.primary,
+                size: 18,
+              ),
+            )
+          : const Icon(FluentIcons.arrow_sync_24_regular),
     );
   }
 }
