@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 
-/// Mirrors bett_box's `lib/common/superellipse.dart` (packages cannot import
-/// the host app), so the tab pill keeps a continuous-curvature outline.
+/// Mirrors bett_box's `lib/common/superellipse.dart`; 2.12-compatible syntax.
 class SuperellipseBorder extends RoundedSuperellipseBorder {
-  const SuperellipseBorder({super.side, super.borderRadius});
+  const SuperellipseBorder({
+    BorderSide? side,
+    BorderRadiusGeometry? borderRadius,
+  }) : super(
+         side: side ?? BorderSide.none,
+         borderRadius: borderRadius ?? BorderRadius.zero,
+       );
 
   @override
   void paintInterior(
