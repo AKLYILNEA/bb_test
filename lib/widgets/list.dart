@@ -496,7 +496,7 @@ class ListHeader extends StatelessWidget {
       alignment: Alignment.centerLeft,
       padding:
           padding ??
-          const EdgeInsets.only(left: 24, right: 8, top: 24, bottom: 8),
+          const EdgeInsets.only(left: 36, right: 8, top: 24, bottom: 8),
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -558,7 +558,7 @@ class SectionContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final headerPadding = isFirst
-        ? const EdgeInsets.only(left: 24, right: 8, top: 8, bottom: 8)
+        ? const EdgeInsets.only(left: 36, right: 8, top: 8, bottom: 8)
         : null;
 
     if (plain) {
@@ -910,7 +910,7 @@ Widget generateListView(List<Widget> items) {
                 title: item.title,
                 subTitle: item.subTitle,
                 padding: const EdgeInsets.only(
-                  left: 24,
+                  left: 36,
                   right: 8,
                   top: 8,
                   bottom: 8,

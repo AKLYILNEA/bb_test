@@ -445,6 +445,11 @@ class _ClockDialogState extends State<_ClockDialog> {
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final fabTheme = Theme.of(context).floatingActionButtonTheme;
+    final fabBgColor =
+        fabTheme.backgroundColor ?? colorScheme.primaryContainer;
+    final fabFgColor =
+        fabTheme.foregroundColor ?? colorScheme.onPrimaryContainer;
     final hasImage = !_imageCleared &&
         _selectedImagePath != null &&
         File(_selectedImagePath!).existsSync();
@@ -541,7 +546,7 @@ class _ClockDialogState extends State<_ClockDialog> {
                     if (hasImage) ...[
                       IconButton.filledTonal(
                         iconSize: 20,
-                        padding: const EdgeInsets.all(6),
+                        padding: const EdgeInsets.all(4),
                         visualDensity: VisualDensity.compact,
                         tooltip: appLocalizations.restoreDefaultImage,
                         onPressed: _resetImage,
@@ -549,8 +554,10 @@ class _ClockDialogState extends State<_ClockDialog> {
                       ),
                       const SizedBox(width: 8),
                     ],
-                    FilledButton.tonalIcon(
+                    FilledButton.icon(
                       style: FilledButton.styleFrom(
+                        backgroundColor: fabBgColor,
+                        foregroundColor: fabFgColor,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
                           vertical: 8,

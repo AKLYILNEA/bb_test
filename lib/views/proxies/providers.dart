@@ -130,7 +130,7 @@ class _ProvidersViewState extends ConsumerState<ProvidersView> {
                       title: section.title,
                       padding: current == 0
                           ? const EdgeInsets.only(
-                              left: 24,
+                              left: 36,
                               right: 8,
                               top: 8,
                               bottom: 8,
