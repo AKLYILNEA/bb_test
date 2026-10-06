@@ -144,15 +144,31 @@ Color panelDividerColor(BuildContext context) {
   );
 }
 
+// Lifts every channel by a few units, saturating at white.
+Color _liftColor(Color color, [double amount = 3]) {
+  int channel(double value) {
+    return (value * 255 + amount).round().clamp(0, 255).toInt();
+  }
+
+  return Color.fromARGB(
+    255,
+    channel(color.r),
+    channel(color.g),
+    channel(color.b),
+  );
+}
+
 Color commonCardColor(BuildContext context) {
   final colorScheme = Theme.of(context).colorScheme;
   if (colorScheme.brightness == Brightness.light) {
-    return Color.lerp(
+    return _liftColor(
+      Color.lerp(
+            colorScheme.surfaceContainerLow,
+            colorScheme.surfaceContainerLowest,
+            0.72,
+          ) ??
           colorScheme.surfaceContainerLow,
-          colorScheme.surfaceContainerLowest,
-          0.72,
-        ) ??
-        colorScheme.surfaceContainerLow;
+    );
   }
   return colorScheme.surfaceContainerHigh;
 }
@@ -164,12 +180,14 @@ Color sidebarSurfaceColor(BuildContext context) {
 Color headerSurfaceColor(BuildContext context) {
   final colorScheme = Theme.of(context).colorScheme;
   if (colorScheme.brightness == Brightness.light) {
-    return Color.lerp(
+    return _liftColor(
+      Color.lerp(
+            colorScheme.surface,
+            colorScheme.surfaceContainerLowest,
+            0.72,
+          ) ??
           colorScheme.surface,
-          colorScheme.surfaceContainerLowest,
-          0.72,
-        ) ??
-        colorScheme.surface;
+    );
   }
   return colorScheme.surfaceContainerHighest;
 }

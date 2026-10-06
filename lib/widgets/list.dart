@@ -496,7 +496,7 @@ class ListHeader extends StatelessWidget {
       alignment: Alignment.centerLeft,
       padding:
           padding ??
-          const EdgeInsets.only(left: 36, right: 8, top: 24, bottom: 8),
+          const EdgeInsets.only(left: 34, right: 34, top: 24, bottom: 8),
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -524,10 +524,25 @@ class ListHeader extends StatelessWidget {
               ],
             ),
           ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [...genActions(actions, space: space)],
+          IconButtonTheme(
+            // Header action icons must not stretch the header: their default
+            // 48dp tap target would push the title away from the card below.
+            data: IconButtonThemeData(
+              style: ButtonStyle(
+                minimumSize: const WidgetStatePropertyAll(Size.zero),
+                padding: const WidgetStatePropertyAll(EdgeInsets.zero),
+                tapTargetSize: const WidgetStatePropertyAll(
+                  MaterialTapTargetSize.shrinkWrap,
+                ),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.end,
+              // No trailing spacer here: the actions must end exactly at the
+              // header's right padding, mirroring the title's left padding.
+              children: [...actions.separated(SizedBox(width: space ?? 4))],
+            ),
           ),
         ],
       ),
@@ -558,7 +573,7 @@ class SectionContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final headerPadding = isFirst
-        ? const EdgeInsets.only(left: 36, right: 8, top: 8, bottom: 8)
+        ? const EdgeInsets.only(left: 34, right: 34, top: 8, bottom: 8)
         : null;
 
     if (plain) {
@@ -910,8 +925,8 @@ Widget generateListView(List<Widget> items) {
                 title: item.title,
                 subTitle: item.subTitle,
                 padding: const EdgeInsets.only(
-                  left: 36,
-                  right: 8,
+                  left: 34,
+                  right: 34,
                   top: 8,
                   bottom: 8,
                 ),
