@@ -146,12 +146,21 @@ class _ProvidersViewState extends ConsumerState<ProvidersView> {
                   if (index < current + section.providers.length) {
                     final providerIndex = index - current;
                     final provider = section.providers[providerIndex];
-                    return ContinuousListItem(
-                      index: providerIndex,
-                      count: section.providers.length,
-                      child: ProviderItem(
-                        key: ValueKey(provider.name),
-                        provider: provider,
+                    // Mirror SectionContainer's 5dp inset around the card.
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        top: providerIndex == 0 ? 5 : 0,
+                        bottom: providerIndex == section.providers.length - 1
+                            ? 5
+                            : 0,
+                      ),
+                      child: ContinuousListItem(
+                        index: providerIndex,
+                        count: section.providers.length,
+                        child: ProviderItem(
+                          key: ValueKey(provider.name),
+                          provider: provider,
+                        ),
                       ),
                     );
                   }
