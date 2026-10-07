@@ -474,6 +474,13 @@ class ListItem<T> extends StatelessWidget {
   }
 }
 
+/// Padding of the first section title: its left edge lands on the corner.
+EdgeInsets? sectionHeaderPadding({required bool isFirst}) {
+  return isFirst
+      ? const EdgeInsets.only(left: 34, right: 34, top: 8, bottom: 8)
+      : null;
+}
+
 class ListHeader extends StatelessWidget {
   final String title;
   final String? subTitle;
@@ -570,9 +577,7 @@ class SectionContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final headerPadding = isFirst
-        ? const EdgeInsets.only(left: 34, right: 34, top: 8, bottom: 8)
-        : null;
+    final headerPadding = sectionHeaderPadding(isFirst: isFirst);
 
     if (plain) {
       final genItems = separated
@@ -922,12 +927,7 @@ Widget generateListView(List<Widget> items) {
               return ListHeader(
                 title: item.title,
                 subTitle: item.subTitle,
-                padding: const EdgeInsets.only(
-                  left: 34,
-                  right: 34,
-                  top: 8,
-                  bottom: 8,
-                ),
+                padding: sectionHeaderPadding(isFirst: true),
                 actions: item.actions,
                 space: item.space,
               );

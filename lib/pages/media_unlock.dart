@@ -66,7 +66,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
               key: ValueKey(cat),
               color: isSelected
                   ? fabBgColor
-                  : context.colorScheme.surfaceContainerHigh,
+                  : commonCardColor(context),
               shape: shape,
               clipBehavior: Clip.antiAlias,
               child: InkWell(
