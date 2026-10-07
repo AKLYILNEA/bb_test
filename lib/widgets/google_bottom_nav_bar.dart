@@ -110,10 +110,11 @@ class GoogleBottomNavBar extends ConsumerWidget {
                     vertical: 8,
                   ),
                   decoration: ShapeDecoration(
-                    color: (isLight
-                            ? context.colorScheme.surface
-                            : context.colorScheme.surfaceContainer)
-                        .withValues(alpha: isLight ? 0.80 : 0.72),
+                    // Same surface as the cards (and widgets); the selected
+                    // pill keeps its own primary tint below.
+                    color: commonCardColor(
+                      context,
+                    ).withValues(alpha: isLight ? 0.88 : 0.86),
                     shape: SuperellipseBorder(
                       borderRadius: BorderRadius.circular(36),
                       side: BorderSide(
