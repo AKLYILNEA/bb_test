@@ -37,10 +37,11 @@ class OutboundMode extends StatelessWidget {
             data: Theme.of(context).copyWith(
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
-              hoverColor: Colors.transparent,
             ),
             child: CommonCard(
               padding: EdgeInsets.zero,
+              // No-op press: only for the shared hover / press feedback.
+              onPressed: () {},
               info: Info(
                 label: appLocalizations.outboundMode,
                 iconData: FluentIcons.arrow_split_24_regular,
@@ -305,6 +306,8 @@ class OutboundModeV2 extends StatelessWidget {
       height: height,
       child: CommonCard(
         padding: EdgeInsets.zero,
+        // No-op press: only for the shared hover / press feedback.
+        onPressed: () {},
         child: Consumer(
           builder: (_, ref, _) {
             final mode = ref.watch(
