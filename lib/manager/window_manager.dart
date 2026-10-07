@@ -463,7 +463,7 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
                         isDark
                             ? 'assets/images/Bettbbox_text_dark.svg'
                             : 'assets/images/Bettbbox_text_light.svg',
-                        height: 16,
+                        height: 11,
                       ),
                     ],
                   ),
