@@ -266,26 +266,31 @@ class ListItem<T> extends StatelessWidget {
     Widget? leading,
     bool enabled = true,
   }) {
-    return ListTile(
-      key: key,
-      dense: dense,
-      enabled: enabled,
-      focusColor:
-          FocusManager.instance.highlightMode == FocusHighlightMode.traditional
-          ? context.colorScheme.primary.withValues(alpha: 0.18)
-          : Colors.transparent,
-      shape: SuperellipseBorder(borderRadius: BorderRadius.circular(16)),
-      titleTextStyle: titleTextStyle,
-      subtitleTextStyle: subtitleTextStyle,
-      leading: leading ?? this.leading,
-      horizontalTitleGap: horizontalTitleGap,
-      title: title,
-      minVerticalPadding: 12,
-      subtitle: subtitle,
-      titleAlignment: tileTitleAlignment,
-      onTap: onTap,
-      trailing: trailing ?? this.trailing,
-      contentPadding: padding,
+    // Desktop defaults to a compact density, which squeezes the trailing
+    // controls; keep the row height identical on every platform.
+    return Theme(
+      data: Theme.of(context).copyWith(visualDensity: VisualDensity.standard),
+      child: ListTile(
+        key: key,
+        dense: dense,
+        enabled: enabled,
+        focusColor:
+            FocusManager.instance.highlightMode == FocusHighlightMode.traditional
+            ? context.colorScheme.primary.withValues(alpha: 0.18)
+            : Colors.transparent,
+        shape: SuperellipseBorder(borderRadius: BorderRadius.circular(16)),
+        titleTextStyle: titleTextStyle,
+        subtitleTextStyle: subtitleTextStyle,
+        leading: leading ?? this.leading,
+        horizontalTitleGap: horizontalTitleGap,
+        title: title,
+        minVerticalPadding: 12,
+        subtitle: subtitle,
+        titleAlignment: tileTitleAlignment,
+        onTap: onTap,
+        trailing: trailing ?? this.trailing,
+        contentPadding: padding,
+      ),
     );
   }
 
