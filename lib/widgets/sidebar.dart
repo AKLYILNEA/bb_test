@@ -102,8 +102,8 @@ class NavigationSidebar extends StatelessWidget {
 
 class _SidebarColors {
   _SidebarColors(ColorScheme scheme)
-    : selectedFill = scheme.onSurface.withValues(alpha: 0.08),
-      selectedHoverFill = scheme.onSurface.withValues(alpha: 0.12),
+    : selectedFill = navSelectedColor(scheme),
+      selectedHoverFill = navSelectedColor(scheme, hovered: true),
       pressedFill = scheme.onSurface.withValues(alpha: 0.08),
       hoverFill = scheme.onSurface.withValues(alpha: 0.06),
       icon = scheme.onSurfaceVariant,

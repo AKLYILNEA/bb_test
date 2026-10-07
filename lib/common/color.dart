@@ -144,6 +144,12 @@ Color panelDividerColor(BuildContext context) {
   );
 }
 
+/// Selected-item tint matching the floating nav bar's tab background.
+Color navSelectedColor(ColorScheme colorScheme, {bool hovered = false}) {
+  final base = colorScheme.brightness == Brightness.light ? 0.20 : 0.26;
+  return colorScheme.primary.withValues(alpha: hovered ? base + 0.08 : base);
+}
+
 // Lifts every channel by a few units, saturating at white.
 Color _liftColor(Color color, [double amount = 3]) {
   int channel(double value) {
