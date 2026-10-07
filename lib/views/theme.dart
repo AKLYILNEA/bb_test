@@ -138,6 +138,7 @@ class _ThemeModeItem extends ConsumerWidget {
             final themeModeItem = themeModeItems[index];
             return CommonCard(
               isSelected: themeModeItem.themeMode == themeMode,
+              isOption: true,
               onPressed: () {
                 ref
                     .read(themeSettingProvider.notifier)

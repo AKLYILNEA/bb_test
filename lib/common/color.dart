@@ -144,6 +144,13 @@ Color panelDividerColor(BuildContext context) {
   );
 }
 
+/// Idle surface of selectable option cards (theme mode, pickers, …): must
+/// differ from both the page and [commonCardColor], otherwise the unselected
+/// options read as ordinary cards.
+Color optionCardColor(BuildContext context) {
+  return Theme.of(context).colorScheme.surfaceContainerHighest;
+}
+
 /// Selected-item tint matching the floating nav bar's tab background.
 Color navSelectedColor(ColorScheme colorScheme, {bool hovered = false}) {
   final base = colorScheme.brightness == Brightness.light ? 0.20 : 0.26;

@@ -127,11 +127,15 @@ class CommonCard extends StatelessWidget {
     this.enterAnimated = false,
     this.info,
     this.actions,
+    this.isOption = false,
     this.clipBehavior = Clip.antiAlias,
   }) : isSelected = isSelected ?? false;
 
   final bool enterAnimated;
   final bool isSelected;
+  /// Selectable option/segment: its idle surface uses [optionCardColor] so it
+  /// does not look like an ordinary card.
+  final bool isOption;
   final void Function()? onPressed;
   final void Function()? onLongPress;
   final Widget? selectWidget;
@@ -167,6 +171,9 @@ class CommonCard extends StatelessWidget {
       return type == CommonCardType.filled
           ? context.colorScheme.secondaryContainer.opacity80
           : context.colorScheme.secondaryContainer;
+    }
+    if (isOption) {
+      return optionCardColor(context);
     }
     return commonCardColor(context);
   }
