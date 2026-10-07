@@ -459,14 +459,11 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
                         height: 20,
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        '𝐁𝐞𝐭𝐭𝐛𝐨𝐱',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.2,
-                          color: context.colorScheme.onSurfaceVariant,
-                        ),
+                      SvgPicture.asset(
+                        isDark
+                            ? 'assets/images/Bettbbox_text_dark.svg'
+                            : 'assets/images/Bettbbox_text_light.svg',
+                        height: 16,
                       ),
                     ],
                   ),
