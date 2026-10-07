@@ -212,6 +212,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
       appSettingProvider.select((state) => state.showCardStartButton),
     );
     final isMobileView = ref.watch(isMobileViewProvider);
+    final customTitle = ref.watch(customDashboardTitleProvider);
     final children = [
       ...dashboardState.dashboardWidgets
           .where(
@@ -232,7 +233,8 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
     });
     return CommonScaffold(
       resizeToAvoidBottomInset: false,
-      title: ref.watch(customDashboardTitleProvider) ?? currentGreeting(),
+      title: customTitle ?? currentGreeting(),
+      titleWidget: customTitle == null ? const _GreetingTitle() : null,
       actions: _buildActions(),
       floatingActionButton:
           (isMobileView || showCardStartButton) ? null : const StartFab(),
@@ -292,6 +294,62 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _GreetingTitle extends StatefulWidget {
+  const _GreetingTitle();
+
+  @override
+  State<_GreetingTitle> createState() => _GreetingTitleState();
+}
+
+class _GreetingTitleState extends State<_GreetingTitle> {
+  late String _greeting = currentGreeting();
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _scheduleNext();
+  }
+
+  /// Fires right after the next greeting boundary, like the clock widget.
+  void _scheduleNext() {
+    _timer?.cancel();
+    final now = DateTime.now();
+    var next = DateTime(now.year, now.month, now.day + 1);
+    for (final hour in const [6, 12, 18, 22]) {
+      final candidate = DateTime(now.year, now.month, now.day, hour);
+      if (candidate.isAfter(now)) {
+        next = candidate;
+        break;
+      }
+    }
+    _timer = Timer(next.difference(now) + const Duration(seconds: 1), () {
+      if (!mounted) return;
+      setState(() => _greeting = currentGreeting());
+      _scheduleNext();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 350),
+      child: EmojiText(
+        _greeting,
+        key: ValueKey(_greeting),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }

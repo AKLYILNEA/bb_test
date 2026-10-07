@@ -153,6 +153,7 @@ class CommonScaffold extends StatefulWidget {
   final Widget body;
   final Color? backgroundColor;
   final String? title;
+  final Widget? titleWidget;
   final Widget? leading;
   final List<Widget>? actions;
   final bool? centerTitle;
@@ -170,6 +171,7 @@ class CommonScaffold extends StatefulWidget {
     this.backgroundColor,
     this.leading,
     this.title,
+    this.titleWidget,
     this.actions,
     this.centerTitle,
     this.editState,
@@ -339,27 +341,34 @@ class CommonScaffoldState extends State<CommonScaffold> {
   }
 
   Widget _buildTitle(AppBarSearchState? startState) {
-    return _isSearch
-        ? TextField(
-            focusNode: _searchFocusNode,
-            controller: _textController,
-            style: context.textTheme.titleLarge,
-            onChanged: (value) {
-              if (startState != null) {
-                startState.onSearch(value);
-              }
-            },
-            decoration: InputDecoration(hintText: appLocalizations.search),
-          )
-        : EmojiText(
-            !_isEdit
-                ? widget.title!
-                : appLocalizations.selectedCountTitle(
-                    '${_appBarState.value.editState?.editCount ?? 0}',
-                  ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          );
+    if (_isSearch) {
+      return TextField(
+        focusNode: _searchFocusNode,
+        controller: _textController,
+        style: context.textTheme.titleLarge,
+        onChanged: (value) {
+          if (startState != null) {
+            startState.onSearch(value);
+          }
+        },
+        decoration: InputDecoration(hintText: appLocalizations.search),
+      );
+    }
+    if (_isEdit) {
+      return EmojiText(
+        appLocalizations.selectedCountTitle(
+          '${_appBarState.value.editState?.editCount ?? 0}',
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      );
+    }
+    return widget.titleWidget ??
+        EmojiText(
+          widget.title!,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        );
   }
 
   List<Widget> _buildActions(bool hasSearch, List<Widget> actions) {
