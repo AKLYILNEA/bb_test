@@ -447,40 +447,32 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
                 left: 12,
                 top: 0,
                 bottom: 0,
-                child: Center(
-                  child: IgnorePointer(
-                    child: SvgPicture.asset(
-                      isDark
-                          ? 'assets/images/splash_icon_dark.svg'
-                          : 'assets/images/splash_icon_light.svg',
-                      width: 20,
-                      height: 20,
-                    ),
+                child: IgnorePointer(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SvgPicture.asset(
+                        isDark
+                            ? 'assets/images/splash_icon_dark.svg'
+                            : 'assets/images/splash_icon_light.svg',
+                        width: 20,
+                        height: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '𝐁𝐞𝐭𝐭𝐛𝐨𝐱',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.2,
+                          color: context.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              Positioned(
-                right: 0,
-                top: 0,
-                bottom: 0,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IgnorePointer(
-                      child: Text(
-                        '𝐁𝐞𝐭𝐭𝐛𝐨𝐱',
-                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                          color: context.colorScheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.2,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    _buildActions(),
-                  ],
-                ),
-              ),
+              Positioned(right: 0, child: _buildActions()),
             ],
           ],
         ),
