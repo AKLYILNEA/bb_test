@@ -1318,3 +1318,13 @@ class Utils {
 }
 
 final utils = Utils();
+
+/// English greeting used as the dashboard's default title.
+String currentGreeting([DateTime? now]) {
+  final hour = (now ?? DateTime.now()).hour;
+  if (hour >= 6 && hour < 12) return 'Good morning ☀️';
+  if (hour >= 12 && hour < 18) return 'Good afternoon ☀️';
+  if (hour >= 18 && hour < 22) return 'Good evening ✨';
+  if (hour >= 22) return 'Good night ✨';
+  return 'Bed time ✨';
+}

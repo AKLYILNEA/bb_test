@@ -9,6 +9,7 @@ import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:window_ext/window_ext.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
@@ -417,6 +418,7 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Material(
       color: headerSurfaceColor(context),
       shape: Border(
@@ -441,7 +443,44 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
             if (system.isMacOS)
               const Text(appName)
             else ...[
-              Positioned(right: 0, child: _buildActions()),
+              Positioned(
+                left: 12,
+                top: 0,
+                bottom: 0,
+                child: Center(
+                  child: IgnorePointer(
+                    child: SvgPicture.asset(
+                      isDark
+                          ? 'assets/images/splash_icon_dark.svg'
+                          : 'assets/images/splash_icon_light.svg',
+                      width: 20,
+                      height: 20,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                right: 0,
+                top: 0,
+                bottom: 0,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IgnorePointer(
+                      child: Text(
+                        '𝐁𝐞𝐭𝐭𝐛𝐨𝐱',
+                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          color: context.colorScheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    _buildActions(),
+                  ],
+                ),
+              ),
             ],
           ],
         ),
