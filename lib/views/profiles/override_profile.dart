@@ -380,6 +380,11 @@ class RuleTitle extends ConsumerWidget {
                 icon: Icon(
                   isOverrideRule ? FluentIcons.document_edit_24_regular : FluentIcons.note_add_24_regular,
                 ),
+                // The enclosing IconButtonTheme zeroes the padding, which
+                // leaves the tonal circle smaller than the icon inside it.
+                iconSize: 20,
+                padding: const EdgeInsets.all(8),
+                visualDensity: VisualDensity.standard,
                 onPressed: () {
                   _handleChangeType(ref, isOverrideRule);
                 },
