@@ -161,7 +161,7 @@ class _ModeRows extends StatelessWidget {
 
 IconData _getModeIcon(Mode mode) {
   return switch (mode) {
-    Mode.rule => FluentIcons.task_list_square_rtl_24_regular,
+    Mode.rule => FluentIcons.zoom_fit_24_regular,
     Mode.global => FluentIcons.hexagon_three_24_regular,
     Mode.direct => FluentIcons.cd_16_regular,
   };
