@@ -128,7 +128,7 @@ class ResourcesView extends ConsumerWidget {
         padding: EdgeInsets.only(
           bottom: (globalState.isAndroidTV ? 48.0 : 16.0) +
               MediaQuery.of(context).padding.bottom,
-          top: 8,
+          top: 12,
         ),
         children: [
           ...generateSection(

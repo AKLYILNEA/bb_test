@@ -453,14 +453,13 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
         return CommonScrollBar(
           controller: null,
           child: ListView(
-            padding: const EdgeInsets.only(top: 8, bottom: 80),
+            padding: const EdgeInsets.only(top: 12, bottom: 80),
             children: [
               SectionContainer(
                 title: appLocalizations.myScripts,
                 isFirst: true,
                 items: scriptItems,
               ),
-              const SizedBox(height: 8),
               SectionContainer(
                 title: appLocalizations.myProfiles,
                 items: profileItems,
