@@ -345,6 +345,14 @@ class _GreetingTitleState extends State<_GreetingTitle> {
   Widget build(BuildContext context) {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 350),
+      // Keep both children flush left so the title never shifts sideways.
+      layoutBuilder: (currentChild, previousChildren) => Stack(
+        alignment: Alignment.centerLeft,
+        children: [
+          ...previousChildren,
+          if (currentChild != null) currentChild,
+        ],
+      ),
       child: EmojiText(
         _greeting,
         key: ValueKey(_greeting),
