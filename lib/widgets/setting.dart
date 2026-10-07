@@ -20,7 +20,6 @@ class SettingInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return CommonCard(
       isSelected: isSelected,
-      isOption: true,
       onPressed: onPressed,
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -57,7 +56,6 @@ class SettingTextCard extends StatelessWidget {
     return CommonCard(
       onPressed: onPressed,
       isSelected: isSelected,
-      isOption: true,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: EmojiText(text, style: context.textTheme.bodyMedium),
