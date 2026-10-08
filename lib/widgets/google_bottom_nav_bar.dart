@@ -52,10 +52,7 @@ class GoogleBottomNavBar extends ConsumerWidget {
               ? context.colorScheme.primary
               : context.colorScheme.onSurfaceVariant,
         ),
-        // No expanding label: the google style would widen the selected tab
-        // and shift the whole bar on every switch. The label stays as the
-        // semantic name only.
-        semanticLabel: Intl.message(e.label.name),
+        text: Intl.message(e.label.name),
       );
     }).toList();
 
