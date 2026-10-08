@@ -149,11 +149,17 @@ class GoogleBottomNavBar extends ConsumerWidget {
                     tabBackgroundColor: context.colorScheme.primary.withValues(
                       alpha: isLight ? 0.20 : 0.26,
                     ),
-                    // Same hairline as the cards, so the selected pill reads
-                    // as a surface instead of a flat tint.
-                    tabActiveBorder: Border.all(
-                      color: commonCardBorderSide(context).color,
-                      width: 1,
+                    // Theme-hued ring like the official bar's lens border;
+                    // strokeAlignInside keeps its dimensions at zero so the
+                    // bar does not re-lay-out when the selection moves.
+                    tabActiveBorder: Border.fromBorderSide(
+                      BorderSide(
+                        color: context.colorScheme.primary.withValues(
+                          alpha: isLight ? 0.22 : 0.30,
+                        ),
+                        width: 1,
+                        strokeAlign: BorderSide.strokeAlignInside,
+                      ),
                     ),
                     color: context.colorScheme.onSurfaceVariant,
                     tabs: tabsList,
