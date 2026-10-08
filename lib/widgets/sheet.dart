@@ -213,9 +213,9 @@ class AdaptiveSheetScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final bottomSheet = type == SheetType.bottomSheet;
     final sideSheet = type == SheetType.sideSheet;
-    final backgroundColor = bottomSheet
-        ? context.colorScheme.surfaceContainerHigh
-        : context.colorScheme.surfaceContainer;
+    // Card surfaces sit on surfaceContainerHigh in dark mode, so a bottom
+    // sheet using that tier swallows the cards inside it.
+    final backgroundColor = context.colorScheme.surfaceContainer;
     final canPop = ModalRoute.of(context)?.canPop ?? false;
     final implyLeading = !bottomSheet && (!(actions.isEmpty && sideSheet));
     final hasLeading = leading != null || (implyLeading && canPop);
