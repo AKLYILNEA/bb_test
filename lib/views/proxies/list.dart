@@ -16,7 +16,7 @@ import 'card.dart';
 import 'common.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-const _listRevealDuration = Duration(milliseconds: 153);
+const _listRevealDuration = Duration(milliseconds: 176);
 
 class ProxiesListView extends ConsumerWidget {
   const ProxiesListView({super.key});
