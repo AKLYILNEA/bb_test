@@ -121,8 +121,11 @@ class _ButtonState extends State<Button> with TickerProviderStateMixin {
             curve: Curves.easeOut,
             padding: widget.padding,
             duration: widget.duration!,
-            decoration: ShapeDecoration(
-              shadows: widget.shadow,
+            // The border lives in the foreground decoration on purpose: a side
+            // inside `decoration` feeds ShapeDecoration.padding via
+            // shape.dimensions, so toggling it animates the tab's inset and
+            // makes the whole bar grow and shrink while the selection moves.
+            foregroundDecoration: ShapeDecoration(
               shape: SuperellipseBorder(
                 borderRadius: widget.borderRadius ?? BorderRadius.zero,
                 side: (widget.active!
@@ -130,6 +133,12 @@ class _ButtonState extends State<Button> with TickerProviderStateMixin {
                         : widget.border)
                     ?.top ??
                     BorderSide.none,
+              ),
+            ),
+            decoration: ShapeDecoration(
+              shadows: widget.shadow,
+              shape: SuperellipseBorder(
+                borderRadius: widget.borderRadius ?? BorderRadius.zero,
               ),
               gradient: widget.gradient,
               color: _expanded

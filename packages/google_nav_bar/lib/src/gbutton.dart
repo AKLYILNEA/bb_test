@@ -104,12 +104,6 @@ class _GButtonState extends State<GButton> {
         icon: widget.icon,
         text: Text(
           widget.text,
-          // The label is revealed by animating its width from 0: without this
-          // it wraps to several lines while narrow, growing the tab (and the
-          // whole bar) for the duration of the animation.
-          maxLines: 1,
-          softWrap: false,
-          overflow: TextOverflow.clip,
           style: widget.textStyle ??
               TextStyle(
                 fontWeight: FontWeight.w600,
