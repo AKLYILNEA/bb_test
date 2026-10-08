@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:bett_box/widgets/animated_nav_icon.dart';
+import 'package:bett_box/widgets/card.dart';
 
 class GoogleBottomNavBar extends ConsumerWidget {
   static const double _blurSigma = 8.0;
@@ -147,6 +148,12 @@ class GoogleBottomNavBar extends ConsumerWidget {
                     duration: const Duration(milliseconds: 250),
                     tabBackgroundColor: context.colorScheme.primary.withValues(
                       alpha: isLight ? 0.20 : 0.26,
+                    ),
+                    // Same hairline as the cards, so the selected pill reads
+                    // as a surface instead of a flat tint.
+                    tabActiveBorder: Border.all(
+                      color: commonCardBorderSide(context).color,
+                      width: 1,
                     ),
                     color: context.colorScheme.onSurfaceVariant,
                     tabs: tabsList,
