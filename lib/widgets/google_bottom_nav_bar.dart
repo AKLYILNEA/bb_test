@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
@@ -114,9 +115,11 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
     with TickerProviderStateMixin {
   late final _Spring _lens = _Spring(this, _selectedIndex.toDouble());
   late final _Spring _lift = _Spring(this, 0);
+  late final _Spring _iconLift = _Spring(this, 0);
   late final Listenable _motion = Listenable.merge([_lens, _lift]);
   final ValueNotifier<int?> _activePressIndex = ValueNotifier(null);
   final ValueNotifier<bool> _isDragging = ValueNotifier(false);
+  Timer? _longPressTimer;
 
   int? _pointer;
   int? _pressedIndex;
@@ -150,8 +153,10 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
 
   @override
   void dispose() {
+    _longPressTimer?.cancel();
     _lens.dispose();
     _lift.dispose();
+    _iconLift.dispose();
     _activePressIndex.dispose();
     _isDragging.dispose();
     super.dispose();
@@ -227,6 +232,12 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
     _activePressIndex.value = index;
     _lift.springTo(1, _liftSpring);
     _lens.springTo(index.toDouble(), _settleSpring);
+    _longPressTimer?.cancel();
+    _longPressTimer = Timer(const Duration(milliseconds: 220), () {
+      if (mounted && _pressedIndex != null) {
+        _iconLift.springTo(1, _liftSpring);
+      }
+    });
     _triggerHapticFeedback(enableFeedback);
   }
 
@@ -240,6 +251,8 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
       }
       _dragging = true;
       _isDragging.value = true;
+      _longPressTimer?.cancel();
+      _iconLift.springTo(1, _liftSpring);
     }
     final position = _positionAt(localPosition);
     _lens.springTo(position, _trackSpring);
@@ -254,6 +267,10 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
 
   void _release({required bool commit}) {
     final index = _pressedIndex;
+    _longPressTimer?.cancel();
+    if (_iconLift.value > 0 || _iconLift.target > 0) {
+      _iconLift.springTo(0, _settleSpring);
+    }
     if (index == null) {
       return;
     }
@@ -388,7 +405,7 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
                                     item: item,
                                     index: index,
                                     lens: _lens,
-                                    lift: _lift,
+                                    iconLift: _iconLift,
                                     isDragging: _isDragging,
                                     activePressIndex: _activePressIndex,
                                     onActivate: () {
@@ -498,7 +515,7 @@ class _FloatingBarItem extends StatelessWidget {
     required this.item,
     required this.index,
     required this.lens,
-    required this.lift,
+    required this.iconLift,
     required this.isDragging,
     required this.activePressIndex,
     required this.onActivate,
@@ -507,7 +524,7 @@ class _FloatingBarItem extends StatelessWidget {
   final NavigationItem item;
   final int index;
   final ValueListenable<double> lens;
-  final ValueListenable<double> lift;
+  final ValueListenable<double> iconLift;
   final ValueListenable<bool> isDragging;
   final ValueListenable<int?> activePressIndex;
   final VoidCallback onActivate;
@@ -516,10 +533,10 @@ class _FloatingBarItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
     return AnimatedBuilder(
-      animation: Listenable.merge([lens, lift, isDragging, activePressIndex]),
+      animation: Listenable.merge([lens, iconLift, isDragging, activePressIndex]),
       builder: (context, _) {
         final emphasis = (1.0 - (lens.value - index).abs()).clamp(0.0, 1.0);
-        final currentLift = lift.value.clamp(0.0, 1.0);
+        final currentIconLift = iconLift.value.clamp(0.0, 1.0);
         final dragging = isDragging.value;
         final activeIndex = activePressIndex.value;
         final scaleEmphasis = dragging
@@ -530,7 +547,7 @@ class _FloatingBarItem extends StatelessWidget {
           colorScheme.primary,
           emphasis,
         )!;
-        final scale = 1.0 + 0.16 * scaleEmphasis * currentLift;
+        final scale = 1.0 + 0.16 * scaleEmphasis * currentIconLift;
 
         return Center(
           child: Transform.scale(
