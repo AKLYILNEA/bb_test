@@ -564,7 +564,6 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
                   child: RepaintBoundary(
                     child: LayoutBuilder(
                       builder: (context, constraints) {
-                        _barWidth = constraints.maxWidth;
                         final count =
                             math.max(1, widget.navigationItems.length);
                         final slotWidth = constraints.maxWidth / count;
