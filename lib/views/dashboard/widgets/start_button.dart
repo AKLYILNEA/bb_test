@@ -185,12 +185,17 @@ class _StartButtonState extends ConsumerState<StartButton> {
       return Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Icon(
-            Icons.play_arrow_rounded,
-            size: 16,
-            color: context.colorScheme.primary,
+          SizedBox(
+            width: 24,
+            child: Center(
+              child: Icon(
+                FluentIcons.play_circle_24_filled,
+                size: 20,
+                color: context.colorScheme.primary,
+              ),
+            ),
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
               appLocalizations.serviceReady,
@@ -207,13 +212,17 @@ class _StartButtonState extends ConsumerState<StartButton> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Icon(
-          Icons.pause_rounded,
-          size: 16,
-          color: context.colorScheme.primary,
+        SizedBox(
+          width: 24,
+          child: Center(
+            child: Icon(
+              FluentIcons.pause_circle_24_filled,
+              size: 20,
+              color: context.colorScheme.primary,
+            ),
+          ),
         ),
-        const SizedBox(width: 4),
-        const Text('  '),
+        const SizedBox(width: 8),
         Expanded(
           child: Text(
             timeText,
