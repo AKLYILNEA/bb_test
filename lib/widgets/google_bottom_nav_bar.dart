@@ -118,7 +118,6 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
   late final Listenable _motion = Listenable.merge([_lens, _lift]);
   final ValueNotifier<int?> _activePressIndex = ValueNotifier(null);
   final ValueNotifier<bool> _isDragging = ValueNotifier(false);
-  int _pressTime = 0;
 
   int? _pointer;
   int? _pressedIndex;
@@ -225,7 +224,6 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
     _pressedIndex = index;
     _lastSnappedIndex = index;
     _pressX = localPosition.dx;
-    _pressTime = DateTime.now().millisecondsSinceEpoch;
     _dragging = false;
     _isDragging.value = false;
     _activePressIndex.value = index;
@@ -260,13 +258,8 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
 
   void _release({required bool commit}) {
     final index = _pressedIndex;
-    final pressDuration = DateTime.now().millisecondsSinceEpoch - _pressTime;
     if (_iconLift.value > 0 || _iconLift.target > 0) {
-      if (pressDuration < 160 && !_dragging) {
-        _iconLift.jumpTo(0);
-      } else {
-        _iconLift.springTo(0, _settleSpring);
-      }
+      _iconLift.springTo(0, _settleSpring);
     }
     if (index == null) {
       return;
