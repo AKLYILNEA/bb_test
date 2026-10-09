@@ -507,7 +507,7 @@ class _FloatingBarItem extends StatelessWidget {
           colorScheme.primary,
           emphasis,
         )!;
-        final scale = 1.0 + 0.10 * emphasis + 0.10 * emphasis * currentLift;
+        final scale = 1.0 + 0.16 * emphasis * currentLift;
 
         return Center(
           child: Transform.scale(
