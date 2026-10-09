@@ -14,9 +14,10 @@ import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/common.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/widgets/animated_nav_icon.dart';
+import 'package:bett_box/widgets/card.dart';
 
-const double _barHeight = 60.0;
-const double _barPadding = 4.0;
+const double _barHeight = 64.0;
+const double _lensInset = 5.0;
 const double _iconSize = 24.0;
 const double _labelGap = 2.0;
 const double _labelInset = 2.0;
@@ -290,13 +291,16 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
   }
 
   double _positionAt(Offset localPosition) {
-    final width = context.size!.width;
+    final width = context.size?.width ?? 0;
+    if (width <= 0 || widget.navigationItems.isEmpty) {
+      return widget.selectedIndex.toDouble();
+    }
     final dx = Directionality.of(context) == TextDirection.ltr
         ? localPosition.dx
         : width - localPosition.dx;
     final count = math.max(1, widget.navigationItems.length);
-    final extent = (width - _barPadding * 2) / count;
-    final position = (dx - _barPadding) / extent - 0.5;
+    final slotWidth = width / count;
+    final position = (dx / slotWidth) - 0.5;
     if (position < 0) {
       return _rubberBand(position, _overdrag);
     }
@@ -475,40 +479,16 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
     final primaryColor = colorScheme.primary;
     final onSurfaceVariantColor = colorScheme.onSurfaceVariant;
 
-    final navGradient = isLight
-        ? LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color.lerp(
-                    colorScheme.surfaceContainerLowest,
-                    Colors.white,
-                    0.20,
-                  )?.withValues(alpha: 0.88) ??
-                  colorScheme.surface.withValues(alpha: 0.88),
-              colorScheme.surfaceContainer.withValues(alpha: 0.86),
-            ],
-          )
-        : LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              (!pureBlack
-                          ? colorScheme.surfaceContainerHigh
-                          : Color.lerp(
-                              Colors.black,
-                              colorScheme.surfaceContainerHighest,
-                              0.10,
-                            ))
-                      ?.withValues(alpha: pureBlack ? 0.95 : 0.88) ??
-                  Colors.black.withValues(alpha: 0.88),
-              (!pureBlack ? colorScheme.surfaceContainer : Colors.black)
-                  .withValues(alpha: pureBlack ? 0.95 : 0.86),
-            ],
-          );
-    final borderColor = isLight
-        ? colorScheme.outlineVariant.withValues(alpha: 0.24)
-        : Colors.white.withValues(alpha: 0.08);
+    final barColor = (!pureBlack
+            ? commonCardColor(context)
+            : Colors.black)
+        .withValues(alpha: pureBlack ? 0.95 : (isLight ? 0.88 : 0.86));
+    final barBorderSide = BorderSide(
+      color: isLight
+          ? colorScheme.outlineVariant.withValues(alpha: 0.45)
+          : Colors.white.withValues(alpha: 0.14),
+      width: 1,
+    );
 
     final labelStyle = context.textTheme.labelSmall?.copyWith(
       fontSize: _labelSize,
@@ -528,24 +508,24 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
       (height, label) => math.max(height, label.height),
     );
 
-    final bar = DecoratedBox(
+    final bar = Container(
       decoration: ShapeDecoration(
         shape: SuperellipseBorder(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(36),
         ),
         shadows: [
           BoxShadow(
-            blurRadius: 24,
-            offset: const Offset(0, 6),
+            blurRadius: 28,
+            offset: const Offset(0, 8),
             color: Colors.black.withValues(
-              alpha: isLight ? 0.06 : 0.25,
+              alpha: isLight ? 0.08 : 0.22,
             ),
           ),
           BoxShadow(
-            blurRadius: 8,
+            blurRadius: 10,
             offset: const Offset(0, 2),
             color: Colors.black.withValues(
-              alpha: isLight ? 0.04 : 0.12,
+              alpha: isLight ? 0.04 : 0.10,
             ),
           ),
         ],
@@ -553,7 +533,7 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
       child: ClipPath(
         clipper: ShapeBorderClipper(
           shape: SuperellipseBorder(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(36),
           ),
         ),
         child: BackdropFilter(
@@ -561,15 +541,13 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
             sigmaX: _blurSigma,
             sigmaY: _blurSigma,
           ),
-          child: DecoratedBox(
+          child: Container(
+            height: _barHeight,
             decoration: ShapeDecoration(
-              gradient: navGradient,
+              color: barColor,
               shape: SuperellipseBorder(
-                borderRadius: BorderRadius.circular(30),
-                side: BorderSide(
-                  color: borderColor,
-                  width: 1,
-                ),
+                borderRadius: BorderRadius.circular(36),
+                side: barBorderSide,
               ),
             ),
             child: Listener(
@@ -581,89 +559,88 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
               child: MouseRegion(
                 onHover: _handleHover,
                 onExit: _handleExit,
-                child: Padding(
-                  padding: const EdgeInsets.all(_barPadding),
-                  child: SizedBox(
-                    height: _barHeight - (_barPadding * 2),
-                    child: RepaintBoundary(
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          final count =
-                              math.max(1, widget.navigationItems.length);
-                          final extent = constraints.maxWidth / count;
-                          final room = extent - _labelInset * 2;
-                          final labelScale = widest <= room
-                              ? 1.0
-                              : math.max(
-                                  room / widest,
-                                  _minLabelSize / _labelSize,
-                                );
-                          final innerHeight = constraints.maxHeight;
+                child: SizedBox(
+                  height: _barHeight,
+                  child: RepaintBoundary(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        _barWidth = constraints.maxWidth;
+                        final count =
+                            math.max(1, widget.navigationItems.length);
+                        final slotWidth = constraints.maxWidth / count;
+                        final room = slotWidth - (_labelInset * 2);
+                        final labelScale = widest <= room
+                            ? 1.0
+                            : math.max(
+                                room / widest,
+                                _minLabelSize / _labelSize,
+                              );
 
-                          return Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              if (widget.navigationItems.isNotEmpty)
-                                AnimatedBuilder(
-                                  animation: _motion,
-                                  builder: (_, _) => _Lens(
-                                    position: _lens.value,
-                                    velocity: _lens.velocity,
-                                    extent: extent,
-                                    height: innerHeight,
-                                    lift: _lift.value,
-                                    isLight: isLight,
-                                    primaryColor: primaryColor,
-                                  ),
+                        return Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            if (widget.navigationItems.isNotEmpty)
+                              AnimatedBuilder(
+                                animation: _motion,
+                                builder: (_, _) => _Lens(
+                                  position: _lens.value,
+                                  velocity: _lens.velocity,
+                                  slotWidth: slotWidth,
+                                  barHeight: _barHeight,
+                                  lensInset: _lensInset,
+                                  lift: _lift.value,
+                                  isLight: isLight,
+                                  primaryColor: primaryColor,
                                 ),
-                              if (widget.navigationItems.isNotEmpty)
-                                AnimatedBuilder(
-                                  animation: _hoverMotion,
-                                  builder: (_, _) => _HoverHighlight(
-                                    position: _hover.value,
-                                    extent: extent,
-                                    opacity: _hoverShow.value,
-                                    height: innerHeight,
-                                  ),
-                                ),
-                              Row(
-                                children: [
-                                  for (final (index, item)
-                                      in widget.navigationItems.indexed)
-                                    Expanded(
-                                      child: _FloatingBarItem(
-                                        item: item,
-                                        selected: index == _selectedIndex,
-                                        index: index,
-                                        lens: _lens,
-                                        hoverAt: _hoverAt,
-                                        extent: extent,
-                                        lift: _lift,
-                                        labelStyle: labelStyle?.copyWith(
-                                          fontSize: _labelSize * labelScale,
-                                        ),
-                                        labelHeight: lineHeight,
-                                        labelOverflows:
-                                            labels[index].width * labelScale >
-                                                room,
-                                        onActivate: () {
-                                          widget.onTabChange(index);
-                                          _lens.springTo(
-                                            index.toDouble(),
-                                            _settleSpring,
-                                          );
-                                        },
-                                        primaryColor: primaryColor,
-                                        onSurfaceVariantColor:
-                                            onSurfaceVariantColor,
-                                      ),
-                                    ),
-                                ],
                               ),
-                            ],
-                          );
-                        },
-                      ),
+                            if (widget.navigationItems.isNotEmpty)
+                              AnimatedBuilder(
+                                animation: _hoverMotion,
+                                builder: (_, _) => _HoverHighlight(
+                                  position: _hover.value,
+                                  slotWidth: slotWidth,
+                                  opacity: _hoverShow.value,
+                                  barHeight: _barHeight,
+                                  lensInset: _lensInset,
+                                ),
+                              ),
+                            Row(
+                              children: [
+                                for (final (index, item)
+                                    in widget.navigationItems.indexed)
+                                  Expanded(
+                                    child: _FloatingBarItem(
+                                      item: item,
+                                      selected: index == _selectedIndex,
+                                      index: index,
+                                      lens: _lens,
+                                      hoverAt: _hoverAt,
+                                      extent: slotWidth,
+                                      lift: _lift,
+                                      labelStyle: labelStyle?.copyWith(
+                                        fontSize: _labelSize * labelScale,
+                                      ),
+                                      labelHeight: lineHeight,
+                                      labelOverflows:
+                                          labels[index].width * labelScale >
+                                              room,
+                                      onActivate: () {
+                                        widget.onTabChange(index);
+                                        _lens.springTo(
+                                          index.toDouble(),
+                                          _settleSpring,
+                                        );
+                                      },
+                                      primaryColor: primaryColor,
+                                      onSurfaceVariantColor:
+                                          onSurfaceVariantColor,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -674,14 +651,13 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
       ),
     );
 
-    return SafeArea(
-      top: false,
-      left: false,
-      right: false,
-      minimum: const EdgeInsets.only(bottom: 12),
+    final viewBottom = MediaQuery.viewPaddingOf(context).bottom;
+    return RepaintBoundary(
       child: Padding(
-        padding: const EdgeInsets.only(left: 17, right: 17, top: 8),
-        child: RepaintBoundary(
+        padding: EdgeInsets.only(bottom: math.max(viewBottom, 12.0)),
+        child: Container(
+          color: Colors.transparent,
+          padding: const EdgeInsets.only(left: 16, right: 16, top: 8),
           child: AnimatedBuilder(
             animation: _barMotion,
             builder: (_, child) => _PressTransform(
@@ -700,15 +676,17 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
 class _HoverHighlight extends StatelessWidget {
   const _HoverHighlight({
     required this.position,
-    required this.extent,
+    required this.slotWidth,
     required this.opacity,
-    required this.height,
+    required this.barHeight,
+    required this.lensInset,
   });
 
   final double position;
-  final double extent;
+  final double slotWidth;
   final double opacity;
-  final double height;
+  final double barHeight;
+  final double lensInset;
 
   @override
   Widget build(BuildContext context) {
@@ -716,15 +694,17 @@ class _HoverHighlight extends StatelessWidget {
     if (alpha <= 0.001) {
       return const SizedBox.shrink();
     }
-    const baseGap = 4.0;
-    final pillHeight = math.max(0.0, height - (2 * baseGap));
-    final pillRadius = pillHeight / 2;
+    final height = math.max(0.0, barHeight - (2 * lensInset));
+    final width = math.max(0.0, slotWidth - (2 * lensInset));
+    final pillRadius = height / 2;
+    final centerDx = (position + 0.5) * slotWidth;
+    final start = centerDx - (width / 2);
 
     return PositionedDirectional(
-      start: (position * extent) + baseGap,
-      top: baseGap,
-      bottom: baseGap,
-      width: math.max(0.0, extent - (2 * baseGap)),
+      start: start,
+      top: lensInset,
+      width: width,
+      height: height,
       child: DecoratedBox(
         decoration: ShapeDecoration(
           color: context.colorScheme.onSurface.withValues(alpha: alpha),
@@ -741,8 +721,9 @@ class _Lens extends StatelessWidget {
   const _Lens({
     required this.position,
     required this.velocity,
-    required this.extent,
-    required this.height,
+    required this.slotWidth,
+    required this.barHeight,
+    required this.lensInset,
     required this.lift,
     required this.isLight,
     required this.primaryColor,
@@ -750,25 +731,28 @@ class _Lens extends StatelessWidget {
 
   final double position;
   final double velocity;
-  final double extent;
-  final double height;
+  final double slotWidth;
+  final double barHeight;
+  final double lensInset;
   final double lift;
   final bool isLight;
   final Color primaryColor;
 
   @override
   Widget build(BuildContext context) {
-    const baseGap = 4.0;
-    final currentGap = baseGap * (1.0 - (0.75 * lift));
-    final slotWidth = extent;
-    final pillBaseWidth = math.max(0.0, slotWidth - (2 * currentGap));
-    final pillBaseHeight = math.max(0.0, height - (2 * currentGap));
+    final lensBaseHeight = math.max(0.0, barHeight - (2 * lensInset));
+    final lensBaseWidth = math.max(0.0, slotWidth - (2 * lensInset));
 
     final stretch =
         (velocity.abs() / _jellySpeed).clamp(0.0, 1.0) * _jellyStretch;
-    final width = pillBaseWidth * (1 + stretch);
-    final lensHeight = pillBaseHeight * (1 - stretch / 2);
-    final pillRadius = lensHeight / 2;
+    final growth = _lensGrowth * 2 * lift;
+    final width = (lensBaseWidth + growth) * (1 + stretch);
+    final height = (lensBaseHeight + growth) * (1 - stretch / 2);
+    final pillRadius = height / 2;
+
+    final centerDx = (position + 0.5) * slotWidth;
+    final start = centerDx - (width / 2);
+    final top = lensInset + (lensBaseHeight - height) / 2;
 
     final lensColor = isLight
         ? primaryColor.withValues(
@@ -779,10 +763,10 @@ class _Lens extends StatelessWidget {
           );
 
     return PositionedDirectional(
-      start: (position + 0.5) * extent - (width / 2),
-      top: (height - lensHeight) / 2,
+      start: start,
+      top: top,
       width: width,
-      height: lensHeight,
+      height: height,
       child: DecoratedBox(
         decoration: ShapeDecoration(
           color: lensColor,
