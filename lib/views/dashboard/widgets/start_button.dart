@@ -120,7 +120,7 @@ class _StartButtonState extends ConsumerState<StartButton> {
                   SizedBox(
                     height: math.max(
                       globalState.measure.bodyMediumHeight + 2,
-                      24.0,
+                      20.0,
                     ),
                     child: FadeThroughBox(
                       child: _buildContent(
@@ -188,10 +188,11 @@ class _StartButtonState extends ConsumerState<StartButton> {
     if (!isStart) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(
             FluentIcons.play_circle_24_filled,
-            size: 24,
+            size: 20,
             color: context.colorScheme.primary,
           ),
           const SizedBox(width: 8),
@@ -210,10 +211,11 @@ class _StartButtonState extends ConsumerState<StartButton> {
     final timeText = _formatRunTime(runTime);
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Icon(
           FluentIcons.pause_circle_24_filled,
-          size: 24,
+          size: 20,
           color: context.colorScheme.primary,
         ),
         const SizedBox(width: 8),
