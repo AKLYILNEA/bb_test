@@ -16,13 +16,13 @@ import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/widgets/animated_nav_icon.dart';
 import 'package:bett_box/widgets/card.dart';
 
-const double _barHeight = 64.0;
-const double _lensInset = 4.0;
+const double _barHeight = 65.0;
+const double _lensInset = 6.0;
 const double _iconSize = 24.0;
 const double _labelGap = 2.0;
 const double _labelInset = 2.0;
-const double _labelSize = 10.0;
-const double _minLabelSize = 9.0;
+const double _labelSize = 11.0;
+const double _minLabelSize = 10.0;
 const double _pressGrowth = 1 / 8;
 const double _maxPressGrowth = 16.0;
 const double _lensGrowth = 14.0;
@@ -241,8 +241,6 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
   int? _pointer;
   int? _pressedIndex;
   double _pressX = 0;
-  Offset? _downPosition;
-  bool _dragCancel = false;
   bool _dragging = false;
   Offset? _cursor;
   final ValueNotifier<double?> _hoverAt = ValueNotifier(null);
@@ -358,8 +356,6 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
     }
     _pointer = event.pointer;
     _pressX = event.localPosition.dx;
-    _downPosition = event.localPosition;
-    _dragCancel = false;
     _hoverShow.springTo(0, _fadeSpring);
     _hoverAt.value = null;
     _swell.springTo(1, _liftSpring);
@@ -367,25 +363,9 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
   }
 
   void _handlePointerMove(PointerMoveEvent event, bool enableFeedback) {
-    if (event.pointer != _pointer || _dragCancel) {
-      return;
+    if (event.pointer == _pointer) {
+      _slide(event.localPosition, enableFeedback);
     }
-    final downPos = _downPosition;
-    if (downPos != null) {
-      final delta = event.localPosition - downPos;
-      if (delta.dy < -50 || delta.dy > 80) {
-        _dragCancel = true;
-        _pointer = null;
-        _pressedIndex = null;
-        _dragging = false;
-        _lift.springTo(0, _settleSpring);
-        _swell.springTo(0, _settleSpring);
-        _stretch.springTo(0, _settleSpring);
-        _lens.springTo(_selectedIndex.toDouble(), _settleSpring);
-        return;
-      }
-    }
-    _slide(event.localPosition, enableFeedback);
   }
 
   void _handlePointerEnd(PointerEvent event) {
@@ -393,10 +373,6 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
       return;
     }
     _pointer = null;
-    if (_dragCancel) {
-      _dragCancel = false;
-      return;
-    }
     _release(commit: event is PointerUpEvent);
     _stretch.springTo(0, _settleSpring);
     _swell.springTo(0, _settleSpring);
@@ -471,21 +447,14 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
     final enableFeedback = ref.watch(
       appSettingProvider.select((state) => state.enableNavBarHapticFeedback),
     );
-    final pureBlack = ref.watch(
-      themeSettingProvider.select((s) => s.pureBlack),
-    );
     final colorScheme = context.colorScheme;
     final isLight = colorScheme.brightness == Brightness.light;
-    final isDark = !isLight;
     final primaryColor = colorScheme.primary;
     final onSurfaceVariantColor = colorScheme.onSurfaceVariant;
 
-    final barColor = (isDark && pureBlack
-            ? Colors.black
-            : commonCardColor(context))
-        .withValues(
-          alpha: (isDark && pureBlack) ? 0.95 : (isLight ? 0.88 : 0.86),
-        );
+    final barColor = commonCardColor(context).withValues(
+      alpha: isLight ? 0.88 : 0.86,
+    );
     final barBorderSide = BorderSide(
       color: isLight
           ? colorScheme.outlineVariant.withValues(alpha: 0.45)
@@ -495,7 +464,7 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
 
     final labelStyle = context.textTheme.labelSmall?.copyWith(
       fontSize: _labelSize,
-      fontWeight: FontWeight.w500,
+      fontWeight: FontWeight.w700,
       letterSpacing: 0,
     );
     final labels = [
@@ -511,48 +480,59 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
       (height, label) => math.max(height, label.height),
     );
 
-    final bar = Container(
-      decoration: ShapeDecoration(
-        shape: SuperellipseBorder(
-          borderRadius: BorderRadius.circular(36),
-        ),
-        shadows: [
-          BoxShadow(
-            blurRadius: 28,
-            offset: const Offset(0, 8),
-            color: Colors.black.withValues(
-              alpha: isLight ? 0.08 : 0.22,
-            ),
-          ),
-          BoxShadow(
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-            color: Colors.black.withValues(
-              alpha: isLight ? 0.04 : 0.10,
-            ),
-          ),
-        ],
-      ),
-      child: ClipPath(
-        clipper: ShapeBorderClipper(
-          shape: SuperellipseBorder(
-            borderRadius: BorderRadius.circular(36),
-          ),
-        ),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: _blurSigma,
-            sigmaY: _blurSigma,
-          ),
-          child: Container(
-            height: _barHeight,
-            decoration: ShapeDecoration(
-              color: barColor,
-              shape: SuperellipseBorder(
-                borderRadius: BorderRadius.circular(36),
-                side: barBorderSide,
+    final bar = SizedBox(
+      height: _barHeight,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Positioned.fill(
+            child: Container(
+              decoration: ShapeDecoration(
+                shape: SuperellipseBorder(
+                  borderRadius: BorderRadius.circular(36),
+                ),
+                shadows: [
+                  BoxShadow(
+                    blurRadius: 28,
+                    offset: const Offset(0, 8),
+                    color: Colors.black.withValues(
+                      alpha: isLight ? 0.08 : 0.22,
+                    ),
+                  ),
+                  BoxShadow(
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                    color: Colors.black.withValues(
+                      alpha: isLight ? 0.04 : 0.10,
+                    ),
+                  ),
+                ],
+              ),
+              child: ClipPath(
+                clipper: ShapeBorderClipper(
+                  shape: SuperellipseBorder(
+                    borderRadius: BorderRadius.circular(36),
+                  ),
+                ),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(
+                    sigmaX: _blurSigma,
+                    sigmaY: _blurSigma,
+                  ),
+                  child: DecoratedBox(
+                    decoration: ShapeDecoration(
+                      color: barColor,
+                      shape: SuperellipseBorder(
+                        borderRadius: BorderRadius.circular(36),
+                        side: barBorderSide,
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
+          ),
+          Positioned.fill(
             child: Listener(
               behavior: HitTestBehavior.opaque,
               onPointerDown: (e) => _handlePointerDown(e, enableFeedback),
@@ -562,96 +542,93 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
               child: MouseRegion(
                 onHover: _handleHover,
                 onExit: _handleExit,
-                child: SizedBox(
-                  height: _barHeight,
-                  child: RepaintBoundary(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        final count =
-                            math.max(1, widget.navigationItems.length);
-                        final slotWidth = constraints.maxWidth / count;
-                        final room = slotWidth - (_labelInset * 2);
-                        final labelScale = widest <= room
-                            ? 1.0
-                            : math.max(
-                                room / widest,
-                                _minLabelSize / _labelSize,
-                              );
+                child: RepaintBoundary(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final count =
+                          math.max(1, widget.navigationItems.length);
+                      final slotWidth = constraints.maxWidth / count;
+                      final room = slotWidth - (_labelInset * 2);
+                      final labelScale = widest <= room
+                          ? 1.0
+                          : math.max(
+                              room / widest,
+                              _minLabelSize / _labelSize,
+                            );
 
-                        return Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            if (widget.navigationItems.isNotEmpty)
-                              AnimatedBuilder(
-                                animation: _motion,
-                                builder: (_, _) => _Lens(
-                                  position: _lens.value,
-                                  velocity: _lens.velocity,
-                                  slotWidth: slotWidth,
-                                  barHeight: _barHeight,
-                                  lensInset: _lensInset,
-                                  lift: _lift.value,
-                                  isLight: isLight,
-                                  primaryColor: primaryColor,
-                                ),
-                              ),
-                            if (widget.navigationItems.isNotEmpty)
-                              AnimatedBuilder(
-                                animation: _hoverMotion,
-                                builder: (_, _) => _HoverHighlight(
-                                  position: _hover.value,
-                                  slotWidth: slotWidth,
-                                  opacity: _hoverShow.value,
-                                  barHeight: _barHeight,
-                                  lensInset: _lensInset,
-                                ),
-                              ),
-                            Positioned.fill(
-                              child: Row(
-                                children: [
-                                  for (final (index, item)
-                                      in widget.navigationItems.indexed)
-                                    Expanded(
-                                      child: _FloatingBarItem(
-                                        item: item,
-                                        selected: index == _selectedIndex,
-                                        index: index,
-                                        lens: _lens,
-                                        hoverAt: _hoverAt,
-                                        extent: slotWidth,
-                                        lift: _lift,
-                                        labelStyle: labelStyle?.copyWith(
-                                          fontSize: _labelSize * labelScale,
-                                        ),
-                                        labelHeight: lineHeight,
-                                        labelOverflows:
-                                            labels[index].width * labelScale >
-                                                room,
-                                        onActivate: () {
-                                          widget.onTabChange(index);
-                                          _lens.springTo(
-                                            index.toDouble(),
-                                            _settleSpring,
-                                          );
-                                        },
-                                        primaryColor: primaryColor,
-                                        onSurfaceVariantColor:
-                                            onSurfaceVariantColor,
-                                      ),
-                                    ),
-                                ],
+                      return Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          if (widget.navigationItems.isNotEmpty)
+                            AnimatedBuilder(
+                              animation: _motion,
+                              builder: (_, _) => _Lens(
+                                position: _lens.value,
+                                velocity: _lens.velocity,
+                                slotWidth: slotWidth,
+                                barHeight: _barHeight,
+                                lensInset: _lensInset,
+                                lift: _lift.value,
+                                isLight: isLight,
+                                primaryColor: primaryColor,
                               ),
                             ),
-                          ],
-                        );
-                      },
-                    ),
+                          if (widget.navigationItems.isNotEmpty)
+                            AnimatedBuilder(
+                              animation: _hoverMotion,
+                              builder: (_, _) => _HoverHighlight(
+                                position: _hover.value,
+                                slotWidth: slotWidth,
+                                opacity: _hoverShow.value,
+                                barHeight: _barHeight,
+                                lensInset: _lensInset,
+                              ),
+                            ),
+                          Positioned.fill(
+                            child: Row(
+                              children: [
+                                for (final (index, item)
+                                    in widget.navigationItems.indexed)
+                                  Expanded(
+                                    child: _FloatingBarItem(
+                                      item: item,
+                                      selected: index == _selectedIndex,
+                                      index: index,
+                                      lens: _lens,
+                                      hoverAt: _hoverAt,
+                                      extent: slotWidth,
+                                      lift: _lift,
+                                      labelStyle: labelStyle?.copyWith(
+                                        fontSize: _labelSize * labelScale,
+                                      ),
+                                      labelHeight: lineHeight,
+                                      labelOverflows:
+                                          labels[index].width * labelScale >
+                                              room,
+                                      onActivate: () {
+                                        widget.onTabChange(index);
+                                        _lens.springTo(
+                                          index.toDouble(),
+                                          _settleSpring,
+                                        );
+                                      },
+                                      primaryColor: primaryColor,
+                                      onSurfaceVariantColor:
+                                          onSurfaceVariantColor,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
 
@@ -703,10 +680,11 @@ class _HoverHighlight extends StatelessWidget {
     final pillRadius = height / 2;
     final centerDx = (position + 0.5) * slotWidth;
     final start = centerDx - (width / 2);
+    final top = (barHeight - height) / 2;
 
     return PositionedDirectional(
       start: start,
-      top: lensInset,
+      top: top,
       width: width,
       height: height,
       child: DecoratedBox(
@@ -756,15 +734,11 @@ class _Lens extends StatelessWidget {
 
     final centerDx = (position + 0.5) * slotWidth;
     final start = centerDx - (width / 2);
-    final top = lensInset + (lensBaseHeight - height) / 2;
+    final top = (barHeight - height) / 2;
 
-    final lensColor = isLight
-        ? primaryColor.withValues(
-            alpha: 0.08 + (0.05 * lift),
-          )
-        : primaryColor.withValues(
-            alpha: 0.16 + (0.06 * lift),
-          );
+    final lensColor = primaryColor.withValues(
+      alpha: isLight ? 0.20 + (0.05 * lift) : 0.26 + (0.06 * lift),
+    );
 
     return PositionedDirectional(
       start: start,
@@ -883,6 +857,11 @@ class _FloatingBarItemState extends State<_FloatingBarItem>
             widget.primaryColor,
             emphasis,
           )!;
+          final fontWeight = FontWeight.lerp(
+            FontWeight.w500,
+            FontWeight.w700,
+            emphasis,
+          );
 
           final column = Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -902,7 +881,10 @@ class _FloatingBarItemState extends State<_FloatingBarItem>
                     maxLines: 1,
                     softWrap: false,
                     overflow: TextOverflow.ellipsis,
-                    style: widget.labelStyle?.copyWith(color: color),
+                    style: widget.labelStyle?.copyWith(
+                      color: color,
+                      fontWeight: fontWeight,
+                    ),
                   ),
                 ),
               ),
