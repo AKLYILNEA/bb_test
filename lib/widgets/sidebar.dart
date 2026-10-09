@@ -46,8 +46,8 @@ class NavigationSidebar extends StatelessWidget {
 
   double _calculateExpandedWidth(BuildContext context) {
     final labelStyle =
-        context.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600) ??
-        const TextStyle(fontSize: 14, fontWeight: FontWeight.w600);
+        context.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.normal) ??
+        const TextStyle(fontSize: 14, fontWeight: FontWeight.normal);
 
     final textScaler = MediaQuery.textScalerOf(context);
     double maxTextWidth = 0.0;
@@ -334,7 +334,7 @@ class _DestinationRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final effectiveStyle = style?.copyWith(
       color: iconColor,
-      fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+      fontWeight: FontWeight.normal,
     );
 
     return ClipRect(
