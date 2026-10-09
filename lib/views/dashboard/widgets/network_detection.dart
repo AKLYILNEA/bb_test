@@ -62,8 +62,16 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
               shape: SuperellipseBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
-              leading: Icon(FluentIcons.shield_24_regular),
-              title: Text(appLocalizations.ipPrivacyProtection),
+              leading: Icon(
+                detectionState.isIpMasked
+                    ? FluentIcons.eye_24_regular
+                    : FluentIcons.eye_off_24_regular,
+              ),
+              title: Text(
+                detectionState.isIpMasked
+                    ? appLocalizations.showCurrentIp
+                    : appLocalizations.hideCurrentIp,
+              ),
               onTap: () {
                 Navigator.of(context, rootNavigator: true).pop();
                 detectionState.toggleIpPrivacy();

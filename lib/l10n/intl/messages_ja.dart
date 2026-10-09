@@ -510,6 +510,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "ipAddress": MessageLookupByLibrary.simpleMessage("IP アドレス"),
     "ipClickBehavior": MessageLookupByLibrary.simpleMessage("表示切替"),
     "ipPrivacyProtection": MessageLookupByLibrary.simpleMessage("IP表示を隠す"),
+    "hideCurrentIp": MessageLookupByLibrary.simpleMessage("現在のIPを隠す"),
+    "showCurrentIp": MessageLookupByLibrary.simpleMessage("現在のIPを表示"),
     "ipcidr": MessageLookupByLibrary.simpleMessage("IP / サブネットマスク"),
     "ipv6Desc": MessageLookupByLibrary.simpleMessage("IPv6トラフィックの受信を有効化"),
     "ipv6InboundDesc": MessageLookupByLibrary.simpleMessage("IPv6インバウンド通信を許可"),

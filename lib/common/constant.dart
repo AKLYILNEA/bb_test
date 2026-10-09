@@ -48,6 +48,7 @@ const customSidebarIconKey = 'custom_sidebar_icon';
 const customDashboardTitleKey = 'custom_dashboard_title';
 const wakelockEnabledKey = 'wakelock_enabled';
 const trafficUsageShowUploadKey = 'traffic_usage_show_upload';
+const ipPrivacyProtectionKey = 'ip_privacy_protection';
 const double dialogCommonWidth = 300;
 const repository = 'aaANDkk/Bettbox-Myui';
 const ipInfoToken = String.fromEnvironment('IPINFO_TOKEN', defaultValue: '');

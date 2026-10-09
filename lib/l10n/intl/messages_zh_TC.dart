@@ -468,6 +468,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "ipAddress": MessageLookupByLibrary.simpleMessage("IP 位址"),
     "ipClickBehavior": MessageLookupByLibrary.simpleMessage("顯示切換"),
     "ipPrivacyProtection": MessageLookupByLibrary.simpleMessage("隱藏 IP 顯示"),
+    "hideCurrentIp": MessageLookupByLibrary.simpleMessage("隱藏當前 IP"),
+    "showCurrentIp": MessageLookupByLibrary.simpleMessage("顯示當前 IP"),
     "ipcidr": MessageLookupByLibrary.simpleMessage("IP / 遮罩"),
     "ipv6Desc": MessageLookupByLibrary.simpleMessage("開啟後將可以接收 IPv6 流量"),
     "ipv6InboundDesc": MessageLookupByLibrary.simpleMessage("允許 IPv6 入站"),

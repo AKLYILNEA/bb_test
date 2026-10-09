@@ -670,6 +670,8 @@ class MessageLookup extends MessageLookupByLibrary {
       "Режим отображения",
     ),
     "ipPrivacyProtection": MessageLookupByLibrary.simpleMessage("Скрыть IP"),
+    "hideCurrentIp": MessageLookupByLibrary.simpleMessage("Скрыть текущий IP"),
+    "showCurrentIp": MessageLookupByLibrary.simpleMessage("Показать текущий IP"),
     "ipcidr": MessageLookupByLibrary.simpleMessage("IP/CIDR"),
     "ipv6Desc": MessageLookupByLibrary.simpleMessage("Включить поддержку IPv6"),
     "ipv6InboundDesc": MessageLookupByLibrary.simpleMessage(

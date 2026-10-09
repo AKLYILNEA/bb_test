@@ -4536,6 +4536,26 @@ class AppLocalizations {
     );
   }
 
+  /// `Hide Current IP`
+  String get hideCurrentIp {
+    return Intl.message(
+      'Hide Current IP',
+      name: 'hideCurrentIp',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Show Current IP`
+  String get showCurrentIp {
+    return Intl.message(
+      'Show Current IP',
+      name: 'showCurrentIp',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Refresh IP`
   String get manualRefreshIp {
     return Intl.message(

@@ -562,6 +562,8 @@
   "detectionTip": "استفاده از API جانبی (صرفاً جهت اطلاع)",
   "ipClickBehavior": "تغییر نمایش",
   "ipPrivacyProtection": "پنهان‌سازی IP",
+  "hideCurrentIp": "پنهان کردن IP فعلی",
+  "showCurrentIp": "نمایش IP فعلی",
   "manualRefreshIp": "دریافت مجدد IP",
   "tryManualRefresh": "لطفاً به صورت دستی بروزرسانی کنید",
   "refreshAppList": "بروزرسانی لیست برنامه‌ها",

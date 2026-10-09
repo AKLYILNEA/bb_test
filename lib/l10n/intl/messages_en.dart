@@ -641,6 +641,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "ipPrivacyProtection": MessageLookupByLibrary.simpleMessage(
       "Hide IP Display",
     ),
+    "hideCurrentIp": MessageLookupByLibrary.simpleMessage(
+      "Hide Current IP",
+    ),
+    "showCurrentIp": MessageLookupByLibrary.simpleMessage(
+      "Show Current IP",
+    ),
     "ipcidr": MessageLookupByLibrary.simpleMessage("IP/CIDR"),
     "ipv6Desc": MessageLookupByLibrary.simpleMessage(
       "Enable IPv6 traffic routing",

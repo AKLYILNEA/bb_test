@@ -228,6 +228,7 @@ class GlobalState {
     }
     await EmojiManager.init();
     await request.preloadIpCache();
+    await detectionState.init();
   }
 
   bool get isAndroidTV => _isAndroidTV ?? false;
@@ -1308,7 +1309,22 @@ class DetectionState {
     ),
   );
 
-  DetectionState._internal();
+  DetectionState._internal() {
+    _initIpPrivacy();
+  }
+
+  Future<void> _initIpPrivacy() async {
+    _isIpMasked = await preferences.getIpPrivacyProtection();
+    if (_isIpMasked && state.value.ipInfo != null) {
+      state.value = state.value.copyWith(
+        ipInfo: _maskIpInfo(_rawIpInfo ?? state.value.ipInfo),
+      );
+    }
+  }
+
+  Future<void> init() async {
+    await _initIpPrivacy();
+  }
 
   factory DetectionState() {
     _instance ??= DetectionState._internal();
@@ -1325,14 +1341,20 @@ class DetectionState {
 
   void toggleIpPrivacy() {
     _isIpMasked = !_isIpMasked;
+    unawaited(preferences.setIpPrivacyProtection(_isIpMasked));
     if (_rawIpInfo != null) {
       state.value = state.value.copyWith(ipInfo: _maskIpInfo(_rawIpInfo));
+    } else if (state.value.ipInfo != null) {
+      state.value = state.value.copyWith(
+        ipInfo: _isIpMasked
+            ? state.value.ipInfo!.copyWith(ip: '*****')
+            : state.value.ipInfo,
+      );
     }
   }
 
   void manualRefresh() {
     _rawIpInfo = null;
-    _isIpMasked = false;
     state.value = state.value.copyWith(
       isLoading: true,
       ipInfo: null,
@@ -1354,7 +1376,6 @@ class DetectionState {
 
   Future<void> switchToDomesticIp() async {
     _rawIpInfo = null;
-    _isIpMasked = false;
 
     _cancelPreviousRequest();
     _cancelToken = CancelToken();

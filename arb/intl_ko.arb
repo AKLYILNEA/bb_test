@@ -562,6 +562,8 @@
   "detectionTip": "타사 API를 사용하므로 참고용으로만 확인하세요",
   "ipClickBehavior": "표시 전환",
   "ipPrivacyProtection": "IP 표시 숨기기",
+  "hideCurrentIp": "현재 IP 숨기기",
+  "showCurrentIp": "현재 IP 표시",
   "manualRefreshIp": "IP 다시 가져오기",
   "tryManualRefresh": "수동 새로고침을 시도해 보세요",
   "refreshAppList": "앱 목록 새로고침",

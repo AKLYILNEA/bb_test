@@ -641,6 +641,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "ipPrivacyProtection": MessageLookupByLibrary.simpleMessage(
       "پنهان‌سازی IP",
     ),
+    "hideCurrentIp": MessageLookupByLibrary.simpleMessage(
+      "پنهان کردن IP فعلی",
+    ),
+    "showCurrentIp": MessageLookupByLibrary.simpleMessage(
+      "نمایش IP فعلی",
+    ),
     "ipcidr": MessageLookupByLibrary.simpleMessage("IP / ماسک"),
     "ipv6Desc": MessageLookupByLibrary.simpleMessage(
       "دریافت ترافیک IPv6 فعال باشد",
