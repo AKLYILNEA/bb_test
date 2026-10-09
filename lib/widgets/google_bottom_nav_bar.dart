@@ -120,6 +120,7 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
   final ValueNotifier<int?> _activePressIndex = ValueNotifier(null);
   final ValueNotifier<bool> _isDragging = ValueNotifier(false);
   Timer? _longPressTimer;
+  int _pressTime = 0;
 
   int? _pointer;
   int? _pressedIndex;
@@ -227,17 +228,22 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
     _pressedIndex = index;
     _lastSnappedIndex = index;
     _pressX = localPosition.dx;
+    _pressTime = DateTime.now().millisecondsSinceEpoch;
     _dragging = false;
     _isDragging.value = false;
     _activePressIndex.value = index;
     _lift.springTo(1, _liftSpring);
     _lens.springTo(index.toDouble(), _settleSpring);
     _longPressTimer?.cancel();
-    _longPressTimer = Timer(const Duration(milliseconds: 220), () {
-      if (mounted && _pressedIndex != null) {
-        _iconLift.springTo(1, _liftSpring);
-      }
-    });
+    if (index == _selectedIndex) {
+      _iconLift.springTo(1, _liftSpring);
+    } else {
+      _longPressTimer = Timer(const Duration(milliseconds: 220), () {
+        if (mounted && _pressedIndex != null) {
+          _iconLift.springTo(1, _liftSpring);
+        }
+      });
+    }
     _triggerHapticFeedback(enableFeedback);
   }
 
@@ -267,9 +273,14 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
 
   void _release({required bool commit}) {
     final index = _pressedIndex;
+    final pressDuration = DateTime.now().millisecondsSinceEpoch - _pressTime;
     _longPressTimer?.cancel();
     if (_iconLift.value > 0 || _iconLift.target > 0) {
-      _iconLift.springTo(0, _settleSpring);
+      if (pressDuration < 160 && !_dragging) {
+        _iconLift.jumpTo(0);
+      } else {
+        _iconLift.springTo(0, _settleSpring);
+      }
     }
     if (index == null) {
       return;
