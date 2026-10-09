@@ -279,112 +279,124 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
 
     final bar = SizedBox(
       height: _barHeight,
-      child: Container(
-        decoration: ShapeDecoration(
-          shape: SuperellipseBorder(
-            borderRadius: BorderRadius.circular(32.5),
-          ),
-          shadows: [
-            BoxShadow(
-              blurRadius: 28,
-              offset: const Offset(0, 8),
-              color: Colors.black.withValues(
-                alpha: isLight ? 0.08 : 0.22,
-              ),
-            ),
-            BoxShadow(
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-              color: Colors.black.withValues(
-                alpha: isLight ? 0.04 : 0.10,
-              ),
-            ),
-          ],
-        ),
-        child: ClipPath(
-          clipper: ShapeBorderClipper(
-            shape: SuperellipseBorder(
-              borderRadius: BorderRadius.circular(32.5),
-            ),
-          ),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(
-              sigmaX: 8.0,
-              sigmaY: 8.0,
-            ),
-            child: DecoratedBox(
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // Background layer with blur, card color, border & shadows
+          Positioned.fill(
+            child: Container(
               decoration: ShapeDecoration(
-                color: barColor,
                 shape: SuperellipseBorder(
                   borderRadius: BorderRadius.circular(32.5),
-                  side: BorderSide(
-                    color: borderColor,
-                    width: 1,
+                ),
+                shadows: [
+                  BoxShadow(
+                    blurRadius: 28,
+                    offset: const Offset(0, 8),
+                    color: Colors.black.withValues(
+                      alpha: isLight ? 0.08 : 0.22,
+                    ),
+                  ),
+                  BoxShadow(
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                    color: Colors.black.withValues(
+                      alpha: isLight ? 0.04 : 0.10,
+                    ),
+                  ),
+                ],
+              ),
+              child: ClipPath(
+                clipper: ShapeBorderClipper(
+                  shape: SuperellipseBorder(
+                    borderRadius: BorderRadius.circular(32.5),
+                  ),
+                ),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(
+                    sigmaX: 8.0,
+                    sigmaY: 8.0,
+                  ),
+                  child: DecoratedBox(
+                    decoration: ShapeDecoration(
+                      color: barColor,
+                      shape: SuperellipseBorder(
+                        borderRadius: BorderRadius.circular(32.5),
+                        side: BorderSide(
+                          color: borderColor,
+                          width: 1,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final totalWidth = constraints.maxWidth;
-                  final innerWidth = totalWidth - (2 * _barPadding);
-                  final slotWidth = innerWidth / math.max(1, count);
-
-                  return Listener(
-                    behavior: HitTestBehavior.opaque,
-                    onPointerDown: (e) => _handlePointerDown(e, enableFeedback),
-                    onPointerMove: (e) => _handlePointerMove(e, enableFeedback),
-                    onPointerUp: _handlePointerEnd,
-                    onPointerCancel: _handlePointerEnd,
-                    child: MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          if (count > 0)
-                            AnimatedBuilder(
-                              animation: _motion,
-                              builder: (context, _) => _Lens(
-                                position: _lens.value,
-                                lift: _lift.value,
-                                slotWidth: slotWidth,
-                                totalHeight: _barHeight,
-                              ),
-                            ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: _barPadding,
-                            ),
-                            child: Row(
-                              children: [
-                                for (final (index, item)
-                                    in widget.navigationItems.indexed)
-                                  Expanded(
-                                    child: _FloatingBarItem(
-                                      item: item,
-                                      index: index,
-                                      lens: _lens,
-                                      lift: _lift,
-                                      onActivate: () {
-                                        widget.onTabChange(index);
-                                        _lens.springTo(
-                                          index.toDouble(),
-                                          _settleSpring,
-                                        );
-                                      },
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
             ),
           ),
-        ),
+          // Interactive content layer (floating above, can swell outside bar bounds)
+          Positioned.fill(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final totalWidth = constraints.maxWidth;
+                final innerWidth = totalWidth - (2 * _barPadding);
+                final slotWidth = innerWidth / math.max(1, count);
+
+                return Listener(
+                  behavior: HitTestBehavior.opaque,
+                  onPointerDown: (e) => _handlePointerDown(e, enableFeedback),
+                  onPointerMove: (e) => _handlePointerMove(e, enableFeedback),
+                  onPointerUp: _handlePointerEnd,
+                  onPointerCancel: _handlePointerEnd,
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        if (count > 0)
+                          AnimatedBuilder(
+                            animation: _motion,
+                            builder: (context, _) => _Lens(
+                              position: _lens.value,
+                              lift: _lift.value,
+                              slotWidth: slotWidth,
+                              totalHeight: _barHeight,
+                              isLight: isLight,
+                            ),
+                          ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: _barPadding,
+                          ),
+                          child: Row(
+                            children: [
+                              for (final (index, item)
+                                  in widget.navigationItems.indexed)
+                                Expanded(
+                                  child: _FloatingBarItem(
+                                    item: item,
+                                    index: index,
+                                    lens: _lens,
+                                    lift: _lift,
+                                    onActivate: () {
+                                      widget.onTabChange(index);
+                                      _lens.springTo(
+                                        index.toDouble(),
+                                        _settleSpring,
+                                      );
+                                    },
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
 
@@ -394,7 +406,7 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
         padding: EdgeInsets.only(bottom: math.max(viewBottom, 12.0)),
         child: Container(
           color: Colors.transparent,
-          padding: const EdgeInsets.only(left: 16, right: 16, top: 8),
+          padding: const EdgeInsets.only(left: 16, right: 16, top: 12),
           child: bar,
         ),
       ),
@@ -408,23 +420,29 @@ class _Lens extends StatelessWidget {
     required this.lift,
     required this.slotWidth,
     required this.totalHeight,
+    required this.isLight,
   });
 
   final double position;
   final double lift;
   final double slotWidth;
   final double totalHeight;
+  final bool isLight;
 
   @override
   Widget build(BuildContext context) {
     final clampedLift = lift.clamp(0.0, 1.0);
-    final currentGap = _barPadding * (1.0 - clampedLift);
-    final lensHeight = totalHeight - 2 * currentGap;
-    final lensRadius = lensHeight / 2;
-    final lensWidth = slotWidth + 2 * _barPadding * clampedLift;
+    const maxGrowth = 26.0;
+    final growth = maxGrowth * clampedLift;
+
+    final baseHeight = totalHeight - 2 * _barPadding; // 53.0
+    final lensHeight = baseHeight + growth; // 53.0 -> 79.0
+    final lensRadius = lensHeight / 2; // 26.5 -> 39.5
+    final lensWidth = slotWidth + growth; // slotWidth -> slotWidth + 26.0
+
     final centerDx = _barPadding + (position + 0.5) * slotWidth;
     final start = centerDx - lensWidth / 2;
-    final top = currentGap;
+    final top = _barPadding - (growth / 2); // 6.0 -> -7.0
 
     final colorScheme = context.colorScheme;
     final lensColor = Color.alphaBlend(
@@ -445,6 +463,16 @@ class _Lens extends StatelessWidget {
           shape: SuperellipseBorder(
             borderRadius: BorderRadius.circular(lensRadius),
           ),
+          shadows: [
+            if (clampedLift > 0.05)
+              BoxShadow(
+                color: Colors.black.withValues(
+                  alpha: (isLight ? 0.12 : 0.22) * clampedLift,
+                ),
+                blurRadius: 12 * clampedLift,
+                offset: Offset(0, 2 * clampedLift),
+              ),
+          ],
         ),
       ),
     );
@@ -479,7 +507,7 @@ class _FloatingBarItem extends StatelessWidget {
           colorScheme.primary,
           emphasis,
         )!;
-        final scale = 1.0 + 0.10 * emphasis + 0.05 * emphasis * currentLift;
+        final scale = 1.0 + 0.10 * emphasis + 0.10 * emphasis * currentLift;
 
         return Center(
           child: Transform.scale(

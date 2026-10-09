@@ -85,7 +85,7 @@ extension ColorExtension on Color {
         .toUpperCase();
   }
 
-  Color darken([final int amount = 10]) {
+  Color darken([int amount = 10]) {
     if (amount <= 0) return this;
     if (amount > 100) return Colors.black;
     final HSLColor hsl = HSLColor.fromColor(this);
@@ -153,8 +153,13 @@ Color optionCardColor(BuildContext context) {
 
 /// Selected-item tint matching the floating nav bar's tab background.
 Color navSelectedColor(ColorScheme colorScheme, {bool hovered = false}) {
-  final base = colorScheme.brightness == Brightness.light ? 0.20 : 0.26;
-  return colorScheme.primary.withValues(alpha: hovered ? base + 0.08 : base);
+  if (hovered) {
+    return Color.alphaBlend(
+      colorScheme.onSecondaryContainer.withValues(alpha: 0.08),
+      colorScheme.secondaryContainer,
+    );
+  }
+  return colorScheme.secondaryContainer;
 }
 
 // Lifts every channel by a few units, saturating at white.
