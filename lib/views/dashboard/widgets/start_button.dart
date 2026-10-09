@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/models/models.dart';
@@ -117,7 +118,10 @@ class _StartButtonState extends ConsumerState<StartButton> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   SizedBox(
-                    height: globalState.measure.bodyMediumHeight + 2,
+                    height: math.max(
+                      globalState.measure.bodyMediumHeight + 2,
+                      24.0,
+                    ),
                     child: FadeThroughBox(
                       child: _buildContent(
                         context,
@@ -185,15 +189,10 @@ class _StartButtonState extends ConsumerState<StartButton> {
       return Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 24,
-            child: Center(
-              child: Icon(
-                FluentIcons.play_circle_24_filled,
-                size: 20,
-                color: context.colorScheme.primary,
-              ),
-            ),
+          Icon(
+            FluentIcons.play_circle_24_filled,
+            size: 24,
+            color: context.colorScheme.primary,
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -212,15 +211,10 @@ class _StartButtonState extends ConsumerState<StartButton> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        SizedBox(
-          width: 24,
-          child: Center(
-            child: Icon(
-              FluentIcons.pause_circle_24_filled,
-              size: 20,
-              color: context.colorScheme.primary,
-            ),
-          ),
+        Icon(
+          FluentIcons.pause_circle_24_filled,
+          size: 24,
+          color: context.colorScheme.primary,
         ),
         const SizedBox(width: 8),
         Expanded(
