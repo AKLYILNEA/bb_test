@@ -44,7 +44,13 @@ class OutboundMode extends StatelessWidget {
               onPressed: () {},
               info: Info(
                 label: appLocalizations.outboundMode,
-                iconData: FluentIcons.arrow_split_24_regular,
+                icon: RotatedBox(
+                  quarterTurns: 2,
+                  child: Icon(
+                    FluentIcons.arrow_split_24_regular,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
               ),
               child: Padding(
                 padding: EdgeInsets.only(top: _rowGap.ap, bottom: pillInset),
@@ -136,7 +142,7 @@ class _ModeRows extends StatelessWidget {
                     child: _ModeRow(
                       title: Intl.message(item.name),
                       icon: _getModeIcon(item),
-                      glyphTurns: _getModeGlyphTurns(item),
+                      glyphAngle: _getModeGlyphAngle(item),
                       selected: item == mode,
                       foreground: Color.lerp(
                         context.colorScheme.onSurfaceVariant,
@@ -168,10 +174,11 @@ IconData _getModeIcon(Mode mode) {
   };
 }
 
-int _getModeGlyphTurns(Mode mode) {
+double _getModeGlyphAngle(Mode mode) {
   return switch (mode) {
-    Mode.global => 3,
-    _ => 0,
+    Mode.rule => pi / 4,
+    Mode.global => 3 * pi / 2,
+    Mode.direct => 0.0,
   };
 }
 
@@ -211,7 +218,7 @@ class _ModeRow extends StatelessWidget {
   const _ModeRow({
     required this.title,
     required this.icon,
-    required this.glyphTurns,
+    required this.glyphAngle,
     required this.selected,
     required this.foreground,
     required this.contentInset,
@@ -222,7 +229,7 @@ class _ModeRow extends StatelessWidget {
 
   final String title;
   final IconData icon;
-  final int glyphTurns;
+  final double glyphAngle;
   final bool selected;
   final Color foreground;
   final double contentInset;
@@ -255,8 +262,8 @@ class _ModeRow extends StatelessWidget {
                     SizedBox(
                       width: glyphWidth,
                       child: Center(
-                        child: RotatedBox(
-                          quarterTurns: glyphTurns,
+                        child: Transform.rotate(
+                          angle: glyphAngle,
                           child: Icon(
                             icon,
                             size: _rowGlyphSize,
