@@ -17,7 +17,7 @@ import 'package:bett_box/widgets/animated_nav_icon.dart';
 import 'package:bett_box/widgets/card.dart';
 
 const double _barHeight = 64.0;
-const double _lensInset = 5.0;
+const double _lensInset = 4.0;
 const double _iconSize = 24.0;
 const double _labelGap = 2.0;
 const double _labelInset = 2.0;
@@ -476,13 +476,16 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
     );
     final colorScheme = context.colorScheme;
     final isLight = colorScheme.brightness == Brightness.light;
+    final isDark = !isLight;
     final primaryColor = colorScheme.primary;
     final onSurfaceVariantColor = colorScheme.onSurfaceVariant;
 
-    final barColor = (!pureBlack
-            ? commonCardColor(context)
-            : Colors.black)
-        .withValues(alpha: pureBlack ? 0.95 : (isLight ? 0.88 : 0.86));
+    final barColor = (isDark && pureBlack
+            ? Colors.black
+            : commonCardColor(context))
+        .withValues(
+          alpha: (isDark && pureBlack) ? 0.95 : (isLight ? 0.88 : 0.86),
+        );
     final barBorderSide = BorderSide(
       color: isLight
           ? colorScheme.outlineVariant.withValues(alpha: 0.45)
@@ -603,39 +606,41 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
                                   lensInset: _lensInset,
                                 ),
                               ),
-                            Row(
-                              children: [
-                                for (final (index, item)
-                                    in widget.navigationItems.indexed)
-                                  Expanded(
-                                    child: _FloatingBarItem(
-                                      item: item,
-                                      selected: index == _selectedIndex,
-                                      index: index,
-                                      lens: _lens,
-                                      hoverAt: _hoverAt,
-                                      extent: slotWidth,
-                                      lift: _lift,
-                                      labelStyle: labelStyle?.copyWith(
-                                        fontSize: _labelSize * labelScale,
+                            Positioned.fill(
+                              child: Row(
+                                children: [
+                                  for (final (index, item)
+                                      in widget.navigationItems.indexed)
+                                    Expanded(
+                                      child: _FloatingBarItem(
+                                        item: item,
+                                        selected: index == _selectedIndex,
+                                        index: index,
+                                        lens: _lens,
+                                        hoverAt: _hoverAt,
+                                        extent: slotWidth,
+                                        lift: _lift,
+                                        labelStyle: labelStyle?.copyWith(
+                                          fontSize: _labelSize * labelScale,
+                                        ),
+                                        labelHeight: lineHeight,
+                                        labelOverflows:
+                                            labels[index].width * labelScale >
+                                                room,
+                                        onActivate: () {
+                                          widget.onTabChange(index);
+                                          _lens.springTo(
+                                            index.toDouble(),
+                                            _settleSpring,
+                                          );
+                                        },
+                                        primaryColor: primaryColor,
+                                        onSurfaceVariantColor:
+                                            onSurfaceVariantColor,
                                       ),
-                                      labelHeight: lineHeight,
-                                      labelOverflows:
-                                          labels[index].width * labelScale >
-                                              room,
-                                      onActivate: () {
-                                        widget.onTabChange(index);
-                                        _lens.springTo(
-                                          index.toDouble(),
-                                          _settleSpring,
-                                        );
-                                      },
-                                      primaryColor: primaryColor,
-                                      onSurfaceVariantColor:
-                                          onSurfaceVariantColor,
                                     ),
-                                  ),
-                              ],
+                                ],
+                              ),
                             ),
                           ],
                         );
@@ -881,7 +886,6 @@ class _FloatingBarItemState extends State<_FloatingBarItem>
 
           final column = Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
             children: [
               AnimatedNavIcon(
                 label: widget.item.label,
@@ -926,9 +930,11 @@ class _FloatingBarItemState extends State<_FloatingBarItem>
         label: widget.item.label.localizedName,
         excludeSemantics: true,
         onTap: widget.onActivate,
-        child: widget.labelOverflows
-            ? Tooltip(message: widget.item.label.localizedName, child: content)
-            : content,
+        child: SizedBox.expand(
+          child: widget.labelOverflows
+              ? Tooltip(message: widget.item.label.localizedName, child: content)
+              : content,
+        ),
       ),
     );
   }
