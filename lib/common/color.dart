@@ -148,7 +148,11 @@ Color panelDividerColor(BuildContext context) {
 /// differ from both the page and [commonCardColor], otherwise the unselected
 /// options read as ordinary cards.
 Color optionCardColor(BuildContext context) {
-  return Theme.of(context).colorScheme.surfaceContainerHighest;
+  final colorScheme = Theme.of(context).colorScheme;
+  if (colorScheme.brightness == Brightness.light) {
+    return colorScheme.surfaceContainerHigh;
+  }
+  return colorScheme.surfaceContainerHighest;
 }
 
 /// Selected-item tint matching the floating nav bar's tab background.
