@@ -300,7 +300,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                                           !moreStreamingPlatforms.contains(p))))
                                 ListTile(
                                   shape: SuperellipseBorder(
-                                    borderRadius: BorderRadius.circular(22),
+                                    borderRadius: BorderRadius.circular(16),
                                   ),
                                   dense: true,
                                   contentPadding: const EdgeInsets.symmetric(horizontal: 8),
