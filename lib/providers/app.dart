@@ -420,14 +420,19 @@ class Groups extends _$Groups with AutoDisposeNotifierMixin {
 
 @riverpod
 class DelayDataSource extends _$DelayDataSource with AutoDisposeNotifierMixin {
-  Timer? _flushTimer;
-  final List<Delay> _bufferedDelays = [];
+  // Static on purpose: this provider is auto-dispose, and a buffered delay that
+  // is dropped on dispose would leave a node stuck on its "testing" value.
+  static Timer? _flushTimer;
+  static final List<Delay> _bufferedDelays = [];
+  static DelayDataSource? _active;
 
   @override
   DelayMap build() {
+    _active = this;
     ref.onDispose(() {
-      _flushTimer?.cancel();
-      _bufferedDelays.clear();
+      if (identical(_active, this)) {
+        _active = null;
+      }
     });
     return globalState.appState.delayMap;
   }
@@ -447,18 +452,19 @@ class DelayDataSource extends _$DelayDataSource with AutoDisposeNotifierMixin {
     _flushDelays();
   }
 
-  void _flushDelays() {
+  static void _flushDelays() {
     _flushTimer?.cancel();
     _flushTimer = null;
     if (_bufferedDelays.isEmpty) return;
     final delays = List<Delay>.from(_bufferedDelays);
     _bufferedDelays.clear();
 
+    final base = globalState.appState.delayMap;
     DelayMap? newDelayMap;
     for (final delay in delays) {
-      final currentMap = newDelayMap ?? state;
+      final currentMap = newDelayMap ?? base;
       if (currentMap[delay.url]?[delay.name] != delay.value) {
-        newDelayMap ??= Map.from(state);
+        newDelayMap ??= Map.from(base);
         if (newDelayMap[delay.url] == null) {
           newDelayMap[delay.url] = {};
         } else {
@@ -467,9 +473,9 @@ class DelayDataSource extends _$DelayDataSource with AutoDisposeNotifierMixin {
         newDelayMap[delay.url]![delay.name] = delay.value;
       }
     }
-    if (newDelayMap != null) {
-      state = newDelayMap;
-    }
+    if (newDelayMap == null) return;
+    globalState.appState = globalState.appState.copyWith(delayMap: newDelayMap);
+    _active?.state = newDelayMap;
   }
 }
 
