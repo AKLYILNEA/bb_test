@@ -4,6 +4,37 @@ import 'package:flutter/material.dart';
 
 import 'text.dart';
 
+/// Small theme-tinted capsule for inline card subtitles (expiry date, 本地文件…).
+class CommonInfoCapsule extends StatelessWidget {
+  final String label;
+  final TextStyle? style;
+
+  const CommonInfoCapsule(this.label, {super.key, this.style});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.colorScheme;
+    return Container(
+      height: 18,
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      alignment: Alignment.center,
+      decoration: ShapeDecoration(
+        color: navSelectedColor(colorScheme),
+        shape: SuperellipseBorder(borderRadius: BorderRadius.circular(9)),
+      ),
+      child: EmojiText(
+        label,
+        style: (style ?? context.textTheme.labelSmall)?.copyWith(
+          color: colorScheme.primary,
+          height: 1.0,
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+}
+
 class CommonChip extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
