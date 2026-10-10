@@ -156,7 +156,7 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
                         : 0),
               ),
               child: Grid(
-                mainAxisSpacing: 16,
+                mainAxisSpacing: profilesSelectorState.columns <= 1 ? 8 : 16,
                 crossAxisSpacing: 16,
                 crossAxisCount: columns,
                 children: [

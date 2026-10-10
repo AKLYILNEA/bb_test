@@ -200,7 +200,7 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
       decoration: ShapeDecoration(
         color: context.colorScheme.surfaceContainerLow,
         shape: SuperellipseBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(20),
         ),
       ),
       child: Row(

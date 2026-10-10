@@ -344,31 +344,32 @@ class OutboundModeV2 extends StatelessWidget {
                                 final isFocused = Focus.of(context).hasFocus;
                                 final isSelected = item == mode;
                                 return InkWell(
-                                  borderRadius: BorderRadius.circular(12),
+                                  customBorder: SuperellipseBorder(
+                                    borderRadius: BorderRadius.circular(13),
+                                  ),
                                   onTap: () {
                                     globalState.appController.changeMode(item);
                                   },
                                   child: Container(
                                     alignment: Alignment.center,
                                     height: height - 18,
-                                    decoration: BoxDecoration(
+                                    decoration: ShapeDecoration(
                                       color: isSelected
                                           ? thumbColor
                                           : (isFocused
                                               ? context.colorScheme.primary
                                                   .withValues(alpha: 0.12)
                                               : Colors.transparent),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: isFocused
-                                          ? Border.all(
-                                              color:
-                                                  context.colorScheme.primary,
-                                              width: 2,
-                                            )
-                                          : Border.all(
-                                              color: Colors.transparent,
-                                              width: 2,
-                                            ),
+                                      shape: SuperellipseBorder(
+                                        borderRadius: BorderRadius.circular(13),
+                                        side: isFocused
+                                            ? BorderSide(
+                                                color:
+                                                    context.colorScheme.primary,
+                                                width: 2,
+                                              )
+                                            : BorderSide.none,
+                                      ),
                                     ),
                                     child: Text(
                                       Intl.message(item.name),
@@ -426,7 +427,7 @@ class OutboundModeV2 extends StatelessWidget {
                   horizontal: 10,
                   vertical: 9,
                 ),
-                thumbRadius: const Radius.circular(13),
+                thumbRadius: const Radius.circular(14),
                 groupValue: mode,
                 onValueChanged: (value) {
                   if (value == null) {
