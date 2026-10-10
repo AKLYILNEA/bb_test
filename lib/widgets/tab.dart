@@ -382,7 +382,7 @@ class _CommonTabBarState<T extends Object> extends State<CommonTabBar<T>>
         padding: widget.padding.resolve(Directionality.of(context)),
         decoration: ShapeDecoration(
           shape: const SuperellipseBorder(
-            borderRadius: BorderRadius.all(Radius.circular(20)),
+            borderRadius: BorderRadius.all(Radius.circular(22)),
           ),
           color: widget.backgroundColor,
         ),

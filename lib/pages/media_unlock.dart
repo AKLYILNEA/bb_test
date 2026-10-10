@@ -466,7 +466,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
       decoration: ShapeDecoration(
         color: commonCardColor(context),
         shape: SuperellipseBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(22),
           side: commonCardBorderSide(context),
         ),
       ),

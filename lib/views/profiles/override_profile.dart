@@ -300,7 +300,7 @@ class OverrideSwitch extends ConsumerWidget {
     return CommonCard(
       onPressed: () {},
       type: CommonCardType.filled,
-      radius: 20,
+      radius: 22,
       child: ListItem.switchItem(
         padding: const EdgeInsets.only(left: 16, right: 16),
         title: Text(appLocalizations.enableOverride),
@@ -449,7 +449,7 @@ class RuleContent extends ConsumerWidget {
         margin: EdgeInsets.symmetric(vertical: 4),
         child: CommonCard(
           padding: EdgeInsets.zero,
-          radius: 20,
+          radius: 22,
           type: CommonCardType.filled,
           isSelected: isSelected,
           // decoration: BoxDecoration(
@@ -717,7 +717,7 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
     const menuStyle = MenuStyle(
       shape: WidgetStatePropertyAll<OutlinedBorder>(
         SuperellipseBorder(
-          borderRadius: BorderRadius.all(Radius.circular(20)),
+          borderRadius: BorderRadius.all(Radius.circular(22)),
         ),
       ),
     );
@@ -1025,7 +1025,7 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
                       spacing: 8,
                       children: [
                         CommonCard(
-                          radius: 20,
+                          radius: 22,
                           isSelected: _src,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
@@ -1044,7 +1044,7 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
                           },
                         ),
                         CommonCard(
-                          radius: 20,
+                          radius: 22,
                           isSelected: _noResolve,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(

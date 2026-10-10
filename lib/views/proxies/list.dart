@@ -970,7 +970,7 @@ class _GroupHeader extends ConsumerWidget {
     );
 
     return CommonCard(
-      radius: 20,
+      radius: 22,
       type: CommonCardType.filled,
       onPressed: onToggle,
       child: Padding(

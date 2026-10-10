@@ -613,7 +613,7 @@ class _ColorSchemePreview extends StatelessWidget {
       decoration: ShapeDecoration(
         color: colorScheme.surfaceContainer,
         shape: SuperellipseBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(22),
           side: _panelBorderSide(colorScheme),
         ),
       ),

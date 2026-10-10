@@ -612,7 +612,7 @@ class SectionContainer extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
           child: CommonCard(
             type: CommonCardType.filled,
-            radius: radius ?? 20.0,
+            radius: radius ?? 22.0,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -765,7 +765,7 @@ class ContinuousListItem extends StatelessWidget {
     required this.index,
     required this.count,
     this.reversed = false,
-    this.radius = 20.0,
+    this.radius = 22.0,
     this.standalone = false,
   });
 
@@ -876,7 +876,7 @@ Widget generateSectionV2({
       if (items.isNotEmpty && title != null)
         ListHeader(title: title, actions: actions),
       CommonCard(
-        radius: 20,
+        radius: 22,
         type: CommonCardType.filled,
         child: Column(children: [...items]),
       ),

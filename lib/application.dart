@@ -311,7 +311,7 @@ class ApplicationState extends ConsumerState<Application>
                 ),
                 floatingActionButtonTheme: FloatingActionButtonThemeData(
                   shape: SuperellipseBorder(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(22),
                   ),
                   elevation: 3,
                   hoverElevation: 5,
@@ -341,14 +341,14 @@ class ApplicationState extends ConsumerState<Application>
                 ),
                 popupMenuTheme: const PopupMenuThemeData(
                   shape: SuperellipseBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                    borderRadius: BorderRadius.all(Radius.circular(22)),
                   ),
                 ),
                 dropdownMenuTheme: const DropdownMenuThemeData(
                   menuStyle: MenuStyle(
                     shape: WidgetStatePropertyAll<OutlinedBorder>(
                       SuperellipseBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        borderRadius: BorderRadius.all(Radius.circular(22)),
                       ),
                     ),
                   ),
@@ -357,7 +357,7 @@ class ApplicationState extends ConsumerState<Application>
                   style: MenuStyle(
                     shape: WidgetStatePropertyAll<OutlinedBorder>(
                       SuperellipseBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        borderRadius: BorderRadius.all(Radius.circular(22)),
                       ),
                     ),
                   ),
@@ -444,7 +444,7 @@ class ApplicationState extends ConsumerState<Application>
                 ),
                 floatingActionButtonTheme: FloatingActionButtonThemeData(
                   shape: SuperellipseBorder(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(22),
                   ),
                   elevation: 3,
                   hoverElevation: 5,
@@ -474,14 +474,14 @@ class ApplicationState extends ConsumerState<Application>
                 ),
                 popupMenuTheme: const PopupMenuThemeData(
                   shape: SuperellipseBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                    borderRadius: BorderRadius.all(Radius.circular(22)),
                   ),
                 ),
                 dropdownMenuTheme: const DropdownMenuThemeData(
                   menuStyle: MenuStyle(
                     shape: WidgetStatePropertyAll<OutlinedBorder>(
                       SuperellipseBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        borderRadius: BorderRadius.all(Radius.circular(22)),
                       ),
                     ),
                   ),
@@ -490,7 +490,7 @@ class ApplicationState extends ConsumerState<Application>
                   style: MenuStyle(
                     shape: WidgetStatePropertyAll<OutlinedBorder>(
                       SuperellipseBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        borderRadius: BorderRadius.all(Radius.circular(22)),
                       ),
                     ),
                   ),
