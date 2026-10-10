@@ -29,6 +29,8 @@ const int _kLargeEditableLineThresholdDesktop = 5800;
 const Duration _kFindFocusDelay = Duration(milliseconds: 500);
 const Duration _kMinBusyDuration = Duration(milliseconds: 600);
 
+final _emojiRegex = emojiRegex();
+
 class EditorPage extends ConsumerStatefulWidget {
   final String title;
   final String content;
@@ -528,7 +530,7 @@ class _EditorPageState extends ConsumerState<EditorPage> {
                               ? atomOneDarkTheme
                               : atomOneLightTheme,
                           emojiFamily: emojiFamily,
-                          emojiRegex: emojiRegex(),
+                          emojiRegex: _emojiRegex,
                           textStyle: TextStyle(
                             fontFamily: FontFamily.jetBrainsMono.value,
                             fontFamilyFallback: [

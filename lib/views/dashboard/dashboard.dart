@@ -73,14 +73,17 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
   }
 
   /// Lays out the bundled text families once off the first frames, so the first
-  /// text field opened after a cold start does not pay for loading them.
+  /// text field opened after a cold start does not pay for loading them. The
+  /// emoji families are named directly: as a fallback they are only consulted
+  /// for glyphs the primary family lacks, so they would stay unloaded.
   void _warmUpTextStackOnce() {
     if (_textStackWarmed) return;
     _textStackWarmed = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       const styles = <TextStyle>[
         TextStyle(fontFamily: 'JetBrainsMono'),
-        TextStyle(fontFamilyFallback: ['OpenMoji', 'Twemoji']),
+        TextStyle(fontFamily: 'OpenMoji'),
+        TextStyle(fontFamily: 'Twemoji'),
       ];
       for (final style in styles) {
         final painter = TextPainter(
