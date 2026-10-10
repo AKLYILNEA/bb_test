@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
@@ -418,8 +420,15 @@ class Groups extends _$Groups with AutoDisposeNotifierMixin {
 
 @riverpod
 class DelayDataSource extends _$DelayDataSource with AutoDisposeNotifierMixin {
+  Timer? _flushTimer;
+  final List<Delay> _bufferedDelays = [];
+
   @override
   DelayMap build() {
+    ref.onDispose(() {
+      _flushTimer?.cancel();
+      _bufferedDelays.clear();
+    });
     return globalState.appState.delayMap;
   }
 
@@ -429,12 +438,36 @@ class DelayDataSource extends _$DelayDataSource with AutoDisposeNotifierMixin {
   }
 
   void setDelay(Delay delay) {
-    if (state[delay.url]?[delay.name] != delay.value) {
-      final DelayMap newDelayMap = Map.from(state);
-      if (newDelayMap[delay.url] == null) {
-        newDelayMap[delay.url] = {};
+    _bufferedDelays.add(delay);
+    _flushTimer ??= Timer(const Duration(milliseconds: 32), _flushDelays);
+  }
+
+  void setDelays(Iterable<Delay> delays) {
+    _bufferedDelays.addAll(delays);
+    _flushDelays();
+  }
+
+  void _flushDelays() {
+    _flushTimer?.cancel();
+    _flushTimer = null;
+    if (_bufferedDelays.isEmpty) return;
+    final delays = List<Delay>.from(_bufferedDelays);
+    _bufferedDelays.clear();
+
+    DelayMap? newDelayMap;
+    for (final delay in delays) {
+      final currentMap = newDelayMap ?? state;
+      if (currentMap[delay.url]?[delay.name] != delay.value) {
+        newDelayMap ??= Map.from(state);
+        if (newDelayMap[delay.url] == null) {
+          newDelayMap[delay.url] = {};
+        } else {
+          newDelayMap[delay.url] = Map.from(newDelayMap[delay.url]!);
+        }
+        newDelayMap[delay.url]![delay.name] = delay.value;
       }
-      newDelayMap[delay.url]![delay.name] = delay.value;
+    }
+    if (newDelayMap != null) {
       state = newDelayMap;
     }
   }

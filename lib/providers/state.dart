@@ -586,31 +586,42 @@ int getProxiesColumns(Ref ref) {
 
 List<Group>? _proxyIndexGroups;
 Map<String, Proxy> _proxyIndex = const {};
+Map<String, Group> _groupIndex = const {};
 
-Map<String, Proxy> _proxyIndexOf(List<Group> groups) {
-  if (identical(_proxyIndexGroups, groups)) return _proxyIndex;
-  final index = <String, Proxy>{};
+void _ensureIndexes(List<Group> groups) {
+  if (identical(_proxyIndexGroups, groups)) return;
+  final proxyIdx = <String, Proxy>{};
+  final groupIdx = <String, Group>{};
   for (final group in groups) {
+    groupIdx.putIfAbsent(group.name, () => group);
     for (final proxy in group.all) {
-      index.putIfAbsent(proxy.name, () => proxy);
+      proxyIdx.putIfAbsent(proxy.name, () => proxy);
     }
   }
   _proxyIndexGroups = groups;
-  _proxyIndex = index;
-  return index;
+  _proxyIndex = proxyIdx;
+  _groupIndex = groupIdx;
+}
+
+Map<String, Proxy> _proxyIndexOf(List<Group> groups) {
+  _ensureIndexes(groups);
+  return _proxyIndex;
+}
+
+Map<String, Group> _groupIndexOf(List<Group> groups) {
+  _ensureIndexes(groups);
+  return _groupIndex;
 }
 
 ProxyCardState _getProxyCardState(
-  List<Group> groups,
+  Map<String, Group> groupIndex,
   Map<String, Proxy> proxyIndex,
   SelectedMap selectedMap,
   ProxyCardState proxyDelayState,
 ) {
   if (proxyDelayState.proxyName.isEmpty) return proxyDelayState;
-  final index = groups.indexWhere(
-    (element) => element.name == proxyDelayState.proxyName,
-  );
-  if (index == -1) {
+  final group = groupIndex[proxyDelayState.proxyName];
+  if (group == null) {
     final proxy = proxyIndex[proxyDelayState.proxyName];
     final now = proxy?.now;
     if (proxy != null &&
@@ -619,7 +630,7 @@ ProxyCardState _getProxyCardState(
         now.isNotEmpty &&
         now != proxyDelayState.proxyName) {
       return _getProxyCardState(
-        groups,
+        groupIndex,
         proxyIndex,
         selectedMap,
         proxyDelayState.copyWith(proxyName: now),
@@ -627,7 +638,6 @@ ProxyCardState _getProxyCardState(
     }
     return proxyDelayState;
   }
-  final group = groups[index];
   final currentSelectedName = group.getCurrentSelectedName(
     selectedMap[proxyDelayState.proxyName] ?? '',
   );
@@ -635,7 +645,7 @@ ProxyCardState _getProxyCardState(
     return proxyDelayState;
   }
   return _getProxyCardState(
-    groups,
+    groupIndex,
     proxyIndex,
     selectedMap,
     proxyDelayState.copyWith(
@@ -650,7 +660,7 @@ ProxyCardState getProxyCardState(Ref ref, String proxyName) {
   final groups = ref.watch(groupsProvider);
   final selectedMap = ref.watch(selectedMapProvider);
   return _getProxyCardState(
-    groups,
+    _groupIndexOf(groups),
     _proxyIndexOf(groups),
     selectedMap,
     ProxyCardState(proxyName: proxyName),
