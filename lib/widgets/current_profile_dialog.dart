@@ -260,16 +260,14 @@ class _ProfilePanel extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Flexible(
-              child: DefaultTextStyle.merge(
+              child: EmojiText(
+                name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: titleStyle,
                 strutStyle: StrutStyle.fromTextStyle(
                   titleStyle!,
                   forceStrutHeight: true,
-                ),
-                child: EmojiText(
-                  name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: titleStyle,
                 ),
               ),
             ),

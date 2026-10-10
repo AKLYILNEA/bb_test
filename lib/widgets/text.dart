@@ -73,6 +73,7 @@ class TooltipText extends StatelessWidget {
 class EmojiText extends StatelessWidget {
   final String text;
   final TextStyle? style;
+  final StrutStyle? strutStyle;
   final int? maxLines;
   final TextOverflow? overflow;
   final TextAlign? textAlign;
@@ -83,6 +84,7 @@ class EmojiText extends StatelessWidget {
     this.maxLines,
     this.overflow,
     this.style,
+    this.strutStyle,
     this.textAlign,
   });
 
@@ -141,6 +143,7 @@ class EmojiText extends StatelessWidget {
             children: _buildTextSpans(text, defaultStyle),
           ),
           textAlign: textAlign ?? TextAlign.start,
+          strutStyle: strutStyle,
           maxLines: maxLines,
           overflow: overflow ?? TextOverflow.clip,
         );
