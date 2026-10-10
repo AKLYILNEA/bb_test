@@ -17,7 +17,7 @@ import 'package:bett_box/widgets/card.dart';
 
 const double _barHeight = 65.0;
 const double _barPadding = 6.0;
-const double _barPaddingHorizontal = 7.0;
+const double _barPaddingHorizontal = 6.5;
 const double _overdrag = 0.25;
 
 final _trackSpring = SpringDescription.withDurationAndBounce(
