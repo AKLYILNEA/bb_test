@@ -7,7 +7,6 @@ import 'package:defer_pointer/defer_pointer.dart';
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/providers/providers.dart';
-import 'package:bett_box/views/proxies/common.dart' show delayTest;
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -50,10 +49,6 @@ class DashboardView extends ConsumerStatefulWidget {
   ConsumerState<DashboardView> createState() => _DashboardViewState();
 }
 
-/// Guards the one initial delay test per app run: the dashboard state is rebuilt
-/// whenever the page is re-entered, so this must not live in the state.
-bool _autoDelayTestDone = false;
-
 class _DashboardViewState extends ConsumerState<DashboardView> {
   final key = GlobalKey<SuperGridState>();
   final GlobalKey<_DashboardStartSwitchState> _startSwitchKey = GlobalKey();
@@ -94,28 +89,6 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
           textDirection: TextDirection.ltr,
         )..layout();
         painter.dispose();
-      }
-    });
-  }
-
-  /// First entry after a cold start: measure every node of every group once, so
-  /// no card keeps the untested or spinning placeholder.
-  void _autoDelayTestOnce() {
-    if (_autoDelayTestDone) return;
-    if (!globalState.isStart) return;
-    final groups = globalState.appController.getCurrentGroups();
-    if (groups.isEmpty) return;
-    _autoDelayTestDone = true;
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!mounted) return;
-      await waitRouteSettled(context);
-      for (final group in groups) {
-        if (!mounted || !globalState.isStart) return;
-        await delayTest(
-          group.all,
-          testUrl: group.testUrl,
-          groupName: group.name,
-        );
       }
     });
   }
@@ -257,7 +230,6 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
   @override
   Widget build(BuildContext context) {
     _warmUpTextStackOnce();
-    _autoDelayTestOnce();
     final dashboardState = ref.watch(dashboardStateProvider);
     final columns = max(4 * ((dashboardState.viewWidth / 320).ceil()), 8);
     final spacing = 16.ap;
