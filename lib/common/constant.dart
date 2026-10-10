@@ -78,7 +78,7 @@ Decoration getCommonFabDecoration(BuildContext context) {
   final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
   return ShapeDecoration(
     shape: SuperellipseBorder(
-      borderRadius: BorderRadius.circular(22),
+      borderRadius: BorderRadius.circular(18),
     ),
     shadows: [
       BoxShadow(

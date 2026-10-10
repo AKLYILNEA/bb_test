@@ -311,7 +311,7 @@ class ApplicationState extends ConsumerState<Application>
                 ),
                 floatingActionButtonTheme: FloatingActionButtonThemeData(
                   shape: SuperellipseBorder(
-                    borderRadius: BorderRadius.circular(22),
+                    borderRadius: BorderRadius.circular(18),
                   ),
                   elevation: 3,
                   hoverElevation: 5,
@@ -444,7 +444,7 @@ class ApplicationState extends ConsumerState<Application>
                 ),
                 floatingActionButtonTheme: FloatingActionButtonThemeData(
                   shape: SuperellipseBorder(
-                    borderRadius: BorderRadius.circular(22),
+                    borderRadius: BorderRadius.circular(18),
                   ),
                   elevation: 3,
                   hoverElevation: 5,
