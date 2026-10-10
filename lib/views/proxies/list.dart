@@ -69,7 +69,8 @@ class _ProxyGroupsList extends ConsumerStatefulWidget {
 
 final Set<String> _mountedRows = <String>{};
 
-class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
+class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList>
+    with RouteSettledMixin {
   final ScrollController _scrollController = ScrollController();
   GroupOffsets _groupOffsets = GroupOffsets.empty;
   double _containerHeight = 0;
@@ -78,6 +79,13 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   int _toggleToken = 0;
   int _viewGeneration = 0;
   late Set<String> _unfoldSet;
+
+  @override
+  void didSettleRoute() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   void initState() {
@@ -343,7 +351,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
           child: CustomScrollView(
             key: const PageStorageKey<String>('proxies_list'),
             controller: _scrollController,
-            cacheExtent: 150.0,
+            cacheExtent: arrivalScrollCacheExtent(routeSettled, 150.0),
             slivers: [
               const SliverToBoxAdapter(child: SizedBox(height: 16)),
               for (var i = 0; i < widget.groups.length; i++)
