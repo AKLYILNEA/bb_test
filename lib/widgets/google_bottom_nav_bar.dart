@@ -17,6 +17,7 @@ import 'package:bett_box/widgets/card.dart';
 
 const double _barHeight = 65.0;
 const double _barPadding = 6.0;
+const double _barPaddingHorizontal = 7.0;
 const double _overdrag = 0.25;
 
 final _trackSpring = SpringDescription.withDurationAndBounce(
@@ -171,13 +172,13 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
 
   double _positionAt(Offset localPosition) {
     final width = context.size?.width ?? 0;
-    final innerWidth = width - (2 * _barPadding);
+    final innerWidth = width - (2 * _barPaddingHorizontal);
     if (innerWidth <= 0 || widget.navigationItems.isEmpty) {
       return widget.selectedIndex.toDouble();
     }
     final isRtl = Directionality.of(context) == TextDirection.rtl;
     final dx = isRtl ? (width - localPosition.dx) : localPosition.dx;
-    final localInnerDx = dx - _barPadding;
+    final localInnerDx = dx - _barPaddingHorizontal;
     final count = math.max(1, widget.navigationItems.length);
     final extent = innerWidth / count;
     final position = (localInnerDx / extent) - 0.5;
@@ -357,7 +358,7 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final totalWidth = constraints.maxWidth;
-                final innerWidth = totalWidth - (2 * _barPadding);
+                final innerWidth = totalWidth - (2 * _barPaddingHorizontal);
                 final slotWidth = innerWidth / math.max(1, count);
 
                 return Listener(
@@ -384,7 +385,7 @@ class _GoogleBottomNavBarState extends ConsumerState<GoogleBottomNavBar>
                           ),
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: _barPadding,
+                            horizontal: _barPaddingHorizontal,
                           ),
                           child: Row(
                             children: [
@@ -461,7 +462,7 @@ class _Lens extends StatelessWidget {
     final lensRadius = lensHeight / 2; // 26.5 -> 39.5
     final lensWidth = slotWidth + growth; // slotWidth -> slotWidth + 26.0
 
-    final centerDx = _barPadding + (position + 0.5) * slotWidth;
+    final centerDx = _barPaddingHorizontal + (position + 0.5) * slotWidth;
     final start = centerDx - lensWidth / 2;
     final top = _barPadding - (growth / 2); // 6.0 -> -7.0
 

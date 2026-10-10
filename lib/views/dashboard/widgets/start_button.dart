@@ -193,7 +193,7 @@ class _StartButtonState extends ConsumerState<StartButton> {
           Icon(
             FluentIcons.play_circle_24_filled,
             size: 20,
-            color: context.colorScheme.primary,
+            color: globalState.theme.darken2SecondaryContainer,
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -216,7 +216,7 @@ class _StartButtonState extends ConsumerState<StartButton> {
         Icon(
           FluentIcons.pause_circle_24_filled,
           size: 20,
-          color: context.colorScheme.primary,
+          color: globalState.theme.darken2SecondaryContainer,
         ),
         const SizedBox(width: 8),
         Expanded(
