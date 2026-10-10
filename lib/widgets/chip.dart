@@ -16,6 +16,9 @@ class CommonInfoCapsule extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
     final color = colorScheme.primary;
+    final effectiveStyle = (style ?? context.textTheme.labelMedium)?.copyWith(
+      color: color,
+    );
     return DecoratedBox(
       decoration: ShapeDecoration(
         color: color.withValues(alpha: 0.15),
@@ -23,15 +26,101 @@ class CommonInfoCapsule extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        child: EmojiText(
-          label,
-          style: (style ?? context.textTheme.labelMedium)?.copyWith(
-            color: color,
+        child: _CapCentered(
+          fontSize: effectiveStyle?.fontSize ?? 12,
+          child: EmojiText(
+            label,
+            style: effectiveStyle,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
         ),
       ),
+    );
+  }
+}
+
+/// Centers a line's cap height instead of its line box: a font's ascent
+/// outweighs its descent, so a line-box centered text sits low.
+class _CapCentered extends SingleChildRenderObjectWidget {
+  static const _capHeightPerEm = 0.7;
+
+  final double fontSize;
+
+  const _CapCentered({required this.fontSize, required super.child});
+
+  double _capHeight(BuildContext context) =>
+      MediaQuery.textScalerOf(context).scale(fontSize) * _capHeightPerEm;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderCapCentered(_capHeight(context));
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    _RenderCapCentered renderObject,
+  ) {
+    renderObject.capHeight = _capHeight(context);
+  }
+}
+
+class _RenderCapCentered extends RenderShiftedBox {
+  _RenderCapCentered(this._capHeight) : super(null);
+
+  double _capHeight;
+
+  set capHeight(double value) {
+    if (_capHeight == value) {
+      return;
+    }
+    _capHeight = value;
+    markNeedsLayout();
+  }
+
+  double _shift(Size size, double alphabeticBaseline) =>
+      (size.height + _capHeight) / 2 - alphabeticBaseline;
+
+  @override
+  Size computeDryLayout(covariant BoxConstraints constraints) =>
+      child?.getDryLayout(constraints) ?? constraints.smallest;
+
+  @override
+  double? computeDryBaseline(
+    covariant BoxConstraints constraints,
+    TextBaseline baseline,
+  ) {
+    final child = this.child;
+    if (child == null) {
+      return null;
+    }
+    final alphabetic = child.getDryBaseline(
+      constraints,
+      TextBaseline.alphabetic,
+    );
+    final result = child.getDryBaseline(constraints, baseline);
+    if (alphabetic == null || result == null) {
+      return null;
+    }
+    return result + _shift(child.getDryLayout(constraints), alphabetic);
+  }
+
+  @override
+  void performLayout() {
+    final child = this.child;
+    if (child == null) {
+      size = constraints.smallest;
+      return;
+    }
+    child.layout(constraints, parentUsesSize: true);
+    size = child.size;
+    final baseline = child.getDistanceToBaseline(TextBaseline.alphabetic);
+    if (baseline == null) {
+      return;
+    }
+    (child.parentData! as BoxParentData).offset = Offset(
+      0,
+      _shift(size, baseline),
     );
   }
 }

@@ -294,11 +294,17 @@ class ProfileItem extends StatelessWidget {
     return Row(
       children: [
         Flexible(
-          child: EmojiText(
-            profile.label ?? profile.id,
-            style: context.textTheme.titleMedium,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          child: DefaultTextStyle.merge(
+            strutStyle: StrutStyle.fromTextStyle(
+              context.textTheme.titleMedium!,
+              forceStrutHeight: true,
+            ),
+            child: EmojiText(
+              profile.label ?? profile.id,
+              style: context.textTheme.titleMedium,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ),
         if (subtitleText != null && subtitleText.isNotEmpty) ...[
