@@ -50,13 +50,16 @@ class DashboardView extends ConsumerStatefulWidget {
   ConsumerState<DashboardView> createState() => _DashboardViewState();
 }
 
+/// Guards the one initial delay test per app run: the dashboard state is rebuilt
+/// whenever the page is re-entered, so this must not live in the state.
+bool _autoDelayTestDone = false;
+
 class _DashboardViewState extends ConsumerState<DashboardView> {
   final key = GlobalKey<SuperGridState>();
   final GlobalKey<_DashboardStartSwitchState> _startSwitchKey = GlobalKey();
   final _isEditNotifier = ValueNotifier<bool>(false);
   final _addedWidgetsNotifier = ValueNotifier<List<GridItem>>([]);
   bool _textStackWarmed = false;
-  bool _autoDelayTested = false;
 
   @override
   void initState() {
@@ -98,11 +101,11 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
   /// First entry after a cold start: measure every node of every group once, so
   /// no card keeps the untested or spinning placeholder.
   void _autoDelayTestOnce() {
-    if (_autoDelayTested) return;
+    if (_autoDelayTestDone) return;
     if (!globalState.isStart) return;
     final groups = globalState.appController.getCurrentGroups();
     if (groups.isEmpty) return;
-    _autoDelayTested = true;
+    _autoDelayTestDone = true;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       await waitRouteSettled(context);
