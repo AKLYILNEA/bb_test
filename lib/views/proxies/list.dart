@@ -100,6 +100,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   }
 
   void _handleToggle(String groupName) {
+    _autoScrollToGroup(groupName);
     final isExpanding = !_unfoldSet.contains(groupName);
     setState(() {
       if (isExpanding) {
@@ -146,66 +147,97 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     return GroupOffsets(groups, offsets);
   }
 
-  void _animateToOffset(double targetOffset) {
-    if (!mounted || !_scrollController.hasClients) return;
-    final currentOffset = _scrollController.offset;
-    final clampedTarget = targetOffset.clamp(
+  double _getGroupOffset(String groupName) {
+    if (!_scrollController.hasClients ||
+        _scrollController.position.maxScrollExtent == 0 ||
+        _groupOffsets.isEmpty) {
+      return 0;
+    }
+    return _groupOffsets.offsetOf(groupName);
+  }
+
+  void _scrollToMakeVisibleWithPadding({
+    required double containerHeight,
+    required double pixels,
+    required double start,
+    required double end,
+    double padding = 24,
+  }) {
+    final visibleStart = pixels;
+    final visibleEnd = pixels + containerHeight;
+
+    final isElementVisible = start >= visibleStart && end <= visibleEnd;
+    if (isElementVisible) {
+      return;
+    }
+
+    double targetScrollOffset;
+
+    if (end <= visibleStart) {
+      targetScrollOffset = start;
+    } else if (start >= visibleEnd) {
+      targetScrollOffset = end - containerHeight + padding;
+    } else {
+      final visibleTopPart = end - visibleStart;
+      final visibleBottomPart = visibleEnd - start;
+      if (visibleTopPart.abs() >= visibleBottomPart.abs()) {
+        targetScrollOffset = end - containerHeight + padding;
+      } else {
+        targetScrollOffset = start;
+      }
+    }
+
+    targetScrollOffset = targetScrollOffset.clamp(
       _scrollController.position.minScrollExtent,
       _scrollController.position.maxScrollExtent,
     );
-    final distance = (clampedTarget - currentOffset).abs();
-    if (distance < 1.0) return;
 
-    final durationMs = (240 + (distance * 0.1)).clamp(280, 400).toInt();
-    _scrollController.animateTo(
-      clampedTarget,
-      duration: Duration(milliseconds: durationMs),
-      curve: Curves.easeOutCubic,
+    _scrollController.jumpTo(targetScrollOffset);
+  }
+
+  void _autoScrollToGroup(String groupName) {
+    final pixels = _scrollController.position.pixels;
+    final offset = _getGroupOffset(groupName);
+    _scrollToMakeVisibleWithPadding(
+      containerHeight: _containerHeight,
+      pixels: pixels,
+      start: offset,
+      end: offset + 72.0,
     );
   }
 
-  void _scrollToSelected(String groupName) {
-    if (!_scrollController.hasClients) return;
-    final selectedName = ref
-        .read(getSelectedProxyNameProvider(groupName))
-        .getSafeValue('');
-    if (selectedName.isEmpty) return;
-
+  void _scrollToGroupSelected(String groupName, int columns) {
+    final currentInitOffset = _getGroupOffset(groupName);
     final group = widget.groups.getGroup(groupName);
-    if (group == null) return;
-
-    final sortedProxies = globalState.appController.getSortProxies(
-      proxies: group.all,
-      sortType: widget.sortType,
-      testUrl: group.testUrl,
+    final proxies = group == null
+        ? <Proxy>[]
+        : globalState.appController.getSortProxies(
+            proxies: group.all,
+            sortType: widget.sortType,
+            testUrl: group.testUrl,
+          );
+    _jumpTo(
+      currentInitOffset +
+          8 +
+          getScrollToSelectedOffset(
+            groupName: groupName,
+            proxies: proxies,
+            columns: columns,
+          ),
     );
-    final proxyIndex = sortedProxies.indexWhere((p) => p.name == selectedName);
-    if (proxyIndex < 0) return;
+  }
 
-    final groupOffset = _groupOffsets.offsetOf(groupName);
-    const headerExtent = 72.0;
-    final rowExtent = getItemHeight(widget.cardType) + 8.0;
-    final rowIndex = proxyIndex ~/ widget.columns;
-
-    final nodeTop = groupOffset + headerExtent + rowIndex * rowExtent;
-    final nodeBottom = nodeTop + rowExtent;
-
-    final containerHeight = _containerHeight > 0
-        ? _containerHeight
-        : MediaQuery.sizeOf(context).height;
-
-    final totalSpan = (nodeBottom + 8.0) - (groupOffset - 16.0);
-    double targetOffset;
-    if (totalSpan <= containerHeight) {
-      targetOffset = groupOffset - 16.0;
-    } else {
-      targetOffset = (nodeTop - rowExtent - 16.0).clamp(
-        groupOffset - 16.0,
-        double.infinity,
+  void _jumpTo(double offset) {
+    if (mounted && _scrollController.hasClients) {
+      _scrollController.animateTo(
+        offset.clamp(
+          _scrollController.position.minScrollExtent,
+          _scrollController.position.maxScrollExtent,
+        ),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeIn,
       );
     }
-
-    _animateToOffset(targetOffset);
   }
 
   final Map<String, _GroupRows> _rowsCache = <String, _GroupRows>{};
@@ -274,22 +306,26 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
 
     return SliverMainAxisGroup(
       slivers: [
-        SliverToBoxAdapter(
-          child: RepaintBoundary(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-              child: SizedBox(
-                height: 64.0,
-                child: _GroupHeader(
-                  key: ValueKey('header_${group.name}'),
-                  group: group,
-                  isExpand: isExpand,
-                  enterAnimated: enterAnimated,
-                  collapsing: isCollapsing,
-                  onToggle: () => _handleToggle(group.name),
-                  cardType: cardType,
-                  columns: columns,
-                  onScrollToSelected: () => _scrollToSelected(group.name),
+        PinnedHeaderSliver(
+          child: ColoredBox(
+            color: context.colorScheme.surfaceContainer,
+            child: RepaintBoundary(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+                child: SizedBox(
+                  height: 64.0,
+                  child: _GroupHeader(
+                    key: ValueKey('header_${group.name}'),
+                    group: group,
+                    isExpand: isExpand,
+                    enterAnimated: enterAnimated,
+                    collapsing: isCollapsing,
+                    onToggle: () => _handleToggle(group.name),
+                    cardType: cardType,
+                    columns: columns,
+                    onScrollToSelected: () =>
+                        _scrollToGroupSelected(group.name, columns),
+                  ),
                 ),
               ),
             ),
