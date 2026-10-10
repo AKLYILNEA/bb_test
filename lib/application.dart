@@ -396,7 +396,7 @@ class ApplicationState extends ConsumerState<Application>
                 ),
                 chipTheme: ChipThemeData(
                   shape: const SuperellipseBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                    borderRadius: BorderRadius.all(Radius.circular(optionRadius)),
                   ),
                   side: BorderSide(
                     color: _getAppColorScheme(
@@ -537,7 +537,7 @@ class ApplicationState extends ConsumerState<Application>
                 ),
                 chipTheme: ChipThemeData(
                   shape: const SuperellipseBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                    borderRadius: BorderRadius.all(Radius.circular(optionRadius)),
                   ),
                   side: BorderSide(
                     color:

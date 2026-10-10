@@ -1025,7 +1025,7 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
                       spacing: 8,
                       children: [
                         CommonCard(
-                          radius: 22,
+                          isOption: true,
                           isSelected: _src,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
@@ -1044,7 +1044,7 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
                           },
                         ),
                         CommonCard(
-                          radius: 22,
+                          isOption: true,
                           isSelected: _noResolve,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(

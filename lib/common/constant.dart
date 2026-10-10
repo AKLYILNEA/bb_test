@@ -50,6 +50,7 @@ const wakelockEnabledKey = 'wakelock_enabled';
 const trafficUsageShowUploadKey = 'traffic_usage_show_upload';
 const ipPrivacyProtectionKey = 'ip_privacy_protection';
 const double dialogCommonWidth = 300;
+const double optionRadius = 14.0;
 const repository = 'aaANDkk/Bettbox-Myui';
 const ipInfoToken = String.fromEnvironment('IPINFO_TOKEN', defaultValue: '');
 const defaultExternalController = '127.0.0.1:9090';
