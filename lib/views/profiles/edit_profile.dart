@@ -66,12 +66,13 @@ class EditProfileViewState extends State<EditProfileView> {
     );
     if (widget.isNew) {
       urlFocusNode = FocusNode();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (mounted) {
-            urlFocusNode?.requestFocus();
-          }
-        });
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) return;
+        // Same reason as the dialog input: keep the keyboard's first bind out
+        // of the enter transition.
+        await waitRouteSettled(context);
+        if (!mounted) return;
+        urlFocusNode?.requestFocus();
       });
     }
     appPath.getProfilePath(widget.profile.id).then((path) async {

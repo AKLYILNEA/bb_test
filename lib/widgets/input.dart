@@ -163,14 +163,15 @@ class _InputDialogState extends State<InputDialog> {
   void initState() {
     super.initState();
     textController = EmojiTextEditingController(text: value);
-    if (widget.delayedFocus) {
+    if (widget.autofocus || widget.delayedFocus) {
       _focusNode = FocusNode();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (mounted) {
-            _focusNode?.requestFocus();
-          }
-        });
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) return;
+        // Focus only once the route settled: the soft keyboard's first bind must
+        // not land inside the enter transition.
+        await waitRouteSettled(context);
+        if (!mounted) return;
+        _focusNode?.requestFocus();
       });
     }
   }
@@ -223,7 +224,7 @@ class _InputDialogState extends State<InputDialog> {
           runSpacing: 16,
           children: [
             TextFormField(
-              autofocus: widget.autofocus && !widget.delayedFocus,
+              autofocus: false,
               focusNode: _focusNode,
               obscureText: widget.obscureText ?? false,
               keyboardType: widget.keyboardType ??
