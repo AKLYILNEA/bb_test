@@ -48,6 +48,7 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
   bool? _lastVisible;
 
   String _groupName = '';
+  bool _autoTested = false;
 
   @override
   void initState() {
@@ -86,6 +87,20 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
     action?.call();
   }
 
+  /// Runs the resident group's delay test once on first entry, so a cold start
+  /// does not leave every node without a latency.
+  void _maybeAutoTest(VoidCallback? action) {
+    if (_autoTested || action == null) return;
+    if (delayTestCoordinator.isTesting) return;
+    _autoTested = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      await waitRouteSettled(context);
+      if (!mounted) return;
+      _handleProxyTest(action);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final pageLabel = ref.watch(currentPageLabelProvider);
@@ -117,6 +132,7 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
       _updateTestingAnimation();
     }
     final proxyTestAction = ref.watch(residentProxyTestProvider);
+    _maybeAutoTest(proxyTestAction);
 
     if (_lastVisible != visible) {
       final wasVisible = _lastVisible ?? true;

@@ -540,9 +540,12 @@ class GlobalState {
                 child: FadeTransition(
                   opacity: curved,
                   child: SizedBox.expand(
-                    child: BackdropFilter(
-                      filter: commonFilter,
-                      child: const SizedBox.expand(),
+                    child: AnimatedBuilder(
+                      animation: curved,
+                      builder: (_, _) => BackdropFilter(
+                        filter: CommonFilters.blurAt(curved.value),
+                        child: const SizedBox.expand(),
+                      ),
                     ),
                   ),
                 ),

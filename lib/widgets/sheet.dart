@@ -101,20 +101,25 @@ class _BlurModalBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
     if (blurFilter == null) {
       return barrier;
     }
-    return Stack(
-      fit: StackFit.expand,
-      alignment: Alignment.topLeft,
-      clipBehavior: Clip.none,
-      children: [
-        FadeTransition(
-          opacity: animation!.drive(CurveTween(curve: barrierCurve)),
-          child: BackdropFilter(
-            filter: blurFilter,
-            child: const SizedBox.expand(),
+    return RepaintBoundary(
+      child: Stack(
+        fit: StackFit.expand,
+        alignment: Alignment.topLeft,
+        clipBehavior: Clip.none,
+        children: [
+          FadeTransition(
+            opacity: animation!.drive(CurveTween(curve: barrierCurve)),
+            child: AnimatedBuilder(
+              animation: animation!,
+              builder: (_, _) => BackdropFilter(
+                filter: CommonFilters.blurAt(animation!.value),
+                child: const SizedBox.expand(),
+              ),
+            ),
           ),
-        ),
-        barrier,
-      ],
+          barrier,
+        ],
+      ),
     );
   }
 }

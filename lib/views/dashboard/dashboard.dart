@@ -54,6 +54,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
   final GlobalKey<_DashboardStartSwitchState> _startSwitchKey = GlobalKey();
   final _isEditNotifier = ValueNotifier<bool>(false);
   final _addedWidgetsNotifier = ValueNotifier<List<GridItem>>([]);
+  bool _textStackWarmed = false;
 
   @override
   void initState() {
@@ -66,6 +67,26 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
   void _requestStartSwitchFocus() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _startSwitchKey.currentState?.requestFocus();
+    });
+  }
+
+  /// Lays out the bundled text families once off the first frames, so the first
+  /// text field opened after a cold start does not pay for loading them.
+  void _warmUpTextStackOnce() {
+    if (_textStackWarmed) return;
+    _textStackWarmed = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      const styles = <TextStyle>[
+        TextStyle(fontFamily: 'JetBrainsMono'),
+        TextStyle(fontFamilyFallback: ['OpenMoji', 'Twemoji']),
+      ];
+      for (final style in styles) {
+        final painter = TextPainter(
+          text: TextSpan(text: 'Warm 表情😀✨', style: style),
+          textDirection: TextDirection.ltr,
+        )..layout();
+        painter.dispose();
+      }
     });
   }
 
@@ -205,6 +226,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
 
   @override
   Widget build(BuildContext context) {
+    _warmUpTextStackOnce();
     final dashboardState = ref.watch(dashboardStateProvider);
     final columns = max(4 * ((dashboardState.viewWidth / 320).ceil()), 8);
     final spacing = 16.ap;

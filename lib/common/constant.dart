@@ -129,6 +129,18 @@ class CommonFilters {
     sigmaY: blurSigma,
     tileMode: TileMode.clamp,
   );
+
+  /// Blur ramped by an entrance progress, so a barrier never pays a
+  /// full-strength backdrop blur on its first frame.
+  static ImageFilter blurAt(double t) {
+    final sigma = blurSigma * t.clamp(0.0, 1.0);
+    if (sigma <= 0) return ImageFilter.blur();
+    return ImageFilter.blur(
+      sigmaX: sigma,
+      sigmaY: sigma,
+      tileMode: TileMode.clamp,
+    );
+  }
 }
 
 final commonFilter = CommonFilters.blur;
