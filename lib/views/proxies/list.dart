@@ -134,8 +134,8 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   }) {
     final offsets = <double>[];
     final rowExtent = getItemHeight(cardType) + 8.0;
-    const headerExtent = 72.0;
-    var currentOffset = 16.0;
+    const headerExtent = 80.0;
+    var currentOffset = 8.0;
     for (final group in groups) {
       offsets.add(currentOffset);
       currentOffset += headerExtent;
@@ -202,7 +202,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
       containerHeight: _containerHeight,
       pixels: pixels,
       start: offset,
-      end: offset + 72.0,
+      end: offset + 80.0,
     );
   }
 
@@ -306,30 +306,39 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
 
     return SliverMainAxisGroup(
       slivers: [
-        PinnedHeaderSliver(
-          child: ColoredBox(
-            color: context.colorScheme.surfaceContainer,
-            child: RepaintBoundary(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-                child: SizedBox(
-                  height: 64.0,
-                  child: _GroupHeader(
-                    key: ValueKey('header_${group.name}'),
-                    group: group,
-                    isExpand: isExpand,
-                    enterAnimated: enterAnimated,
-                    collapsing: isCollapsing,
-                    onToggle: () => _handleToggle(group.name),
-                    cardType: cardType,
-                    columns: columns,
-                    onScrollToSelected: () =>
-                        _scrollToGroupSelected(group.name, columns),
+        SliverLayoutBuilder(
+          builder: (context, constraints) {
+            final isPinned =
+                constraints.scrollOffset > 0.5 || constraints.overlap > 0.5;
+            return PinnedHeaderSliver(
+              child: RepaintBoundary(
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    top: 8,
+                    bottom: 8,
+                  ),
+                  child: SizedBox(
+                    height: 64.0,
+                    child: _GroupHeader(
+                      key: ValueKey('header_${group.name}'),
+                      group: group,
+                      isExpand: isExpand,
+                      enterAnimated: enterAnimated,
+                      collapsing: isCollapsing,
+                      isPinned: isPinned,
+                      onToggle: () => _handleToggle(group.name),
+                      cardType: cardType,
+                      columns: columns,
+                      onScrollToSelected: () =>
+                          _scrollToGroupSelected(group.name, columns),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         ),
         if (showList)
           _GroupProxyListSliver(
@@ -375,13 +384,13 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
 
         return CommonScrollBar(
           controller: _scrollController,
-          feather: true,
+          feather: false,
           child: CustomScrollView(
             key: const PageStorageKey<String>('proxies_list'),
             controller: _scrollController,
             cacheExtent: 150.0,
             slivers: [
-              const SliverToBoxAdapter(child: SizedBox(height: 16)),
+              const SliverToBoxAdapter(child: SizedBox(height: 8)),
               for (var i = 0; i < widget.groups.length; i++)
                 _buildGroup(
                   context,
@@ -808,6 +817,7 @@ class _GroupHeader extends ConsumerWidget {
   final bool isExpand;
   final bool enterAnimated;
   final bool collapsing;
+  final bool isPinned;
   final VoidCallback onToggle;
   final ProxyCardType cardType;
   final int columns;
@@ -819,6 +829,7 @@ class _GroupHeader extends ConsumerWidget {
     required this.isExpand,
     this.enterAnimated = false,
     this.collapsing = false,
+    this.isPinned = false,
     required this.onToggle,
     required this.cardType,
     required this.columns,
@@ -1005,7 +1016,8 @@ class _GroupHeader extends ConsumerWidget {
       ],
     );
 
-    return CommonCard(
+    final isDark = context.colorScheme.brightness == Brightness.dark;
+    final card = CommonCard(
       radius: 22,
       type: CommonCardType.filled,
       onPressed: onToggle,
@@ -1023,6 +1035,37 @@ class _GroupHeader extends ConsumerWidget {
           ],
         ),
       ),
+    );
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOutCubic,
+      decoration: ShapeDecoration(
+        shape: SuperellipseBorder(
+          borderRadius: BorderRadius.circular(22),
+        ),
+        shadows: isPinned
+            ? [
+                BoxShadow(
+                  color: Colors.black.withValues(
+                    alpha: isDark ? 0.35 : 0.12,
+                  ),
+                  blurRadius: 18,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 4),
+                ),
+                BoxShadow(
+                  color: Colors.black.withValues(
+                    alpha: isDark ? 0.20 : 0.06,
+                  ),
+                  blurRadius: 6,
+                  spreadRadius: 0,
+                  offset: const Offset(0, 1),
+                ),
+              ]
+            : const [],
+      ),
+      child: card,
     );
   }
 
