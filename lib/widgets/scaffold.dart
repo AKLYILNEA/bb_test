@@ -12,6 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'chip.dart';
+import 'keyboard_inset_hold.dart';
 import 'text.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
