@@ -249,6 +249,10 @@ class _ProfilePanel extends StatelessWidget {
 
   Widget _titleRow(BuildContext context, String name, String subtitle) {
     final labelStyle = context.textTheme.labelMedium?.toLight;
+    final titleStyle = context.textTheme.titleMedium?.copyWith(
+      fontWeight: FontWeight.bold,
+      fontVariations: const [FontVariation('wght', 700)],
+    );
     return SizedBox(
       height: globalState.measure.titleMediumHeight,
       child: Center(
@@ -256,24 +260,22 @@ class _ProfilePanel extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Flexible(
-              child: EmojiText(
-                name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: context.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontVariations: const [FontVariation('wght', 700)],
+              child: DefaultTextStyle.merge(
+                strutStyle: StrutStyle.fromTextStyle(
+                  titleStyle!,
+                  forceStrutHeight: true,
+                ),
+                child: EmojiText(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: titleStyle,
                 ),
               ),
             ),
-            const SizedBox(width: 6),
-            Text('·', style: labelStyle),
-            const SizedBox(width: 6),
-            Text(
-              subtitle,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: labelStyle,
+            const SizedBox(width: 8),
+            Flexible(
+              child: CommonInfoCapsule(subtitle, style: labelStyle),
             ),
           ],
         ),
