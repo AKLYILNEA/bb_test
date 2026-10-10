@@ -272,7 +272,7 @@ class ProviderItem extends StatelessWidget {
           ),
         ),
         if (subtitleText != null && subtitleText.isNotEmpty) ...[
-          const SizedBox(width: 6),
+          const SizedBox(width: 8),
           Flexible(
             child: CommonInfoCapsule(
               subtitleText,

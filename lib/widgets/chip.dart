@@ -14,22 +14,28 @@ class CommonInfoCapsule extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
+    final isLight = colorScheme.brightness == Brightness.light;
     return Container(
       height: 18,
-      padding: const EdgeInsets.symmetric(horizontal: 6),
-      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(horizontal: 7),
       decoration: ShapeDecoration(
-        color: navSelectedColor(colorScheme),
+        // A step stronger than the selected card's own tint, so the capsule
+        // stays visible on both plain and selected cards.
+        color: colorScheme.primary.withValues(alpha: isLight ? 0.30 : 0.42),
         shape: SuperellipseBorder(borderRadius: BorderRadius.circular(9)),
       ),
-      child: EmojiText(
-        label,
-        style: (style ?? context.textTheme.labelSmall)?.copyWith(
-          color: colorScheme.primary,
-          height: 1.0,
+      child: Align(
+        alignment: Alignment.center,
+        widthFactor: 1.0,
+        child: EmojiText(
+          label,
+          style: (style ?? context.textTheme.labelSmall)?.copyWith(
+            color: colorScheme.primary,
+            height: 1.0,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
       ),
     );
   }
