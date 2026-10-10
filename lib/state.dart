@@ -14,6 +14,7 @@ import 'package:bett_box/plugins/service.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/providers/state.dart' as providers_state;
 
+import 'package:bett_box/widgets/deferred_push.dart';
 import 'package:bett_box/widgets/dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,6 +31,60 @@ import 'models/models.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 typedef UpdateTasks = List<FutureOr Function()>;
+
+/// Dialog route that holds its enter transition while the dialog's first frames
+/// are still doing first-time work, so the animation cannot jump to its end.
+class _DeferredDialogRoute<T> extends PopupRoute<T>
+    with DeferredPushRouteMixin<T> {
+  _DeferredDialogRoute({
+    required this.child,
+    required this.dismissible,
+    required this.transitionBuilder,
+    this.barrierColor,
+    this.barrierLabel,
+  });
+
+  final Widget child;
+  final bool dismissible;
+  final RouteTransitionsBuilder transitionBuilder;
+
+  @override
+  final Color? barrierColor;
+
+  @override
+  final String? barrierLabel;
+
+  @override
+  bool get barrierDismissible => dismissible;
+
+  @override
+  bool get opaque => false;
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 260);
+
+  @override
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 260);
+
+  @override
+  Widget buildPage(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) {
+    return SafeArea(child: child);
+  }
+
+  @override
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return transitionBuilder(context, animation, secondaryAnimation, child);
+  }
+}
 
 class GlobalState {
   static GlobalState? _instance;
@@ -509,58 +564,57 @@ class GlobalState {
     if (state == null) return null;
     final context = state.context;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return await showGeneralDialog<T>(
-      context: context,
-      barrierColor:
-          isDark ? const Color(0x66000000) : const Color(0x33000000),
-      barrierDismissible: dismissible,
-      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      transitionDuration: const Duration(milliseconds: 260),
-      pageBuilder: (context, animation, secondaryAnimation) => child,
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        final curved = CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeOutCubic,
-          reverseCurve: Curves.easeInCubic,
-        );
-        final opacityAnimation = CurvedAnimation(
-          parent: animation,
-          curve: const Interval(0.0, 0.45, curve: Curves.easeOut),
-          reverseCurve: const Interval(0.55, 1.0, curve: Curves.easeIn),
-        );
-        final scaleAnimation = Tween<double>(
-          begin: 0.80,
-          end: 1.0,
-        ).animate(curved);
-        return RepaintBoundary(
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              IgnorePointer(
-                child: FadeTransition(
-                  opacity: curved,
-                  child: SizedBox.expand(
-                    child: AnimatedBuilder(
-                      animation: curved,
-                      builder: (_, _) => BackdropFilter(
-                        filter: CommonFilters.blurAt(curved.value),
-                        child: const SizedBox.expand(),
+    return await state.push<T>(
+      _DeferredDialogRoute<T>(
+        dismissible: dismissible,
+        barrierColor: isDark ? const Color(0x66000000) : const Color(0x33000000),
+        barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+        child: child,
+        transitionBuilder: (context, animation, secondaryAnimation, child) {
+          final curved = CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+            reverseCurve: Curves.easeInCubic,
+          );
+          final opacityAnimation = CurvedAnimation(
+            parent: animation,
+            curve: const Interval(0.0, 0.45, curve: Curves.easeOut),
+            reverseCurve: const Interval(0.55, 1.0, curve: Curves.easeIn),
+          );
+          final scaleAnimation = Tween<double>(
+            begin: 0.80,
+            end: 1.0,
+          ).animate(curved);
+          return RepaintBoundary(
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                IgnorePointer(
+                  child: FadeTransition(
+                    opacity: curved,
+                    child: SizedBox.expand(
+                      child: AnimatedBuilder(
+                        animation: curved,
+                        builder: (_, _) => BackdropFilter(
+                          filter: CommonFilters.blurAt(curved.value),
+                          child: const SizedBox.expand(),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              FadeTransition(
-                opacity: opacityAnimation,
-                child: ScaleTransition(
-                  scale: scaleAnimation,
-                  child: RepaintBoundary(child: child),
+                FadeTransition(
+                  opacity: opacityAnimation,
+                  child: ScaleTransition(
+                    scale: scaleAnimation,
+                    child: RepaintBoundary(child: child),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        );
-      },
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
