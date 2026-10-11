@@ -197,6 +197,7 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
           builder: (_, state, _) {
             final ipInfo = state.ipInfo;
             final isLoading = state.isLoading;
+            final showFlag = !isLoading && ipInfo != null;
             final flagStyle = Theme.of(context).textTheme.titleMedium?.toLight;
             final flagLineHeight =
                 (flagStyle?.height ?? 1.5) *
@@ -211,25 +212,6 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
                 onLongPress: _showIpClickBehaviorSettings,
                 child: Stack(
                   children: [
-                    // 右侧装饰背景花朵（还原设计图浅色8瓣花朵装饰）
-                    Positioned(
-                      right: -18.ap,
-                      top: -17.ap,
-                      bottom: -17.ap,
-                      width: 118.ap,
-                      child: IgnorePointer(
-                        child: CustomPaint(
-                          painter: _MaterialShapePainter(
-                            shape: MaterialShapes.flower,
-                            color: context.colorScheme.primary.withValues(
-                              alpha: Theme.of(context).colorScheme.brightness == Brightness.dark
-                                  ? 0.16
-                                  : 0.10,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
                     // 左侧主要信息与状态
                     Positioned(
                       left: 0,
@@ -247,7 +229,7 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  if (ipInfo != null) ...[
+                                  if (showFlag) ...[
                                     EmojiText(
                                       _countryCodeToEmoji(ipInfo.countryCode),
                                       style: flagStyle?.copyWith(height: flagLineHeight),
@@ -387,28 +369,31 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
             ? null
             : context.colorScheme.onSurfaceVariant.withValues(alpha: 0.08);
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Container(
-          width: 7.ap,
-          height: 7.ap,
-          decoration: ShapeDecoration(
-            color: dotColor,
-            shape: const CircleBorder(),
+    return Transform.translate(
+      offset: Offset(0, -1.ap),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 7.ap,
+            height: 7.ap,
+            decoration: ShapeDecoration(
+              color: dotColor,
+              shape: const CircleBorder(),
+            ),
           ),
-        ),
-        const SizedBox(width: 6),
-        CommonInfoCapsule(
-          text,
-          color: capsuleColor,
-          backgroundColor: capsuleBg,
-          style: context.textTheme.labelMedium?.copyWith(
-            fontWeight: FontWeight.w600,
+          const SizedBox(width: 6),
+          CommonInfoCapsule(
+            text,
+            color: capsuleColor,
+            backgroundColor: capsuleBg,
+            style: context.textTheme.labelMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -638,34 +623,4 @@ class MaterialPolygonBorder extends ShapeBorder {
 
   @override
   ShapeBorder scale(double t) => this;
-}
-
-class _MaterialShapePainter extends CustomPainter {
-  final RoundedPolygon shape;
-  final Color color;
-
-  _MaterialShapePainter({required this.shape, required this.color});
-
-  late final Path _path = shape.toPath();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final dimension = size.shortestSide;
-    final offset = Offset(
-      (size.width - dimension) / 2,
-      (size.height - dimension) / 2,
-    );
-    final paint = Paint()
-      ..color = color
-      ..isAntiAlias = true;
-    canvas.save();
-    canvas.translate(offset.dx, offset.dy);
-    canvas.scale(dimension);
-    canvas.drawPath(_path, paint);
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(covariant _MaterialShapePainter oldDelegate) =>
-      oldDelegate.shape != shape || oldDelegate.color != color;
 }
