@@ -260,7 +260,6 @@ class _CurrentProfileState extends ConsumerState<CurrentProfile> {
                         );
                       },
                     ),
-                    // 内存总数值（写总内存，非等宽、非加粗；MB单位颜色对齐流量统计组件）
                     Text.rich(
                       TextSpan(
                         children: [
@@ -270,7 +269,9 @@ class _CurrentProfileState extends ConsumerState<CurrentProfile> {
                               fontWeight: FontWeight.normal,
                               fontSize: 22.ap,
                               height: 1.15,
-                              color: context.colorScheme.onSurface,
+                              color: (context.textTheme.bodyMedium?.color ??
+                                      context.colorScheme.onSurface)
+                                  .opacity80,
                             ),
                           ),
                           const TextSpan(text: ' '),
