@@ -289,7 +289,7 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
                   padding: baseInfoEdgeInsets.copyWith(bottom: 0),
                   info: Info(
                     label: appLocalizations.mediaUnlockShort,
-                    iconData: FluentIcons.communication_24_regular,
+                    iconData: IconsExt.cowork,
                   ),
                   actions: [
                     Transform.translate(
