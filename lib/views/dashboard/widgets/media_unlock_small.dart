@@ -63,16 +63,50 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
     BuildContext context, {
     bool isItemTesting = false,
     required bool colorfulIcons,
+    required int count,
   }) {
     final isTesting = isItemTesting ||
         (isLoading &&
             (result == null || result.status == MediaUnlockStatus.testing));
     final status = isTesting
         ? MediaUnlockStatus.testing
-        : (result?.status ?? (isLoading ? MediaUnlockStatus.testing : MediaUnlockStatus.unknown));
+        : (result?.status ??
+            (isLoading ? MediaUnlockStatus.testing : MediaUnlockStatus.unknown));
     final color = status.statusColor(context.colorScheme);
 
-    final double iconSize = 16.ap;
+    final double iconBoxSize;
+    final double textFontSize;
+    final double dotSize;
+    final double horizontalPadding;
+    final double iconSpacing;
+
+    if (count == 1) {
+      iconBoxSize = 28.ap;
+      textFontSize = 15.ap;
+      dotSize = 9.ap;
+      horizontalPadding = 16.ap;
+      iconSpacing = 12.ap;
+    } else if (count == 2) {
+      iconBoxSize = 22.ap;
+      textFontSize = 13.5.ap;
+      dotSize = 8.5.ap;
+      horizontalPadding = 14.ap;
+      iconSpacing = 10.ap;
+    } else if (count == 3) {
+      iconBoxSize = 19.ap;
+      textFontSize = 13.ap;
+      dotSize = 8.ap;
+      horizontalPadding = 12.ap;
+      iconSpacing = 8.ap;
+    } else {
+      iconBoxSize = 17.ap;
+      textFontSize = 12.ap;
+      dotSize = 7.5.ap;
+      horizontalPadding = 12.ap;
+      iconSpacing = 8.ap;
+    }
+
+    final double iconSize = iconBoxSize - 2.ap;
     final Widget icon;
     if (platform.isMonochrome) {
       icon = SvgPicture.asset(
@@ -104,57 +138,91 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
       );
     }
 
-    return SizedBox(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final capsuleBg = context.colorScheme.surfaceContainerHighest.withValues(
+      alpha: isDark ? 0.45 : 0.55,
+    );
+
+    return DecoratedBox(
       key: ValueKey(platform),
-      height: 24.ap,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(
-            width: 20.ap,
-            height: 20.ap,
-            child: Center(child: themedPlatformIcon(context, platform, icon)),
-          ),
-          SizedBox(width: 8.ap),
-          Expanded(
-            child: Text(
-              platform.defaultName,
-              style: context.textTheme.labelMedium?.copyWith(
-                fontWeight: FontWeight.w500,
-                fontSize: 12.ap,
-                color: context.colorScheme.onSurface,
+      decoration: ShapeDecoration(
+        color: capsuleBg,
+        shape: const SuperellipseBorder(
+          borderRadius: BorderRadius.all(Radius.circular(1000)),
+        ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: iconBoxSize,
+              height: iconBoxSize,
+              child: Center(
+                child: themedPlatformIcon(context, platform, icon),
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
-          ),
-          SizedBox(width: 8.ap),
-          SizedBox(
-            width: 24.ap,
-            height: 24.ap,
-            child: Center(
-              child: status == MediaUnlockStatus.testing
-                  ? RepaintBoundary(
-                      child: SizedBox(
-                        width: 10.ap,
-                        height: 10.ap,
-                        child: SpinKitFadingCircle(
-                          color: context.colorScheme.primary,
-                          size: 10.ap,
+            SizedBox(width: iconSpacing),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    platform.defaultName,
+                    style: context.textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      fontSize: textFontSize,
+                      color: context.colorScheme.onSurface,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (count == 1 && result?.latency != null) ...[
+                    SizedBox(height: 2.ap),
+                    Text(
+                      '${result!.latency}ms',
+                      style: context.textTheme.bodySmall?.copyWith(
+                        fontSize: 11.5.ap,
+                        fontWeight: FontWeight.w500,
+                        color: context.colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.8,
                         ),
                       ),
-                    )
-                  : Container(
-                      width: 7.ap,
-                      height: 7.ap,
-                      decoration: BoxDecoration(
-                        color: color,
-                        shape: BoxShape.circle,
-                      ),
                     ),
+                  ],
+                ],
+              ),
             ),
-          ),
-        ],
+            SizedBox(width: 8.ap),
+            SizedBox(
+              width: dotSize + 4.ap,
+              height: dotSize + 4.ap,
+              child: Center(
+                child: isTesting
+                    ? RepaintBoundary(
+                        child: SizedBox(
+                          width: dotSize + 3.ap,
+                          height: dotSize + 3.ap,
+                          child: SpinKitFadingCircle(
+                            color: context.colorScheme.primary,
+                            size: dotSize + 3.ap,
+                          ),
+                        ),
+                      )
+                    : Container(
+                        width: dotSize,
+                        height: dotSize,
+                        decoration: ShapeDecoration(
+                          color: color,
+                          shape: const CircleBorder(),
+                        ),
+                      ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -191,6 +259,12 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
 
           final isWidgetLoading =
               displayedPlatforms.any(state.testingPlatforms.contains);
+
+          final int count = displayedPlatforms.length;
+          final double gap = count == 4
+              ? 6.ap
+              : (count == 3 ? 8.ap : (count == 2 ? 12.ap : 0.0));
+
           final card = CommonCard(
             onPressed: () {
               showExtend(
@@ -239,31 +313,26 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
                     ),
                   ],
                 ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(16.ap, 8.ap, 16.ap, 4.ap),
-                  child: Container(
-                    height: 1.0,
-                    color: context.colorScheme.outlineVariant.withValues(
-                      alpha: 0.6,
-                    ),
-                  ),
-                ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(16.ap, 2.ap, 16.ap, 8.ap),
+                    padding: EdgeInsets.fromLTRB(16.ap, 12.ap, 16.ap, 16.ap),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        for (final p in displayedPlatforms)
-                          _buildPlatformRow(
-                            p,
-                            state.results[p],
-                            state.isLoading,
-                            context,
-                            isItemTesting:
-                                state.testingPlatforms.contains(p),
-                            colorfulIcons: colorfulIcons,
+                        for (int i = 0; i < count; i++) ...[
+                          if (i > 0) SizedBox(height: gap),
+                          Expanded(
+                            child: _buildPlatformRow(
+                              displayedPlatforms[i],
+                              state.results[displayedPlatforms[i]],
+                              state.isLoading,
+                              context,
+                              isItemTesting: state.testingPlatforms
+                                  .contains(displayedPlatforms[i]),
+                              colorfulIcons: colorfulIcons,
+                              count: count,
+                            ),
                           ),
+                        ],
                       ],
                     ),
                   ),
