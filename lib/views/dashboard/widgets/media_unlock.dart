@@ -259,36 +259,39 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
                   padding: baseInfoEdgeInsets.copyWith(bottom: 0),
                   info: Info(
                     label: appLocalizations.mediaUnlockShort,
-                    iconData: FluentIcons.link_24_regular,
+                    iconData: FluentIcons.communication_24_regular,
                   ),
                   actions: [
-                    SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        onPressed: isWidgetLoading
-                            ? null
-                            : () => mediaUnlockState.checkPlatforms(
-                                  displayedPlatforms,
-                                  force: true,
-                                ),
-                        icon: isWidgetLoading
-                            ? RepaintBoundary(
-                                child: SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: SpinKitFadingCircle(
-                                    color: context.colorScheme.primary,
-                                    size: 20,
+                    Transform.translate(
+                      offset: Offset(2.ap, 0),
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: isWidgetLoading
+                              ? null
+                              : () => mediaUnlockState.checkPlatforms(
+                                    displayedPlatforms,
+                                    force: true,
                                   ),
+                          icon: isWidgetLoading
+                              ? RepaintBoundary(
+                                  child: SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: SpinKitFadingCircle(
+                                      color: context.colorScheme.primary,
+                                      size: 20,
+                                    ),
+                                  ),
+                                )
+                              : Icon(
+                                  FluentIcons.arrow_sync_24_regular,
+                                  color: context.colorScheme.onSurfaceVariant,
                                 ),
-                              )
-                            : Icon(
-                                FluentIcons.arrow_sync_24_regular,
-                                color: context.colorScheme.onSurfaceVariant,
-                              ),
+                        ),
                       ),
                     ),
                   ],

@@ -149,21 +149,24 @@ class _CurrentProfileState extends ConsumerState<CurrentProfile> {
                 iconData: FluentIcons.rocket_24_regular,
               ),
               actions: [
-                SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: IconButton(
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    icon: Icon(
-                      FluentIcons.settings_24_regular,
-                      color: context.colorScheme.onSurfaceVariant,
+                Transform.translate(
+                  offset: Offset(2.ap, 0),
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      icon: Icon(
+                        FluentIcons.settings_24_regular,
+                        color: context.colorScheme.onSurfaceVariant,
+                      ),
+                      onPressed: () {
+                        if (profile != null) {
+                          showCurrentProfileDialog();
+                        }
+                      },
                     ),
-                    onPressed: () {
-                      if (profile != null) {
-                        showCurrentProfileDialog();
-                      }
-                    },
                   ),
                 ),
               ],
