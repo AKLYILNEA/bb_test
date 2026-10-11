@@ -333,7 +333,10 @@ enum DashboardWidget {
     platforms: desktopPlatforms,
   ),
   intranetIp(GridItem(crossAxisCellCount: 4, child: IntranetIP())),
-  memoryInfo(GridItem(crossAxisCellCount: 4, child: MemoryInfo())),
+  memoryInfo(
+    GridItem(crossAxisCellCount: 4, child: MemoryInfo()),
+    platforms: [],
+  ),
   connectionsCount(GridItem(crossAxisCellCount: 4, child: ConnectionsCount())),
   ipv6Switch(GridItem(crossAxisCellCount: 4, child: Ipv6Switch())),
   accessControlSwitch(

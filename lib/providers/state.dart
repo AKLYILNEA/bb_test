@@ -290,7 +290,7 @@ DashboardState dashboardState(Ref ref) {
   );
   final viewWidth = ref.watch(viewWidthProvider);
   final widgets = dashboardWidgets
-      .where((w) => w != DashboardWidget.startButton)
+      .where((w) => w != DashboardWidget.startButton && w != DashboardWidget.memoryInfo)
       .toList();
   if (!widgets.contains(DashboardWidget.networkDetection)) {
     final insertIdx = widgets.indexOf(DashboardWidget.outboundMode);

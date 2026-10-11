@@ -251,6 +251,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
             (item) =>
                 !children.contains(item.widget) &&
                 item != DashboardWidget.startButton &&
+                item != DashboardWidget.memoryInfo &&
                 item != DashboardWidget.networkDetection &&
                 item.platforms.contains(SupportPlatform.currentPlatform),
           )

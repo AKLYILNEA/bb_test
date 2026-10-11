@@ -6929,10 +6929,10 @@ class AppLocalizations {
     );
   }
 
-  /// `Stopped`
+  /// `Paused`
   String get coreStopped {
     return Intl.message(
-      'Stopped',
+      'Paused',
       name: 'coreStopped',
       desc: '',
       args: [],

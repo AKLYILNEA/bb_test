@@ -846,7 +846,7 @@
   "overridden": "Overridden",
   "notOverridden": "Not Overridden",
   "coreRunning": "Running",
-  "coreStopped": "Stopped",
+  "coreStopped": "Paused",
   "coreRestarting": "Restarting"
 }
 

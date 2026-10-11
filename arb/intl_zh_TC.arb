@@ -845,8 +845,8 @@
   "defaultImage": "預設背景",
   "overridden": "已覆寫",
   "notOverridden": "未覆寫",
-  "coreRunning": "已運行",
-  "coreStopped": "未運行",
+  "coreRunning": "運行中",
+  "coreStopped": "暫停中",
   "coreRestarting": "重啟中"
 }
 

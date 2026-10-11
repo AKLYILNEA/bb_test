@@ -541,13 +541,13 @@ class _StartButtonState extends State<_StartButton>
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  // 纯圆形背景（停止态）
+                  // 纯圆形背景（停止态：使用流量统计次色）
                   if (progress < 1.0)
                     Opacity(
                       opacity: (1.0 - progress).clamp(0.0, 1.0),
                       child: DecoratedBox(
                         decoration: ShapeDecoration(
-                          color: context.colorScheme.primary,
+                          color: globalState.theme.darken2SecondaryContainer,
                           shape: const CircleBorder(),
                         ),
                       ),

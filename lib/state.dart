@@ -1458,10 +1458,15 @@ class DetectionState {
     final appState = globalState.appState;
     if (!appState.isInit) return;
 
-    state.value = state.value.copyWith(
-      isLoading: true,
-      errorMessage: null,
-    );
+    final isStart = appState.runTime != null;
+    final isStateChanged = _preIsStart != null && _preIsStart != isStart;
+    final shouldShow = showLoading || state.value.ipInfo == null || isStateChanged;
+    if (shouldShow) {
+      state.value = state.value.copyWith(
+        isLoading: true,
+        errorMessage: null,
+      );
+    }
 
     final delay = immediate
         ? Duration.zero

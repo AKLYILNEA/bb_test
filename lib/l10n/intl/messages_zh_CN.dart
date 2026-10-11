@@ -1117,8 +1117,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "defaultImage": MessageLookupByLibrary.simpleMessage("默认背景"),
     "overridden": MessageLookupByLibrary.simpleMessage("已覆写"),
     "notOverridden": MessageLookupByLibrary.simpleMessage("未覆写"),
-    "coreRunning": MessageLookupByLibrary.simpleMessage("已运行"),
-    "coreStopped": MessageLookupByLibrary.simpleMessage("未运行"),
+    "coreRunning": MessageLookupByLibrary.simpleMessage("运行中"),
+    "coreStopped": MessageLookupByLibrary.simpleMessage("暂停中"),
     "coreRestarting": MessageLookupByLibrary.simpleMessage("重启中"),
   };
 }

@@ -1553,7 +1553,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "overridden": MessageLookupByLibrary.simpleMessage("Overridden"),
     "notOverridden": MessageLookupByLibrary.simpleMessage("Not Overridden"),
     "coreRunning": MessageLookupByLibrary.simpleMessage("Running"),
-    "coreStopped": MessageLookupByLibrary.simpleMessage("Stopped"),
+    "coreStopped": MessageLookupByLibrary.simpleMessage("Paused"),
     "coreRestarting": MessageLookupByLibrary.simpleMessage("Restarting"),
   };
 }

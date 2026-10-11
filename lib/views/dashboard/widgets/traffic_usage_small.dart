@@ -164,7 +164,7 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
                   padding: EdgeInsets.only(
                     left: 4,
                     top: _donutEdge,
-                    right: _donutEdge,
+                    right: 16.ap + 25.ap - _donutSize / 2,
                     bottom: _donutEdge,
                   ),
                   child: SizedBox(
