@@ -257,7 +257,7 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
               children: [
                 InfoHeader(
                   padding: baseInfoEdgeInsets.copyWith(bottom: 0),
-                  actionsHeight: globalState.measure.titleSmallHeight,
+                  actionsHeight: 24.ap,
                   info: Info(
                     label: appLocalizations.mediaUnlockShort,
                     iconData: FluentIcons.link_24_regular,
@@ -268,6 +268,7 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
                       height: 24.ap,
                       child: IconButton(
                         padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
                         onPressed: isWidgetLoading
                             ? null
                             : () => mediaUnlockState.checkPlatforms(
@@ -277,17 +278,17 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
                         icon: isWidgetLoading
                             ? RepaintBoundary(
                                 child: SizedBox(
-                                  width: 16.ap,
-                                  height: 16.ap,
+                                  width: 24.ap,
+                                  height: 24.ap,
                                   child: SpinKitFadingCircle(
                                     color: context.colorScheme.primary,
-                                    size: 16.ap,
+                                    size: 20.ap,
                                   ),
                                 ),
                               )
                             : Icon(
                                 FluentIcons.arrow_sync_24_regular,
-                                size: 18.ap,
+                                size: 24.ap,
                                 color: context.colorScheme.onSurfaceVariant,
                               ),
                       ),

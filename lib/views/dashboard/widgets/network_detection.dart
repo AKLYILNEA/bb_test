@@ -519,7 +519,7 @@ class _StartButtonState extends State<_StartButton>
     if (widget.showLoading || widget.isRestarting) {
       return Transform.translate(
         key: const ValueKey('loading'),
-        offset: Offset(0, -1.2.ap),
+        offset: Offset(0, -0.6.ap),
         child: OverflowBox(
           maxWidth: 26,
           maxHeight: 16,
@@ -534,7 +534,7 @@ class _StartButtonState extends State<_StartButton>
     if (widget.isStart) {
       return Transform.translate(
         key: const ValueKey('pause'),
-        offset: Offset(0, -1.2.ap),
+        offset: Offset(0, -0.6.ap),
         child: Icon(
           FluentIcons.align_space_around_vertical_20_filled,
           size: 20.ap,
@@ -545,7 +545,7 @@ class _StartButtonState extends State<_StartButton>
 
     return Transform.translate(
       key: const ValueKey('play'),
-      offset: Offset(0, -1.2.ap),
+      offset: Offset(0, -0.6.ap),
       child: Icon(
         FluentIcons.play_24_filled,
         size: 20.ap,
@@ -560,7 +560,7 @@ class _StartButtonState extends State<_StartButton>
       animation: Listenable.merge([_curve, _breatheCurve]),
       builder: (context, _) {
         final progress = _curve.value;
-        final breatheScale = 1.0 + 0.07 * _breatheCurve.value * progress;
+        final breatheScale = 1.0 + 0.15 * _breatheCurve.value * progress;
         final effectiveShape = widget.isStart
             ? MaterialPolygonBorder(polygon: MaterialShapes.cookie12Sided)
             : const CircleBorder();

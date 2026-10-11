@@ -144,7 +144,7 @@ class _CurrentProfileState extends ConsumerState<CurrentProfile> {
             // 上半部分：当前配置头部（使用标准 InfoHeader 对齐所有小部件）
             InfoHeader(
               padding: baseInfoEdgeInsets.copyWith(bottom: 0),
-              actionsHeight: globalState.measure.titleSmallHeight,
+              actionsHeight: 24.ap,
               info: Info(
                 label: appLocalizations.currentProfile,
                 iconData: FluentIcons.rocket_24_regular,
@@ -155,9 +155,10 @@ class _CurrentProfileState extends ConsumerState<CurrentProfile> {
                   height: 24.ap,
                   child: IconButton(
                     padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                     icon: Icon(
                       FluentIcons.settings_24_regular,
-                      size: 18.ap,
+                      size: 24.ap,
                       color: context.colorScheme.onSurfaceVariant,
                     ),
                     onPressed: () {
@@ -207,7 +208,7 @@ class _CurrentProfileState extends ConsumerState<CurrentProfile> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    // 双色水平进度条（内核负载详情可分配和可回收颜色，最小保底为圆形）
+                    // 双色水平进度条（内核负载详情可分配和可回收颜色，最小保底为圆形，支持平滑滑动动效）
                     LayoutBuilder(
                       builder: (context, constraints) {
                         final barHeight = 10.ap;
@@ -216,46 +217,57 @@ class _CurrentProfileState extends ConsumerState<CurrentProfile> {
                         final availableWidth = max(0.0, totalWidth - gap);
                         final minBarWidth = barHeight;
 
-                        double reclaimableW;
-                        double inUseW;
+                        final targetInUseRatio = totalMem > 0
+                            ? (_inUse / totalMem).clamp(0.0, 1.0)
+                            : 1.0;
 
-                        if (totalMem > 0 && availableWidth > minBarWidth * 2) {
-                          final rawReclaim = availableWidth * (_reclaimable / totalMem);
-                          reclaimableW = rawReclaim.clamp(minBarWidth, availableWidth - minBarWidth);
-                          inUseW = max(minBarWidth, availableWidth - reclaimableW);
-                        } else {
-                          reclaimableW = minBarWidth;
-                          inUseW = max(minBarWidth, availableWidth - minBarWidth);
-                        }
+                        return TweenAnimationBuilder<double>(
+                          tween: Tween<double>(end: targetInUseRatio),
+                          duration: const Duration(milliseconds: 650),
+                          curve: Curves.easeInOutCubic,
+                          builder: (context, animatedRatio, _) {
+                            double reclaimableW;
+                            double inUseW;
 
-                        return Row(
-                          children: [
-                            SizedBox(
-                              width: inUseW,
-                              height: barHeight,
-                              child: DecoratedBox(
-                                decoration: ShapeDecoration(
-                                  color: context.colorScheme.primary,
-                                  shape: SuperellipseBorder(
-                                    borderRadius: BorderRadius.circular(100),
+                            if (availableWidth > minBarWidth * 2) {
+                              final rawInUse = availableWidth * animatedRatio;
+                              inUseW = rawInUse.clamp(minBarWidth, availableWidth - minBarWidth);
+                              reclaimableW = max(minBarWidth, availableWidth - inUseW);
+                            } else {
+                              reclaimableW = minBarWidth;
+                              inUseW = max(minBarWidth, availableWidth - minBarWidth);
+                            }
+
+                            return Row(
+                              children: [
+                                SizedBox(
+                                  width: inUseW,
+                                  height: barHeight,
+                                  child: DecoratedBox(
+                                    decoration: ShapeDecoration(
+                                      color: context.colorScheme.primary,
+                                      shape: SuperellipseBorder(
+                                        borderRadius: BorderRadius.circular(100),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                            SizedBox(width: gap),
-                            SizedBox(
-                              width: reclaimableW,
-                              height: barHeight,
-                              child: DecoratedBox(
-                                decoration: ShapeDecoration(
-                                  color: context.colorScheme.tertiary,
-                                  shape: SuperellipseBorder(
-                                    borderRadius: BorderRadius.circular(100),
+                                SizedBox(width: gap),
+                                SizedBox(
+                                  width: reclaimableW,
+                                  height: barHeight,
+                                  child: DecoratedBox(
+                                    decoration: ShapeDecoration(
+                                      color: context.colorScheme.tertiary,
+                                      shape: SuperellipseBorder(
+                                        borderRadius: BorderRadius.circular(100),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          ],
+                              ],
+                            );
+                          },
                         );
                       },
                     ),
