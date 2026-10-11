@@ -120,152 +120,130 @@ class _CurrentProfileState extends ConsumerState<CurrentProfile> {
         onPressed: () => showCoreStatusDialog(context),
         onLongPress: () => showCoreStatusDialog(context),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // 上半部分：当前配置
+            // 上半部分：当前配置头部（使用标准 InfoHeader 对齐所有小部件）
+            InfoHeader(
+              padding: baseInfoEdgeInsets.copyWith(bottom: 0),
+              actionsHeight: globalState.measure.titleSmallHeight,
+              info: Info(
+                label: appLocalizations.currentProfile,
+                iconData: FluentIcons.rocket_24_regular,
+              ),
+              actions: [
+                SizedBox(
+                  width: 24.ap,
+                  height: 24.ap,
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    icon: Icon(
+                      FluentIcons.settings_24_regular,
+                      size: 18.ap,
+                      color: context.colorScheme.onSurfaceVariant,
+                    ),
+                    onPressed: () {
+                      if (profile != null) {
+                        showCurrentProfileDialog();
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
             Padding(
-              padding: EdgeInsets.fromLTRB(16.ap, 14.ap, 12.ap, 12.ap),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    height: globalState.measure.titleSmallHeight,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Icon(
-                          FluentIcons.rocket_24_regular,
-                          size: 20.ap,
-                          color: context.colorScheme.onSurfaceVariant,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            appLocalizations.currentProfile,
-                            style: context.textTheme.titleSmall?.copyWith(
-                              color: context.colorScheme.onSurfaceVariant,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 28.ap,
-                          height: 28.ap,
-                          child: IconButton(
-                            padding: EdgeInsets.zero,
-                            icon: Icon(
-                              FluentIcons.settings_24_regular,
-                              size: 18.ap,
-                              color: context.colorScheme.onSurfaceVariant,
-                            ),
-                            onPressed: () {
-                              if (profile != null) {
-                                showCurrentProfileDialog();
-                              }
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
+              padding: EdgeInsets.fromLTRB(16.ap, 8.ap, 16.ap, 14.ap),
+              child: TooltipText(
+                text: Text(
+                  profile?.label ?? appLocalizations.notAcquired,
+                  style: context.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 18.ap,
                   ),
-                  SizedBox(height: 8.ap),
-                  Text(
-                    profile?.label ?? appLocalizations.notAcquired,
-                    style: context.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 18.ap,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
-            // 分割线
+            // 中间分割线
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.ap),
               child: Container(
                 height: 1.0,
-                color: context.colorScheme.outlineVariant.withValues(alpha: 0.35),
+                color: context.colorScheme.outlineVariant.withValues(alpha: 0.25),
               ),
             ),
             // 下半部分：内存信息
             Padding(
-              padding: EdgeInsets.fromLTRB(16.ap, 12.ap, 16.ap, 16.ap),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
+              padding: EdgeInsets.fromLTRB(16.ap, 14.ap, 16.ap, 0),
+              child: Text(
+                appLocalizations.memoryInfo,
+                style: context.textTheme.titleSmall?.copyWith(
+                  color: context.colorScheme.onSurfaceVariant,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            // 双色水平进度条（内核负载详情可分配和可回收颜色）
+            Padding(
+              padding: EdgeInsets.fromLTRB(16.ap, 10.ap, 16.ap, 0),
+              child: Row(
                 children: [
-                  Text(
-                    appLocalizations.memoryInfo,
-                    style: context.textTheme.titleSmall?.copyWith(
-                      color: context.colorScheme.onSurfaceVariant,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 10.ap),
-                  // 双色水平进度条（内核负载详情可分配和可回收颜色）
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: flexInUse,
-                        child: Container(
-                          height: 12.ap,
-                          decoration: ShapeDecoration(
-                            color: context.colorScheme.primary,
-                            shape: SuperellipseBorder(
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                          ),
+                  Expanded(
+                    flex: flexInUse,
+                    child: Container(
+                      height: 12.ap,
+                      decoration: ShapeDecoration(
+                        color: context.colorScheme.primary,
+                        shape: SuperellipseBorder(
+                          borderRadius: BorderRadius.circular(100),
                         ),
                       ),
-                      SizedBox(width: 4.ap),
-                      Expanded(
-                        flex: flexReclaim,
-                        child: Container(
-                          height: 12.ap,
-                          decoration: ShapeDecoration(
-                            color: context.colorScheme.tertiary,
-                            shape: SuperellipseBorder(
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                          ),
+                    ),
+                  ),
+                  SizedBox(width: 4.ap),
+                  Expanded(
+                    flex: flexReclaim,
+                    child: Container(
+                      height: 12.ap,
+                      decoration: ShapeDecoration(
+                        color: context.colorScheme.tertiary,
+                        shape: SuperellipseBorder(
+                          borderRadius: BorderRadius.circular(100),
                         ),
                       ),
-                    ],
-                  ),
-                  SizedBox(height: 10.ap),
-                  // 内存数值大字号呈现
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: _memoryValue.showValue,
-                          style: context.textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 24.ap,
-                            color: context.colorScheme.onSurface,
-                          ).toJetBrainsMono,
-                        ),
-                        const TextSpan(text: ' '),
-                        TextSpan(
-                          text: _memoryValue.showUnit,
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            color: context.colorScheme.onSurfaceVariant,
-                            fontSize: 16.ap,
-                            fontWeight: FontWeight.w500,
-                          ).toJetBrainsMono,
-                        ),
-                      ],
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
+              ),
+            ),
+            // 内存数值（不使用等宽字体，不加粗，位置适度上提）
+            Padding(
+              padding: EdgeInsets.fromLTRB(16.ap, 10.ap, 16.ap, 0),
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: _memoryValue.showValue,
+                      style: context.textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.normal,
+                        fontSize: 24.ap,
+                        color: context.colorScheme.onSurface,
+                      ),
+                    ),
+                    const TextSpan(text: ' '),
+                    TextSpan(
+                      text: _memoryValue.showUnit,
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.normal,
+                        color: context.colorScheme.onSurfaceVariant,
+                        fontSize: 16.ap,
+                      ),
+                    ),
+                  ],
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],

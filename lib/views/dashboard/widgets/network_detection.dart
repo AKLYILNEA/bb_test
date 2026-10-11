@@ -348,7 +348,7 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
     final Color dotColor = isRestarting
         ? context.colorScheme.primary
         : isStart
-            ? context.colorScheme.success
+            ? mediaUnlockGreen
             : context.colorScheme.outlineVariant;
 
     final String text = isRestarting
