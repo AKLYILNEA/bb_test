@@ -1633,5 +1633,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "defaultImage": MessageLookupByLibrary.simpleMessage("Фон по умолчанию"),
     "overridden": MessageLookupByLibrary.simpleMessage("Переопределено"),
     "notOverridden": MessageLookupByLibrary.simpleMessage("Не переопределено"),
+    "coreRunning": MessageLookupByLibrary.simpleMessage("Работает"),
+    "coreStopped": MessageLookupByLibrary.simpleMessage("Остановлен"),
+    "coreRestarting": MessageLookupByLibrary.simpleMessage("Перезапуск"),
   };
 }

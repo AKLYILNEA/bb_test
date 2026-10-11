@@ -1588,5 +1588,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "defaultImage": MessageLookupByLibrary.simpleMessage("پس‌زمینه پیش‌فرض"),
     "overridden": MessageLookupByLibrary.simpleMessage("بازنویسی شده"),
     "notOverridden": MessageLookupByLibrary.simpleMessage("بازنویسی نشده"),
+    "coreRunning": MessageLookupByLibrary.simpleMessage("در حال اجرا"),
+    "coreStopped": MessageLookupByLibrary.simpleMessage("متوقف شده"),
+    "coreRestarting": MessageLookupByLibrary.simpleMessage("در حال راه‌اندازی مجدد"),
   };
 }

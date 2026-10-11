@@ -844,7 +844,10 @@
   "customImageSelected": "已設定自訂圖片",
   "defaultImage": "預設背景",
   "overridden": "已覆寫",
-  "notOverridden": "未覆寫"
+  "notOverridden": "未覆寫",
+  "coreRunning": "已運行",
+  "coreStopped": "未運行",
+  "coreRestarting": "重啟中"
 }
 
 

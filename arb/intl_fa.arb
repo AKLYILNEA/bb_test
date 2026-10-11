@@ -844,7 +844,10 @@
   "customImageSelected": "تصویر سفارشی تنظیم شد",
   "defaultImage": "پس‌زمینه پیش‌فرض",
   "overridden": "بازنویسی شده",
-  "notOverridden": "بازنویسی نشده"
+  "notOverridden": "بازنویسی نشده",
+  "coreRunning": "در حال اجرا",
+  "coreStopped": "متوقف شده",
+  "coreRestarting": "در حال راه‌اندازی مجدد"
 }
 
 

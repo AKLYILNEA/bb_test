@@ -317,7 +317,7 @@ enum DashboardWidget {
   trafficUsageSmall(
     GridItem(crossAxisCellCount: 4, child: TrafficUsageSmall()),
   ),
-  networkDetection(GridItem(crossAxisCellCount: 4, child: NetworkDetection())),
+  networkDetection(GridItem(crossAxisCellCount: 8, child: NetworkDetection())),
   tunButton(
     GridItem(crossAxisCellCount: 4, child: TUNButton()),
     platforms: desktopPlatforms,
@@ -358,6 +358,7 @@ enum DashboardWidget {
   clockLarge(GridItem(crossAxisCellCount: 8, child: ClockCardLarge())),
   startButton(
     GridItem(crossAxisCellCount: 4, isDeletable: false, child: StartButton()),
+    platforms: [],
   );
 
   final GridItem widget;

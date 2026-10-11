@@ -233,9 +233,6 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
     final dashboardState = ref.watch(dashboardStateProvider);
     final columns = max(4 * ((dashboardState.viewWidth / 320).ceil()), 8);
     final spacing = 16.ap;
-    final showCardStartButton = ref.watch(
-      appSettingProvider.select((state) => state.showCardStartButton),
-    );
     final isMobileView = ref.watch(isMobileViewProvider);
     final customTitle = ref.watch(customDashboardTitleProvider);
     final children = [
@@ -250,7 +247,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
           .where(
             (item) =>
                 !children.contains(item.widget) &&
-                (showCardStartButton || item != DashboardWidget.startButton) &&
+                item != DashboardWidget.startButton &&
                 item.platforms.contains(SupportPlatform.currentPlatform),
           )
           .map((item) => item.widget)
@@ -261,8 +258,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
       title: customTitle ?? currentGreeting(),
       titleWidget: customTitle == null ? const _GreetingTitle() : null,
       actions: _buildActions(),
-      floatingActionButton:
-          (isMobileView || showCardStartButton) ? null : const StartFab(),
+      floatingActionButton: null,
       body: Align(
         alignment: Alignment.topCenter,
         child: SingleChildScrollView(

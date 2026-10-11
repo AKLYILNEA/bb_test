@@ -1253,5 +1253,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "defaultImage": MessageLookupByLibrary.simpleMessage("デフォルト背景"),
     "overridden": MessageLookupByLibrary.simpleMessage("オーバーライド済み"),
     "notOverridden": MessageLookupByLibrary.simpleMessage("未オーバーライド"),
+    "coreRunning": MessageLookupByLibrary.simpleMessage("実行中"),
+    "coreStopped": MessageLookupByLibrary.simpleMessage("停止"),
+    "coreRestarting": MessageLookupByLibrary.simpleMessage("再起動中"),
   };
 }

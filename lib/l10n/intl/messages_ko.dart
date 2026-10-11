@@ -1261,5 +1261,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "defaultImage": MessageLookupByLibrary.simpleMessage("기본 배경"),
     "overridden": MessageLookupByLibrary.simpleMessage("재정의됨"),
     "notOverridden": MessageLookupByLibrary.simpleMessage("재정의 안 됨"),
+    "coreRunning": MessageLookupByLibrary.simpleMessage("실행 중"),
+    "coreStopped": MessageLookupByLibrary.simpleMessage("중지됨"),
+    "coreRestarting": MessageLookupByLibrary.simpleMessage("재시작 중"),
   };
 }

@@ -288,20 +288,10 @@ DashboardState dashboardState(Ref ref) {
           : state.desktopDashboardWidgets,
     ),
   );
-  final showCardStartButton = ref.watch(
-    appSettingProvider.select((state) => state.showCardStartButton),
-  );
   final viewWidth = ref.watch(viewWidthProvider);
-  final List<DashboardWidget> widgets;
-  if (showCardStartButton) {
-    widgets = dashboardWidgets.contains(DashboardWidget.startButton)
-        ? dashboardWidgets
-        : [...dashboardWidgets, DashboardWidget.startButton];
-  } else {
-    widgets = dashboardWidgets
-        .where((w) => w != DashboardWidget.startButton)
-        .toList();
-  }
+  final widgets = dashboardWidgets
+      .where((w) => w != DashboardWidget.startButton)
+      .toList();
   return DashboardState(dashboardWidgets: widgets, viewWidth: viewWidth);
 }
 

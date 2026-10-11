@@ -844,7 +844,10 @@
   "customImageSelected": "Custom image set",
   "defaultImage": "Default background",
   "overridden": "Overridden",
-  "notOverridden": "Not Overridden"
+  "notOverridden": "Not Overridden",
+  "coreRunning": "Running",
+  "coreStopped": "Stopped",
+  "coreRestarting": "Restarting"
 }
 
 

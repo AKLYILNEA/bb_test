@@ -6918,6 +6918,36 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Running`
+  String get coreRunning {
+    return Intl.message(
+      'Running',
+      name: 'coreRunning',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Stopped`
+  String get coreStopped {
+    return Intl.message(
+      'Stopped',
+      name: 'coreStopped',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Restarting`
+  String get coreRestarting {
+    return Intl.message(
+      'Restarting',
+      name: 'coreRestarting',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

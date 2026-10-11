@@ -844,7 +844,10 @@
   "customImageSelected": "カスタム画像設定済み",
   "defaultImage": "デフォルト背景",
   "overridden": "オーバーライド済み",
-  "notOverridden": "未オーバーライド"
+  "notOverridden": "未オーバーライド",
+  "coreRunning": "実行中",
+  "coreStopped": "停止",
+  "coreRestarting": "再起動中"
 }
 
 

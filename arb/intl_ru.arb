@@ -846,7 +846,10 @@
   "customImageSelected": "Пользовательское изображение",
   "defaultImage": "Фон по умолчанию",
   "overridden": "Переопределено",
-  "notOverridden": "Не переопределено"
+  "notOverridden": "Не переопределено",
+  "coreRunning": "Работает",
+  "coreStopped": "Остановлен",
+  "coreRestarting": "Перезапуск"
 }
 
 

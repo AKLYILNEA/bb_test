@@ -844,7 +844,10 @@
   "customImageSelected": "사용자 지정 이미지 설정됨",
   "defaultImage": "기본 배경",
   "overridden": "재정의됨",
-  "notOverridden": "재정의 안 됨"
+  "notOverridden": "재정의 안 됨",
+  "coreRunning": "실행 중",
+  "coreStopped": "중지됨",
+  "coreRestarting": "재시작 중"
 }
 
 

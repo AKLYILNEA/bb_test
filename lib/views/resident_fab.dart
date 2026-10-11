@@ -97,11 +97,8 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
     final proxiesType = ref.watch(
       proxiesStyleSettingProvider.select((state) => state.type),
     );
-    final showCardStartButton = ref.watch(
-      appSettingProvider.select((state) => state.showCardStartButton),
-    );
     final residentPage = switch (effectivePage) {
-      PageLabel.dashboard => showCardStartButton ? null : PageLabel.dashboard,
+      PageLabel.dashboard => null,
       PageLabel.profiles => PageLabel.profiles,
       PageLabel.proxies => proxiesType == ProxiesType.tab
           ? PageLabel.proxies
