@@ -163,13 +163,13 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 6.ap),
+        padding: EdgeInsets.symmetric(horizontal: 8.ap),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(
-              width: 24.ap,
-              height: 24.ap,
+              width: 22.ap,
+              height: 22.ap,
               child: Center(
                 child: themedPlatformIcon(context, platform, icon),
               ),
@@ -208,8 +208,8 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
             ),
             SizedBox(width: 8.ap),
             SizedBox(
-              width: 24.ap,
-              height: 24.ap,
+              width: 22.ap,
+              height: 22.ap,
               child: Center(
                 child: isTesting
                     ? RepaintBoundary(
@@ -286,17 +286,17 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
             child: Column(
               children: [
                 InfoHeader(
-                  padding: baseInfoEdgeInsets.copyWith(bottom: 0),
+                  padding: EdgeInsets.fromLTRB(22.ap, 14.ap, 22.ap, 0),
                   actionsHeight: globalState.measure.titleSmallHeight,
                   info: Info(
                     label: appLocalizations.mediaUnlockShort,
                     icon: SizedBox(
-                      width: 24.ap,
-                      height: 24.ap,
+                      width: 22.ap,
+                      height: 22.ap,
                       child: Center(
                         child: Icon(
                           FluentIcons.link_24_regular,
-                          size: 20.ap,
+                          size: 19.ap,
                           color: context.colorScheme.onSurfaceVariant,
                         ),
                       ),
@@ -304,8 +304,8 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
                   ),
                   actions: [
                     SizedBox(
-                      width: 24.ap,
-                      height: 24.ap,
+                      width: 22.ap,
+                      height: 22.ap,
                       child: IconButton(
                         padding: EdgeInsets.zero,
                         onPressed: isWidgetLoading
@@ -336,7 +336,7 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
                 ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(10.ap, 8.ap, 10.ap, 10.ap),
+                    padding: EdgeInsets.fromLTRB(14.ap, 8.ap, 14.ap, 14.ap),
                     child: Column(
                       children: [
                         for (int i = 0; i < count; i++) ...[

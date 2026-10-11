@@ -9,6 +9,7 @@ import 'text.dart';
 /// ExpireChip: a 15% theme tint, h8/v2 padding and a full superellipse.
 class CommonInfoCapsule extends StatelessWidget {
   final String label;
+  final Widget? leading;
   final TextStyle? style;
   final Color? color;
   final Color? backgroundColor;
@@ -17,6 +18,7 @@ class CommonInfoCapsule extends StatelessWidget {
   const CommonInfoCapsule(
     this.label, {
     super.key,
+    this.leading,
     this.style,
     this.color,
     this.backgroundColor,
@@ -29,6 +31,29 @@ class CommonInfoCapsule extends StatelessWidget {
     final effectiveStyle = (style ?? context.textTheme.labelMedium)?.copyWith(
       color: effectiveColor,
     );
+    final textWidget = _CapCentered(
+      fontSize: effectiveStyle?.fontSize ?? 12,
+      child: EmojiText(
+        label,
+        style: effectiveStyle,
+        textAlign: TextAlign.center,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+
+    final content = leading == null
+        ? textWidget
+        : Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              leading!,
+              const SizedBox(width: 5),
+              textWidget,
+            ],
+          );
+
     return DecoratedBox(
       decoration: ShapeDecoration(
         color: backgroundColor ?? effectiveColor.withValues(alpha: 0.15),
@@ -36,16 +61,7 @@ class CommonInfoCapsule extends StatelessWidget {
       ),
       child: Padding(
         padding: padding ?? const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        child: _CapCentered(
-          fontSize: effectiveStyle?.fontSize ?? 12,
-          child: EmojiText(
-            label,
-            style: effectiveStyle,
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
+        child: content,
       ),
     );
   }

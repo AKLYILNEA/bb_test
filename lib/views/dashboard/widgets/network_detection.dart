@@ -369,31 +369,35 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
             ? null
             : context.colorScheme.onSurfaceVariant.withValues(alpha: 0.08);
 
-    return Transform.translate(
-      offset: Offset(0, -1.ap),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: 7.ap,
-            height: 7.ap,
+    final Widget dot = isRestarting
+        ? SizedBox(
+            width: 8.ap,
+            height: 8.ap,
+            child: SpinKitFadingCircle(
+              color: dotColor,
+              size: 8.ap,
+            ),
+          )
+        : Container(
+            width: 6.ap,
+            height: 6.ap,
             decoration: ShapeDecoration(
               color: dotColor,
               shape: const CircleBorder(),
             ),
-          ),
-          const SizedBox(width: 6),
-          CommonInfoCapsule(
-            text,
-            color: capsuleColor,
-            backgroundColor: capsuleBg,
-            padding: const EdgeInsets.fromLTRB(10, 2, 8, 2),
-            style: context.textTheme.labelMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
+          );
+
+    return Transform.translate(
+      offset: Offset(0, -1.ap),
+      child: CommonInfoCapsule(
+        text,
+        leading: dot,
+        color: capsuleColor,
+        backgroundColor: capsuleBg,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        style: context.textTheme.labelMedium?.copyWith(
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
