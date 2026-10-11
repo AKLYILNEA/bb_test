@@ -12,6 +12,7 @@ class CommonInfoCapsule extends StatelessWidget {
   final TextStyle? style;
   final Color? color;
   final Color? backgroundColor;
+  final EdgeInsetsGeometry? padding;
 
   const CommonInfoCapsule(
     this.label, {
@@ -19,6 +20,7 @@ class CommonInfoCapsule extends StatelessWidget {
     this.style,
     this.color,
     this.backgroundColor,
+    this.padding,
   });
 
   @override
@@ -33,12 +35,13 @@ class CommonInfoCapsule extends StatelessWidget {
         shape: SuperellipseBorder(borderRadius: BorderRadius.circular(1000)),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        padding: padding ?? const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         child: _CapCentered(
           fontSize: effectiveStyle?.fontSize ?? 12,
           child: EmojiText(
             label,
             style: effectiveStyle,
+            textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

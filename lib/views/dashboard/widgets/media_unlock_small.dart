@@ -74,39 +74,38 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
             (isLoading ? MediaUnlockStatus.testing : MediaUnlockStatus.unknown));
     final color = status.statusColor(context.colorScheme);
 
-    final double iconBoxSize;
+    final double iconSize;
     final double textFontSize;
     final double dotSize;
-    final double horizontalPadding;
     final double iconSpacing;
+    final double borderRadius;
 
     if (count == 1) {
-      iconBoxSize = 28.ap;
-      textFontSize = 15.ap;
-      dotSize = 9.ap;
-      horizontalPadding = 16.ap;
-      iconSpacing = 12.ap;
-    } else if (count == 2) {
-      iconBoxSize = 22.ap;
-      textFontSize = 13.5.ap;
+      iconSize = 22.ap;
+      textFontSize = 14.ap;
       dotSize = 8.5.ap;
-      horizontalPadding = 14.ap;
       iconSpacing = 10.ap;
+      borderRadius = 11.ap;
+    } else if (count == 2) {
+      iconSize = 20.ap;
+      textFontSize = 13.5.ap;
+      dotSize = 8.ap;
+      iconSpacing = 9.ap;
+      borderRadius = 11.ap;
     } else if (count == 3) {
-      iconBoxSize = 19.ap;
+      iconSize = 19.ap;
       textFontSize = 13.ap;
       dotSize = 8.ap;
-      horizontalPadding = 12.ap;
       iconSpacing = 8.ap;
+      borderRadius = 10.ap;
     } else {
-      iconBoxSize = 17.ap;
+      iconSize = 18.ap;
       textFontSize = 12.ap;
       dotSize = 7.5.ap;
-      horizontalPadding = 12.ap;
       iconSpacing = 8.ap;
+      borderRadius = 10.ap;
     }
 
-    final double iconSize = iconBoxSize - 2.ap;
     final Widget icon;
     if (platform.isMonochrome) {
       icon = SvgPicture.asset(
@@ -139,26 +138,38 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
     }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final capsuleBg = context.colorScheme.surfaceContainerHighest.withValues(
-      alpha: isDark ? 0.45 : 0.55,
-    );
+    final rowBg = isDark
+        ? Color.alphaBlend(
+            context.colorScheme.onSurface.withValues(alpha: 0.10),
+            context.colorScheme.surfaceContainerHighest,
+          )
+        : context.colorScheme.surfaceContainerHighest.withValues(
+            alpha: 0.65,
+          );
+    final rowBorder = isDark
+        ? BorderSide(
+            color: context.colorScheme.outlineVariant.withValues(alpha: 0.35),
+            width: 0.8,
+          )
+        : BorderSide.none;
 
     return DecoratedBox(
       key: ValueKey(platform),
       decoration: ShapeDecoration(
-        color: capsuleBg,
-        shape: const SuperellipseBorder(
-          borderRadius: BorderRadius.all(Radius.circular(1000)),
+        color: rowBg,
+        shape: SuperellipseBorder(
+          borderRadius: BorderRadius.circular(borderRadius),
+          side: rowBorder,
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+        padding: EdgeInsets.symmetric(horizontal: 6.ap),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(
-              width: iconBoxSize,
-              height: iconBoxSize,
+              width: 24.ap,
+              height: 24.ap,
               child: Center(
                 child: themedPlatformIcon(context, platform, icon),
               ),
@@ -179,12 +190,12 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (count == 1 && result?.latency != null) ...[
+                  if (count <= 2 && result?.latency != null) ...[
                     SizedBox(height: 2.ap),
                     Text(
                       '${result!.latency}ms',
                       style: context.textTheme.bodySmall?.copyWith(
-                        fontSize: 11.5.ap,
+                        fontSize: (textFontSize - 2.ap).clamp(10.ap, 12.ap),
                         fontWeight: FontWeight.w500,
                         color: context.colorScheme.onSurfaceVariant.withValues(
                           alpha: 0.8,
@@ -197,8 +208,8 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
             ),
             SizedBox(width: 8.ap),
             SizedBox(
-              width: dotSize + 4.ap,
-              height: dotSize + 4.ap,
+              width: 24.ap,
+              height: 24.ap,
               child: Center(
                 child: isTesting
                     ? RepaintBoundary(
@@ -263,7 +274,7 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
           final int count = displayedPlatforms.length;
           final double gap = count == 4
               ? 6.ap
-              : (count == 3 ? 8.ap : (count == 2 ? 12.ap : 0.0));
+              : (count == 3 ? 8.ap : (count == 2 ? 10.ap : 0.0));
 
           final card = CommonCard(
             onPressed: () {
@@ -279,7 +290,17 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
                   actionsHeight: globalState.measure.titleSmallHeight,
                   info: Info(
                     label: appLocalizations.mediaUnlockShort,
-                    iconData: FluentIcons.link_24_regular,
+                    icon: SizedBox(
+                      width: 24.ap,
+                      height: 24.ap,
+                      child: Center(
+                        child: Icon(
+                          FluentIcons.link_24_regular,
+                          size: 20.ap,
+                          color: context.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
                   ),
                   actions: [
                     SizedBox(
@@ -315,7 +336,7 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
                 ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(16.ap, 12.ap, 16.ap, 16.ap),
+                    padding: EdgeInsets.fromLTRB(10.ap, 8.ap, 10.ap, 10.ap),
                     child: Column(
                       children: [
                         for (int i = 0; i < count; i++) ...[

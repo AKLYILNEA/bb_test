@@ -388,6 +388,7 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
             text,
             color: capsuleColor,
             backgroundColor: capsuleBg,
+            padding: const EdgeInsets.fromLTRB(10, 2, 8, 2),
             style: context.textTheme.labelMedium?.copyWith(
               fontWeight: FontWeight.w600,
             ),
