@@ -144,21 +144,19 @@ class _CurrentProfileState extends ConsumerState<CurrentProfile> {
             // 上半部分：当前配置头部（使用标准 InfoHeader 对齐所有小部件）
             InfoHeader(
               padding: baseInfoEdgeInsets.copyWith(bottom: 0),
-              actionsHeight: 24.ap,
               info: Info(
                 label: appLocalizations.currentProfile,
                 iconData: FluentIcons.rocket_24_regular,
               ),
               actions: [
                 SizedBox(
-                  width: 24.ap,
-                  height: 24.ap,
+                  width: 24,
+                  height: 24,
                   child: IconButton(
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                     icon: Icon(
                       FluentIcons.settings_24_regular,
-                      size: 24.ap,
                       color: context.colorScheme.onSurfaceVariant,
                     ),
                     onPressed: () {

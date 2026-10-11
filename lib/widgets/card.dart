@@ -56,7 +56,6 @@ class InfoHeader extends StatelessWidget {
                 ] else if (info.iconData != null) ...[
                   Icon(
                     info.iconData,
-                    size: 24.ap,
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: 8),
