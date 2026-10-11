@@ -796,7 +796,7 @@
   "vpnSystemProxyConfirmDesc": "非桌面端通常不推荐使用 HTTP 代理，此功能仅建议您在必要且熟悉的情况下开启",
   "contributor": "贡献者",
   "customFont": "自定义字体",
-  "customFontDesc": "默认系统字体，开启后可自定义自己喜欢的字体",
+  "customFontDesc": "默认系统字体，开启后可自定义喜欢的字体",
   "toggleLabel": "切换标签",
   "mediaUnlockShort": "连通性测试",
   "styleSetting": "样式设置",

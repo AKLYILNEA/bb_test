@@ -415,7 +415,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "goDownload": MessageLookupByLibrary.simpleMessage("前往下载"),
     "customFont": MessageLookupByLibrary.simpleMessage("自定义字体"),
     "customFontDesc": MessageLookupByLibrary.simpleMessage(
-      "默认系统字体，开启后可自定义自己喜欢的字体",
+      "默认系统字体，开启后可自定义喜欢的字体",
     ),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage("是否缓存修改"),
     "healthCheckTimeout": MessageLookupByLibrary.simpleMessage("超时时间"),

@@ -48,24 +48,24 @@ const defaultAccessControl = AccessControl();
 final defaultThemeProps = ThemeProps(primaryColor: defaultPrimaryColor);
 
 const List<DashboardWidget> defaultDashboardWidgets = [
+  DashboardWidget.networkDetection,
   DashboardWidget.clockLarge,
-  DashboardWidget.mediaUnlock,
+  DashboardWidget.mediaUnlockSmall,
   DashboardWidget.networkSpeedSmall,
   DashboardWidget.trafficUsageSmall,
   DashboardWidget.outboundMode,
-  DashboardWidget.networkDetection,
   DashboardWidget.currentProfile,
   DashboardWidget.scriptOverride,
   DashboardWidget.accessControlSwitch,
 ];
 
 const List<DashboardWidget> defaultAndroidDashboardWidgets = [
+  DashboardWidget.networkDetection,
   DashboardWidget.clockLarge,
-  DashboardWidget.mediaUnlock,
+  DashboardWidget.mediaUnlockSmall,
   DashboardWidget.networkSpeedSmall,
   DashboardWidget.trafficUsageSmall,
   DashboardWidget.outboundMode,
-  DashboardWidget.networkDetection,
   DashboardWidget.currentProfile,
   DashboardWidget.scriptOverride,
   DashboardWidget.accessControlSwitch,

@@ -212,7 +212,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
           .map((item) => DashboardWidget.getDashboardWidget(item))
           .toList();
       if (!dashboardWidgets.contains(DashboardWidget.networkDetection)) {
-        dashboardWidgets.add(DashboardWidget.networkDetection);
+        dashboardWidgets.insert(0, DashboardWidget.networkDetection);
       }
       ref
           .read(appSettingProvider.notifier)

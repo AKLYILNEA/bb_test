@@ -293,12 +293,7 @@ DashboardState dashboardState(Ref ref) {
       .where((w) => w != DashboardWidget.startButton && w != DashboardWidget.memoryInfo)
       .toList();
   if (!widgets.contains(DashboardWidget.networkDetection)) {
-    final insertIdx = widgets.indexOf(DashboardWidget.outboundMode);
-    if (insertIdx != -1) {
-      widgets.insert(insertIdx + 1, DashboardWidget.networkDetection);
-    } else {
-      widgets.add(DashboardWidget.networkDetection);
-    }
+    widgets.insert(0, DashboardWidget.networkDetection);
   }
   return DashboardState(dashboardWidgets: widgets, viewWidth: viewWidth);
 }
