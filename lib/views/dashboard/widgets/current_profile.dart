@@ -68,20 +68,21 @@ class _CurrentProfileState extends ConsumerState<CurrentProfile> {
 
     try {
       final status = await clashCore.getCoreStatus();
-      if (status != null && (status.inUse > 0 || status.physical > 0)) {
-        final currentInUse = status.inUse > 0 ? status.inUse : status.physical;
+      if (status != null && (status.inUse > 0 || status.physical > 0 || status.reclaimable > 0)) {
+        final totalMemory = (status.inUse + status.reclaimable) > 0
+            ? (status.inUse + status.reclaimable)
+            : (status.inUse > 0 ? status.inUse : status.physical);
         if (mounted) {
           setState(() {
-            _inUse = currentInUse;
+            _inUse = status.inUse;
             _reclaimable = status.reclaimable;
-            _memoryValue = TrafficValue(value: currentInUse);
+            _memoryValue = TrafficValue(value: totalMemory);
             _lastInUse = _inUse;
             _lastReclaimable = _reclaimable;
             _lastMemoryValue = _memoryValue;
           });
         }
       } else {
-        // Fallback to getMemory() if core status is not available
         final mem = await clashCore.getMemory();
         if (mem > 0 && mounted) {
           setState(() {
@@ -151,13 +152,13 @@ class _CurrentProfileState extends ConsumerState<CurrentProfile> {
               ],
             ),
             Padding(
-              padding: EdgeInsets.fromLTRB(16.ap, 8.ap, 16.ap, 14.ap),
+              padding: EdgeInsets.fromLTRB(16.ap, 4.ap, 16.ap, 8.ap),
               child: TooltipText(
                 text: Text(
                   profile?.label ?? appLocalizations.notAcquired,
                   style: context.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w700,
-                    fontSize: 18.ap,
+                    fontSize: 17.ap,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -172,9 +173,9 @@ class _CurrentProfileState extends ConsumerState<CurrentProfile> {
                 color: context.colorScheme.outlineVariant.withValues(alpha: 0.25),
               ),
             ),
-            // 下半部分：内存信息
+            // 下半部分：内存信息（紧凑精致排版）
             Padding(
-              padding: EdgeInsets.fromLTRB(16.ap, 14.ap, 16.ap, 0),
+              padding: EdgeInsets.fromLTRB(16.ap, 8.ap, 16.ap, 0),
               child: Text(
                 appLocalizations.memoryInfo,
                 style: context.textTheme.titleSmall?.copyWith(
@@ -186,13 +187,13 @@ class _CurrentProfileState extends ConsumerState<CurrentProfile> {
             ),
             // 双色水平进度条（内核负载详情可分配和可回收颜色）
             Padding(
-              padding: EdgeInsets.fromLTRB(16.ap, 10.ap, 16.ap, 0),
+              padding: EdgeInsets.fromLTRB(16.ap, 6.ap, 16.ap, 0),
               child: Row(
                 children: [
                   Expanded(
                     flex: flexInUse,
                     child: Container(
-                      height: 12.ap,
+                      height: 10.ap,
                       decoration: ShapeDecoration(
                         color: context.colorScheme.primary,
                         shape: SuperellipseBorder(
@@ -205,7 +206,7 @@ class _CurrentProfileState extends ConsumerState<CurrentProfile> {
                   Expanded(
                     flex: flexReclaim,
                     child: Container(
-                      height: 12.ap,
+                      height: 10.ap,
                       decoration: ShapeDecoration(
                         color: context.colorScheme.tertiary,
                         shape: SuperellipseBorder(
@@ -217,9 +218,9 @@ class _CurrentProfileState extends ConsumerState<CurrentProfile> {
                 ],
               ),
             ),
-            // 内存数值（不使用等宽字体，不加粗，位置适度上提）
+            // 内存总数值（写总内存，非等宽、非加粗、紧凑上提，底部留白充足）
             Padding(
-              padding: EdgeInsets.fromLTRB(16.ap, 10.ap, 16.ap, 0),
+              padding: EdgeInsets.fromLTRB(16.ap, 6.ap, 16.ap, 0),
               child: Text.rich(
                 TextSpan(
                   children: [
@@ -227,7 +228,8 @@ class _CurrentProfileState extends ConsumerState<CurrentProfile> {
                       text: _memoryValue.showValue,
                       style: context.textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.normal,
-                        fontSize: 24.ap,
+                        fontSize: 22.ap,
+                        height: 1.15,
                         color: context.colorScheme.onSurface,
                       ),
                     ),
@@ -237,7 +239,8 @@ class _CurrentProfileState extends ConsumerState<CurrentProfile> {
                       style: context.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.normal,
                         color: context.colorScheme.onSurfaceVariant,
-                        fontSize: 16.ap,
+                        fontSize: 15.ap,
+                        height: 1.15,
                       ),
                     ),
                   ],
