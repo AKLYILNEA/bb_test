@@ -31,6 +31,10 @@ class CommonInfoCapsule extends StatelessWidget {
     final effectiveStyle = (style ?? context.textTheme.labelMedium)?.copyWith(
       color: effectiveColor,
     );
+    final locale = Localizations.maybeLocaleOf(context);
+    final isAlphabetic = const {'en', 'ru'}.contains(locale?.languageCode);
+    final textShift = isAlphabetic ? 0.0 : 1.0;
+
     final textWidget = _CapCentered(
       fontSize: effectiveStyle?.fontSize ?? 12,
       child: EmojiText(
@@ -42,15 +46,22 @@ class CommonInfoCapsule extends StatelessWidget {
       ),
     );
 
-    final content = leading == null
+    final shiftedText = textShift == 0.0
         ? textWidget
+        : Transform.translate(
+            offset: Offset(textShift, 0),
+            child: textWidget,
+          );
+
+    final content = leading == null
+        ? shiftedText
         : Row(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               leading!,
               const SizedBox(width: 5),
-              textWidget,
+              shiftedText,
             ],
           );
 

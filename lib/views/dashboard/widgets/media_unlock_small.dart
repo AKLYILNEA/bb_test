@@ -81,29 +81,29 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
     final double borderRadius;
 
     if (count == 1) {
-      iconSize = 22.ap;
-      textFontSize = 14.ap;
-      dotSize = 8.5.ap;
-      iconSpacing = 10.ap;
-      borderRadius = 11.ap;
-    } else if (count == 2) {
       iconSize = 20.ap;
       textFontSize = 13.5.ap;
       dotSize = 8.ap;
       iconSpacing = 9.ap;
-      borderRadius = 11.ap;
-    } else if (count == 3) {
-      iconSize = 19.ap;
-      textFontSize = 13.ap;
-      dotSize = 8.ap;
-      iconSpacing = 8.ap;
       borderRadius = 10.ap;
-    } else {
-      iconSize = 18.ap;
-      textFontSize = 12.ap;
+    } else if (count == 2) {
+      iconSize = 18.5.ap;
+      textFontSize = 13.ap;
       dotSize = 7.5.ap;
       iconSpacing = 8.ap;
       borderRadius = 10.ap;
+    } else if (count == 3) {
+      iconSize = 17.5.ap;
+      textFontSize = 12.5.ap;
+      dotSize = 7.ap;
+      iconSpacing = 7.ap;
+      borderRadius = 9.ap;
+    } else {
+      iconSize = 16.ap;
+      textFontSize = 11.5.ap;
+      dotSize = 6.5.ap;
+      iconSpacing = 7.ap;
+      borderRadius = 9.ap;
     }
 
     final Widget icon;
@@ -163,13 +163,13 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 8.ap),
+        padding: EdgeInsets.symmetric(horizontal: 10.ap),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(
-              width: 22.ap,
-              height: 22.ap,
+              width: 20.ap,
+              height: 20.ap,
               child: Center(
                 child: themedPlatformIcon(context, platform, icon),
               ),
@@ -195,7 +195,7 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
                     Text(
                       '${result!.latency}ms',
                       style: context.textTheme.bodySmall?.copyWith(
-                        fontSize: (textFontSize - 2.ap).clamp(10.ap, 12.ap),
+                        fontSize: (textFontSize - 2.ap).clamp(9.5.ap, 11.5.ap),
                         fontWeight: FontWeight.w500,
                         color: context.colorScheme.onSurfaceVariant.withValues(
                           alpha: 0.8,
@@ -206,10 +206,10 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
                 ],
               ),
             ),
-            SizedBox(width: 8.ap),
+            SizedBox(width: 6.ap),
             SizedBox(
-              width: 22.ap,
-              height: 22.ap,
+              width: 16.ap,
+              height: 16.ap,
               child: Center(
                 child: isTesting
                     ? RepaintBoundary(
@@ -286,26 +286,16 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
             child: Column(
               children: [
                 InfoHeader(
-                  padding: EdgeInsets.fromLTRB(22.ap, 14.ap, 22.ap, 0),
+                  padding: baseInfoEdgeInsets.copyWith(bottom: 0),
                   actionsHeight: globalState.measure.titleSmallHeight,
                   info: Info(
                     label: appLocalizations.mediaUnlockShort,
-                    icon: SizedBox(
-                      width: 22.ap,
-                      height: 22.ap,
-                      child: Center(
-                        child: Icon(
-                          FluentIcons.link_24_regular,
-                          size: 19.ap,
-                          color: context.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
+                    iconData: FluentIcons.link_24_regular,
                   ),
                   actions: [
                     SizedBox(
-                      width: 22.ap,
-                      height: 22.ap,
+                      width: 24.ap,
+                      height: 24.ap,
                       child: IconButton(
                         padding: EdgeInsets.zero,
                         onPressed: isWidgetLoading
@@ -336,7 +326,7 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
                 ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(14.ap, 8.ap, 14.ap, 14.ap),
+                    padding: EdgeInsets.fromLTRB(16.ap, 10.ap, 16.ap, 16.ap),
                     child: Column(
                       children: [
                         for (int i = 0; i < count; i++) ...[
