@@ -460,7 +460,7 @@ class _StartButton extends StatefulWidget {
 }
 
 class _StartButtonState extends State<_StartButton>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     duration: const Duration(milliseconds: 650),
     vsync: this,
@@ -472,14 +472,38 @@ class _StartButtonState extends State<_StartButton>
     curve: Curves.easeInOutCubic,
   );
 
+  late final AnimationController _breatheController = AnimationController(
+    duration: const Duration(milliseconds: 1400),
+    vsync: this,
+  );
+
+  late final Animation<double> _breatheCurve = CurvedAnimation(
+    parent: _breatheController,
+    curve: Curves.easeInOutSine,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isStart) {
+      _breatheController.repeat(reverse: true);
+    }
+  }
+
   @override
   void didUpdateWidget(covariant _StartButton oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.isStart != oldWidget.isStart) {
       if (widget.isStart) {
         _controller.forward();
+        _breatheController.repeat(reverse: true);
       } else {
         _controller.reverse();
+        _breatheController.animateTo(
+          0.0,
+          duration: const Duration(milliseconds: 350),
+          curve: Curves.easeOutCubic,
+        );
       }
     }
   }
@@ -487,99 +511,113 @@ class _StartButtonState extends State<_StartButton>
   @override
   void dispose() {
     _controller.dispose();
+    _breatheController.dispose();
     super.dispose();
   }
 
   Widget _buildIcon(BuildContext context) {
     if (widget.showLoading || widget.isRestarting) {
-      return OverflowBox(
+      return Transform.translate(
         key: const ValueKey('loading'),
-        maxWidth: 26,
-        maxHeight: 16,
-        child: SpinKitThreeBounce(
-          color: context.colorScheme.onPrimary,
-          size: 14,
+        offset: Offset(0, -1.2.ap),
+        child: OverflowBox(
+          maxWidth: 26,
+          maxHeight: 16,
+          child: SpinKitThreeBounce(
+            color: context.colorScheme.onPrimary,
+            size: 14,
+          ),
         ),
       );
     }
 
     if (widget.isStart) {
-      return Icon(
-        FluentIcons.align_space_around_vertical_20_filled,
+      return Transform.translate(
         key: const ValueKey('pause'),
-        size: 20.ap,
-        color: context.colorScheme.onPrimary,
+        offset: Offset(0, -1.2.ap),
+        child: Icon(
+          FluentIcons.align_space_around_vertical_20_filled,
+          size: 20.ap,
+          color: context.colorScheme.onPrimary,
+        ),
       );
     }
 
-    return Icon(
-      FluentIcons.play_24_filled,
+    return Transform.translate(
       key: const ValueKey('play'),
-      size: 20.ap,
-      color: context.colorScheme.onPrimary,
+      offset: Offset(0.8.ap, -1.2.ap),
+      child: Icon(
+        FluentIcons.play_24_filled,
+        size: 20.ap,
+        color: context.colorScheme.onPrimary,
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _curve,
+      animation: Listenable.merge([_curve, _breatheCurve]),
       builder: (context, _) {
         final progress = _curve.value;
+        final breatheScale = 1.0 + 0.035 * _breatheCurve.value * progress;
         final effectiveShape = widget.isStart
             ? MaterialPolygonBorder(polygon: MaterialShapes.cookie12Sided)
             : const CircleBorder();
 
-        return RotationTransition(
-          turns: _curve,
-          child: Material(
-            color: Colors.transparent,
-            shape: effectiveShape,
-            clipBehavior: Clip.antiAlias,
-            child: InkWell(
-              onTap: widget.canPress
-                  ? widget.onStart
-                  : (widget.hasNoProfile ? widget.onAddProfile : null),
-              onLongPress: widget.isStart && widget.canPress
-                  ? widget.onLongPress
-                  : null,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  // 纯圆形背景（停止态：使用流量统计次色）
-                  if (progress < 1.0)
-                    Opacity(
-                      opacity: (1.0 - progress).clamp(0.0, 1.0),
-                      child: DecoratedBox(
-                        decoration: ShapeDecoration(
-                          color: globalState.theme.darken2SecondaryContainer,
-                          shape: const CircleBorder(),
-                        ),
-                      ),
-                    ),
-                  // 多边形背景（启动态，随着旋转慢慢变出）
-                  if (progress > 0.0)
-                    Opacity(
-                      opacity: progress.clamp(0.0, 1.0),
-                      child: Transform.scale(
-                        scale: 0.8 + 0.2 * progress,
+        return Transform.scale(
+          scale: breatheScale,
+          child: RotationTransition(
+            turns: _curve,
+            child: Material(
+              color: Colors.transparent,
+              shape: effectiveShape,
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: widget.canPress
+                    ? widget.onStart
+                    : (widget.hasNoProfile ? widget.onAddProfile : null),
+                onLongPress: widget.isStart && widget.canPress
+                    ? widget.onLongPress
+                    : null,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    // 纯圆形背景（停止态：使用流量统计次色）
+                    if (progress < 1.0)
+                      Opacity(
+                        opacity: (1.0 - progress).clamp(0.0, 1.0),
                         child: DecoratedBox(
                           decoration: ShapeDecoration(
-                            color: context.colorScheme.primary,
-                            shape: MaterialPolygonBorder(
-                              polygon: MaterialShapes.cookie12Sided,
+                            color: globalState.theme.darken2SecondaryContainer,
+                            shape: const CircleBorder(),
+                          ),
+                        ),
+                      ),
+                    // 多边形背景（启动态，随着旋转慢慢变出）
+                    if (progress > 0.0)
+                      Opacity(
+                        opacity: progress.clamp(0.0, 1.0),
+                        child: Transform.scale(
+                          scale: 0.8 + 0.2 * progress,
+                          child: DecoratedBox(
+                            decoration: ShapeDecoration(
+                              color: context.colorScheme.primary,
+                              shape: MaterialPolygonBorder(
+                                polygon: MaterialShapes.cookie12Sided,
+                              ),
                             ),
                           ),
                         ),
                       ),
+                    Center(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 250),
+                        child: _buildIcon(context),
+                      ),
                     ),
-                  Center(
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 250),
-                      child: _buildIcon(context),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

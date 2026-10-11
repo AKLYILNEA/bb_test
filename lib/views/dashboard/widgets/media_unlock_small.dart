@@ -85,25 +85,25 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
       textFontSize = 13.5.ap;
       dotSize = 8.ap;
       iconSpacing = 9.ap;
-      borderRadius = 10.ap;
+      borderRadius = 11.ap;
     } else if (count == 2) {
       iconSize = 18.5.ap;
       textFontSize = 13.ap;
       dotSize = 7.5.ap;
       iconSpacing = 8.ap;
-      borderRadius = 10.ap;
+      borderRadius = 11.ap;
     } else if (count == 3) {
       iconSize = 17.5.ap;
       textFontSize = 12.5.ap;
       dotSize = 7.ap;
       iconSpacing = 7.ap;
-      borderRadius = 9.ap;
+      borderRadius = 10.ap;
     } else {
       iconSize = 16.ap;
       textFontSize = 11.5.ap;
       dotSize = 6.5.ap;
       iconSpacing = 7.ap;
-      borderRadius = 9.ap;
+      borderRadius = 10.ap;
     }
 
     final Widget icon;
