@@ -545,7 +545,7 @@ class _StartButtonState extends State<_StartButton>
 
     return Transform.translate(
       key: const ValueKey('play'),
-      offset: Offset(0.8.ap, -1.2.ap),
+      offset: Offset(0, -1.2.ap),
       child: Icon(
         FluentIcons.play_24_filled,
         size: 20.ap,
@@ -560,67 +560,75 @@ class _StartButtonState extends State<_StartButton>
       animation: Listenable.merge([_curve, _breatheCurve]),
       builder: (context, _) {
         final progress = _curve.value;
-        final breatheScale = 1.0 + 0.035 * _breatheCurve.value * progress;
+        final breatheScale = 1.0 + 0.07 * _breatheCurve.value * progress;
         final effectiveShape = widget.isStart
             ? MaterialPolygonBorder(polygon: MaterialShapes.cookie12Sided)
             : const CircleBorder();
 
-        return Transform.scale(
-          scale: breatheScale,
-          child: RotationTransition(
-            turns: _curve,
-            child: Material(
-              color: Colors.transparent,
-              shape: effectiveShape,
-              clipBehavior: Clip.antiAlias,
-              child: InkWell(
-                onTap: widget.canPress
-                    ? widget.onStart
-                    : (widget.hasNoProfile ? widget.onAddProfile : null),
-                onLongPress: widget.isStart && widget.canPress
-                    ? widget.onLongPress
-                    : null,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    // 纯圆形背景（停止态：使用流量统计次色）
-                    if (progress < 1.0)
-                      Opacity(
-                        opacity: (1.0 - progress).clamp(0.0, 1.0),
-                        child: DecoratedBox(
-                          decoration: ShapeDecoration(
-                            color: globalState.theme.darken2SecondaryContainer,
-                            shape: const CircleBorder(),
-                          ),
-                        ),
-                      ),
-                    // 多边形背景（启动态，随着旋转慢慢变出）
-                    if (progress > 0.0)
-                      Opacity(
-                        opacity: progress.clamp(0.0, 1.0),
-                        child: Transform.scale(
-                          scale: 0.8 + 0.2 * progress,
-                          child: DecoratedBox(
-                            decoration: ShapeDecoration(
-                              color: context.colorScheme.primary,
-                              shape: MaterialPolygonBorder(
-                                polygon: MaterialShapes.cookie12Sided,
+        return Stack(
+          alignment: Alignment.center,
+          fit: StackFit.expand,
+          children: [
+            Transform.scale(
+              scale: breatheScale,
+              child: RotationTransition(
+                turns: _curve,
+                child: Material(
+                  color: Colors.transparent,
+                  shape: effectiveShape,
+                  clipBehavior: Clip.antiAlias,
+                  child: InkWell(
+                    onTap: widget.canPress
+                        ? widget.onStart
+                        : (widget.hasNoProfile ? widget.onAddProfile : null),
+                    onLongPress: widget.isStart && widget.canPress
+                        ? widget.onLongPress
+                        : null,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        // 纯圆形背景（停止态：使用流量统计次色）
+                        if (progress < 1.0)
+                          Opacity(
+                            opacity: (1.0 - progress).clamp(0.0, 1.0),
+                            child: DecoratedBox(
+                              decoration: ShapeDecoration(
+                                color: globalState.theme.darken2SecondaryContainer,
+                                shape: const CircleBorder(),
                               ),
                             ),
                           ),
-                        ),
-                      ),
-                    Center(
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 250),
-                        child: _buildIcon(context),
-                      ),
+                        // 多边形背景（启动态，随着旋转慢慢变出）
+                        if (progress > 0.0)
+                          Opacity(
+                            opacity: progress.clamp(0.0, 1.0),
+                            child: Transform.scale(
+                              scale: 0.8 + 0.2 * progress,
+                              child: DecoratedBox(
+                                decoration: ShapeDecoration(
+                                  color: context.colorScheme.primary,
+                                  shape: MaterialPolygonBorder(
+                                    polygon: MaterialShapes.cookie12Sided,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
+            IgnorePointer(
+              child: Center(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  child: _buildIcon(context),
+                ),
+              ),
+            ),
+          ],
         );
       },
     );
