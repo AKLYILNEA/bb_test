@@ -211,16 +211,16 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
                 onLongPress: _showIpClickBehaviorSettings,
                 child: Stack(
                   children: [
-                    // 右侧装饰背景水波
+                    // 右侧装饰背景花朵（还原设计图浅色8瓣花朵装饰）
                     Positioned(
-                      right: -24.ap,
-                      top: -24.ap,
-                      bottom: -24.ap,
-                      width: 132.ap,
+                      right: -18.ap,
+                      top: -17.ap,
+                      bottom: -17.ap,
+                      width: 118.ap,
                       child: IgnorePointer(
                         child: CustomPaint(
                           painter: _MaterialShapePainter(
-                            shape: MaterialShapes.softBoom,
+                            shape: MaterialShapes.flower,
                             color: context.colorScheme.primary.withValues(
                               alpha: Theme.of(context).colorScheme.brightness == Brightness.dark
                                   ? 0.16
@@ -285,66 +285,67 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
                             padding: baseInfoEdgeInsets.copyWith(top: 0, right: 0),
                             child: SizedBox(
                               height: globalState.measure.bodyMediumHeight + 2,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Flexible(
-                                    child: _buildIpContent(
-                                      context,
-                                      state,
-                                      ipInfo,
-                                      isLoading,
+                              child: isLoading
+                                  ? Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: OverflowBox(
+                                        alignment: Alignment.centerLeft,
+                                        maxWidth: 32,
+                                        maxHeight: 16,
+                                        child: SpinKitThreeBounce(
+                                          color: context.colorScheme.primary,
+                                          size: 14,
+                                        ),
+                                      ),
+                                    )
+                                  : Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Flexible(
+                                          child: _buildIpContent(
+                                            context,
+                                            state,
+                                            ipInfo,
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                                          child: Container(
+                                            width: 1.0,
+                                            height: 12.ap,
+                                            color: context.colorScheme.outlineVariant.withValues(alpha: 0.6),
+                                          ),
+                                        ),
+                                        Text(
+                                          displayStart ? _formatRunTime(runTime) : '00:00:00',
+                                          style: context.textTheme.bodyMedium?.toLight
+                                              .adjustSize(1)
+                                              .toJetBrainsMono,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                                    child: Container(
-                                      width: 1.0,
-                                      height: 12.ap,
-                                      color: context.colorScheme.outlineVariant.withValues(alpha: 0.6),
-                                    ),
-                                  ),
-                                  Text(
-                                    displayStart ? _formatRunTime(runTime) : '00:00:00',
-                                    style: context.textTheme.bodyMedium?.toLight
-                                        .adjustSize(1)
-                                        .toJetBrainsMono,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    // 右上角/右侧启动按钮
+                    // 右上角/右侧启动按钮（未运行纯圆，启动时旋转变出多边形）
                     Positioned(
                       right: 16.ap,
                       top: 17.ap,
                       bottom: 17.ap,
                       width: 50.ap,
-                      child: Material(
-                        color: context.colorScheme.primary,
-                        shape: MaterialPolygonBorder(
-                          polygon: MaterialShapes.cookie12Sided,
-                        ),
-                        clipBehavior: Clip.antiAlias,
-                        child: InkWell(
-                          onTap: canPress
-                              ? _handleStart
-                              : (hasNoProfile ? showAddProfileExtend : null),
-                          onLongPress: isStart && canPress ? _handleLongPress : null,
-                          child: Center(
-                            child: _buildStartButtonIcon(
-                              context,
-                              displayStart,
-                              showLoading,
-                              isRestarting,
-                            ),
-                          ),
-                        ),
+                      child: _StartButton(
+                        isStart: displayStart,
+                        canPress: canPress,
+                        showLoading: showLoading,
+                        isRestarting: isRestarting,
+                        hasNoProfile: hasNoProfile,
+                        onStart: _handleStart,
+                        onLongPress: _handleLongPress,
+                        onAddProfile: showAddProfileExtend,
                       ),
                     ),
                   ],
@@ -368,22 +369,27 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
             ? context.colorScheme.success
             : context.colorScheme.outlineVariant;
 
-    final Color pillBg = isRestarting || isStart
-        ? context.colorScheme.primary.withValues(alpha: 0.12)
-        : context.colorScheme.onSurfaceVariant.withValues(alpha: 0.08);
-
-    final Color textColor = isRestarting || isStart
-        ? context.colorScheme.primary
-        : context.colorScheme.onSurfaceVariant;
-
     final String text = isRestarting
         ? appLocalizations.coreRestarting
         : isStart
             ? appLocalizations.coreRunning
             : appLocalizations.coreStopped;
 
+    final Color? capsuleColor = isRestarting
+        ? context.colorScheme.primary
+        : isStart
+            ? null
+            : context.colorScheme.onSurfaceVariant;
+
+    final Color? capsuleBg = isRestarting
+        ? context.colorScheme.primary.withValues(alpha: 0.15)
+        : isStart
+            ? null
+            : context.colorScheme.onSurfaceVariant.withValues(alpha: 0.08);
+
     return Row(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
           width: 7.ap,
@@ -394,22 +400,12 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
           ),
         ),
         const SizedBox(width: 6),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 8.ap, vertical: 2.ap),
-          decoration: ShapeDecoration(
-            color: pillBg,
-            shape: SuperellipseBorder(
-              borderRadius: BorderRadius.circular(999),
-            ),
-          ),
-          child: Text(
-            text,
-            style: TextStyle(
-              color: textColor,
-              fontSize: 11.ap,
-              fontWeight: FontWeight.w600,
-              height: 1.2,
-            ),
+        CommonInfoCapsule(
+          text,
+          color: capsuleColor,
+          backgroundColor: capsuleBg,
+          style: context.textTheme.labelMedium?.copyWith(
+            fontWeight: FontWeight.w600,
           ),
         ),
       ],
@@ -420,7 +416,6 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
     BuildContext context,
     NetworkDetectionState state,
     IpInfo? ipInfo,
-    bool isLoading,
   ) {
     if (ipInfo != null) {
       final isMasked = detectionState.isIpMasked || ipInfo.ip == '*****';
@@ -440,33 +435,75 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
       );
     }
 
-    if (isLoading == false) {
-      return Text(
-        state.errorMessage ?? 'timeout',
-        style: context.textTheme.bodyMedium?.copyWith(color: Colors.red).adjustSize(1),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      );
-    }
-
-    return OverflowBox(
-      maxWidth: 30,
-      maxHeight: 16,
-      child: SpinKitThreeBounce(
-        color: context.colorScheme.primary,
-        size: 14,
-      ),
+    return Text(
+      state.errorMessage ?? 'timeout',
+      style: context.textTheme.bodyMedium?.copyWith(color: Colors.red).adjustSize(1),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
     );
   }
+}
 
-  Widget _buildStartButtonIcon(
-    BuildContext context,
-    bool isStart,
-    bool showLoading,
-    bool isRestarting,
-  ) {
-    if (showLoading || isRestarting) {
+class _StartButton extends StatefulWidget {
+  final bool isStart;
+  final bool canPress;
+  final bool showLoading;
+  final bool isRestarting;
+  final bool hasNoProfile;
+  final VoidCallback? onStart;
+  final VoidCallback? onLongPress;
+  final VoidCallback? onAddProfile;
+
+  const _StartButton({
+    required this.isStart,
+    required this.canPress,
+    required this.showLoading,
+    required this.isRestarting,
+    required this.hasNoProfile,
+    this.onStart,
+    this.onLongPress,
+    this.onAddProfile,
+  });
+
+  @override
+  State<_StartButton> createState() => _StartButtonState();
+}
+
+class _StartButtonState extends State<_StartButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    duration: const Duration(milliseconds: 650),
+    vsync: this,
+    value: widget.isStart ? 1.0 : 0.0,
+  );
+
+  late final Animation<double> _curve = CurvedAnimation(
+    parent: _controller,
+    curve: Curves.easeInOutCubic,
+  );
+
+  @override
+  void didUpdateWidget(covariant _StartButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isStart != oldWidget.isStart) {
+      if (widget.isStart) {
+        _controller.forward();
+      } else {
+        _controller.reverse();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Widget _buildIcon(BuildContext context) {
+    if (widget.showLoading || widget.isRestarting) {
       return OverflowBox(
+        key: const ValueKey('loading'),
         maxWidth: 26,
         maxHeight: 16,
         child: SpinKitThreeBounce(
@@ -476,9 +513,10 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
       );
     }
 
-    if (isStart) {
+    if (widget.isStart) {
       return Icon(
         FluentIcons.align_space_around_vertical_20_filled,
+        key: const ValueKey('pause'),
         size: 20.ap,
         color: context.colorScheme.onPrimary,
       );
@@ -486,8 +524,77 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
 
     return Icon(
       FluentIcons.play_24_filled,
+      key: const ValueKey('play'),
       size: 20.ap,
       color: context.colorScheme.onPrimary,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _curve,
+      builder: (context, _) {
+        final progress = _curve.value;
+        final effectiveShape = widget.isStart
+            ? MaterialPolygonBorder(polygon: MaterialShapes.cookie12Sided)
+            : const CircleBorder();
+
+        return RotationTransition(
+          turns: _curve,
+          child: Material(
+            color: Colors.transparent,
+            shape: effectiveShape,
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: widget.canPress
+                  ? widget.onStart
+                  : (widget.hasNoProfile ? widget.onAddProfile : null),
+              onLongPress: widget.isStart && widget.canPress
+                  ? widget.onLongPress
+                  : null,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // 纯圆形背景（停止态）
+                  if (progress < 1.0)
+                    Opacity(
+                      opacity: (1.0 - progress).clamp(0.0, 1.0),
+                      child: DecoratedBox(
+                        decoration: ShapeDecoration(
+                          color: context.colorScheme.primary,
+                          shape: const CircleBorder(),
+                        ),
+                      ),
+                    ),
+                  // 多边形背景（启动态，随着旋转慢慢变出）
+                  if (progress > 0.0)
+                    Opacity(
+                      opacity: progress.clamp(0.0, 1.0),
+                      child: Transform.scale(
+                        scale: 0.8 + 0.2 * progress,
+                        child: DecoratedBox(
+                          decoration: ShapeDecoration(
+                            color: context.colorScheme.primary,
+                            shape: MaterialPolygonBorder(
+                              polygon: MaterialShapes.cookie12Sided,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  Center(
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 250),
+                      child: _buildIcon(context),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

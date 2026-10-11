@@ -10,19 +10,26 @@ import 'text.dart';
 class CommonInfoCapsule extends StatelessWidget {
   final String label;
   final TextStyle? style;
+  final Color? color;
+  final Color? backgroundColor;
 
-  const CommonInfoCapsule(this.label, {super.key, this.style});
+  const CommonInfoCapsule(
+    this.label, {
+    super.key,
+    this.style,
+    this.color,
+    this.backgroundColor,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = context.colorScheme;
-    final color = colorScheme.primary;
+    final effectiveColor = color ?? context.colorScheme.primary;
     final effectiveStyle = (style ?? context.textTheme.labelMedium)?.copyWith(
-      color: color,
+      color: effectiveColor,
     );
     return DecoratedBox(
       decoration: ShapeDecoration(
-        color: color.withValues(alpha: 0.15),
+        color: backgroundColor ?? effectiveColor.withValues(alpha: 0.15),
         shape: SuperellipseBorder(borderRadius: BorderRadius.circular(1000)),
       ),
       child: Padding(

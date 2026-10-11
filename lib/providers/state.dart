@@ -292,6 +292,14 @@ DashboardState dashboardState(Ref ref) {
   final widgets = dashboardWidgets
       .where((w) => w != DashboardWidget.startButton)
       .toList();
+  if (!widgets.contains(DashboardWidget.networkDetection)) {
+    final insertIdx = widgets.indexOf(DashboardWidget.outboundMode);
+    if (insertIdx != -1) {
+      widgets.insert(insertIdx + 1, DashboardWidget.networkDetection);
+    } else {
+      widgets.add(DashboardWidget.networkDetection);
+    }
+  }
   return DashboardState(dashboardWidgets: widgets, viewWidth: viewWidth);
 }
 

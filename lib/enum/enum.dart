@@ -317,7 +317,9 @@ enum DashboardWidget {
   trafficUsageSmall(
     GridItem(crossAxisCellCount: 4, child: TrafficUsageSmall()),
   ),
-  networkDetection(GridItem(crossAxisCellCount: 8, child: NetworkDetection())),
+  networkDetection(
+    GridItem(crossAxisCellCount: 8, isDeletable: false, child: NetworkDetection()),
+  ),
   tunButton(
     GridItem(crossAxisCellCount: 4, child: TUNButton()),
     platforms: desktopPlatforms,

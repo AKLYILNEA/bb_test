@@ -211,6 +211,9 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
       final dashboardWidgets = children
           .map((item) => DashboardWidget.getDashboardWidget(item))
           .toList();
+      if (!dashboardWidgets.contains(DashboardWidget.networkDetection)) {
+        dashboardWidgets.add(DashboardWidget.networkDetection);
+      }
       ref
           .read(appSettingProvider.notifier)
           .updateState(
@@ -248,6 +251,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
             (item) =>
                 !children.contains(item.widget) &&
                 item != DashboardWidget.startButton &&
+                item != DashboardWidget.networkDetection &&
                 item.platforms.contains(SupportPlatform.currentPlatform),
           )
           .map((item) => item.widget)
