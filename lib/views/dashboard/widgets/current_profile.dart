@@ -186,10 +186,9 @@ class _CurrentProfileState extends ConsumerState<CurrentProfile> {
             // 中间分割线
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.ap),
-              child: Divider(
-                height: 1,
-                thickness: 1,
-                color: context.colorScheme.outlineVariant.withValues(alpha: 0.2),
+              child: Container(
+                height: 1.0,
+                color: context.colorScheme.outlineVariant.withValues(alpha: 0.6),
               ),
             ),
             // 下半部分：内存信息（充满下半部分并均匀分布，底边对齐左侧连通性测试）

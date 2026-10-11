@@ -296,11 +296,10 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
                 ),
                 Padding(
                   padding: EdgeInsets.fromLTRB(16.ap, 8.ap, 16.ap, 4.ap),
-                  child: Divider(
-                    height: 1,
-                    thickness: 1,
+                  child: Container(
+                    height: 1.0,
                     color: context.colorScheme.outlineVariant.withValues(
-                      alpha: 0.2,
+                      alpha: 0.6,
                     ),
                   ),
                 ),
