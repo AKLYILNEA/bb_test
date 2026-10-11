@@ -170,7 +170,7 @@ class _CurrentProfileState extends ConsumerState<CurrentProfile> {
               ],
             ),
             Padding(
-              padding: EdgeInsets.fromLTRB(16.ap, 4.ap, 16.ap, 8.ap),
+              padding: EdgeInsets.fromLTRB(16.ap, 6.ap, 16.ap, 12.ap),
               child: TooltipText(
                 text: Text(
                   profile?.label ?? appLocalizations.notAcquired,
@@ -186,107 +186,113 @@ class _CurrentProfileState extends ConsumerState<CurrentProfile> {
             // 中间分割线
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.ap),
-              child: Container(
-                height: 1.0,
-                color: context.colorScheme.outlineVariant.withValues(alpha: 0.25),
+              child: Divider(
+                height: 1,
+                thickness: 1,
+                color: context.colorScheme.outlineVariant.withValues(alpha: 0.2),
               ),
             ),
-            // 下半部分：内存信息（紧凑精致排版）
-            Padding(
-              padding: EdgeInsets.fromLTRB(16.ap, 8.ap, 16.ap, 0),
-              child: Text(
-                appLocalizations.memoryInfo,
-                style: context.textTheme.titleSmall?.copyWith(
-                  color: context.colorScheme.onSurfaceVariant,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            // 双色水平进度条（内核负载详情可分配和可回收颜色，最小保底为圆形）
-            Padding(
-              padding: EdgeInsets.fromLTRB(16.ap, 6.ap, 16.ap, 0),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final barHeight = 10.ap;
-                  final totalWidth = constraints.maxWidth;
-                  final gap = 4.ap;
-                  final availableWidth = max(0.0, totalWidth - gap);
-                  final minBarWidth = barHeight;
-
-                  double reclaimableW;
-                  double inUseW;
-
-                  if (totalMem > 0 && availableWidth > minBarWidth * 2) {
-                    final rawReclaim = availableWidth * (_reclaimable / totalMem);
-                    reclaimableW = rawReclaim.clamp(minBarWidth, availableWidth - minBarWidth);
-                    inUseW = max(minBarWidth, availableWidth - reclaimableW);
-                  } else {
-                    reclaimableW = minBarWidth;
-                    inUseW = max(minBarWidth, availableWidth - minBarWidth);
-                  }
-
-                  return Row(
-                    children: [
-                      SizedBox(
-                        width: inUseW,
-                        height: barHeight,
-                        child: DecoratedBox(
-                          decoration: ShapeDecoration(
-                            color: context.colorScheme.primary,
-                            shape: SuperellipseBorder(
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: gap),
-                      SizedBox(
-                        width: reclaimableW,
-                        height: barHeight,
-                        child: DecoratedBox(
-                          decoration: ShapeDecoration(
-                            color: context.colorScheme.tertiary,
-                            shape: SuperellipseBorder(
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-            // 内存总数值（写总内存，非等宽、非加粗、紧凑上提，底部留白充足）
-            Padding(
-              padding: EdgeInsets.fromLTRB(16.ap, 6.ap, 16.ap, 0),
-              child: Text.rich(
-                TextSpan(
+            // 下半部分：内存信息（充满下半部分并均匀分布，底边对齐左侧连通性测试）
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16.ap, 12.ap, 16.ap, 16.ap),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    TextSpan(
-                      text: _memoryValue.showValue,
-                      style: context.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.normal,
-                        fontSize: 22.ap,
-                        height: 1.15,
-                        color: context.colorScheme.onSurface,
-                      ),
-                    ),
-                    const TextSpan(text: ' '),
-                    TextSpan(
-                      text: _memoryValue.showUnit,
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.normal,
+                    Text(
+                      appLocalizations.memoryInfo,
+                      style: context.textTheme.titleSmall?.copyWith(
                         color: context.colorScheme.onSurfaceVariant,
-                        fontSize: 15.ap,
-                        height: 1.15,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    // 双色水平进度条（内核负载详情可分配和可回收颜色，最小保底为圆形）
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final barHeight = 10.ap;
+                        final totalWidth = constraints.maxWidth;
+                        final gap = 4.ap;
+                        final availableWidth = max(0.0, totalWidth - gap);
+                        final minBarWidth = barHeight;
+
+                        double reclaimableW;
+                        double inUseW;
+
+                        if (totalMem > 0 && availableWidth > minBarWidth * 2) {
+                          final rawReclaim = availableWidth * (_reclaimable / totalMem);
+                          reclaimableW = rawReclaim.clamp(minBarWidth, availableWidth - minBarWidth);
+                          inUseW = max(minBarWidth, availableWidth - reclaimableW);
+                        } else {
+                          reclaimableW = minBarWidth;
+                          inUseW = max(minBarWidth, availableWidth - minBarWidth);
+                        }
+
+                        return Row(
+                          children: [
+                            SizedBox(
+                              width: inUseW,
+                              height: barHeight,
+                              child: DecoratedBox(
+                                decoration: ShapeDecoration(
+                                  color: context.colorScheme.primary,
+                                  shape: SuperellipseBorder(
+                                    borderRadius: BorderRadius.circular(100),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: gap),
+                            SizedBox(
+                              width: reclaimableW,
+                              height: barHeight,
+                              child: DecoratedBox(
+                                decoration: ShapeDecoration(
+                                  color: context.colorScheme.tertiary,
+                                  shape: SuperellipseBorder(
+                                    borderRadius: BorderRadius.circular(100),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                    // 内存总数值（写总内存，非等宽、非加粗；MB单位颜色对齐流量统计组件）
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: _memoryValue.showValue,
+                            style: context.textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.normal,
+                              fontSize: 22.ap,
+                              height: 1.15,
+                              color: context.colorScheme.onSurface,
+                            ),
+                          ),
+                          const TextSpan(text: ' '),
+                          TextSpan(
+                            text: _memoryValue.showUnit,
+                            style: (context.textTheme.bodyMedium?.toLighter ??
+                                    context.textTheme.bodyMedium?.copyWith(
+                                      color: context.colorScheme.onSurface.opacity60,
+                                    ))
+                                ?.copyWith(
+                              fontWeight: FontWeight.normal,
+                              fontSize: 14.ap,
+                              height: 1.15,
+                            ),
+                          ),
+                        ],
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
