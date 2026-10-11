@@ -415,10 +415,9 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
           style: isMasked
               ? context.textTheme.bodyMedium?.copyWith(
                   color: context.colorScheme.success.opacity80,
-                ).toJetBrainsMono.adjustSize(1)
+                ).adjustSize(1)
               : context.textTheme.bodyMedium?.toLight
-                  .adjustSize(1)
-                  .toJetBrainsMono,
+                  .adjustSize(1),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
