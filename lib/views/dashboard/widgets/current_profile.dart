@@ -99,27 +99,45 @@ class _CurrentProfileState extends ConsumerState<CurrentProfile> {
     }
   }
 
+  Future<void> _handleForceGC(BuildContext context) async {
+    final result = await globalState.showCommonDialog<bool>(
+      child: CommonDialog(
+        title: appLocalizations.forceGCTitle,
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context, rootNavigator: true).pop(false);
+            },
+            child: Text(appLocalizations.cancel),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context, rootNavigator: true).pop(true);
+            },
+            child: Text(appLocalizations.confirm),
+          ),
+        ],
+        child: Text(appLocalizations.forceGCDesc),
+      ),
+    );
+
+    if (result == true) {
+      await clashCore.requestGc(forceFreeOSMemory: true);
+      globalState.showNotifier(appLocalizations.success);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final profile = ref.watch(currentProfileProvider);
     final totalMem = _inUse + _reclaimable;
-    final int flexInUse;
-    final int flexReclaim;
-
-    if (totalMem > 0) {
-      flexInUse = max((_inUse / totalMem * 100).round(), 1);
-      flexReclaim = max((_reclaimable / totalMem * 100).round(), 1);
-    } else {
-      flexInUse = 70;
-      flexReclaim = 30;
-    }
 
     return SizedBox(
       height: getWidgetHeight(2),
       child: CommonCard(
         padding: EdgeInsets.zero,
         onPressed: () => showCoreStatusDialog(context),
-        onLongPress: () => showCoreStatusDialog(context),
+        onLongPress: () => _handleForceGC(context),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -185,37 +203,59 @@ class _CurrentProfileState extends ConsumerState<CurrentProfile> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            // 双色水平进度条（内核负载详情可分配和可回收颜色）
+            // 双色水平进度条（内核负载详情可分配和可回收颜色，最小保底为圆形）
             Padding(
               padding: EdgeInsets.fromLTRB(16.ap, 6.ap, 16.ap, 0),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: flexInUse,
-                    child: Container(
-                      height: 10.ap,
-                      decoration: ShapeDecoration(
-                        color: context.colorScheme.primary,
-                        shape: SuperellipseBorder(
-                          borderRadius: BorderRadius.circular(100),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final barHeight = 10.ap;
+                  final totalWidth = constraints.maxWidth;
+                  final gap = 4.ap;
+                  final availableWidth = max(0.0, totalWidth - gap);
+                  final minBarWidth = barHeight;
+
+                  double reclaimableW;
+                  double inUseW;
+
+                  if (totalMem > 0 && availableWidth > minBarWidth * 2) {
+                    final rawReclaim = availableWidth * (_reclaimable / totalMem);
+                    reclaimableW = rawReclaim.clamp(minBarWidth, availableWidth - minBarWidth);
+                    inUseW = max(minBarWidth, availableWidth - reclaimableW);
+                  } else {
+                    reclaimableW = minBarWidth;
+                    inUseW = max(minBarWidth, availableWidth - minBarWidth);
+                  }
+
+                  return Row(
+                    children: [
+                      SizedBox(
+                        width: inUseW,
+                        height: barHeight,
+                        child: DecoratedBox(
+                          decoration: ShapeDecoration(
+                            color: context.colorScheme.primary,
+                            shape: SuperellipseBorder(
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  SizedBox(width: 4.ap),
-                  Expanded(
-                    flex: flexReclaim,
-                    child: Container(
-                      height: 10.ap,
-                      decoration: ShapeDecoration(
-                        color: context.colorScheme.tertiary,
-                        shape: SuperellipseBorder(
-                          borderRadius: BorderRadius.circular(100),
+                      SizedBox(width: gap),
+                      SizedBox(
+                        width: reclaimableW,
+                        height: barHeight,
+                        child: DecoratedBox(
+                          decoration: ShapeDecoration(
+                            color: context.colorScheme.tertiary,
+                            shape: SuperellipseBorder(
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                ],
+                    ],
+                  );
+                },
               ),
             ),
             // 内存总数值（写总内存，非等宽、非加粗、紧凑上提，底部留白充足）
