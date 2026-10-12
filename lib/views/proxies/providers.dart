@@ -128,65 +128,59 @@ class _ProvidersBodyState extends ConsumerState<ProvidersBody> {
         ),
     ];
 
-    return Builder(
-          builder: (context) {
-            final bottomPadding = MediaQuery.of(context).padding.bottom;
-            final itemCount = sections.fold<int>(
-              0,
-              (sum, section) => sum + 1 + section.providers.length,
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final itemCount = sections.fold<int>(
+      0,
+      (sum, section) => sum + 1 + section.providers.length,
+    );
+    return ListView.builder(
+      padding: EdgeInsets.only(bottom: 24 + bottomPadding, top: 12),
+      itemCount: itemCount,
+      itemBuilder: (context, index) {
+        var current = 0;
+        for (final section in sections) {
+          if (index == current) {
+            return ListHeader(
+              title: section.title,
+              padding: sectionHeaderPadding(isFirst: current == 0),
+              actions: [
+                IconButton(
+                  onPressed: section.onSync,
+                  tooltip: appLocalizations.update,
+                  icon: const Icon(FluentIcons.arrow_sync_24_regular),
+                  iconSize: 20,
+                  splashRadius: 20,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+              ],
             );
-            return ListView.builder(
-              padding: EdgeInsets.only(bottom: 24 + bottomPadding, top: 12),
-              itemCount: itemCount,
-              itemBuilder: (context, index) {
-                var current = 0;
-                for (final section in sections) {
-                  if (index == current) {
-                    return ListHeader(
-                      title: section.title,
-                      padding: sectionHeaderPadding(isFirst: current == 0),
-                      actions: [
-                        IconButton(
-                          onPressed: section.onSync,
-                          tooltip: appLocalizations.update,
-                          icon: const Icon(FluentIcons.arrow_sync_24_regular),
-                          iconSize: 20,
-                          splashRadius: 20,
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        ),
-                      ],
-                    );
-                  }
-                  current++;
-                  if (index < current + section.providers.length) {
-                    final providerIndex = index - current;
-                    final provider = section.providers[providerIndex];
-                    // Mirror SectionContainer's 5dp inset around the card.
-                    return Padding(
-                      padding: EdgeInsets.only(
-                        top: providerIndex == 0 ? 5 : 0,
-                        bottom: providerIndex == section.providers.length - 1
-                            ? 5
-                            : 0,
-                      ),
-                      child: ContinuousListItem(
-                        index: providerIndex,
-                        count: section.providers.length,
-                        child: ProviderItem(
-                          key: ValueKey(provider.name),
-                          provider: provider,
-                        ),
-                      ),
-                    );
-                  }
-                  current += section.providers.length;
-                }
-                return const SizedBox.shrink();
-              },
+          }
+          current++;
+          if (index < current + section.providers.length) {
+            final providerIndex = index - current;
+            final provider = section.providers[providerIndex];
+            // Mirror SectionContainer's 5dp inset around the card.
+            return Padding(
+              padding: EdgeInsets.only(
+                top: providerIndex == 0 ? 5 : 0,
+                bottom: providerIndex == section.providers.length - 1
+                    ? 5
+                    : 0,
+              ),
+              child: ContinuousListItem(
+                index: providerIndex,
+                count: section.providers.length,
+                child: ProviderItem(
+                  key: ValueKey(provider.name),
+                  provider: provider,
+                ),
+              ),
             );
-          },
-        );
+          }
+          current += section.providers.length;
+        }
+        return const SizedBox.shrink();
       },
     );
   }
