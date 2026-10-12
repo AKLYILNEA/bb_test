@@ -19,7 +19,7 @@ class AccessControlSwitch extends ConsumerWidget {
           type: type,
           title: appLocalizations.appAccessControl,
           body: const AccessView(),
-          showScrollGradient: false,
+          showScrollGradient: true,
         );
       },
     );

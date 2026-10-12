@@ -308,22 +308,27 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
     return DecoratedBox(
       decoration: ShapeDecoration(
         color: context.colorScheme.surfaceContainerHighest,
-        shape: SuperellipseBorder(
-          borderRadius: BorderRadius.circular(6),
+        shape: const SuperellipseBorder(
+          borderRadius: BorderRadius.all(Radius.circular(6)),
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
         child: Row(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(icon, size: 12, color: context.colorScheme.onSurfaceVariant),
-            const SizedBox(width: 3),
-            Text(
-              label,
-              style: context.textTheme.labelSmall?.copyWith(
-                color: context.colorScheme.onSurfaceVariant,
-                height: 1.1,
+            const SizedBox(width: 3.5),
+            Padding(
+              padding: const EdgeInsets.only(top: 1.5),
+              child: Text(
+                label,
+                style: context.textTheme.labelSmall?.copyWith(
+                  color: context.colorScheme.onSurfaceVariant,
+                  height: 1.0,
+                  leadingDistribution: TextLeadingDistribution.even,
+                ),
               ),
             ),
           ],

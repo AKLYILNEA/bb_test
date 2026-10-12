@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'button.dart';
 import 'chip.dart';
 import 'keyboard_inset_hold.dart';
 import 'text.dart';
@@ -315,7 +316,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
     _keywordsNotifier.value = keywords;
   }
 
-  Widget? _buildLeading([bool canPop = false]) {
+  Widget? _buildLeadingButton([bool canPop = false]) {
     if (_isEdit) {
       return IconButton(
         onPressed: _appBarState.value.editState?.onExit,
@@ -334,11 +335,23 @@ class CommonScaffoldState extends State<CommonScaffold> {
       return widget.leading;
     }
     if (canPop) {
-      return BackButton(
+      return IconButton(
         onPressed: () => Navigator.maybePop(context),
+        icon: const Icon(FluentIcons.arrow_left_24_regular),
+        tooltip: appLocalizations.back,
       );
     }
     return null;
+  }
+
+  Widget? _buildLeading([bool canPop = false]) {
+    final button = _buildLeadingButton(canPop);
+    if (button == null) return null;
+    return Center(
+      child: ElasticPress(
+        child: button,
+      ),
+    );
   }
 
   Widget _buildTitle(AppBarSearchState? startState) {
@@ -375,14 +388,16 @@ class CommonScaffoldState extends State<CommonScaffold> {
   List<Widget> _buildActions(bool hasSearch, List<Widget> actions) {
     if (_isSearch) {
       return genActions([
-        IconButton(
-          onPressed: _handleClear,
-          icon: const Icon(FluentIcons.dismiss_24_regular),
-          tooltip: appLocalizations.clear,
+        ElasticPress(
+          child: IconButton(
+            onPressed: _handleClear,
+            icon: const Icon(FluentIcons.dismiss_24_regular),
+            tooltip: appLocalizations.clear,
+          ),
         ),
       ]);
     }
-    return genActions([
+    final shown = <Widget>[
       if (hasSearch)
         IconButton(
           onPressed: () {
@@ -398,11 +413,24 @@ class CommonScaffoldState extends State<CommonScaffold> {
           tooltip: appLocalizations.search,
         ),
       ...actions,
+    ];
+    final grouped = shown.length > 1 ? shown.take(2).toList() : null;
+    return genActions([
+      if (grouped != null)
+        TonalButtonGroup(
+          children: [
+            for (final action in grouped) action,
+          ],
+        ),
+      for (final action in shown.skip(grouped?.length ?? 0))
+        ElasticPress(
+          child: action,
+        ),
     ]);
   }
 
   Widget _buildAppBarWrap(Widget child) {
-    final appBar = _isSearch ? _buildSearchingAppBarTheme(child) : child;
+    final themedBar = _isSearch ? _buildSearchingAppBarTheme(child) : child;
     if (_isEdit || _isSearch) {
       return SystemBackBlock(
         child: CommonPopScope(
@@ -414,11 +442,11 @@ class CommonScaffoldState extends State<CommonScaffold> {
             }
             return true;
           },
-          child: appBar,
+          child: themedBar,
         ),
       );
     }
-    return appBar;
+    return themedBar;
   }
 
   Widget _buildLoading() {
@@ -439,14 +467,15 @@ class CommonScaffoldState extends State<CommonScaffold> {
       child: Stack(
         alignment: Alignment.bottomCenter,
         children: [
-          widget.appBar ??
-              ValueListenableBuilder<AppBarState>(
+          TonalButtonTheme(
+            child: widget.appBar ??
+                ValueListenableBuilder<AppBarState>(
                 valueListenable: _appBarState,
                 builder: (context, state, _) {
                   final parentRoute = ModalRoute.of(context);
                   final canPop = parentRoute?.canPop ?? false;
                   final leading = _buildLeading(canPop);
-                  final hasLeading = leading != null || canPop;
+                  final hasLeading = leading != null;
                   return _buildAppBarWrap(
                     AppBar(
                       backgroundColor:
@@ -455,16 +484,9 @@ class CommonScaffoldState extends State<CommonScaffold> {
                       surfaceTintColor: Colors.transparent,
                       scrolledUnderElevation: 0,
                       centerTitle: widget.centerTitle ?? false,
-                      leading: leading != null
-                          ? Padding(
-                              padding: const EdgeInsets.only(left: 2.0),
-                              child: Center(
-                                child: leading,
-                              ),
-                            )
-                          : null,
-                      leadingWidth: hasLeading ? 58.0 : null,
-                      titleSpacing: hasLeading ? 0.0 : 18.0,
+                      leading: leading,
+                      leadingWidth: hasLeading ? 72.0 : null,
+                      titleSpacing: hasLeading ? 0.0 : 16.0,
                       title: _buildTitle(state.searchState),
                       actions: _buildActions(
                         state.searchState != null,
@@ -476,6 +498,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
                   );
                 },
               ),
+          ),
           _buildLoading(),
         ],
       ),
@@ -528,7 +551,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
             child: ScrollFeatherTheme(
               surfaceColor: widget.backgroundColor ??
                   Theme.of(context).colorScheme.surfaceContainer,
-              child: (widget.showScrollGradient ?? true)
+              child: (widget.showScrollGradient ?? false)
                   ? ScrollConfiguration(
                       behavior: const FeatherBarScrollBehavior(),
                       child: widget.body,
@@ -567,8 +590,8 @@ class CommonScaffoldState extends State<CommonScaffold> {
 
 List<Widget> genActions(List<Widget> actions, {double? space}) {
   return <Widget>[
-    ...actions.separated(SizedBox(width: space ?? 4)),
-    const SizedBox(width: 10),
+    ...actions.separated(SizedBox(width: space ?? 8)),
+    const SizedBox(width: 16),
   ];
 }
 

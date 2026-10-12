@@ -22,7 +22,7 @@ class CommonScrollBar extends StatelessWidget {
     required this.controller,
     this.trackVisibility = false,
     this.thumbVisibility = false,
-    this.feather = true,
+    this.feather = false,
   });
 
   @override

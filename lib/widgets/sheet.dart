@@ -6,6 +6,7 @@ import 'package:bett_box/models/models.dart';
 import 'package:bett_box/state.dart';
 import 'package:flutter/material.dart';
 
+import 'button.dart';
 import 'scaffold.dart';
 import 'side_sheet.dart';
 import 'text.dart';
@@ -231,19 +232,20 @@ class AdaptiveSheetScaffold extends StatelessWidget {
     final hasLeading = leading != null || (implyLeading && canPop);
     final effectiveLeading =
         leading ?? (implyLeading && canPop ? const BackButton() : null);
+    final allActions = [
+      if (actions.isEmpty && sideSheet) const CloseButton(),
+      ...actions,
+    ];
+    final groupedActions =
+        allActions.length > 1 ? allActions.take(2).toList() : null;
     final appBar = AppBar(
       leading: effectiveLeading != null
-          ? Padding(
-              padding: const EdgeInsets.only(left: 2.0),
-              child: Center(
-                child: effectiveLeading,
-              ),
-            )
+          ? Center(child: ElasticPress(child: effectiveLeading))
           : null,
-      leadingWidth: hasLeading ? 58.0 : null,
+      leadingWidth: hasLeading ? 72.0 : null,
       forceMaterialTransparency: bottomSheet,
       automaticallyImplyLeading: false,
-      titleSpacing: hasLeading ? 0.0 : (bottomSheet ? null : 18.0),
+      titleSpacing: hasLeading ? 0.0 : (bottomSheet ? null : 16.0),
       centerTitle: bottomSheet,
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -253,8 +255,16 @@ class AdaptiveSheetScaffold extends StatelessWidget {
         title,
       ),
       actions: genActions([
-        if (actions.isEmpty && sideSheet) const CloseButton(),
-        ...actions,
+        if (groupedActions != null)
+          TonalButtonGroup(
+            children: [
+              for (final action in groupedActions) action,
+            ],
+          ),
+        for (final action in allActions.skip(groupedActions?.length ?? 0))
+          ElasticPress(
+            child: action,
+          ),
       ]),
     );
     final content = bottomSheet
@@ -285,12 +295,12 @@ class AdaptiveSheetScaffold extends StatelessWidget {
                       ),
                     ),
                   ),
-                  appBar,
+                  TonalButtonTheme(child: appBar),
                   Flexible(
                     flex: 1,
                     child: ScrollFeatherTheme(
                       surfaceColor: backgroundColor,
-                      child: (showScrollGradient ?? true)
+                      child: (showScrollGradient ?? false)
                           ? ScrollConfiguration(
                               behavior: const FeatherBarScrollBehavior(),
                               child: body,

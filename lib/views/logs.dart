@@ -111,18 +111,12 @@ class _LogsViewState extends ConsumerState<LogsView>
           icon: const Icon(FluentIcons.settings_24_regular),
           tooltip: appLocalizations.logLevel,
         ),
-        Tooltip(
-          message: appLocalizations.export,
-          child: InkWell(
-            onTap: _handleExport,
-            onLongPress: _handleClearLogs,
-            customBorder: const SuperellipseBorder(
-              borderRadius: BorderRadius.all(Radius.circular(22)),
-            ),
-            child: const Padding(
-              padding: EdgeInsets.all(12),
-              child: Icon(FluentIcons.save_edit_24_regular, size: 24),
-            ),
+        GestureDetector(
+          onLongPress: _handleClearLogs,
+          child: IconButton(
+            onPressed: _handleExport,
+            icon: const Icon(FluentIcons.save_edit_24_regular),
+            tooltip: appLocalizations.export,
           ),
         ),
       ],
@@ -145,8 +139,6 @@ class _LogsViewState extends ConsumerState<LogsView>
               final log = logs[index];
               return LogItem(
                 key: ValueKey(log.dateTime),
-                index: index,
-                count: logs.length,
                 log: log,
                 onClick: (value) {
                   context.commonScaffoldState?.addKeyword(value);
@@ -174,23 +166,22 @@ class _LogBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final styles = RecordTextStyles.of(context);
     final route = payload.route;
     if (route == null) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          EmojiText(
+          SelectableText(
             payload.message,
-            style: context.textTheme.bodyMedium,
+            style: styles.primary,
           ),
           if (payload.tag.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 2),
               child: Text(
                 payload.tag,
-                style: context.textTheme.bodySmall?.copyWith(
-                  color: context.colorScheme.onSurfaceVariant,
-                ),
+                style: styles.muted,
               ),
             ),
         ],
@@ -201,33 +192,29 @@ class _LogBody extends StatelessWidget {
         children: [
           TextSpan(
             text: route.destination,
-            style: context.textTheme.bodyMedium?.copyWith(
+            style: styles.primary?.copyWith(
               fontWeight: FontWeight.w600,
             ),
           ),
           if (route.error.isNotEmpty)
             TextSpan(
               text: '\n${route.error}',
-              style: context.textTheme.bodySmall?.copyWith(color: errorColor),
+              style: styles.secondary?.copyWith(color: errorColor),
             ),
           const TextSpan(text: '\n'),
           if (route.rule.isNotEmpty) ...[
             TextSpan(
               text: route.rule,
-              style: context.textTheme.bodySmall?.copyWith(
-                color: context.colorScheme.onSurfaceVariant,
-              ),
+              style: styles.secondary,
             ),
             TextSpan(
               text: ' \u2192 ',
-              style: context.textTheme.bodySmall?.copyWith(
-                color: context.colorScheme.onSurfaceVariant,
-              ).toJetBrainsMono,
+              style: styles.muted?.toJetBrainsMono,
             ),
           ],
           TextSpan(
             text: route.proxy,
-            style: context.textTheme.bodySmall?.copyWith(
+            style: styles.secondary?.copyWith(
               color: context.colorScheme.primary,
               fontWeight: FontWeight.w600,
             ),
@@ -235,9 +222,7 @@ class _LogBody extends StatelessWidget {
           if (_sourceText.isNotEmpty)
             TextSpan(
               text: '\n$_sourceText',
-              style: context.textTheme.labelSmall?.copyWith(
-                color: context.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-              ),
+              style: styles.muted,
             ),
         ],
       ),
@@ -248,53 +233,63 @@ class _LogBody extends StatelessWidget {
 class LogItem extends StatelessWidget {
   final Log log;
   final Function(String)? onClick;
-  final int index;
-  final int count;
-  final bool reversed;
 
   const LogItem({
     super.key,
     required this.log,
     this.onClick,
-    required this.index,
-    required this.count,
-    this.reversed = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final tone = switch (log.logLevel) {
+      LogLevel.warning => RecordTone.warning,
+      LogLevel.error => RecordTone.error,
+      LogLevel.info => RecordTone.neutral,
+      LogLevel.debug || LogLevel.silent => RecordTone.muted,
+    };
     final payload = LogPayload.parse(log.payload);
-    return RepaintBoundary(
-      child: ContinuousListItem(
-        index: index,
-        count: count,
-        reversed: reversed,
-        standalone: true,
-        child: ListItem(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    final accentColor = tone.accentColor(context);
+    final cardBgColor = tone.tintColor(context) ??
+        context.colorScheme.surfaceContainer;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: DecoratedBox(
+        decoration: ShapeDecoration(
+          color: cardBgColor,
+          shape: SuperellipseBorder(
+            borderRadius: const BorderRadius.all(Radius.circular(16)),
+            side: commonCardBorderSide(context),
+          ),
+        ),
+        child: InkWell(
+          customBorder: const SuperellipseBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+          ),
           onTap: () {
             globalState.showCommonDialog(child: LogDetailDialog(log: log));
           },
-          title: _LogBody(
-            payload: payload,
-            errorColor: context.colorScheme.error,
-          ),
-          subtitle: Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                CommonChip(
-                  onPressed: () {
-                    onClick?.call(log.logLevel.name);
-                  },
-                  label: log.logLevel.name,
+                RecordHeader(
+                  children: [
+                    RecordTimestamp(log.dateTime),
+                    RecordLabel(
+                      label: log.logLevel.name,
+                      tone: tone,
+                      onPressed: () => onClick?.call(log.logLevel.name),
+                    ),
+                  ],
                 ),
-                Text(
-                  log.dateTime,
-                  style: context.textTheme.bodySmall?.copyWith(
-                    color: context.colorScheme.onSurface.opacity80,
-                  ),
+                const SizedBox(height: 8),
+                _LogBody(
+                  payload: payload,
+                  errorColor: accentColor ?? context.colorScheme.error,
                 ),
               ],
             ),

@@ -261,7 +261,7 @@ class _ToolViewState extends ConsumerState<ToolsView> {
             context,
             appLocalizations.appAccessControl,
             const AccessView(),
-            showScrollGradient: false,
+            showScrollGradient: true,
           ),
         ),
       _SearchItem(
@@ -1578,7 +1578,7 @@ class _AccessItem extends StatelessWidget {
       delegate: NextDelegate(
         title: appLocalizations.appAccessControl,
         builder: (_) => const AccessView(),
-        showScrollGradient: false,
+        showScrollGradient: true,
       ),
     );
   }
