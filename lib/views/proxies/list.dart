@@ -143,7 +143,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList>
     final offsets = <double>[];
     final rowExtent = getItemHeight(cardType) + 8.0;
     const headerExtent = 72.0;
-    var currentOffset = 8.0;
+    var currentOffset = 16.0;
     for (final group in groups) {
       offsets.add(currentOffset);
       currentOffset += headerExtent;
@@ -380,7 +380,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList>
             controller: _scrollController,
             cacheExtent: arrivalScrollCacheExtent(routeSettled, 150.0),
             slivers: [
-              const PinnedHeaderSliver(child: SizedBox(height: 8)),
+              const PinnedHeaderSliver(child: SizedBox(height: 16)),
               for (var i = 0; i < widget.groups.length; i++)
                 _buildGroup(
                   context,

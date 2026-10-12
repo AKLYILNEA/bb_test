@@ -112,47 +112,38 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
     );
   }
 
-  List<Widget> _buildActions() {
+  List<Widget> _buildActions(bool isEdit) {
     final showStartSwitch = ref.watch(
       appSettingProvider.select((state) => state.showStartSwitch),
     );
     return [
-      _buildIsEdit((isEdit) {
-        return isEdit
-            ? ValueListenableBuilder(
-                valueListenable: _addedWidgetsNotifier,
-                builder: (_, addedChildren, child) {
-                  if (addedChildren.isEmpty) {
-                    return Container();
-                  }
-                  return child!;
-                },
-                child: IconButton(
-                  onPressed: () {
-                    _showAddWidgetsModal();
-                  },
-                  icon: const Icon(FluentIcons.add_circle_24_regular),
-                ),
-              )
-            : SizedBox();
-      }),
-      Material(
-        type: MaterialType.transparency,
-        shape: const CircleBorder(),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: _handleUpdateIsEdit,
-          onLongPress: () {
-            if (!_isEditNotifier.value) {
-              _showEditTitleDialog();
+      if (isEdit)
+        ValueListenableBuilder(
+          valueListenable: _addedWidgetsNotifier,
+          builder: (_, addedChildren, child) {
+            if (addedChildren.isEmpty) {
+              return const SizedBox.shrink();
             }
+            return child!;
           },
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: _buildIsEdit((isEdit) {
-              return isEdit ? const Icon(FluentIcons.save_24_regular) : const Icon(FluentIcons.edit_24_regular);
-            }),
+          child: IconButton(
+            onPressed: () {
+              _showAddWidgetsModal();
+            },
+            icon: const Icon(FluentIcons.add_circle_24_regular),
           ),
+        ),
+      GestureDetector(
+        onLongPress: () {
+          if (!_isEditNotifier.value) {
+            _showEditTitleDialog();
+          }
+        },
+        child: IconButton(
+          onPressed: _handleUpdateIsEdit,
+          icon: isEdit
+              ? const Icon(FluentIcons.save_24_regular)
+              : const Icon(FluentIcons.edit_24_regular),
         ),
       ),
       if (showStartSwitch)
@@ -258,26 +249,27 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
           .map((item) => item.widget)
           .toList();
     });
-    return CommonScaffold(
-      resizeToAvoidBottomInset: false,
-      title: customTitle ?? currentGreeting(),
-      titleWidget: customTitle == null ? const _GreetingTitle() : null,
-      actions: _buildActions(),
-      floatingActionButton: null,
-      body: Align(
-        alignment: Alignment.topCenter,
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(16).copyWith(
-            bottom:
-                16 +
-                (isMobileView ? getFloatingBottomBarReserveHeight(context) : 0),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildIsEdit((isEdit) {
-                if (isEdit) {
-                  return SystemBackBlock(
+    return _buildIsEdit((isEdit) {
+      return CommonScaffold(
+        resizeToAvoidBottomInset: false,
+        title: customTitle ?? currentGreeting(),
+        titleWidget: customTitle == null ? const _GreetingTitle() : null,
+        actions: _buildActions(isEdit),
+        floatingActionButton: null,
+        body: Align(
+          alignment: Alignment.topCenter,
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(16).copyWith(
+              top: 16 + (MediaQuery.paddingOf(context).top + kToolbarHeight),
+              bottom:
+                  16 +
+                  (isMobileView ? getFloatingBottomBarReserveHeight(context) : 0),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (isEdit)
+                  SystemBackBlock(
                     child: CommonPopScope(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -307,21 +299,20 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                         return false;
                       },
                     ),
-                  );
-                } else {
-                  return Grid(
+                  )
+                else
+                  Grid(
                     crossAxisCount: columns,
                     crossAxisSpacing: spacing,
                     mainAxisSpacing: spacing,
                     children: [...children],
-                  );
-                }
-              }),
-            ],
+                  ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
 

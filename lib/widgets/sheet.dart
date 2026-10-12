@@ -237,13 +237,14 @@ class AdaptiveSheetScaffold extends StatelessWidget {
       ...actions,
     ];
     final groupedActions =
-        allActions.length > 1 ? allActions.take(2).toList() : null;
+        allActions.length > 2 ? allActions.take(2).toList() : null;
     final appBar = AppBar(
+      clipBehavior: Clip.none,
       leading: effectiveLeading != null
           ? Center(child: ElasticPress(child: effectiveLeading))
           : null,
       leadingWidth: hasLeading ? 72.0 : null,
-      forceMaterialTransparency: bottomSheet,
+      forceMaterialTransparency: true,
       automaticallyImplyLeading: false,
       titleSpacing: hasLeading ? 0.0 : (bottomSheet ? null : 16.0),
       centerTitle: bottomSheet,

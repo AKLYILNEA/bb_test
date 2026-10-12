@@ -259,10 +259,12 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
       );
     }).toList();
     _keyMap = keyMap;
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+    return Padding(
+      padding: EdgeInsets.only(top: context.appBarInset),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
         NotificationListener<ScrollMetricsNotification>(
           onNotification: (scrollNotification) {
             _hasMoreButtonNotifier.value =
@@ -353,7 +355,8 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
           child: TabBarView(controller: _tabController, children: children),
         ),
       ],
-    );
+    ),
+  );
   }
 }
 

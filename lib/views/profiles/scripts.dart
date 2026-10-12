@@ -507,7 +507,7 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
         return CommonScrollBar(
           controller: null,
           child: ListView(
-            padding: const EdgeInsets.only(top: 12, bottom: 80),
+            padding: EdgeInsets.only(top: context.contentTopPadding, bottom: 80),
             children: [
               SectionContainer(
                 title: appLocalizations.myScripts,

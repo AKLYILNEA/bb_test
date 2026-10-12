@@ -414,7 +414,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
         ),
       ...actions,
     ];
-    final grouped = shown.length > 1 ? shown.take(2).toList() : null;
+    final grouped = shown.length > 2 ? shown.take(2).toList() : null;
     return genActions([
       if (grouped != null)
         TonalButtonGroup(
@@ -461,44 +461,59 @@ class CommonScaffoldState extends State<CommonScaffold> {
     );
   }
 
+  Widget _buildFloatingHeader(Widget appBar) {
+    final top = MediaQuery.paddingOf(context).top;
+    return FloatingHeader(
+      backgroundColor: widget.backgroundColor ?? Theme.of(context).colorScheme.surface,
+      fadeStart: top > 0 ? top / (top + kToolbarHeight) : 0.0,
+      overhang: 16.0,
+      child: appBar,
+    );
+  }
+
   PreferredSizeWidget _buildAppBar() {
+    final useFeather = widget.showScrollGradient ?? false;
+    final barFloats = !useFeather;
+    final childBar = TonalButtonTheme(
+      child: widget.appBar ??
+          ValueListenableBuilder<AppBarState>(
+            valueListenable: _appBarState,
+            builder: (context, state, _) {
+              final parentRoute = ModalRoute.of(context);
+              final canPop = parentRoute?.canPop ?? false;
+              final leading = _buildLeading(canPop);
+              final hasLeading = leading != null;
+              return _buildAppBarWrap(
+                AppBar(
+                  clipBehavior: Clip.none,
+                  forceMaterialTransparency: true,
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  surfaceTintColor: Colors.transparent,
+                  scrolledUnderElevation: 0,
+                  centerTitle: widget.centerTitle ?? false,
+                  leading: leading,
+                  leadingWidth: hasLeading ? 72.0 : null,
+                  titleSpacing: hasLeading ? 0.0 : 16.0,
+                  title: _buildTitle(state.searchState),
+                  actions: _buildActions(
+                    state.searchState != null,
+                    state.actions.isNotEmpty
+                        ? state.actions
+                        : widget.actions ?? [],
+                  ),
+                ),
+              );
+            },
+          ),
+    );
     return PreferredSize(
       preferredSize: const Size.fromHeight(kToolbarHeight),
       child: Stack(
         alignment: Alignment.bottomCenter,
+        clipBehavior: Clip.none,
         children: [
-          TonalButtonTheme(
-            child: widget.appBar ??
-                ValueListenableBuilder<AppBarState>(
-                valueListenable: _appBarState,
-                builder: (context, state, _) {
-                  final parentRoute = ModalRoute.of(context);
-                  final canPop = parentRoute?.canPop ?? false;
-                  final leading = _buildLeading(canPop);
-                  final hasLeading = leading != null;
-                  return _buildAppBarWrap(
-                    AppBar(
-                      backgroundColor:
-                          widget.backgroundColor ?? Colors.transparent,
-                      elevation: 0,
-                      surfaceTintColor: Colors.transparent,
-                      scrolledUnderElevation: 0,
-                      centerTitle: widget.centerTitle ?? false,
-                      leading: leading,
-                      leadingWidth: hasLeading ? 72.0 : null,
-                      titleSpacing: hasLeading ? 0.0 : 16.0,
-                      title: _buildTitle(state.searchState),
-                      actions: _buildActions(
-                        state.searchState != null,
-                        state.actions.isNotEmpty
-                            ? state.actions
-                            : widget.actions ?? [],
-                      ),
-                    ),
-                  );
-                },
-              ),
-          ),
+          barFloats ? _buildFloatingHeader(childBar) : childBar,
           _buildLoading(),
         ],
       ),
@@ -508,8 +523,10 @@ class CommonScaffoldState extends State<CommonScaffold> {
   @override
   Widget build(BuildContext context) {
     assert(widget.appBar != null || widget.title != null);
+    final useFeather = widget.showScrollGradient ?? false;
+    final barFloats = !useFeather;
     final body = SafeArea(
-      top: false,
+      top: !barFloats,
       bottom: false,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -523,12 +540,15 @@ class CommonScaffoldState extends State<CommonScaffold> {
                 });
               }
               if (keywords.isEmpty) {
-                return SizedBox();
+                return const SizedBox.shrink();
               }
+              final topPadding = barFloats ? context.contentTopPadding : 16.0;
               return Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 16,
+                padding: EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                  top: topPadding,
+                  bottom: 16,
                 ),
                 child: Wrap(
                   runSpacing: 8,
@@ -551,7 +571,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
             child: ScrollFeatherTheme(
               surfaceColor: widget.backgroundColor ??
                   Theme.of(context).colorScheme.surfaceContainer,
-              child: (widget.showScrollGradient ?? false)
+              child: useFeather
                   ? ScrollConfiguration(
                       behavior: const FeatherBarScrollBehavior(),
                       child: widget.body,
@@ -566,6 +586,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
       child: DesktopBackShortcutWrapper(
         child: Scaffold(
           appBar: _buildAppBar(),
+          extendBodyBehindAppBar: barFloats,
           body: body,
           resizeToAvoidBottomInset: widget.resizeToAvoidBottomInset ??
               (widget.floatingActionButton != null ? false : true),
@@ -577,7 +598,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
                 builder: (_, value, _) {
                   return IntrinsicWidth(
                     child: IntrinsicHeight(
-                      child: FadeScaleBox(child: value ?? SizedBox()),
+                      child: FadeScaleBox(child: value ?? const SizedBox.shrink()),
                     ),
                   );
                 },
@@ -621,3 +642,73 @@ class DesktopBackShortcutWrapper extends StatelessWidget {
     );
   }
 }
+
+/// Fades the surface behind [child] toward its foot so content reads through,
+/// easing out over [overhang] past the foot so the fade shows no edge.
+class FloatingHeader extends StatelessWidget {
+  const FloatingHeader({
+    super.key,
+    required this.backgroundColor,
+    this.fadeStart = 0.5,
+    this.overhang = 16.0,
+    required this.child,
+  });
+
+  static const _alpha = 0.9;
+  static const _fadeSteps = 8;
+
+  final Color backgroundColor;
+  final double fadeStart;
+  final double overhang;
+  final Widget child;
+
+  Gradient _scrimOf(double height) {
+    if (height <= 0) {
+      return LinearGradient(colors: [backgroundColor, backgroundColor]);
+    }
+    final start = ((height - overhang) * fadeStart / height).clamp(0.0, 1.0);
+    final stops = <double>[0];
+    final colors = <Color>[backgroundColor.withValues(alpha: _alpha)];
+    for (var i = 0; i <= _fadeSteps; i++) {
+      final t = i / _fadeSteps;
+      stops.add(start + (1 - start) * t);
+      colors.add(
+        backgroundColor.withValues(
+          alpha: _alpha * (1 - Curves.easeInOut.transform(t)),
+        ),
+      );
+    }
+    return LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      stops: stops,
+      colors: colors,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: -overhang,
+          child: IgnorePointer(
+            child: LayoutBuilder(
+              builder: (_, constraints) => DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: _scrimOf(constraints.maxHeight),
+                ),
+              ),
+            ),
+          ),
+        ),
+        child,
+      ],
+    );
+  }
+}
+

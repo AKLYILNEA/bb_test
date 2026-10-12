@@ -134,7 +134,10 @@ class _ProvidersBodyState extends ConsumerState<ProvidersBody> {
       (sum, section) => sum + 1 + section.providers.length,
     );
     return ListView.builder(
-      padding: EdgeInsets.only(bottom: 24 + bottomPadding, top: 12),
+      padding: EdgeInsets.only(
+        bottom: 24 + bottomPadding,
+        top: context.contentTopPadding,
+      ),
       itemCount: itemCount,
       itemBuilder: (context, index) {
         var current = 0;

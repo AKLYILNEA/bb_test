@@ -145,7 +145,7 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
               padding: EdgeInsets.only(
                 left: 16,
                 right: 16,
-                top: 16,
+                top: context.appBarInset + 16,
                 bottom:
                     (profilesSelectorState.profiles.isNotEmpty &&
                             profilesSelectorState.profiles.length % columns == 0

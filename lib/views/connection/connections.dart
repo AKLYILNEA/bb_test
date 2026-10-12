@@ -257,7 +257,7 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
               controller: _scrollController,
               child: ListView.builder(
                 controller: _scrollController,
-                padding: const EdgeInsets.only(bottom: 16, top: 8),
+                padding: EdgeInsets.only(bottom: 16, top: context.appBarInset + 8),
                 itemBuilder: (context, index) {
                   final trackerInfo = connections[index];
                   return TrackerInfoItem(

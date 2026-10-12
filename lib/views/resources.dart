@@ -201,7 +201,7 @@ class _ResourcesViewState extends ConsumerState<ResourcesView> {
         padding: EdgeInsets.only(
           bottom: (globalState.isAndroidTV ? 48.0 : 16.0) +
               MediaQuery.of(context).padding.bottom,
-          top: 12,
+          top: context.contentTopPadding,
         ),
         children: [
           ...generateSection(

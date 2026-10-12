@@ -134,7 +134,7 @@ class _LogsViewState extends ConsumerState<LogsView>
           child: ListView.builder(
             physics: const NextClampingScrollPhysics(),
             controller: _scrollController,
-            padding: const EdgeInsets.only(bottom: 16, top: 8),
+            padding: EdgeInsets.only(bottom: 16, top: context.appBarInset + 8),
             itemBuilder: (context, index) {
               final log = logs[index];
               return LogItem(

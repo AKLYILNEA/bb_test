@@ -908,7 +908,10 @@ Widget generateListView(List<Widget> items) {
       if (cleanItems.isEmpty) return const SizedBox.shrink();
 
       return ListView.builder(
-        padding: EdgeInsets.only(bottom: 24 + bottomPadding, top: 12),
+        padding: EdgeInsets.only(
+          bottom: 24 + bottomPadding,
+          top: context.contentTopPadding,
+        ),
         itemCount: cleanItems.length,
         itemBuilder: (context, index) {
           final item = cleanItems[index];

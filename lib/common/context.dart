@@ -40,6 +40,13 @@ extension BuildContextExtension on BuildContext {
     return appSize.width;
   }
 
+  /// How far a page's app bar reaches over the top of its body.
+  double get appBarInset =>
+      MediaQuery.paddingOf(this).top + kToolbarHeight;
+
+  /// Where a scaffold body's content starts: a gap clear of the bar.
+  double get contentTopPadding => appBarInset + 12;
+
   ColorScheme get colorScheme => Theme.of(this).colorScheme;
 
   bool get disableAnimations => MediaQuery.disableAnimationsOf(this);
