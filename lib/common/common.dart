@@ -18,6 +18,7 @@ export 'keyboard.dart';
 export 'launch.dart';
 export 'link.dart';
 export 'lock.dart';
+export 'log_payload.dart';
 export 'measure.dart';
 export 'mixin.dart';
 export 'navigation.dart';

@@ -190,10 +190,12 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (count <= 2 && result?.latency != null) ...[
+                  if (count <= 2) ...[
                     SizedBox(height: 2.ap),
                     Text(
-                      '${result!.latency}ms',
+                      result?.latency != null
+                          ? '${result!.latency}ms'
+                          : (isTesting ? '...' : '-'),
                       style: context.textTheme.bodySmall?.copyWith(
                         fontSize: (textFontSize - 2.ap).clamp(9.5.ap, 11.5.ap),
                         fontWeight: FontWeight.w500,

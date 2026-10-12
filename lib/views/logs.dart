@@ -116,7 +116,9 @@ class _LogsViewState extends ConsumerState<LogsView>
           child: InkWell(
             onTap: _handleExport,
             onLongPress: _handleClearLogs,
-            borderRadius: BorderRadius.circular(22),
+            customBorder: const SuperellipseBorder(
+              borderRadius: BorderRadius.all(Radius.circular(22)),
+            ),
             child: const Padding(
               padding: EdgeInsets.all(12),
               child: Icon(FluentIcons.save_edit_24_regular, size: 24),
@@ -159,6 +161,90 @@ class _LogsViewState extends ConsumerState<LogsView>
   }
 }
 
+class _LogBody extends StatelessWidget {
+  final LogPayload payload;
+  final Color? errorColor;
+
+  const _LogBody({required this.payload, this.errorColor});
+
+  String get _sourceText => [
+    payload.tag,
+    if (payload.route case final route?) ...[route.source, route.sourceDetail],
+  ].where((text) => text.isNotEmpty).join('  ·  ');
+
+  @override
+  Widget build(BuildContext context) {
+    final route = payload.route;
+    if (route == null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          EmojiText(
+            payload.message,
+            style: context.textTheme.bodyMedium,
+          ),
+          if (payload.tag.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Text(
+                payload.tag,
+                style: context.textTheme.bodySmall?.copyWith(
+                  color: context.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+        ],
+      );
+    }
+    return SelectableText.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: route.destination,
+            style: context.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          if (route.error.isNotEmpty)
+            TextSpan(
+              text: '\n${route.error}',
+              style: context.textTheme.bodySmall?.copyWith(color: errorColor),
+            ),
+          const TextSpan(text: '\n'),
+          if (route.rule.isNotEmpty) ...[
+            TextSpan(
+              text: route.rule,
+              style: context.textTheme.bodySmall?.copyWith(
+                color: context.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            TextSpan(
+              text: ' \u2192 ',
+              style: context.textTheme.bodySmall?.copyWith(
+                color: context.colorScheme.onSurfaceVariant,
+              ).toJetBrainsMono,
+            ),
+          ],
+          TextSpan(
+            text: route.proxy,
+            style: context.textTheme.bodySmall?.copyWith(
+              color: context.colorScheme.primary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          if (_sourceText.isNotEmpty)
+            TextSpan(
+              text: '\n$_sourceText',
+              style: context.textTheme.labelSmall?.copyWith(
+                color: context.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 class LogItem extends StatelessWidget {
   final Log log;
   final Function(String)? onClick;
@@ -177,6 +263,7 @@ class LogItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final payload = LogPayload.parse(log.payload);
     return RepaintBoundary(
       child: ContinuousListItem(
         index: index,
@@ -184,20 +271,16 @@ class LogItem extends StatelessWidget {
         reversed: reversed,
         standalone: true,
         child: ListItem(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           onTap: () {
             globalState.showCommonDialog(child: LogDetailDialog(log: log));
           },
-          title: EmojiText(
-            log.payload,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: context.textTheme.bodyLarge?.copyWith(
-              color: log.logLevel.color,
-            ),
+          title: _LogBody(
+            payload: payload,
+            errorColor: context.colorScheme.error,
           ),
           subtitle: Padding(
-            padding: const EdgeInsets.only(top: 10),
+            padding: const EdgeInsets.only(top: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -229,6 +312,7 @@ class LogDetailDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final payload = LogPayload.parse(log.payload);
     return CommonDialog(
       title: appLocalizations.details,
       actions: [
@@ -241,11 +325,16 @@ class LogDetailDialog extends StatelessWidget {
       ],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 6,
+        spacing: 8,
         children: [
+          _LogBody(
+            payload: payload,
+            errorColor: context.colorScheme.error,
+          ),
+          const Divider(),
           SelectableText(
             log.payload,
-            style: context.textTheme.bodyLarge?.copyWith(
+            style: context.textTheme.bodySmall?.toJetBrainsMono.copyWith(
               color: log.logLevel.color,
             ),
           ),

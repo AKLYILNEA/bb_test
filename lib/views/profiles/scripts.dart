@@ -304,6 +304,34 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
     }
   }
 
+  Widget _buildScriptTag({required IconData icon, required String label}) {
+    return DecoratedBox(
+      decoration: ShapeDecoration(
+        color: context.colorScheme.surfaceContainerHighest,
+        shape: SuperellipseBorder(
+          borderRadius: BorderRadius.circular(6),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 12, color: context.colorScheme.onSurfaceVariant),
+            const SizedBox(width: 3),
+            Text(
+              label,
+              style: context.textTheme.labelSmall?.copyWith(
+                color: context.colorScheme.onSurfaceVariant,
+                height: 1.1,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildContent() {
     return Consumer(
       builder: (context, ref, _) {
@@ -331,6 +359,27 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
                             _handleToEditor(script: script);
                           },
                     title: EmojiText(script.label),
+                    subtitle: ((script.url?.isNotEmpty ?? false) || script.isCompatibleWithBettbox)
+                        ? Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Wrap(
+                              spacing: 6,
+                              runSpacing: 4,
+                              children: [
+                                if (script.url?.isNotEmpty ?? false)
+                                  _buildScriptTag(
+                                    icon: FluentIcons.arrow_sync_24_regular,
+                                    label: appLocalizations.remote,
+                                  ),
+                                if (script.isCompatibleWithBettbox)
+                                  _buildScriptTag(
+                                    icon: FluentIcons.options_24_regular,
+                                    label: appLocalizations.custom,
+                                  ),
+                              ],
+                            ),
+                          )
+                        : null,
                     trailing: SizedBox(
                       height: 36,
                       width: 36,

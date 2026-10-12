@@ -17,25 +17,11 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 typedef UpdatingMap = Map<String, bool>;
 
-class ProvidersView extends ConsumerStatefulWidget {
-  final SheetType type;
-
-  const ProvidersView({super.key, required this.type});
-
-  @override
-  ConsumerState<ProvidersView> createState() => _ProvidersViewState();
-}
-
-class _ProvidersViewState extends ConsumerState<ProvidersView> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      globalState.appController.updateProviders();
-    });
-  }
-
-  Future<void> _updateProviders({String? type}) async {
+Future<void> updateExternalProviders(
+  WidgetRef ref,
+  BuildContext context, {
+  String? type,
+}) async {
     final allProviders = ref.read(providersProvider);
     final providers = type == null
         ? allProviders
@@ -78,6 +64,46 @@ class _ProvidersViewState extends ConsumerState<ProvidersView> {
     }
   }
 
+class ProvidersView extends ConsumerWidget {
+  final SheetType type;
+
+  const ProvidersView({super.key, required this.type});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return RepaintBoundary(
+      child: AdaptiveSheetScaffold(
+        actions: [
+          IconButton(
+            onPressed: () => updateExternalProviders(ref, context),
+            tooltip: appLocalizations.update,
+            icon: const Icon(FluentIcons.arrow_sync_24_regular),
+          ),
+        ],
+        type: type,
+        body: const ProvidersBody(),
+        title: appLocalizations.providers,
+      ),
+    );
+  }
+}
+
+class ProvidersBody extends ConsumerStatefulWidget {
+  const ProvidersBody({super.key});
+
+  @override
+  ConsumerState<ProvidersBody> createState() => _ProvidersBodyState();
+}
+
+class _ProvidersBodyState extends ConsumerState<ProvidersBody> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      globalState.appController.updateProviders();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final providers = ref.watch(providersProvider);
@@ -92,27 +118,17 @@ class _ProvidersViewState extends ConsumerState<ProvidersView> {
         (
           title: appLocalizations.proxyProviders,
           providers: proxyProviders,
-          onSync: () => _updateProviders(type: 'Proxy'),
+          onSync: () => updateExternalProviders(ref, context, type: 'Proxy'),
         ),
       if (ruleProviders.isNotEmpty)
         (
           title: appLocalizations.ruleProviders,
           providers: ruleProviders,
-          onSync: () => _updateProviders(type: 'Rule'),
+          onSync: () => updateExternalProviders(ref, context, type: 'Rule'),
         ),
     ];
 
-    return RepaintBoundary(
-      child: AdaptiveSheetScaffold(
-        actions: [
-          IconButton(
-            onPressed: _updateProviders,
-            tooltip: appLocalizations.update,
-            icon: const Icon(FluentIcons.arrow_sync_24_regular),
-          ),
-        ],
-        type: widget.type,
-        body: Builder(
+    return Builder(
           builder: (context) {
             final bottomPadding = MediaQuery.of(context).padding.bottom;
             final itemCount = sections.fold<int>(
@@ -170,9 +186,8 @@ class _ProvidersViewState extends ConsumerState<ProvidersView> {
               },
             );
           },
-        ),
-        title: appLocalizations.providers,
-      ),
+        );
+      },
     );
   }
 }

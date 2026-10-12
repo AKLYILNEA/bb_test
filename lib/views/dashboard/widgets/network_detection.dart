@@ -267,47 +267,51 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
                             padding: baseInfoEdgeInsets.copyWith(top: 0, right: 0),
                             child: SizedBox(
                               height: globalState.measure.bodyMediumHeight + 2,
-                              child: isLoading
-                                  ? Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: OverflowBox(
+                              child: FadeThroughBox(
+                                child: isLoading
+                                    ? Align(
+                                        key: const ValueKey('loading'),
                                         alignment: Alignment.centerLeft,
-                                        maxWidth: 32,
-                                        maxHeight: 16,
-                                        child: SpinKitThreeBounce(
-                                          color: context.colorScheme.primary,
-                                          size: 14,
+                                        child: OverflowBox(
+                                          alignment: Alignment.centerLeft,
+                                          maxWidth: 32,
+                                          maxHeight: 16,
+                                          child: SpinKitThreeBounce(
+                                            color: context.colorScheme.primary,
+                                            size: 14,
+                                          ),
                                         ),
+                                      )
+                                    : Row(
+                                        key: const ValueKey('loaded'),
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Flexible(
+                                            child: _buildIpContent(
+                                              context,
+                                              state,
+                                              ipInfo,
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                                            child: Container(
+                                              width: 1.0,
+                                              height: 12.ap,
+                                              color: context.colorScheme.outlineVariant.withValues(alpha: 0.6),
+                                            ),
+                                          ),
+                                          Text(
+                                            displayStart ? _formatRunTime(runTime) : '00:00:00',
+                                            style: context.textTheme.bodyMedium?.toLight
+                                                .adjustSize(1)
+                                                .toJetBrainsMono,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
                                       ),
-                                    )
-                                  : Row(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        Flexible(
-                                          child: _buildIpContent(
-                                            context,
-                                            state,
-                                            ipInfo,
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                                          child: Container(
-                                            width: 1.0,
-                                            height: 12.ap,
-                                            color: context.colorScheme.outlineVariant.withValues(alpha: 0.6),
-                                          ),
-                                        ),
-                                        Text(
-                                          displayStart ? _formatRunTime(runTime) : '00:00:00',
-                                          style: context.textTheme.bodyMedium?.toLight
-                                              .adjustSize(1)
-                                              .toJetBrainsMono,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
-                                    ),
+                              ),
                             ),
                           ),
                         ],
@@ -415,7 +419,7 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
           style: isMasked
               ? context.textTheme.bodyMedium?.copyWith(
                   color: context.colorScheme.success.opacity80,
-                ).adjustSize(1)
+                ).adjustSize(1).toJetBrainsMono
               : context.textTheme.bodyMedium?.toLight
                   .adjustSize(1),
           maxLines: 1,
