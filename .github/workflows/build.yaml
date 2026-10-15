@@ -79,14 +79,45 @@ jobs:
 
       - name: Setup Keystore (Android)
         if: matrix.platform == 'android'
+        env:
+          SECRET_BETTBOX: ${{ secrets.BETTBOX }}
+          SECRET_KEYSTORE: ${{ secrets.KEYSTORE }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          KEYSTORE_CONTENT="${{ secrets.BETTBOX || secrets.KEYSTORE }}"
-          if [ -n "$KEYSTORE_CONTENT" ]; then
-            echo "$KEYSTORE_CONTENT" | base64 --decode > android/app/keystore.jks
-            echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/local.properties
-            echo "storePassword=${{ secrets.STORE_PASSWORD }}" >> android/local.properties
-            echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/local.properties
-          fi
+          python3 - << 'EOF'
+          import os, base64
+
+          def try_decode(val):
+              if not val:
+                  return None
+              cleaned = "".join(val.split())
+              try:
+                  decoded = base64.b64decode(cleaned, validate=False)
+                  if len(decoded) > 500:
+                      return decoded
+              except Exception:
+                  pass
+              return None
+
+          keystore_data = try_decode(os.environ.get("SECRET_BETTBOX")) or try_decode(os.environ.get("SECRET_KEYSTORE"))
+
+          if keystore_data:
+              os.makedirs("android/app", exist_ok=True)
+              with open("android/app/keystore.jks", "wb") as f:
+                  f.write(keystore_data)
+              
+              alias = os.environ.get("KEY_ALIAS") or "bettbox"
+              store_pass = os.environ.get("STORE_PASSWORD") or "bettboxpassword"
+              key_pass = os.environ.get("KEY_PASSWORD") or "bettboxpassword"
+
+              with open("android/local.properties", "a", encoding="utf-8") as f:
+                  f.write(f"\nkeyAlias={alias}\nstorePassword={store_pass}\nkeyPassword={key_pass}\n")
+              print(f"Keystore restored successfully ({len(keystore_data)} bytes).")
+          else:
+              print("No valid keystore secret found, skipping.")
+          EOF
           
       - name: Setup Java (Android)
         if: matrix.platform == 'android'
